@@ -10,4 +10,4 @@ editor_options:
 
 Welcome to my research website.
 
-Click on this [link](pbmc_purified_results.html) to see my results.
+[PBMC Purified Results](pbmc_purified_results.html)
