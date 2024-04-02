@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2024-04-02" />
+
+<title>PBMC Purified Analysis</title>
+
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">PBMC Purified Analysis</h1>
+<h4 class="date">2024-04-02</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-04-02
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree853af83cb0151cb3c043ce08d7a238828982fff1targetblank853af83a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/853af83cb0151cb3c043ce08d7a238828982fff1" target="_blank">853af83</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree853af83cb0151cb3c043ce08d7a238828982fff1targetblank853af83a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/853af83cb0151cb3c043ce08d7a238828982fff1" target="_blank">853af83</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Untracked files:
+    Untracked:  analysis/pbmc_purified_results.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Here, I analyzed the PBMC purified dataset using three different
+methods: (1) Poisson NMF (as implemented in fastTopics), (2) log1p
+transformed frobenius NMF, and (3) Poisson NMF with a log1p link
+function.</p>
+<pre class="r"><code>library(dplyr)
+library(tidyr)
+library(purrr)
+library(stringr)
+
+load(&quot;~/Documents/data/fastglmpca/raw_data/pbmc_purified.RData&quot;)</code></pre>
+<p>Below is the code to run the log1p link Poisson NMF factorization
+method. Here, I initialize with frobenius NMF run on the log1p
+transformed counts (normalized by a size factor).</p>
+<pre class="r"><code>library(Matrix)
+set.seed(1)
+log1p_fit &lt;- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = counts,
+  K = 30,
+  maxiter = 100,
+  approx_range = c(0, 1.25),
+  s = as.vector(Matrix::rowSums(counts) / mean(Matrix::rowSums(counts))),
+  init_method = &quot;frob_nmf&quot;
+)</code></pre>
+<p>Below is the code to run the Poisson NMF matrix factorization:</p>
+<pre class="r"><code>set.seed(1)
+pois_nmf_fit &lt;- fit_poisson_nmf(
+  counts,
+  k = 30
+)</code></pre>
+<p>Finally, below is the code to transform the counts with a log1p
+transformation and run frobenius NMF.</p>
+<pre class="r"><code>sz &lt;- as.vector(Matrix::rowSums(counts) / mean(Matrix::rowSums(counts)))
+
+counts &lt;- counts / sz
+counts &lt;- MatrixExtra::mapSparse(counts, log1p)
+
+frob_nmf_fit &lt;- RcppML::nmf(counts, k = 30)</code></pre>
+</div>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<p>For starters, it’s helpful to understand the relative sparsity of the
+different models.</p>
+<pre class="r"><code>print(&quot;Poission NMF:&quot;)</code></pre>
+<pre><code>FALSE [1] &quot;Poission NMF:&quot;</code></pre>
+<pre class="r"><code>print(mean(pois_nmf_fit$L &lt; 1e-5))</code></pre>
+<pre><code>FALSE [1] 0.4261923</code></pre>
+<pre class="r"><code>print(mean(pois_nmf_fit$F &lt; 1e-5))</code></pre>
+<pre><code>FALSE [1] 0.609208</code></pre>
+<pre class="r"><code>print(&quot;Frobenius NMF:&quot;)</code></pre>
+<pre><code>FALSE [1] &quot;Frobenius NMF:&quot;</code></pre>
+<pre class="r"><code>print(mean(frob_nmf_fit$w * sqrt(frob_nmf_fit$d) &lt; 1e-5))</code></pre>
+<pre><code>FALSE [1] 0.2144173</code></pre>
+<pre class="r"><code>print(mean(sqrt(frob_nmf_fit$d) * frob_nmf_fit$h &lt; 1e-5))</code></pre>
+<pre><code>FALSE [1] 0.6502642</code></pre>
+<pre class="r"><code>print(&quot;Log1p Link:&quot;)</code></pre>
+<pre><code>FALSE [1] &quot;Log1p Link:&quot;</code></pre>
+<pre class="r"><code>print(mean(log1p_fit$U &lt; 1e-5))</code></pre>
+<pre><code>FALSE [1] 0.3291835</code></pre>
+<pre class="r"><code>print(mean(log1p_fit$V &lt; 1e-5))</code></pre>
+<pre><code>FALSE [1] 0.6682838</code></pre>
+<p>Here, we see that there is a tradeoff in sparsity between the
+different models. Poisson NMF has the sparsest loadings, but it’s
+factors are the least sparse amongst the three models. In fact, the
+log1p link has the sparsest factors.</p>
+<p>Now, it’s helpful to visualize the different models using
+heatmaps.</p>
+<pre class="r"><code>FF_log1p &lt;- log1p_fit$U
+FF_log1p &lt;- scale(FF_log1p, center = FALSE, scale = apply(FF_log1p, 2, max))
+colnames(FF_log1p) &lt;- paste0(&quot;k&quot;, 1:ncol(FF_log1p))
+
+FF_frob_nmf &lt;- frob_nmf_fit$w * sqrt(frob_nmf_fit$d)
+FF_frob_nmf &lt;- scale(FF_frob_nmf, center = FALSE, scale = apply(FF_frob_nmf, 2, max))
+colnames(FF_frob_nmf) &lt;- paste0(&quot;k&quot;, 1:ncol(FF_frob_nmf))
+
+FF_pois_nmf &lt;- pois_nmf_fit$L
+
+cell.type &lt;- samples$celltype
+
+# Downsample the number of cells and sort them using tSNE.
+set.seed(8675309)
+cell.idx &lt;- numeric(0)
+cell.types &lt;- levels(cell.type)
+for (i in 1:length(cell.types)) {
+  which.idx &lt;- which(cell.type == cell.types[i])
+  # Downsample common cell types.
+  if (length(which.idx) &gt; 1250) {
+    which.idx &lt;- sample(which.idx, 1250)
+  }
+  # Don&#39;t include rare cell types.
+  if (length(which.idx) &gt; 20) {
+    # Sort using tsne.
+    tsne.res &lt;- Rtsne::Rtsne(
+      FF_log1p[which.idx, ],
+      dims = 1,
+      pca = FALSE,
+      normalize = FALSE,
+      perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+      theta = 0.1,
+      max_iter = 1000,
+      eta = 200,
+      check_duplicates = FALSE
+    )$Y[, 1]
+    which.idx &lt;- which.idx[order(tsne.res)]
+    cell.idx &lt;- c(cell.idx, which.idx)
+  }
+}
+
+cell.type &lt;- cell.type[cell.idx]
+cell.type &lt;- droplevels(cell.type)
+
+FF_log1p &lt;- FF_log1p[cell.idx, ]
+FF_frob_nmf &lt;- FF_frob_nmf[cell.idx, ]
+FF_pois_nmf &lt;- FF_pois_nmf[cell.idx, ]
+
+make.heatmap.tib &lt;- function(FF) {
+  tib &lt;- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %&gt;%
+    mutate(Cell.type = cell.type) %&gt;%
+    arrange(Cell.type) %&gt;%
+    mutate(Cell.idx = row_number())
+  
+  tib &lt;- tib %&gt;%
+    pivot_longer(
+      -c(Cell.idx, Cell.type),
+      names_to = &quot;Factor&quot;,
+      values_to = &quot;Loading&quot;,
+      values_drop_na = TRUE
+    ) %&gt;%
+    mutate(Factor = as.numeric(str_extract(Factor, &quot;[0-9]+&quot;)))
+  
+  return(tib)
+}
+
+log1p_tib &lt;- make.heatmap.tib(FF_log1p)
+frob_nmf_tib &lt;- make.heatmap.tib(FF_frob_nmf)
+pois_nmf_tib &lt;- make.heatmap.tib(FF_pois_nmf)
+
+heatmap.tib &lt;- log1p_tib %&gt;% mutate(Method = &quot;log1p Poisson NMF&quot;) %&gt;%
+  bind_rows(frob_nmf_tib %&gt;% mutate(Method = &quot;log1p Transformation Frob. NMF&quot;)) %&gt;%
+  bind_rows(pois_nmf_tib %&gt;% mutate(Method = &quot;Poisson NMF&quot;)) %&gt;%
+  mutate(Method = factor(Method, levels = c(&quot;log1p Poisson NMF&quot;, &quot;log1p Transformation Frob. NMF&quot;, &quot;Poisson NMF&quot;)))
+
+tib &lt;- heatmap.tib %&gt;%
+  group_by(Cell.type, Cell.idx) %&gt;%
+  summarize()
+
+cell_type_breaks &lt;- c(1, which(tib$Cell.type[-1] != tib$Cell.type[-nrow(tib)]))
+label_pos &lt;- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib)) / 2
+
+library(ggplot2)
+
+plt &lt;- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = &quot;white&quot;, high = &quot;firebrick&quot;) +
+  labs(y = &quot;&quot;) +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = &quot;all&quot;) +
+  theme(legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 16)) 
+
+plt</code></pre>
+<p><img src="figure/pbmc_purified_results.Rmd/unnamed-chunk-7-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>Here, we can see that the log1p Poisson NMF looks extremely similar
+to frobenius NMF run on the log1p transformed values. The main
+difference is in the sparsity of the loadings, where the Poisson model
+performs much better.</p>
+<pre class="r"><code>rownames(log1p_fit$V) &lt;- genes$ensembl
+frob_nmf_fit$V &lt;- t(sqrt(frob_nmf_fit$d) * frob_nmf_fit$h)
+rownames(frob_nmf_fit$V) &lt;- genes$ensembl
+
+gv &lt;- genes$symbol
+names(gv) &lt;- genes$ensembl</code></pre>
+<pre class="r"><code>library(clusterProfiler)
+library(fgsea)
+library(AnnotationDbi)
+library(org.Hs.eg.db)
+
+get_go_terms &lt;- function(V) {
+  
+  K &lt;- ncol(V)
+  
+  genes_vec &lt;- c()
+  go_terms_vec &lt;- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes &lt;- names(sort(V[,k], decreasing = TRUE))[1:20]
+    
+    go_result &lt;- enrichGO(gene = driving_genes,
+                          OrgDb = org.Hs.eg.db,
+                          keyType = &quot;ENSEMBL&quot;,
+                          ont = &quot;BP&quot;, 
+                          pAdjustMethod = &quot;bonferroni&quot;,
+                          pvalueCutoff = 0.01,
+                          qvalueCutoff = 0.1)@result
+    
+    go_result &lt;- go_result %&gt;%
+      dplyr::filter(p.adjust &lt; .01)
+    
+    go_terms &lt;- go_result$Description
+    
+    genes_vec &lt;- c(genes_vec, paste(unname(gv[driving_genes]), collapse = &quot;, &quot;))
+    go_terms_vec &lt;- c(go_terms_vec, paste(go_terms, collapse = &quot;, &quot;))
+    
+  }
+  
+  go_df &lt;- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}
+
+gdf &lt;- get_go_terms(log1p_fit$V)
+gdf2 &lt;- get_go_terms(frob_nmf_fit$V)
+gdf3 &lt;- get_go_terms(pois_nmf_fit$F)</code></pre>
+<p>Go Terms for log1p link Poisson NMF</p>
+<pre class="r"><code>knitr::kable(gdf)</code></pre>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="91%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">LTB, TMSB4X, CD3E, LDHB, CD3D, GIMAP7, TMSB10, RPL13,
+NOSIP, BTG1, RPL18A, TMEM66, RPL10, CD27, RPL3, RPS6, RPS2, TPT1, RPL19,
+CD7</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">STMN1, S100A6, PTMA, S100A4, LMO4, TUBA1B, HMGB1,
+RPLP1, HMGB2, RPS6, RPL7, RPS2, RP11-620J15.3, CD63, TMSB10, RPLP0,
+TPSAB1, RPL34, RPL10, FTH1</td>
+<td align="left">cytoplasmic translation, negative regulation of
+protein-containing complex assembly</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">ZFAS1, NPM1, SERPINB1, AIF1, RPS24, SNHG7, CD74, RPL7A,
+RPL15, RPS23, GAPDH, GNB2L1, RPL5, HINT1, RPS2, H3F3B, RPS4X, RPL37A,
+ACTG1, HNRNPA1</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">ACTG1, MT-CO1, GAPDH, TAGLN2, PFN1, RPLP1, ARHGDIB,
+ARPC1B, ACTB, SLC25A6, MT-CO3, CRIP1, B2M, GMFG, HLA-A, TMSB10, GNB2L1,
+ARPC2, VIM, UCP2</td>
+<td align="left">regulation of actin filament organization</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">VIM, RPL3, RPS6, RPS2, RPS4X, RPS3, RPL13, RPL10,
+RPS18, RPS14, RPL13A, RPLP1, FTL, RPS12, RPL32, EEF1A1, RPL11, RPL12,
+B2M, RPS8</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">GNLY, NKG7, TYROBP, GZMB, MALAT1, FCER1G, TMSB4X, GZMA,
+B2M, CST7, CLIC3, IFITM2, HCST, CCL5, KLRB1, CTSW, FGFBP2, CD7, TMSB10,
+RPS27</td>
+<td align="left">cell killing, killing of cells of another organism,
+disruption of cell in another organism, disruption of anatomical
+structure in another organism, leukocyte mediated cytotoxicity</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">IL32, TMSB4X, S100A4, B2M, CD3D, HLA-A, TMSB10, CD52,
+MALAT1, PTPRCAP, CD3E, SH3BGRL3, CD74, ACTB, LTB, HLA-B, CD27, PFN1,
+CORO1A, EVL</td>
+<td align="left">positive regulation of T cell activation, positive
+regulation of leukocyte cell-cell adhesion, positive regulation of
+lymphocyte activation, positive regulation of cell-cell adhesion,
+regulation of actin filament polymerization, regulation of actin
+polymerization or depolymerization, regulation of actin filament length,
+positive thymic T cell selection, T cell differentiation, actin filament
+polymerization, actin polymerization or depolymerization, T cell
+differentiation in thymus, thymic T cell selection, regulation of
+protein polymerization, antigen processing and presentation of
+endogenous antigen, lymphocyte differentiation, regulation of actin
+filament organization, positive T cell selection, protein
+polymerization</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">RPSA, RPL14, RPL13A, RPL10, RPLP1, RPS2, RPS3, RPS14,
+RPL3, RPL13, RPL27A, RPS12, RPL19, RPL32, RPS27, RPLP2, RPL11, RPS4X,
+NPM1, EEF1A1</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosome
+assembly, ribosomal small subunit biogenesis, protein-RNA complex
+assembly, non-membrane-bounded organelle assembly, protein-RNA complex
+organization, ribosomal small subunit assembly, ribosomal large subunit
+biogenesis</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">RPS27, RPL37A, RPL37, RPLP2, RPS12, RPL30, RPS23,
+RPL35A, RPL31, RPS18, RPL28, RPL27, RPL27A, RPS28, RPL38, RPS24, RPL36,
+RPL32, RPS20, RPS15A</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis, ribosomal small subunit assembly, rRNA
+processing, rRNA metabolic process, ribosome assembly, ncRNA
+processing</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">CD74, HLA-DRA, HLA-DRB1, LTB, HLA-DPB1, HLA-DPA1,
+CD79A, CD79B, HLA-DRB5, MALAT1, TMSB4X, RPL13, RPL18A, CD37, RPL13A,
+RPS19, CD52, IGLL5, RPS2, RPS18</td>
+<td align="left">antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide or polysaccharide antigen via MHC class II, antigen processing
+and presentation of exogenous peptide antigen, antigen processing and
+presentation of exogenous antigen, cytoplasmic translation, MHC class II
+protein complex assembly, peptide antigen assembly with MHC class II
+protein complex, antigen processing and presentation of peptide antigen,
+MHC protein complex assembly, peptide antigen assembly with MHC protein
+complex, antigen processing and presentation, positive regulation of T
+cell activation, positive regulation of leukocyte cell-cell adhesion,
+dendritic cell antigen processing and presentation, positive regulation
+of lymphocyte activation, positive regulation of cell-cell adhesion</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, MALAT1, SPINK2, RPS24, RPS23, ZFAS1, RPLP1,
+RPS12, RPS19, HLA-DRA, KIAA0125, RPL35A, RPS15, RPL13A, TPT1, RPL28,
+RPS18, AIF1, RPS4X, TMSB4X</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, cell chemotaxis</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">RPL7, RPL34, RPS3A, RPS2, RPS6, RPL13, RPS4X, RPS18,
+RPL10, RPL3, RPLP1, RPL13A, RPS12, RPS27A, RPS15A, RPS3, RPL21, RPL12,
+RPS8, RPL18A</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">ACTB, ACTG1, PFN1, CORO1A, CFL1, MALAT1, RAC2, MYL6,
+ARPC1B, TMSB4X, CYBA, ARPC2, TMSB10, MYL12A, PTPRCAP, IFITM2, ARHGDIB,
+HCST, CLIC1, EMP3</td>
+<td align="left">actin polymerization or depolymerization, regulation of
+actin filament polymerization, regulation of actin filament
+organization, regulation of actin polymerization or depolymerization,
+regulation of actin filament length, actin filament polymerization,
+regulation of actin cytoskeleton organization, platelet aggregation,
+regulation of actin filament-based process, regulation of protein
+polymerization, regulation of supramolecular fiber organization,
+homotypic cell-cell adhesion, protein polymerization, platelet
+activation</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">LTB, TMSB10, CD8B, CD3D, TMSB4X, CD3E, IL32, CD52,
+RPS19, NOSIP, RPL13, CD7, RPL32, B2M, HCST, RPS12, RPL18A, RPLP2, RPS14,
+RPS27</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+assembly, ribosomal small subunit biogenesis</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">LTB, IL32, S100A4, S100A10, CD52, CD3D, B2M, S100A6,
+TMSB4X, IL7R, TMSB10, NOSIP, LGALS1, CD3E, ANXA1, SH3BGRL3, HLA-A,
+RPL10, HLA-B, RPL13</td>
+<td align="left">positive regulation of T cell activation, T cell
+differentiation in thymus, positive regulation of leukocyte cell-cell
+adhesion, positive regulation of lymphocyte activation, lymphocyte
+differentiation, positive regulation of cell-cell adhesion, regulation
+of T cell mediated cytotoxicity, regulation of adaptive immune response
+based on somatic recombination of immune receptors built from
+immunoglobulin superfamily domains, T cell mediated cytotoxicity,
+regulation of adaptive immune response</td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">HLA-B, HLA-C, MALAT1, HLA-A, B2M, RPL10, RPL13A, FTL,
+RPS2, RPL13, RPL3, RPL11, RPS6, RPS3, EEF1A1, RPS4X, FTH1, RPS14, EEF1D,
+RPS27</td>
+<td align="left">cytoplasmic translation, ribosome assembly, antigen
+processing and presentation of peptide antigen via MHC class Ib,
+ribosome biogenesis, antigen processing and presentation via MHC class
+Ib, antigen processing and presentation of endogenous peptide antigen
+via MHC class I, antigen processing and presentation of peptide antigen
+via MHC class I, antigen processing and presentation of endogenous
+peptide antigen, positive regulation of T cell mediated cytotoxicity,
+antigen processing and presentation of endogenous antigen, protein-RNA
+complex assembly, protein-RNA complex organization, ribosomal small
+subunit biogenesis, regulation of T cell mediated cytotoxicity, T cell
+mediated cytotoxicity, positive regulation of T cell mediated immunity,
+positive regulation of leukocyte mediated cytotoxicity, positive
+regulation of cell killing</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, HLA-DRA, CST3, HLA-DPB1, HLA-DPA1, HLA-DRB1, LYZ,
+HLA-DQA1, HLA-DRB5, ACTB, TMSB4X, LGALS1, HLA-DQB1, HLA-DQA2, S100A10,
+FTH1, ACTG1, CYBA, TMSB10, HLA-DMA</td>
+<td align="left">antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide or polysaccharide antigen via MHC class II, antigen processing
+and presentation of exogenous peptide antigen, antigen processing and
+presentation of exogenous antigen, MHC class II protein complex
+assembly, peptide antigen assembly with MHC class II protein complex,
+positive regulation of T cell activation, MHC protein complex assembly,
+peptide antigen assembly with MHC protein complex, positive regulation
+of leukocyte cell-cell adhesion, positive regulation of lymphocyte
+activation, antigen processing and presentation of peptide antigen,
+positive regulation of cell-cell adhesion, antigen processing and
+presentation, positive regulation of viral entry into host cell,
+positive regulation by symbiont of entry into host, dendritic cell
+antigen processing and presentation, positive regulation of viral life
+cycle, positive regulation of T cell differentiation</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">TMSB4X, RPLP1, RPLP2, RPS27, RPS19, RPS12, RPS14,
+RPS18, RPL36, RPS28, RPS15, RPL32, RPL28, RPL13, RPL27A, RPL35, RPL13A,
+RPL31, RPL37A, RPL41</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+assembly, ribosomal small subunit biogenesis, ribosome assembly,
+ribosome biogenesis, rRNA processing, protein-RNA complex assembly,
+protein-RNA complex organization, rRNA metabolic process, ncRNA
+processing, maturation of SSU-rRNA</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO1, MT-CO3, RPS2, RPL10, RPL13, FTL, RPL12, RPS6,
+RPL15, GNB2L1, RPL13A, RPL18, RPL3, RPL18A, RPS4X, RPS5, RPS19, RPL29,
+RPL8, MT-ND1</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribosome assembly</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, S100A8, FTL, TYROBP, S100A4, TMSB4X, S100A6,
+FTH1, LYZ, AIF1, CST3, HLA-DRB1, LST1, FCN1, TMSB10, SAT1, CYBA, TSPO,
+LGALS1, PSAP</td>
+<td align="left">maintenance of location in cell, sequestering of metal
+ion, maintenance of location</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, MT-CO1, MT-CO3, TMSB4X, RPL13A, RPS2, RPL13,
+EIF1, MT-ND1, RPLP1, RPS27, RPL10, RPL3, RPS4X, RPS6, RPL32, RPS19, B2M,
+DDX5, PTMA</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">H3F3B, TXNIP, UBC, EIF1, TSC22D3, FTH1, H1FX, HNRNPDL,
+CIRBP, PNRC1, FTL, SRSF5, DDX5, BTG1, PTMA, ITM2B, ARHGDIB, VAMP2,
+HIST1H1C, HNRNPA1</td>
+<td align="left">chromosome condensation</td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">RPL34, RPL7, MT-CO2, RPS27A, RPL21, RPS3A, RPS15A,
+TMSB4X, RPL26, TMSB10, RPS27, FTH1, B2M, MALAT1, FTL, RPL36AL, MT-CYB,
+RPL35A, MT-ND2, RPL31</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, iron ion
+transport</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">DUSP1, FOS, JUN, NFKBIA, PPP1R15A, ZFP36, TSC22D3,
+CD69, KLF6, TUBA1A, BTG1, HLA-B, PNRC1, HLA-C, UBC, EIF1, HLA-A,
+ZFP36L2, TMSB4X, UBB</td>
+<td align="left">response to tumor necrosis factor, negative regulation
+of DNA binding, cellular response to tumor necrosis factor, cellular
+response to epidermal growth factor stimulus, integrated stress response
+signaling, response to epidermal growth factor</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">JUNB, DUSP2, CXCR4, DDIT4, ZNF331, ZFP36, BTG2, H3F3B,
+SLC2A3, FTH1, SLC25A6, EIF1, UBC, ZFP36L2, GADD45B, DDX5, HLA-C, B2M,
+GYPC, HLA-B</td>
+<td align="left">nuclear-transcribed mRNA catabolic process, cellular
+response to glucocorticoid stimulus</td>
+<td align="right">25</td>
+</tr>
+<tr class="even">
+<td align="left">YBX1, ENO1, PFN1, HSP90AB1, HSP90AA1, ACTB, PTMA,
+MT-ND4, TPI1, EIF4A1, PSMA7, TUBA1B, MT-CYB, GAPDH, MT-ND2, GSTP1, CFL1,
+RAN, C1QBP, MT-CO2</td>
+<td align="left">aerobic electron transport chain, ATP synthesis coupled
+electron transport, mitochondrial ATP synthesis coupled electron
+transport, respiratory electron transport chain</td>
+<td align="right">26</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO2, MT-CYB, MT-ND2, MT-ND4, MT-ATP6, MT-CO1,
+MT-CO3, MT-ND1, MT-ND5, RPL34, RPL7, RPS3A, RPS27A, MT-ND3, RPS24, RPL9,
+RPL21, B2M, RPS15A, HLA-B</td>
+<td align="left">oxidative phosphorylation, aerobic electron transport
+chain, ATP synthesis coupled electron transport, mitochondrial ATP
+synthesis coupled electron transport, aerobic respiration, respiratory
+electron transport chain, cellular respiration, electron transport
+chain, energy derivation by oxidation of organic compounds, cytoplasmic
+translation, proton motive force-driven mitochondrial ATP synthesis,
+proton transmembrane transport, proton motive force-driven ATP
+synthesis, ATP biosynthetic process, purine ribonucleoside triphosphate
+biosynthetic process, purine nucleoside triphosphate biosynthetic
+process, ribonucleoside triphosphate biosynthetic process, nucleoside
+triphosphate biosynthetic process, mitochondrial electron transport,
+NADH to ubiquinone, ATP metabolic process, purine ribonucleoside
+triphosphate metabolic process, purine nucleoside triphosphate metabolic
+process, ribonucleoside triphosphate metabolic process, nucleoside
+triphosphate metabolic process, purine ribonucleotide biosynthetic
+process, ribonucleotide biosynthetic process, ribose phosphate
+biosynthetic process, purine nucleotide biosynthetic process,
+purine-containing compound biosynthetic process, nucleotide biosynthetic
+process, nucleoside phosphate biosynthetic process, NADH dehydrogenase
+complex assembly, mitochondrial respiratory chain complex I assembly,
+purine ribonucleotide metabolic process, mitochondrial electron
+transport, cytochrome c to oxygen, ribonucleotide metabolic process,
+ribose phosphate metabolic process, mitochondrial respiratory chain
+complex assembly</td>
+<td align="right">27</td>
+</tr>
+<tr class="even">
+<td align="left">CCL5, GNLY, NKG7, GZMK, GZMA, IL32, LYAR, TMSB4X,
+MALAT1, B2M, CST7, HCST, CTSW, S100A4, CD52, RPS19, RPS3, HLA-B, RPL13A,
+RPS27</td>
+<td align="left">cell killing, killing of cells of another organism,
+disruption of cell in another organism, disruption of anatomical
+structure in another organism, cytoplasmic translation</td>
+<td align="right">28</td>
+</tr>
+<tr class="odd">
+<td align="left">HLA-B, B2M, HLA-C, HLA-A, DDX5, CD53, HLA-E, HNRNPA2B1,
+MYL12A, ACTB, MT-CO1, CNBP, ARHGDIB, SRSF5, ITM2B, RAN, CALM2, ARL6IP5,
+BTG1, SRSF3</td>
+<td align="left">antigen processing and presentation of peptide antigen
+via MHC class Ib, antigen processing and presentation via MHC class Ib,
+antigen processing and presentation of endogenous peptide antigen via
+MHC class I, antigen processing and presentation of peptide antigen via
+MHC class I, antigen processing and presentation of endogenous peptide
+antigen, positive regulation of T cell mediated cytotoxicity, antigen
+processing and presentation of endogenous antigen, regulation of T cell
+mediated cytotoxicity, T cell mediated cytotoxicity, positive regulation
+of T cell mediated immunity, positive regulation of leukocyte mediated
+cytotoxicity, positive regulation of cell killing, antigen processing
+and presentation of endogenous peptide antigen via MHC class I via ER
+pathway, TAP-independent, antigen processing and presentation of
+endogenous peptide antigen via MHC class Ib, antigen processing and
+presentation of endogenous peptide antigen via MHC class I via ER
+pathway, regulation of T cell mediated immunity, primary miRNA
+processing, positive regulation of adaptive immune response based on
+somatic recombination of immune receptors built from immunoglobulin
+superfamily domains, positive regulation of adaptive immune response,
+antigen processing and presentation of peptide antigen, T cell mediated
+immunity, regulation of leukocyte mediated cytotoxicity, regulation of
+cell killing, protection from natural killer cell mediated cytotoxicity,
+positive regulation of lymphocyte mediated immunity, antigen processing
+and presentation, positive regulation of leukocyte mediated immunity,
+regulation of adaptive immune response based on somatic recombination of
+immune receptors built from immunoglobulin superfamily domains,
+regulation of adaptive immune response, leukocyte mediated cytotoxicity,
+miRNA processing</td>
+<td align="right">29</td>
+</tr>
+<tr class="even">
+<td align="left">IER2, JUN, ZFP36, H3F3B, BTG2, DUSP2, MALAT1, RPL10,
+MT-CO1, RPL13, EIF1, FTL, RPS6, ZFP36L1, SAT1, RPL3, RPL32, MT-CO3,
+RPL13A, RPS2</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">30</td>
+</tr>
+</tbody>
+</table>
+<p>Go Terms for log1p transformation Frob. NMF</p>
+<pre class="r"><code>knitr::kable(gdf2)</code></pre>
+<table>
+<colgroup>
+<col width="4%" />
+<col width="94%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">LTB, LDHB, GIMAP7, CD3E, DDX5, NOSIP, TMSB4X, TMEM66,
+B2M, MALAT1, ARHGDIB, PABPC1, CD3D, CD27, SELL, RPL7, RPS3A, AES, CD7,
+RPL3</td>
+<td align="left"></td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">CFL1, SERF2, ACTB, ATP5E, PTMA, PFN1, TMSB10, MYL6,
+TMA7, SRP14, TMSB4X, RPL34, HSP90AA1, MYL12A, CHCHD2, RPS24, HNRNPA2B1,
+RPL7, PPIA, CYBA</td>
+<td align="left"></td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">GAPDH, MT-CO3, MT-CO1, NPM1, LDHB, HINT1, FTL,
+HSP90AB1, FTH1, ATP5G2, RPS2, SERPINB1, RPS4X, PTMA, H3F3B, RPS6, RPL15,
+RPL12, RPL7A, ACTG1</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">LIMD2, GAPDH, CD52, BTF3, MT-CO1, GMFG, SLC25A6, UBC,
+OAZ1, SH3BGRL3, ARHGDIB, ARPC1B, PFN1, AES, ARPC3, TMSB10, UCP2, GPSM3,
+MT-CO3, RAC2</td>
+<td align="left">Arp2/3 complex-mediated actin nucleation</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">FXYD5, PABPC1, EEF2, VIM, GAPDH, GLTSCR2, UBC, YBX1,
+EEF1A1, FTL, RPL3, OAZ1, RPSA, RPL4, RPS2, RPLP0, HSPA8, DDX5, RPS6,
+RPL7</td>
+<td align="left">cytoplasmic translation, viral genome replication,
+positive regulation of translation, ribosome biogenesis</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">GNLY, NKG7, MALAT1, TYROBP, B2M, GZMB, HLA-B, HLA-A,
+IFITM2, FCER1G, GZMA, HCST, HLA-C, CST7, CLIC3, TMSB4X, CD7, RPS27,
+CTSW, KLRB1</td>
+<td align="left">cell killing, leukocyte mediated cytotoxicity, antigen
+processing and presentation of peptide antigen via MHC class I,
+regulation of leukocyte mediated cytotoxicity, regulation of cell
+killing, positive regulation of leukocyte mediated cytotoxicity,
+positive regulation of cell killing, antigen processing and presentation
+of peptide antigen via MHC class Ib, antigen processing and presentation
+via MHC class Ib, antigen processing and presentation of endogenous
+peptide antigen via MHC class I, natural killer cell mediated
+cytotoxicity, antigen processing and presentation of peptide antigen,
+natural killer cell mediated immunity, regulation of leukocyte mediated
+immunity, antigen processing and presentation of endogenous peptide
+antigen, positive regulation of T cell mediated cytotoxicity, antigen
+processing and presentation of endogenous antigen, antigen processing
+and presentation, positive regulation of leukocyte mediated immunity,
+killing of cells of another organism, disruption of cell in another
+organism, regulation of T cell mediated cytotoxicity, T cell mediated
+cytotoxicity, disruption of anatomical structure in another organism,
+positive regulation of T cell mediated immunity, regulation of
+lymphocyte mediated immunity</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">IL32, S100A4, B2M, ACTB, HLA-A, SH3BGRL3, TMSB4X,
+MALAT1, HLA-B, ARHGDIB, CD3D, PFN1, HLA-C, PTPRCAP, ACTG1, S100A6,
+RPL10, TMSB10, CD3E, FTL</td>
+<td align="left">antigen processing and presentation of peptide antigen
+via MHC class Ib, antigen processing and presentation via MHC class Ib,
+antigen processing and presentation of endogenous peptide antigen via
+MHC class I, antigen processing and presentation of peptide antigen via
+MHC class I, antigen processing and presentation of endogenous peptide
+antigen, positive regulation of T cell mediated cytotoxicity, antigen
+processing and presentation of endogenous antigen, regulation of T cell
+mediated cytotoxicity, T cell mediated cytotoxicity, positive regulation
+of T cell mediated immunity, positive regulation of leukocyte mediated
+cytotoxicity, positive regulation of cell killing</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">NPM1, BTG1, EEF1B2, PFDN5, HNRNPA1, TMEM66, RPL36AL,
+RPSA, RPL3, RPL13, RPL10, RPL5, RPS3, RPL14, NACA, RPL17, RPS2, RPL13A,
+RPS12, EEF1A1</td>
+<td align="left">cytoplasmic translation, ribosome assembly, ribosome
+biogenesis, ribosomal large subunit biogenesis</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">RPL38, RPL23, RPL37, RPS21, RPL37A, RPL27, RPS20,
+RPS24, RPS11, RPLP2, RPL30, RPS28, TOMM7, RPS27, RPS12, ATP5E, COX7C,
+RPL28, RPS23, RPL27A</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribosomal small subunit assembly, rRNA
+processing, positive regulation of signal transduction by p53 class
+mediator, rRNA metabolic process, ribosome assembly</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">LTB, CD37, CYBA, CD52, FTL, RPS11, RPL13, MALAT1, FAU,
+RPLP1, RPL13A, RPS19, PTPRCAP, RPS27, RPLP2, CD79A, RPL18A, CD79B,
+RPL32, TMSB10</td>
+<td align="left">cytoplasmic translation, respiratory burst</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, ZFAS1, CD74, SPINK2, ACTG1, RPL35A, RPS24,
+AIF1, GNB2L1, TPT1, RPL31, SNHG7, RPS23, RPLP1, RPS4X, NACA, RPL26,
+LST1, KIAA0125, RPS12</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis, regulation of intrinsic apoptotic signaling
+pathway in response to DNA damage</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">RPL7, RPS24, EEF1B2, BTF3, RPL34, RPS3A, RPS27A, RPL13,
+RPS15A, RPS2, EEF2, RPS6, RPS4X, RPL10, RPL21, RPS12, RPL13A, RPS18,
+RPL3, RPL10A</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis, ribosomal large subunit biogenesis, rRNA
+processing</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">ACTG1, ACTB, CORO1A, PFN1, CFL1, PTPRCAP, MALAT1,
+TMSB4X, RPL10, RPL13, RAC2, RPS2, RPL13A, TMSB10, RPS6, RPL3, RPS4X,
+RPS3, RPL18A, ARPC1B</td>
+<td align="left">cytoplasmic translation, actin polymerization or
+depolymerization, regulation of protein polymerization, regulation of
+supramolecular fiber organization, regulation of protein-containing
+complex assembly, regulation of actin filament organization, regulation
+of actin filament polymerization, protein polymerization, regulation of
+actin polymerization or depolymerization, negative regulation of
+protein-containing complex assembly, regulation of actin filament
+length</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">CD8B, HCST, CD3D, RPS21, TMSB10, CD3E, CD52, CD7,
+RPS28, NOSIP, PABPC1, HLA-B, ARHGDIB, IL32, RPL38, RPL31, RPS29, FTL,
+HLA-C, RPL36</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">LTB, S100A4, VIM, S100A6, CD52, MYL12A, S100A10, NOSIP,
+IFITM2, CRIP1, ANXA1, EMP3, IL7R, TAGLN2, RPS18, PPDPF, RPS19, B2M,
+RPLP0, RPS25</td>
+<td align="left"></td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">SLC25A6, FTL, MALAT1, RPL10, RPL13, RPS2, RPL3, RPS6,
+RPL13A, HLA-B, B2M, RPS3, RPS4X, HLA-C, RPL11, LIMD2, RPL32, RPL18A,
+RPS18, RPL19</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, HLA-DRA, HLA-DRB1, HLA-DPB1, HLA-DPA1, HLA-DRB5,
+HLA-DQA1, HLA-DQA2, HLA-B, HLA-DQB1, CD79A, MALAT1, B2M, HLA-C, HLA-A,
+CD79B, HLA-DMA, ARHGDIB, NACA, ACTB</td>
+<td align="left">antigen processing and presentation of peptide antigen,
+antigen processing and presentation, antigen processing and presentation
+of exogenous peptide antigen, antigen processing and presentation of
+exogenous antigen, antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide or polysaccharide antigen via MHC class II, MHC class II protein
+complex assembly, peptide antigen assembly with MHC class II protein
+complex, MHC protein complex assembly, peptide antigen assembly with MHC
+protein complex, positive regulation of T cell activation, positive
+regulation of leukocyte cell-cell adhesion, positive regulation of
+lymphocyte activation, positive regulation of cell-cell adhesion,
+antigen processing and presentation of endogenous antigen, antigen
+processing and presentation of endogenous peptide antigen, positive
+regulation of T cell mediated cytotoxicity, regulation of T cell
+mediated cytotoxicity, T cell mediated cytotoxicity, positive regulation
+of T cell mediated immunity, positive regulation of leukocyte mediated
+cytotoxicity, positive regulation of cell killing, regulation of T cell
+mediated immunity, positive regulation of adaptive immune response based
+on somatic recombination of immune receptors built from immunoglobulin
+superfamily domains, positive regulation of adaptive immune response, T
+cell mediated immunity, regulation of leukocyte mediated cytotoxicity,
+positive regulation of immune effector process, regulation of cell
+killing, positive regulation of lymphocyte mediated immunity, antigen
+receptor-mediated signaling pathway, positive regulation of leukocyte
+mediated immunity, lymphocyte differentiation, adaptive immune response
+based on somatic recombination of immune receptors built from
+immunoglobulin superfamily domains, regulation of adaptive immune
+response based on somatic recombination of immune receptors built from
+immunoglobulin superfamily domains, regulation of adaptive immune
+response, leukocyte mediated cytotoxicity, antigen processing and
+presentation of peptide antigen via MHC class Ib, regulation of
+lymphocyte mediated immunity, antigen processing and presentation via
+MHC class Ib, lymphocyte proliferation, antigen processing and
+presentation of endogenous peptide antigen via MHC class I, mononuclear
+cell proliferation, immune response-activating cell surface receptor
+signaling pathway, regulation of leukocyte mediated immunity, cell
+killing, antigen processing and presentation of peptide antigen via MHC
+class I, leukocyte proliferation, dendritic cell antigen processing and
+presentation, immune response-regulating cell surface receptor signaling
+pathway, detection of bacterium, regulation of hemopoiesis, detection of
+other organism, positive regulation of T cell differentiation,
+regulation of lymphocyte proliferation, regulation of mononuclear cell
+proliferation, detection of external biotic stimulus, positive
+regulation of lymphocyte differentiation, T cell differentiation</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">SERF2, PFDN5, RPS29, RPS27, RPLP1, RPLP2, OAZ1, RPL13,
+MALAT1, RPS18, RPS12, RPL13A, RPS14, RPS19, RPS28, RPL32, RPL36, RPL37A,
+TMSB4X, RPS26</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+assembly, ribosomal small subunit biogenesis, ribosome assembly,
+protein-RNA complex assembly, protein-RNA complex organization, ribosome
+biogenesis, maturation of SSU-rRNA</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">GLTSCR2, COX4I1, SH3BGRL3, RPL22, RPS10, EEF1D, RPS2,
+RPL13, RPL10, RPS5, CD52, RPS6, RPS11, RPL29, RPL18A, RPLP0, RPS3, RPL3,
+RPS4X, RPL13A</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosome
+assembly, ribosomal large subunit assembly, protein-RNA complex
+assembly, protein-RNA complex organization, ribosomal small subunit
+biogenesis</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">FTL, S100A9, S100A8, S100A4, FTH1, TYROBP, TMSB4X,
+S100A6, CST3, CYBA, LYZ, TMSB10, RPS2, AIF1, RPS9, RPLP1, RPL13, GPX1,
+LGALS1, RPS14</td>
+<td align="left">sequestering of metal ion, maintenance of location in
+cell, maintenance of location, cytoplasmic translation</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO3, MT-CO1, MALAT1, MT-ND4, EIF1, TMSB10, RPL13,
+RPS2, RPL13A, RPL10, MT-CYB, TMSB4X, FTH1, UBC, RPS6, RPS15, RPS19,
+RPS27, RPL3, MT-ND1</td>
+<td align="left">cytoplasmic translation, aerobic electron transport
+chain, ATP synthesis coupled electron transport, mitochondrial ATP
+synthesis coupled electron transport, respiratory electron transport
+chain, ribosome assembly, oxidative phosphorylation, proton
+transmembrane transport, ribosomal small subunit assembly, electron
+transport chain, aerobic respiration, protein-RNA complex assembly,
+cellular respiration, protein-RNA complex organization, ribosomal small
+subunit biogenesis, ribosome biogenesis, energy derivation by oxidation
+of organic compounds</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">H3F3B, JUNB, UBC, MALAT1, FTL, DDX5, BTG1, FTH1, PPDPF,
+EIF1, B2M, TSC22D3, PTMA, CIRBP, RPL10, TMSB4X, RPL13, VAMP2, RPS27,
+RPL3</td>
+<td align="left"></td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">RPL34, RPL7, RPL41, RPL36AL, RPS3A, RPS27A, RPL36A,
+RPS15A, MT-CO2, ATP5G2, FXYD5, RPL21, RPL22, RPL26, EIF1, B2M, RPS27,
+TMSB4X, RPS29, MALAT1</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">DUSP1, JUN, FOS, NFKBIA, ZFP36, TSC22D3, PPP1R15A,
+EIF1, KLF6, PNRC1, TUBA1A, TPT1, CD69, UBB, SLC25A6, FTH1, BTG1,
+ZFP36L2, MALAT1, SERF2</td>
+<td align="left">cellular response to epidermal growth factor stimulus,
+integrated stress response signaling, response to tumor necrosis factor,
+response to epidermal growth factor</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">JUNB, JUN, PFDN5, RPL13, RPL10, RPS6, RPS2, RPS3,
+RPL18A, RPL3, RPS4X, RPS8, LTB, RPS18, RPL29, EEF1B2, RPL5, RPL4, RPS5,
+RPL32</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis, ribosome assembly</td>
+<td align="right">25</td>
+</tr>
+<tr class="even">
+<td align="left">MT-ND1, MT-CO3, MT-CO1, MT-ND4, MT-CYB, MT-ND2, RPL41,
+RPL36A, RPLP0, ATP5G2, SLC25A6, CORO1A, RPL22, EDF1, RPL17, RPS11, RPSA,
+RPS2, EIF3K, EEF1B2</td>
+<td align="left">cytoplasmic translation, aerobic electron transport
+chain, ATP synthesis coupled electron transport, mitochondrial ATP
+synthesis coupled electron transport, respiratory electron transport
+chain, oxidative phosphorylation, electron transport chain, aerobic
+respiration, cellular respiration, proton transmembrane transport,
+energy derivation by oxidation of organic compounds, proton motive
+force-driven ATP synthesis, ATP biosynthetic process, purine
+ribonucleoside triphosphate biosynthetic process, purine nucleoside
+triphosphate biosynthetic process, ribonucleoside triphosphate
+biosynthetic process, nucleoside triphosphate biosynthetic process, ATP
+metabolic process, purine ribonucleoside triphosphate metabolic process,
+purine nucleoside triphosphate metabolic process, ribonucleoside
+triphosphate metabolic process, mitochondrial electron transport, NADH
+to ubiquinone, nucleoside triphosphate metabolic process</td>
+<td align="right">26</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO2, MT-ND2, MT-CYB, RPL34, RPL7, MT-ATP6, MT-ND4,
+RPS3A, RPS27A, RPS15A, MT-ND5, RPL21, MT-CO1, RPL9, B2M, RPL26, RPS24,
+MT-CO3, SKP1, RPL39</td>
+<td align="left">cytoplasmic translation, oxidative phosphorylation,
+aerobic electron transport chain, ATP synthesis coupled electron
+transport, mitochondrial ATP synthesis coupled electron transport,
+aerobic respiration, respiratory electron transport chain, cellular
+respiration, proton transmembrane transport, electron transport chain,
+energy derivation by oxidation of organic compounds, proton motive
+force-driven mitochondrial ATP synthesis, proton motive force-driven ATP
+synthesis, mitochondrial electron transport, cytochrome c to oxygen, ATP
+biosynthetic process, purine ribonucleoside triphosphate biosynthetic
+process, purine nucleoside triphosphate biosynthetic process,
+ribonucleoside triphosphate biosynthetic process, nucleoside
+triphosphate biosynthetic process, ATP metabolic process, ribosome
+biogenesis, purine ribonucleoside triphosphate metabolic process, purine
+nucleoside triphosphate metabolic process, ribonucleoside triphosphate
+metabolic process, mitochondrial electron transport, NADH to
+ubiquinone</td>
+<td align="right">27</td>
+</tr>
+<tr class="even">
+<td align="left">CCL5, NKG7, MALAT1, B2M, GZMA, GZMK, TMSB4X, S100A4,
+RPL13A, RPS27, RPS3, RPL23A, RPS14, RPL21, RPS18, HLA-B, CST7, RPS19,
+RPL13, RPL27A</td>
+<td align="left">cytoplasmic translation, ribosome assembly, ribosomal
+small subunit assembly, protein-RNA complex assembly, protein-RNA
+complex organization</td>
+<td align="right">28</td>
+</tr>
+<tr class="odd">
+<td align="left">HLA-E, HLA-C, HLA-B, HLA-A, MALAT1, B2M, BTG1, PTMA,
+MT-CO1, TMSB4X, RPS24, MT-CO3, CD52, MT-CYB, ACTB, TMSB10, RPL13A,
+RPS27, RPL13, RPL10</td>
+<td align="left">antigen processing and presentation of peptide antigen
+via MHC class Ib, antigen processing and presentation via MHC class Ib,
+antigen processing and presentation of endogenous peptide antigen via
+MHC class I, antigen processing and presentation of peptide antigen via
+MHC class I, antigen processing and presentation of endogenous peptide
+antigen, positive regulation of T cell mediated cytotoxicity, antigen
+processing and presentation of endogenous antigen, regulation of T cell
+mediated cytotoxicity, T cell mediated cytotoxicity, positive regulation
+of T cell mediated immunity, positive regulation of leukocyte mediated
+cytotoxicity, positive regulation of cell killing, antigen processing
+and presentation of endogenous peptide antigen via MHC class I via ER
+pathway, TAP-independent, antigen processing and presentation of
+endogenous peptide antigen via MHC class Ib, antigen processing and
+presentation of endogenous peptide antigen via MHC class I via ER
+pathway, cytoplasmic translation, regulation of T cell mediated
+immunity, positive regulation of adaptive immune response based on
+somatic recombination of immune receptors built from immunoglobulin
+superfamily domains, positive regulation of adaptive immune response,
+antigen processing and presentation of peptide antigen, T cell mediated
+immunity, regulation of leukocyte mediated cytotoxicity, regulation of
+cell killing, protection from natural killer cell mediated cytotoxicity,
+positive regulation of lymphocyte mediated immunity, antigen processing
+and presentation, positive regulation of leukocyte mediated immunity,
+regulation of adaptive immune response based on somatic recombination of
+immune receptors built from immunoglobulin superfamily domains,
+regulation of adaptive immune response, leukocyte mediated cytotoxicity,
+regulation of lymphocyte mediated immunity</td>
+<td align="right">29</td>
+</tr>
+<tr class="even">
+<td align="left">IER2, RPL13, RPL10, JUN, RPS2, RPS6, RPL13A, RPL32,
+RPS18, RPL18A, RPL3, RPS3, RPS12, RPS19, RPL11, RPL12, RPLP2, RPS27,
+RPS4X, ZFP36</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis, ribosome assembly, protein-RNA complex
+assembly, protein-RNA complex organization</td>
+<td align="right">30</td>
+</tr>
+</tbody>
+</table>
+<p>Go Terms for Poisson NMF</p>
+<pre class="r"><code>knitr::kable(gdf3)</code></pre>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="90%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">RPL13, RPS14, RPL32, RPS12, RPS2, RPS27, RPS19, TMSB10,
+RPLP2, RPL10, RPS18, RPS6, RPL31, RPL18A, RPL13A, RPL19, RPS15, RPL28,
+TMSB4X, B2M</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosomal small subunit assembly, ribosome assembly,
+ribosome biogenesis, protein-RNA complex assembly, protein-RNA complex
+organization, rRNA processing, rRNA metabolic process, erythrocyte
+differentiation, erythrocyte homeostasis</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">RPS2, RPL10, RPL13, RPS6, RPL3, RPL13A, RPS3, RPS4X,
+RPS18, RPL18A, RPS19, RPL32, RPL11, RPL15, RPL12, RPL8, FTL, RPS14,
+RPL18, MT-CO1</td>
+<td align="left">cytoplasmic translation, ribosome assembly, ribosome
+biogenesis, protein-RNA complex assembly, protein-RNA complex
+organization, ribosomal small subunit biogenesis</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, B2M, CCL5, TMSB4X, HLA-B, RPS27, RPL13A, RPS19,
+HLA-A, RPL13, RPS18, RPS3, HLA-C, RPS14, RPL23A, RPL10, IL32, RPL21,
+RPS2, RPL27A</td>
+<td align="left">cytoplasmic translation, ribosome assembly, protein-RNA
+complex assembly, protein-RNA complex organization, antigen processing
+and presentation of peptide antigen via MHC class Ib, ribosomal small
+subunit assembly, antigen processing and presentation via MHC class Ib,
+antigen processing and presentation of endogenous peptide antigen via
+MHC class I, antigen processing and presentation of peptide antigen via
+MHC class I, antigen processing and presentation of endogenous peptide
+antigen, non-membrane-bounded organelle assembly, positive regulation of
+T cell mediated cytotoxicity, antigen processing and presentation of
+endogenous antigen, regulation of T cell mediated cytotoxicity, T cell
+mediated cytotoxicity, positive regulation of T cell mediated immunity,
+positive regulation of leukocyte mediated cytotoxicity, positive
+regulation of cell killing, ribosome biogenesis, regulation of T cell
+mediated immunity</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">RPLP1, RPS18, RPS23, RPS2, RPS4X, RPS12, RPS24, RPS14,
+RPL32, RPL31, RPL35A, RPS19, RPS15, RPL26, RPS8, RPL11, RPL34, RPS15A,
+RPS3A, RPS27A</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis, rRNA processing, rRNA metabolic process, ncRNA
+processing, ribosome assembly, ribosomal small subunit assembly,
+positive regulation of signal transduction by p53 class mediator,
+maturation of SSU-rRNA, ribosomal large subunit biogenesis,
+non-membrane-bounded organelle assembly</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">GNLY, MALAT1, B2M, NKG7, TMSB4X, RPS27, HLA-B, HLA-A,
+TMSB10, HLA-C, PFN1, TYROBP, GZMB, RPL37A, RPL10, HCST, CYBA, IFITM2,
+RPLP2, GZMA</td>
+<td align="left">cell killing, leukocyte mediated cytotoxicity, positive
+regulation of leukocyte mediated cytotoxicity, positive regulation of
+cell killing, antigen processing and presentation of peptide antigen via
+MHC class Ib, antigen processing and presentation via MHC class Ib,
+antigen processing and presentation of endogenous peptide antigen via
+MHC class I, regulation of leukocyte mediated cytotoxicity, antigen
+processing and presentation of peptide antigen via MHC class I, antigen
+processing and presentation of endogenous peptide antigen, positive
+regulation of T cell mediated cytotoxicity, regulation of cell killing,
+antigen processing and presentation of endogenous antigen, positive
+regulation of leukocyte mediated immunity, killing of cells of another
+organism, disruption of cell in another organism, regulation of T cell
+mediated cytotoxicity, T cell mediated cytotoxicity, disruption of
+anatomical structure in another organism, positive regulation of T cell
+mediated immunity</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">B2M, TMSB4X, HLA-A, IL32, HLA-B, ACTB, HLA-C, RPL10,
+CD52, RPL13, PFN1, RPS2, CD3D, PTPRCAP, ARHGDIB, EIF1, FTH1, RPL18A,
+SH3BGRL3, TPT1</td>
+<td align="left">antigen processing and presentation of peptide antigen
+via MHC class Ib, antigen processing and presentation via MHC class Ib,
+antigen processing and presentation of endogenous peptide antigen via
+MHC class I, antigen processing and presentation of peptide antigen via
+MHC class I, antigen processing and presentation of endogenous peptide
+antigen, positive regulation of T cell mediated cytotoxicity, antigen
+processing and presentation of endogenous antigen, regulation of T cell
+mediated cytotoxicity, T cell mediated cytotoxicity, positive regulation
+of T cell mediated immunity, positive regulation of leukocyte mediated
+cytotoxicity, positive regulation of cell killing</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">S100A4, TMSB10, S100A6, VIM, SH3BGRL3, S100A10, B2M,
+LGALS1, CYBA, EMP3, RPL10, CD52, MYL6, CRIP1, RPL28, FTH1, MYL12A,
+CALM1, PFN1, RPS14</td>
+<td align="left"></td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">B2M, HLA-B, HLA-C, HLA-A, MALAT1, RPL10, RPL3, RPS3,
+FTL, RPL13A, RPS6, RPS4X, RPS14, RPS2, PTMA, EEF1A1, FTH1, RPL11, UBC,
+RPS7</td>
+<td align="left">cytoplasmic translation, antigen processing and
+presentation of peptide antigen via MHC class Ib, ribosome biogenesis,
+antigen processing and presentation via MHC class Ib, antigen processing
+and presentation of endogenous peptide antigen via MHC class I, antigen
+processing and presentation of peptide antigen via MHC class I, antigen
+processing and presentation of endogenous peptide antigen, positive
+regulation of T cell mediated cytotoxicity, antigen processing and
+presentation of endogenous antigen, ribosomal small subunit biogenesis,
+regulation of T cell mediated cytotoxicity, T cell mediated
+cytotoxicity, positive regulation of T cell mediated immunity,
+regulation of ubiquitin-protein transferase activity, positive
+regulation of leukocyte mediated cytotoxicity, positive regulation of
+cell killing</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, TMSB4X, RPS27, RPL13A, B2M, RPL13, TMSB10,
+RPL21, RPL10, RPL11, RPL32, RPL3, RPS6, MT-CO1, PTMA, RPS4X, RPS19,
+RPS15, EIF1, RPS2</td>
+<td align="left">cytoplasmic translation, ribosome assembly, ribosome
+biogenesis, ribosomal small subunit biogenesis, protein-RNA complex
+assembly, protein-RNA complex organization, ribosomal small subunit
+assembly, rRNA processing, rRNA metabolic process</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">MALAT1, RPS27, DUSP1, EIF1, RPLP2, TPT1, PTMA, H3F3B,
+JUN, NFKBIA, RPS28, RPL21, RPL13A, RPL27A, TSC22D3, BTG1, RPS12, FOS,
+RPL30, RPL23A</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">RPL13, RPS2, RPL10, RPL13A, RPS18, RPS6, RPS12, RPLP1,
+RPS4X, RPL3, RPS3, RPL32, RPS14, RPL18A, RPL11, RPS19, RPL19, RPLP2,
+RPS3A, RPS27</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis, ribosome assembly, protein-RNA complex
+assembly, protein-RNA complex organization, ribosomal small subunit
+assembly, rRNA processing, non-membrane-bounded organelle assembly, rRNA
+metabolic process</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">MALAT1, RPS23, RPS4X, RPS24, RPLP1, RPS18, RPL35A,
+RPS14, RPS12, RPL31, RPL26, RPL32, RPS15A, RPS15, RPS2, RPL37A, RPS27A,
+RPL15, RPS27, RPL34</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, rRNA processing, rRNA metabolic
+process, ribosomal small subunit assembly, ncRNA processing, ribosome
+assembly</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, RPLP1, RPL35A, RPS4X, CD74, TPT1, RPS23, RPS24,
+RPS15, RPL11, RPL31, GNB2L1, RPS12, RPL32, RPS19, RPS18, RPL26, RPL13A,
+RPS2, RPL34</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis, rRNA processing, rRNA metabolic process,
+regulation of intrinsic apoptotic signaling pathway, positive regulation
+of signal transduction by p53 class mediator, regulation of signal
+transduction by p53 class mediator, ncRNA processing, regulation of
+intrinsic apoptotic signaling pathway in response to DNA damage,
+regulation of intrinsic apoptotic signaling pathway by p53 class
+mediator, intrinsic apoptotic signaling pathway</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">TMSB4X, TMSB10, MT-CO1, RPLP1, RPS4X, PFN1, RPS2,
+RPL15, GNB2L1, ARHGDIB, RPL13A, RPS15A, GAPDH, RPL29, RPL28, ACTG1, B2M,
+RPS7, RPS18, RPS8</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, negative regulation of protein-containing complex
+assembly</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">TUBA1B, GAPDH, HMGB2, PTMA, STMN1, H2AFZ, HMGB1, RPLP1,
+TUBB, TMSB4X, PFN1, CFL1, RPS2, RPS3, TMSB10, RPLP0, RPSA, ACTB, DUT,
+PPIA</td>
+<td align="left">regulation of protein-containing complex assembly,
+negative regulation of protein-containing complex assembly, cytoplasmic
+translation, negative regulation of protein polymerization, regulation
+of protein polymerization, regulation of nuclease activity, regulation
+of binding, protein polymerization</td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">LTB, RPS2, B2M, RPL10, RPL13, TMSB4X, RPS4X, EEF1A1,
+RPL13A, RPL3, RPS6, RPL18A, RPS18, RPS3, IL32, RPL8, HLA-B, RPLP0, RPL6,
+RPSA</td>
+<td align="left">cytoplasmic translation, ribosome assembly, ribosome
+biogenesis, ribosomal large subunit assembly, protein-RNA complex
+assembly, protein-RNA complex organization</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">ACTB, PFN1, TMSB4X, ACTG1, TMSB10, CFL1, CORO1A,
+ARHGDIB, B2M, RPL10, RPS2, RPS6, MYL6, CYBA, MYL12A, RAC2, ARPC1B,
+SH3BGRL3, RPL13, FTH1</td>
+<td align="left">actin polymerization or depolymerization, maintenance
+of location in cell, regulation of actin filament organization, tissue
+homeostasis, anatomical structure homeostasis, regulation of actin
+filament polymerization</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">RPS27, RPLP2, RPS18, RPS14, TMSB4X, RPL32, RPL13A,
+RPS12, RPS19, RPL13, RPS15, RPLP1, TMSB10, RPL28, RPL31, RPL11, RPL27A,
+RPL23A, RPL36, RPS15A</td>
+<td align="left">cytoplasmic translation, ribosome assembly, ribosome
+biogenesis, ribosomal small subunit biogenesis, ribosomal small subunit
+assembly, protein-RNA complex assembly, protein-RNA complex
+organization, rRNA processing, non-membrane-bounded organelle assembly,
+rRNA metabolic process</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">FTL, TMSB4X, FTH1, RPS2, RPL13, TMSB10, S100A4, RPL13A,
+S100A9, RPS9, S100A8, RPLP1, RPS14, RPL10, TYROBP, HLA-DRB1, HLA-B,
+CYBA, CST3, COX4I1</td>
+<td align="left">cytoplasmic translation, sequestering of metal ion,
+maintenance of location in cell, maintenance of location</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, MT-CO3, MT-CO2, MT-CYB, MT-ND4, MT-ND2, MT-ND1,
+MT-ATP6, MALAT1, MT-ND5, RPS3A, MT-ND3, RPLP2, RPL7, RPS19, RPL28, RPS3,
+HLA-B, RPL9, RPS5</td>
+<td align="left">oxidative phosphorylation, aerobic electron transport
+chain, ATP synthesis coupled electron transport, mitochondrial ATP
+synthesis coupled electron transport, aerobic respiration, respiratory
+electron transport chain, cellular respiration, electron transport
+chain, energy derivation by oxidation of organic compounds, cytoplasmic
+translation, proton motive force-driven mitochondrial ATP synthesis,
+proton transmembrane transport, proton motive force-driven ATP
+synthesis, ATP biosynthetic process, purine ribonucleoside triphosphate
+biosynthetic process, purine nucleoside triphosphate biosynthetic
+process, ribonucleoside triphosphate biosynthetic process, nucleoside
+triphosphate biosynthetic process, mitochondrial electron transport,
+NADH to ubiquinone, ATP metabolic process, purine ribonucleoside
+triphosphate metabolic process, purine nucleoside triphosphate metabolic
+process, ribonucleoside triphosphate metabolic process, nucleoside
+triphosphate metabolic process, purine ribonucleotide biosynthetic
+process, ribonucleotide biosynthetic process, ribose phosphate
+biosynthetic process, purine nucleotide biosynthetic process,
+purine-containing compound biosynthetic process, nucleotide biosynthetic
+process, nucleoside phosphate biosynthetic process, NADH dehydrogenase
+complex assembly, mitochondrial respiratory chain complex I assembly,
+purine ribonucleotide metabolic process, mitochondrial electron
+transport, cytochrome c to oxygen, ribonucleotide metabolic process,
+ribose phosphate metabolic process, mitochondrial respiratory chain
+complex assembly</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">S100A9, S100A8, TMSB4X, FTL, RPLP1, TMSB10, FTH1,
+TYROBP, S100A6, S100A4, RPS14, RPLP2, RPS2, RPL28, LYZ, RPL13, RPL35A,
+RPL26, RPS24, FAU</td>
+<td align="left">cytoplasmic translation, sequestering of metal ion,
+maintenance of location in cell, maintenance of location</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">RPL34, RPL7, RPS3A, RPS27A, RPL21, RPS15A, B2M, RPL26,
+MT-CO2, RPL9, RPS6, RPS27, TMSB4X, RPS4X, RPL10, RPL13, RPL3, RPS18,
+RPL32, RPS2</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis</td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">RPLP1, RPL13A, RPS12, RPL13, RPS14, RPS18, RPS19, RPS2,
+RPS6, RPLP2, RPS8, RPL34, RPS23, RPS15, RPL37A, RPS28, RPL10, RPL12,
+RPL28, RPS20</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribosomal small subunit assembly,
+ribosome assembly, rRNA processing, protein-RNA complex assembly,
+protein-RNA complex organization, rRNA metabolic process, maturation of
+SSU-rRNA, non-membrane-bounded organelle assembly, ncRNA processing</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">B2M, ACTB, TMSB4X, RPL3, DDX5, FTL, RPS3, RPL21, RPS6,
+RPL13, RPL13A, PTMA, RPS3A, RPS27, RPL30, RPL32, RPS12, MT-CO1, RPL27A,
+ARHGDIB</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, HLA-DRA, HLA-DPB1, HLA-DRB1, HLA-DPA1, CST3,
+ACTB, TMSB4X, LYZ, HLA-DRB5, FTH1, HLA-DQA1, B2M, RPS2, MALAT1, TMSB10,
+VIM, PFN1, HLA-DQB1, HLA-B</td>
+<td align="left">antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide or polysaccharide antigen via MHC class II, antigen processing
+and presentation of peptide antigen, antigen processing and presentation
+of exogenous peptide antigen, antigen processing and presentation of
+exogenous antigen, MHC class II protein complex assembly, peptide
+antigen assembly with MHC class II protein complex, antigen processing
+and presentation, MHC protein complex assembly, peptide antigen assembly
+with MHC protein complex, positive regulation of T cell activation,
+positive regulation of leukocyte cell-cell adhesion, positive regulation
+of lymphocyte activation, positive regulation of cell-cell adhesion,
+antigen processing and presentation of endogenous antigen, antigen
+processing and presentation of endogenous peptide antigen, dendritic
+cell antigen processing and presentation, positive regulation of T cell
+mediated cytotoxicity, regulation of hemopoiesis, regulation of T cell
+mediated cytotoxicity, T cell mediated cytotoxicity, positive regulation
+of T cell mediated immunity, positive regulation of leukocyte mediated
+cytotoxicity, positive regulation of T cell differentiation, positive
+regulation of cell killing</td>
+<td align="right">25</td>
+</tr>
+<tr class="even">
+<td align="left">PTMA, RPS2, RPL18A, PFN1, YBX1, RPS6, RPL8, RPL3,
+RPLP0, ACTB, ENO1, HSP90AB1, RPS5, RPL35, RPL12, RPL6, RPL7A, RPL13,
+RPL10A, RPSA</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+large subunit biogenesis, ribosome assembly, maturation of LSU-rRNA,
+protein-RNA complex assembly, protein-RNA complex organization</td>
+<td align="right">26</td>
+</tr>
+<tr class="odd">
+<td align="left">JUNB, IER2, JUN, TMSB4X, H3F3B, RPL10, RPS6, RPL13,
+ZFP36, B2M, RPS8, RPS2, EIF1, RPS4X, RPS18, DUSP2, UBC, RPL3, RPL8,
+FOS</td>
+<td align="left">cytoplasmic translation, integrated stress response
+signaling</td>
+<td align="right">27</td>
+</tr>
+<tr class="even">
+<td align="left">RPL13, RPL10, RPS2, TMSB4X, RPL3, RPL13A, RPS6, B2M,
+EEF1A1, RPS4X, RPL19, RPL18A, RPS3, RPL11, RPS3A, TPT1, LTB, RPL6, RPL5,
+TMSB10</td>
+<td align="left">cytoplasmic translation, ribosomal large subunit
+assembly, ribosome biogenesis, ribosome assembly, ribosomal large
+subunit biogenesis, protein-RNA complex assembly, protein-RNA complex
+organization, regulation of ubiquitin-protein transferase activity</td>
+<td align="right">28</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, RPLP1, RPS23, CD74, TMSB4X, TMSB10, RPS12,
+RPL28, RPL13A, RPS4X, RPS15, RPS19, RPS24, RPS14, RPLP2, RPS2, RPL19,
+RPL35A, RPS18, RPL10</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis, ribosome assembly, ribosomal small subunit
+assembly, rRNA processing, protein-RNA complex assembly, protein-RNA
+complex organization, rRNA metabolic process</td>
+<td align="right">29</td>
+</tr>
+<tr class="even">
+<td align="left">CD74, HLA-DRA, RPL18A, RPL13A, RPL13, RPS2, LTB,
+HLA-DRB1, RPLP1, TMSB4X, RPS19, RPS18, RPLP2, HLA-DPB1, RPL19, RPS23,
+RPS27, HLA-DPA1, CD37, RPL23A</td>
+<td align="left">cytoplasmic translation, antigen processing and
+presentation of exogenous peptide antigen via MHC class II, antigen
+processing and presentation of peptide antigen via MHC class II, antigen
+processing and presentation of peptide or polysaccharide antigen via MHC
+class II, antigen processing and presentation of exogenous peptide
+antigen, antigen processing and presentation of exogenous antigen,
+antigen processing and presentation of peptide antigen, MHC class II
+protein complex assembly, peptide antigen assembly with MHC class II
+protein complex, MHC protein complex assembly, peptide antigen assembly
+with MHC protein complex, dendritic cell antigen processing and
+presentation, antigen processing and presentation, positive regulation
+of T cell activation</td>
+<td align="right">30</td>
+</tr>
+</tbody>
+</table>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>FALSE R version 4.3.2 (2023-10-31)
+FALSE Platform: aarch64-apple-darwin20 (64-bit)
+FALSE Running under: macOS Ventura 13.5
+FALSE 
+FALSE Matrix products: default
+FALSE BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
+FALSE LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+FALSE 
+FALSE locale:
+FALSE [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+FALSE 
+FALSE time zone: America/New_York
+FALSE tzcode source: internal
+FALSE 
+FALSE attached base packages:
+FALSE [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+FALSE [8] base     
+FALSE 
+FALSE other attached packages:
+FALSE  [1] org.Hs.eg.db_3.18.0    AnnotationDbi_1.64.1   IRanges_2.36.0        
+FALSE  [4] S4Vectors_0.40.2       Biobase_2.62.0         BiocGenerics_0.48.1   
+FALSE  [7] fgsea_1.28.0           clusterProfiler_4.10.0 ggplot2_3.5.0         
+FALSE [10] stringr_1.5.1          purrr_1.0.2            tidyr_1.3.1           
+FALSE [13] dplyr_1.1.4           
+FALSE 
+FALSE loaded via a namespace (and not attached):
+FALSE   [1] RColorBrewer_1.1-3            rstudioapi_0.15.0            
+FALSE   [3] jsonlite_1.8.8                magrittr_2.0.3               
+FALSE   [5] farver_2.1.1                  rmarkdown_2.26               
+FALSE   [7] fs_1.6.3                      zlibbioc_1.48.0              
+FALSE   [9] vctrs_0.6.5                   memoise_2.0.1                
+FALSE  [11] RCurl_1.98-1.14               ggtree_3.10.1                
+FALSE  [13] htmltools_0.5.7               curl_5.2.1                   
+FALSE  [15] AnnotationHub_3.10.0          gridGraphics_0.5-1           
+FALSE  [17] sass_0.4.8                    bslib_0.6.1                  
+FALSE  [19] plyr_1.8.9                    cachem_1.0.8                 
+FALSE  [21] igraph_2.0.2                  mime_0.12                    
+FALSE  [23] lifecycle_1.0.4               pkgconfig_2.0.3              
+FALSE  [25] Matrix_1.6-5                  R6_2.5.1                     
+FALSE  [27] fastmap_1.1.1                 gson_0.1.0                   
+FALSE  [29] shiny_1.8.0                   GenomeInfoDbData_1.2.11      
+FALSE  [31] digest_0.6.34                 aplot_0.2.2                  
+FALSE  [33] enrichplot_1.22.0             colorspace_2.1-0             
+FALSE  [35] patchwork_1.2.0               rprojroot_2.0.4              
+FALSE  [37] RSQLite_2.3.5                 filelock_1.0.3               
+FALSE  [39] labeling_0.4.3                fansi_1.0.6                  
+FALSE  [41] httr_1.4.7                    polyclip_1.10-6              
+FALSE  [43] compiler_4.3.2                bit64_4.0.5                  
+FALSE  [45] withr_3.0.0                   BiocParallel_1.36.0          
+FALSE  [47] viridis_0.6.5                 DBI_1.2.2                    
+FALSE  [49] highr_0.10                    ggforce_0.4.2                
+FALSE  [51] MASS_7.3-60.0.1               rappdirs_0.3.3               
+FALSE  [53] HDO.db_0.99.1                 tools_4.3.2                  
+FALSE  [55] interactiveDisplayBase_1.40.0 ape_5.7-1                    
+FALSE  [57] scatterpie_0.2.1              httpuv_1.6.14                
+FALSE  [59] glue_1.7.0                    nlme_3.1-164                 
+FALSE  [61] GOSemSim_2.28.1               promises_1.2.1               
+FALSE  [63] grid_4.3.2                    shadowtext_0.1.3             
+FALSE  [65] Rtsne_0.17                    reshape2_1.4.4               
+FALSE  [67] generics_0.1.3                gtable_0.3.4                 
+FALSE  [69] tzdb_0.4.0                    data.table_1.15.2            
+FALSE  [71] hms_1.1.3                     tidygraph_1.3.1              
+FALSE  [73] utf8_1.2.4                    XVector_0.42.0               
+FALSE  [75] ggrepel_0.9.5                 BiocVersion_3.18.1           
+FALSE  [77] pillar_1.9.0                  yulab.utils_0.1.4            
+FALSE  [79] later_1.3.2                   splines_4.3.2                
+FALSE  [81] tweenr_2.0.3                  BiocFileCache_2.10.1         
+FALSE  [83] treeio_1.26.0                 lattice_0.22-5               
+FALSE  [85] bit_4.0.5                     tidyselect_1.2.0             
+FALSE  [87] GO.db_3.18.0                  Biostrings_2.70.2            
+FALSE  [89] knitr_1.45                    git2r_0.33.0                 
+FALSE  [91] gridExtra_2.3                 xfun_0.42                    
+FALSE  [93] graphlayouts_1.1.1            stringi_1.8.3                
+FALSE  [95] workflowr_1.7.1               lazyeval_0.2.2               
+FALSE  [97] ggfun_0.1.4                   yaml_2.3.8                   
+FALSE  [99] evaluate_0.23                 codetools_0.2-19             
+FALSE [101] ggraph_2.2.1                  tibble_3.2.1                 
+FALSE [103] qvalue_2.34.0                 BiocManager_1.30.22          
+FALSE [105] ggplotify_0.1.2               cli_3.6.2                    
+FALSE [107] xtable_1.8-4                  munsell_0.5.0                
+FALSE [109] jquerylib_0.1.4               Rcpp_1.0.12                  
+FALSE [111] GenomeInfoDb_1.38.6           dbplyr_2.4.0                 
+FALSE [113] png_0.1-8                     parallel_4.3.2               
+FALSE [115] ellipsis_0.3.2                readr_2.1.5                  
+FALSE [117] blob_1.2.4                    DOSE_3.28.2                  
+FALSE [119] bitops_1.0-7                  viridisLite_0.4.2            
+FALSE [121] tidytree_0.4.6                scales_1.3.0                 
+FALSE [123] crayon_1.5.2                  rlang_1.1.3                  
+FALSE [125] cowplot_1.1.3                 fastmatch_1.1-4              
+FALSE [127] KEGGREST_1.42.0</code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

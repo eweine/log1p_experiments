@@ -1,0 +1,270 @@
+---
+title: "PBMC Purified Analysis"
+output: html_document
+date: "2024-04-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, comment = FALSE, message = FALSE)
+options(warn=-1)
+```
+
+## Introduction
+
+Here, I analyzed the PBMC purified dataset using three different methods: (1) Poisson NMF (as implemented in fastTopics), (2) log1p transformed frobenius NMF, and (3) Poisson NMF with a log1p link function.
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(stringr)
+
+load("~/Documents/data/fastglmpca/raw_data/pbmc_purified.RData")
+```
+
+
+Below is the code to run the log1p link Poisson NMF factorization method. Here, I initialize with frobenius NMF run on the log1p transformed counts (normalized by a size factor).
+
+```{r, eval=FALSE}
+library(Matrix)
+set.seed(1)
+log1p_fit <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = counts,
+  K = 30,
+  maxiter = 100,
+  approx_range = c(0, 1.25),
+  s = as.vector(Matrix::rowSums(counts) / mean(Matrix::rowSums(counts))),
+  init_method = "frob_nmf"
+)
+```
+
+Below is the code to run the Poisson NMF matrix factorization:
+
+```{r, eval=FALSE}
+set.seed(1)
+pois_nmf_fit <- fit_poisson_nmf(
+  counts,
+  k = 30
+)
+```
+
+Finally, below is the code to transform the counts with a log1p transformation and run frobenius NMF.
+
+```{r, eval=FALSE}
+sz <- as.vector(Matrix::rowSums(counts) / mean(Matrix::rowSums(counts)))
+
+counts <- counts / sz
+counts <- MatrixExtra::mapSparse(counts, log1p)
+
+frob_nmf_fit <- RcppML::nmf(counts, k = 30)
+```
+
+```{r, echo=FALSE}
+log1p_fit <- readr::read_rds(
+  "~/Documents/passPCA/inst/experiments/results/log1p_quad_approx_pbmc_purified_30_factors_100_iter_nmf_init.rds"
+)
+pois_nmf_fit <- readr::read_rds("~/Documents/passPCA/inst/experiments/results/pois_nmf_pbmc_purified_30_factors_125_iter.rds")
+frob_nmf_fit <- readr::read_rds("~/Documents/passPCA/inst/experiments/results/log1p_transformation_pbmc_purified_frob_nmf.rds")
+```
+
+## Analysis
+
+For starters, it's helpful to understand the relative sparsity of the different models.
+
+```{r}
+print("Poission NMF:")
+print(mean(pois_nmf_fit$L < 1e-5))
+print(mean(pois_nmf_fit$F < 1e-5))
+
+print("Frobenius NMF:")
+print(mean(frob_nmf_fit$w * sqrt(frob_nmf_fit$d) < 1e-5))
+print(mean(sqrt(frob_nmf_fit$d) * frob_nmf_fit$h < 1e-5))
+
+print("Log1p Link:")
+print(mean(log1p_fit$U < 1e-5))
+print(mean(log1p_fit$V < 1e-5))
+```
+Here, we see that there is a tradeoff in sparsity between the different models. Poisson NMF has the sparsest loadings, but it's factors are the least sparse amongst the three models. In fact, the log1p link has the sparsest factors. 
+
+Now, it's helpful to visualize the different models using heatmaps.
+
+```{r, fig.width=12, fig.height=16}
+FF_log1p <- log1p_fit$U
+FF_log1p <- scale(FF_log1p, center = FALSE, scale = apply(FF_log1p, 2, max))
+colnames(FF_log1p) <- paste0("k", 1:ncol(FF_log1p))
+
+FF_frob_nmf <- frob_nmf_fit$w * sqrt(frob_nmf_fit$d)
+FF_frob_nmf <- scale(FF_frob_nmf, center = FALSE, scale = apply(FF_frob_nmf, 2, max))
+colnames(FF_frob_nmf) <- paste0("k", 1:ncol(FF_frob_nmf))
+
+FF_pois_nmf <- pois_nmf_fit$L
+
+cell.type <- samples$celltype
+
+# Downsample the number of cells and sort them using tSNE.
+set.seed(8675309)
+cell.idx <- numeric(0)
+cell.types <- levels(cell.type)
+for (i in 1:length(cell.types)) {
+  which.idx <- which(cell.type == cell.types[i])
+  # Downsample common cell types.
+  if (length(which.idx) > 1250) {
+    which.idx <- sample(which.idx, 1250)
+  }
+  # Don't include rare cell types.
+  if (length(which.idx) > 20) {
+    # Sort using tsne.
+    tsne.res <- Rtsne::Rtsne(
+      FF_log1p[which.idx, ],
+      dims = 1,
+      pca = FALSE,
+      normalize = FALSE,
+      perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+      theta = 0.1,
+      max_iter = 1000,
+      eta = 200,
+      check_duplicates = FALSE
+    )$Y[, 1]
+    which.idx <- which.idx[order(tsne.res)]
+    cell.idx <- c(cell.idx, which.idx)
+  }
+}
+
+cell.type <- cell.type[cell.idx]
+cell.type <- droplevels(cell.type)
+
+FF_log1p <- FF_log1p[cell.idx, ]
+FF_frob_nmf <- FF_frob_nmf[cell.idx, ]
+FF_pois_nmf <- FF_pois_nmf[cell.idx, ]
+
+make.heatmap.tib <- function(FF) {
+  tib <- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %>%
+    mutate(Cell.type = cell.type) %>%
+    arrange(Cell.type) %>%
+    mutate(Cell.idx = row_number())
+  
+  tib <- tib %>%
+    pivot_longer(
+      -c(Cell.idx, Cell.type),
+      names_to = "Factor",
+      values_to = "Loading",
+      values_drop_na = TRUE
+    ) %>%
+    mutate(Factor = as.numeric(str_extract(Factor, "[0-9]+")))
+  
+  return(tib)
+}
+
+log1p_tib <- make.heatmap.tib(FF_log1p)
+frob_nmf_tib <- make.heatmap.tib(FF_frob_nmf)
+pois_nmf_tib <- make.heatmap.tib(FF_pois_nmf)
+
+heatmap.tib <- log1p_tib %>% mutate(Method = "log1p Poisson NMF") %>%
+  bind_rows(frob_nmf_tib %>% mutate(Method = "log1p Transformation Frob. NMF")) %>%
+  bind_rows(pois_nmf_tib %>% mutate(Method = "Poisson NMF")) %>%
+  mutate(Method = factor(Method, levels = c("log1p Poisson NMF", "log1p Transformation Frob. NMF", "Poisson NMF")))
+
+tib <- heatmap.tib %>%
+  group_by(Cell.type, Cell.idx) %>%
+  summarize()
+
+cell_type_breaks <- c(1, which(tib$Cell.type[-1] != tib$Cell.type[-nrow(tib)]))
+label_pos <- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib)) / 2
+
+library(ggplot2)
+
+plt <- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "firebrick") +
+  labs(y = "") +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = "all") +
+  theme(legend.position = "none", 
+        strip.text = element_text(size = 16)) 
+
+plt
+```
+
+Here, we can see that the log1p Poisson NMF looks extremely similar to frobenius NMF run on the log1p transformed values. The main difference is in the sparsity of the loadings, where the Poisson model performs much better.
+
+```{r}
+rownames(log1p_fit$V) <- genes$ensembl
+frob_nmf_fit$V <- t(sqrt(frob_nmf_fit$d) * frob_nmf_fit$h)
+rownames(frob_nmf_fit$V) <- genes$ensembl
+
+gv <- genes$symbol
+names(gv) <- genes$ensembl
+```
+
+
+```{r}
+library(clusterProfiler)
+library(fgsea)
+library(AnnotationDbi)
+library(org.Hs.eg.db)
+
+get_go_terms <- function(V) {
+  
+  K <- ncol(V)
+  
+  genes_vec <- c()
+  go_terms_vec <- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes <- names(sort(V[,k], decreasing = TRUE))[1:20]
+    
+    go_result <- enrichGO(gene = driving_genes,
+                          OrgDb = org.Hs.eg.db,
+                          keyType = "ENSEMBL",
+                          ont = "BP", 
+                          pAdjustMethod = "bonferroni",
+                          pvalueCutoff = 0.01,
+                          qvalueCutoff = 0.1)@result
+    
+    go_result <- go_result %>%
+      dplyr::filter(p.adjust < .01)
+    
+    go_terms <- go_result$Description
+    
+    genes_vec <- c(genes_vec, paste(unname(gv[driving_genes]), collapse = ", "))
+    go_terms_vec <- c(go_terms_vec, paste(go_terms, collapse = ", "))
+    
+  }
+  
+  go_df <- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}
+
+gdf <- get_go_terms(log1p_fit$V)
+gdf2 <- get_go_terms(frob_nmf_fit$V)
+gdf3 <- get_go_terms(pois_nmf_fit$F)
+```
+Go Terms for log1p link Poisson NMF
+
+```{r}
+knitr::kable(gdf)
+```
+
+Go Terms for log1p transformation Frob. NMF
+
+```{r}
+knitr::kable(gdf2)
+```
+
+Go Terms for Poisson NMF
+
+```{r}
+knitr::kable(gdf3)
+```
