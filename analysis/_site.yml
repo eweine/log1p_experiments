@@ -1,7 +1,7 @@
-name: "log1p_experiments"
+name: log1p_experiments
 output_dir: ../docs
 navbar:
-  title: "log1p_experiments"
+  title: log1p_experiments
   left:
   - text: Home
     href: index.html
@@ -9,6 +9,10 @@ navbar:
     href: about.html
   - text: License
     href: license.html
+  right:
+  - icon: fab fa-github
+    text: Source code
+    href: https://github.com/eweine/log1p_experiments
 output:
   workflowr::wflow_html:
     toc: yes
