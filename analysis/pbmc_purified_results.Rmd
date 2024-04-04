@@ -65,6 +65,9 @@ log1p_fit <- readr::read_rds(
 )
 pois_nmf_fit <- readr::read_rds("~/Documents/passPCA/inst/experiments/results/pois_nmf_pbmc_purified_30_factors_125_iter.rds")
 frob_nmf_fit <- readr::read_rds("~/Documents/passPCA/inst/experiments/results/log1p_transformation_pbmc_purified_frob_nmf.rds")
+log1p_fit_K1_init <- readr::read_rds(
+  "~/Documents/passPCA/inst/experiments/results/log1p_k1_init_pbmc_purified_K30.rds"
+)
 ```
 
 ## Analysis
@@ -83,6 +86,10 @@ print(mean(sqrt(frob_nmf_fit$d) * frob_nmf_fit$h < 1e-5))
 print("Log1p Link:")
 print(mean(log1p_fit$U < 1e-5))
 print(mean(log1p_fit$V < 1e-5))
+
+print("Log1p Link with K = 1 Initialization:")
+print(mean(log1p_fit_K1_init$U < 1e-5))
+print(mean(log1p_fit_K1_init$V < 1e-5))
 ```
 Here, we see that there is a tradeoff in sparsity between the different models. Poisson NMF has the sparsest loadings, but it's factors are the least sparse amongst the three models. In fact, the log1p link has the sparsest factors. 
 
@@ -92,6 +99,14 @@ Now, it's helpful to visualize the different models using heatmaps.
 FF_log1p <- log1p_fit$U
 FF_log1p <- scale(FF_log1p, center = FALSE, scale = apply(FF_log1p, 2, max))
 colnames(FF_log1p) <- paste0("k", 1:ncol(FF_log1p))
+
+FF_log1p_K1_init <- log1p_fit_K1_init$U
+FF_log1p_K1_init <- scale(
+  FF_log1p_K1_init, 
+  center = FALSE,
+  scale = apply(FF_log1p_K1_init, 2, max)
+)
+colnames(FF_log1p_K1_init) <- paste0("k", 1:ncol(FF_log1p_K1_init))
 
 FF_frob_nmf <- frob_nmf_fit$w * sqrt(frob_nmf_fit$d)
 FF_frob_nmf <- scale(FF_frob_nmf, center = FALSE, scale = apply(FF_frob_nmf, 2, max))
@@ -136,6 +151,7 @@ cell.type <- droplevels(cell.type)
 FF_log1p <- FF_log1p[cell.idx, ]
 FF_frob_nmf <- FF_frob_nmf[cell.idx, ]
 FF_pois_nmf <- FF_pois_nmf[cell.idx, ]
+FF_log1p_K1_init <- FF_log1p_K1_init[cell.idx, ]
 
 make.heatmap.tib <- function(FF) {
   tib <- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %>%
@@ -156,13 +172,15 @@ make.heatmap.tib <- function(FF) {
 }
 
 log1p_tib <- make.heatmap.tib(FF_log1p)
+log1p_k1_init_tib <- make.heatmap.tib(FF_log1p_K1_init)
 frob_nmf_tib <- make.heatmap.tib(FF_frob_nmf)
 pois_nmf_tib <- make.heatmap.tib(FF_pois_nmf)
 
 heatmap.tib <- log1p_tib %>% mutate(Method = "log1p Poisson NMF") %>%
+  bind_rows(log1p_k1_init_tib %>% mutate(Method = "log1p Poisson NMF with rank-1 initialization")) %>%
   bind_rows(frob_nmf_tib %>% mutate(Method = "log1p Transformation Frob. NMF")) %>%
   bind_rows(pois_nmf_tib %>% mutate(Method = "Poisson NMF")) %>%
-  mutate(Method = factor(Method, levels = c("log1p Poisson NMF", "log1p Transformation Frob. NMF", "Poisson NMF")))
+  mutate(Method = factor(Method, levels = c("log1p Poisson NMF", "log1p Poisson NMF with rank-1 initialization", "log1p Transformation Frob. NMF", "Poisson NMF")))
 
 tib <- heatmap.tib %>%
   group_by(Cell.type, Cell.idx) %>%
@@ -217,7 +235,7 @@ get_go_terms <- function(V) {
   
   for (k in 1:K) {
     
-    driving_genes <- names(sort(V[,k], decreasing = TRUE))[1:20]
+    driving_genes <- names(sort(V[,k], decreasing = TRUE))[1:50]
     
     go_result <- enrichGO(gene = driving_genes,
                           OrgDb = org.Hs.eg.db,
@@ -248,6 +266,7 @@ get_go_terms <- function(V) {
 }
 
 gdf <- get_go_terms(log1p_fit$V)
+gdf0 <- get_go_terms(log1p_fit_K1_init$V)
 gdf2 <- get_go_terms(frob_nmf_fit$V)
 gdf3 <- get_go_terms(pois_nmf_fit$F)
 ```
@@ -255,6 +274,12 @@ Go Terms for log1p link Poisson NMF
 
 ```{r}
 knitr::kable(gdf)
+```
+
+Go Terms for log1p link Poisson NMF with K = 1 init
+
+```{r}
+knitr::kable(gdf0)
 ```
 
 Go Terms for log1p transformation Frob. NMF
