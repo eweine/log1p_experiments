@@ -25,8 +25,11 @@ load("~/Documents/data/fastglmpca/raw_data/pbmc_purified.RData")
 set.seed(1)
 sz <- Matrix::rowSums(counts) / mean(Matrix::rowSums(counts))
 counts <- counts[, Matrix::colSums(counts) >= 100]
-genes_map <- genes$symbol
-names(genes_map) <- genes$ensembl
+genes_map <- genes$ensembl
+names(genes_map) <- genes$symbol
+
+genes_map_inv <- genes$symbol
+names(genes_map_inv) <- genes$ensembl
 ```
 
 
@@ -85,6 +88,8 @@ log1p_fit_init_nmf <- readr::read_rds(
 ```
 
 ## Analysis
+
+# Heatmaps
 
 Below are the heatmaps of the different models:
 
@@ -206,6 +211,40 @@ plt
 
 The greedy fit looks generally as expected, except that the 24th factor also looks like an intercept, which is strange. With greedy initialization, the fit looks somewhere in between the NMF init and the greedy init. The first factor stays mostly intact, but you can see that some if it has been replaced by other factors. 
 
+# GO Analysis
+
+First, we exclude genes that are very highly expressed across many factors.
+
+
+```{r}
+
+rownames(log1p_greedy_fit$V) <- genes_map_inv[rownames(log1p_greedy_fit$V)]
+rownames(log1p_fit_init_greedy$V) <- genes_map_inv[rownames(log1p_fit_init_greedy$V)]
+rownames(log1p_fit_init_nmf$V) <- genes_map_inv[rownames(log1p_fit_init_nmf$V)]
+
+log1p_greedy_fit$V <- log1p_greedy_fit$V[
+  rownames(log1p_greedy_fit$V) != "MALAT1" &
+    !(rownames(log1p_greedy_fit$V) %in% rownames(log1p_greedy_fit$V)[grep("^RPS", rownames(log1p_greedy_fit$V))]) &
+    !(rownames(log1p_greedy_fit$V) %in% rownames(log1p_greedy_fit$V)[grep("^RPL", rownames(log1p_greedy_fit$V))]) &
+    !(rownames(log1p_greedy_fit$V) %in% rownames(log1p_greedy_fit$V)[grep("\\.", rownames(log1p_greedy_fit$V))]), 
+]
+
+log1p_fit_init_greedy$V <- log1p_fit_init_greedy$V[
+  rownames(log1p_fit_init_greedy$V) != "MALAT1" &
+    !(rownames(log1p_fit_init_greedy$V) %in% rownames(log1p_fit_init_greedy$V)[grep("^RPS", rownames(log1p_fit_init_greedy$V))]) &
+    !(rownames(log1p_fit_init_greedy$V) %in% rownames(log1p_fit_init_greedy$V)[grep("^RPL", rownames(log1p_fit_init_greedy$V))]) &
+    !(rownames(log1p_fit_init_greedy$V) %in% rownames(log1p_fit_init_greedy$V)[grep("\\.", rownames(log1p_fit_init_greedy$V))]), 
+]
+
+log1p_fit_init_nmf$V <- log1p_fit_init_nmf$V[
+  rownames(log1p_fit_init_nmf$V) != "MALAT1" &
+    !(rownames(log1p_fit_init_nmf$V) %in% rownames(log1p_fit_init_nmf$V)[grep("^RPS", rownames(log1p_fit_init_nmf$V))]) &
+    !(rownames(log1p_fit_init_nmf$V) %in% rownames(log1p_fit_init_nmf$V)[grep("^RPL", rownames(log1p_fit_init_nmf$V))]) &
+    !(rownames(log1p_fit_init_nmf$V) %in% rownames(log1p_fit_init_nmf$V)[grep("\\.", rownames(log1p_fit_init_nmf$V))]), 
+]
+```
+
+
 ```{r}
 library(clusterProfiler)
 library(fgsea)
@@ -221,9 +260,11 @@ get_go_terms <- function(V) {
   
   for (k in 1:K) {
     
-    driving_genes <- names(sort(V[,k], decreasing = TRUE))[1:50]
+    driving_genes <- names(sort(V[,k], decreasing = TRUE))[1:20]
+    driving_genes_ensembl <- genes_map[driving_genes]
     
-    go_result <- enrichGO(gene = driving_genes,
+    
+    go_result <- enrichGO(gene = driving_genes_ensembl,
                           OrgDb = org.Hs.eg.db,
                           keyType = "ENSEMBL",
                           ont = "BP", 
@@ -236,7 +277,7 @@ get_go_terms <- function(V) {
     
     go_terms <- go_result$Description
     
-    genes_vec <- c(genes_vec, paste(unname(genes_map[driving_genes]), collapse = ", "))
+    genes_vec <- c(genes_vec, paste(driving_genes, collapse = ", "))
     go_terms_vec <- c(go_terms_vec, paste(go_terms, collapse = ", "))
     
   }
@@ -255,6 +296,7 @@ gdf <- get_go_terms(log1p_greedy_fit$V)
 gdf2 <- get_go_terms(log1p_fit_init_greedy$V)
 gdf3 <- get_go_terms(log1p_fit_init_nmf$V)
 ```
+
 Go Terms for log1p link Poisson NMF greedy fit
 
 ```{r}
