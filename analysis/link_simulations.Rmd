@@ -1,0 +1,156 @@
+---
+title: "Log1p vs. Identity Simulations"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-05-20"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results='hide')
+```
+
+## Simulation
+
+Below, I simulate data from a simple model of gene expression in two groups. For genes 1-250, each gene is expressed as Poisson with rate $0.05$. The next 100 genes are expressed as Poisson with rate $3$. In group 1, the final 100 genes are also expressed as Poisson with rate $3$. However, in group two, the last 100 genes are split between Poisson with rate $1$ and Poisson with rate $5$. 
+
+```{r}
+library(Matrix)
+set.seed(1)
+n_genes <- 500
+lambda_g1 <- numeric(n_genes)
+lambda_g1[1:250] <- .05
+lambda_g1[251:500] <- 3
+lambda_g2 <- lambda_g1
+diff_idx <- 401:500
+lambda_g2[diff_idx] <- lambda_g2[diff_idx] + c(rep(2, 50), rep(-2, 50))
+```
+
+Below is a visualization of the description above:
+
+```{r, echo=FALSE}
+gene_mean_df <- data.frame(
+  lambda = c(lambda_g1, lambda_g2),
+  pos = rep(1:500, 2),
+  group = c(rep("1", 500), rep("2", 500))
+)
+
+library(ggplot2)
+ggplot(gene_mean_df, aes(x = pos, y = lambda)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ group) +          # Create a panel for each group
+  labs(x = "Position", y = "Lambda") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+
+```
+
+I simulate $1250$ cells per group, and store the results as a sparse matrix.
+
+```{r}
+n_cells_per_group <- 2500
+
+Y_g1 <- matrix(
+  data = 0,
+  nrow = n_cells_per_group,
+  ncol = n_genes
+)
+
+Y_g2 <- matrix(
+  data = 0,
+  nrow = n_cells_per_group,
+  ncol = n_genes
+)
+
+for (i in 1:n_cells_per_group) {
+  
+  Y_g1[i, ] <- rpois(n = n_genes, lambda = lambda_g1)
+  
+}
+
+for (i in 1:n_cells_per_group) {
+  
+  Y_g2[i, ] <- rpois(n = n_genes, lambda = lambda_g2)
+  
+}
+
+Y <- rbind(Y_g1, Y_g2)
+Y <- as(Y, "sparseMatrix")
+Y <- Y[,Matrix::colSums(Y) > 0]
+```
+
+I then fit two Poisson NMF models, one with an identity link and the other with a log1p link. 
+
+```{r, warning=FALSE, results='hide'}
+library(passPCA)
+library(fastTopics)
+
+ft_mod <- fit_poisson_nmf(
+  X = Y, k = 3
+)
+
+log1p_mod <- fit_factor_model_log1p_quad_approx_sparse(
+  Y = Y, 
+  K = 3, 
+  approx_range = c(0, 1.25),
+  maxiter = 100,
+  init_method = "frob_nmf"
+  )
+```
+
+Below is a structure plot and a plot of the factors from the identity link model:
+
+```{r}
+structure_plot(ft_mod, grouping = c(rep("g1", 2500), rep("g2", 2500)))
+```
+
+```{r, echo=FALSE}
+ft_factor_df <- data.frame(
+  val = c(
+    ft_mod$F[,1], ft_mod$F[,2], ft_mod$F[,3]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500)
+  ),
+  pos = c(rep(1:500, 3))
+)
+
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+
+You can see that instead of one dense factor representing the minimum of the two groups and two sparse factors representing increases relative to that minimum, you can see the model represents all groups as the average of three factors. 
+
+For the log1p model, we normalize the results so that the maximum value of each loading is 1. Then, we make the same plots as the model above.
+
+```{r}
+max_col <- apply(log1p_mod$U, 2, max)
+log1p_LL <- sweep(log1p_mod$U, 2, max_col, FUN = "/")
+log1p_FF <- sweep(log1p_mod$V, 2, max_col, FUN = "*")
+```
+
+```{r}
+structure_plot(log1p_LL, grouping = c(rep("g1", 2500), rep("g2", 2500)))
+```
+
+```{r}
+log1p_factor_df <- data.frame(
+  val = c(
+    log1p_FF[,1], log1p_FF[,2], log1p_FF[,3]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500)
+  ),
+  pos = c(rep(1:500, 3))
+)
+
+ggplot(log1p_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+
+Again, the results are not really satisfactory, as the model represents the cells as an average of 3 dense factors. 

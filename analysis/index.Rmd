@@ -13,3 +13,5 @@ Welcome to my research website.
 [PBMC Purified Results](pbmc_purified_results.html)
 
 [Greedy Fitting](greedy_init.html)
+
+[Comparing Link Functions with a Simple Simulation](link_simulations.html)
