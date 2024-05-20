@@ -289,7 +289,7 @@ $(document).ready(function () {
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+workflowr <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -300,8 +300,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> </a>
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -310,13 +310,13 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-04-10
+<strong>Last updated:</strong> 2024-05-20
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 1
+aria-hidden="true"></span> 0
 </p>
 <p>
 <strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
@@ -339,36 +339,33 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
-<span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
-changes </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguncommittedchanges"
+<div id="strongRMarkdownfilestronguptodate"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
-<code>wflow_publish</code> to commit the R Markdown file and build the
-HTML.</p>
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree067cd65553bb130af690b10af0279b20783f78a5targetblank067cd65a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree78e0b04b32b74049ad0f93e1799eacfa4c40dde2targetblank78e0b04a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/067cd65553bb130af690b10af0279b20783f78a5" target="_blank">067cd65</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/78e0b04b32b74049ad0f93e1799eacfa4c40dde2" target="_blank">78e0b04</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree067cd65553bb130af690b10af0279b20783f78a5targetblank067cd65a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree78e0b04b32b74049ad0f93e1799eacfa4c40dde2targetblank78e0b04a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -378,7 +375,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/067cd65553bb130af690b10af0279b20783f78a5" target="_blank">067cd65</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/78e0b04b32b74049ad0f93e1799eacfa4c40dde2" target="_blank">78e0b04</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -394,15 +391,6 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rhistory
-
-Unstaged changes:
-    Modified:   analysis/index.Rmd
-
-Staged changes:
-    New:        analysis/greedy_init.Rmd
-    New:        output/pbmc_purified_25K_frob_nmf_init_log1p_fit.rds
-    New:        output/pbmc_purified_25K_greedy_init_log1p_fit.rds
-    New:        output/pbmc_purified_25K_greedy_log1p_fit.rds
 
 </code></pre>
 <p>
@@ -447,6 +435,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/78e0b04b32b74049ad0f93e1799eacfa4c40dde2/analysis/index.Rmd" target="_blank">78e0b04</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-05-20
+</td>
+<td>
+added simulation study
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/950f789f2b1c3eb293a8e98467f3d34cb511defa/analysis/index.Rmd" target="_blank">950f789</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-04-10
+</td>
+<td>
+added greedy fit analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/950f789f2b1c3eb293a8e98467f3d34cb511defa/docs/index.html" target="_blank">950f789</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-04-10
+</td>
+<td>
+added greedy fit analysis
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -576,6 +615,8 @@ Start workflowr project.
 <p>Welcome to my research website.</p>
 <p><a href="pbmc_purified_results.html">PBMC Purified Results</a></p>
 <p><a href="greedy_init.html">Greedy Fitting</a></p>
+<p><a href="link_simulations.html">Comparing Link Functions with a
+Simple Simulation</a></p>
 
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
