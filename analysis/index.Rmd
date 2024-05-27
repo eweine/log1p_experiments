@@ -15,3 +15,5 @@ Welcome to my research website.
 [Greedy Fitting](greedy_init.html)
 
 [Comparing Link Functions with a Simple Simulation](link_simulations.html)
+
+[Comparing Link Functions with a Multi-Group Simulation](link_simulations2.html)

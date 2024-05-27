@@ -12,9 +12,9 @@
 
 <meta name="date" content="2024-05-20" />
 
-<title>Log1p vs. Identity Simulations</title>
+<title>Log1p vs. Identity Simulations With Multiple Groups</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -370,7 +370,8 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Log1p vs. Identity Simulations</h1>
+<h1 class="title toc-ignore">Log1p vs. Identity Simulations With
+Multiple Groups</h1>
 <h4 class="date">2024-05-20</h4>
 
 </div>
@@ -400,7 +401,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-05-20
+<strong>Last updated:</strong> 2024-05-27
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -438,10 +439,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -569,6 +570,9 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
 
+Untracked files:
+    Untracked:  analysis/link_simulations2.Rmd
+
 Unstaged changes:
     Modified:   analysis/link_simulations.Rmd
 
@@ -585,316 +589,129 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were
-made to the R Markdown (<code>analysis/link_simulations.Rmd</code>) and
-HTML (<code>docs/link_simulations.html</code>) files. If you’ve
-configured a remote Git repository (see <code>?wflow_git_remote</code>),
-click on the hyperlinks in the table below to view the files as they
-were in that past version.
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
 </p>
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-File
-</th>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-<th>
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/78e0b04b32b74049ad0f93e1799eacfa4c40dde2/analysis/link_simulations.Rmd" target="_blank">78e0b04</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-20
-</td>
-<td>
-added simulation study
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/eweine/log1p_experiments/78e0b04b32b74049ad0f93e1799eacfa4c40dde2/docs/link_simulations.html" target="_blank">78e0b04</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-20
-</td>
-<td>
-added simulation study
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <hr>
 </div>
 </div>
 </div>
 <div id="simulation" class="section level2">
 <h2>Simulation</h2>
-<p>Below, I simulate data from a simple model of gene expression in two
-groups. For genes 1-250, each gene is expressed as Poisson with rate
-<span class="math inline">\(0.05\)</span>. The next 100 genes are
-expressed as Poisson with rate <span class="math inline">\(3\)</span>.
-In group 1, the final 100 genes are also expressed as Poisson with rate
-<span class="math inline">\(3\)</span>. However, in group two, the last
-100 genes are split between Poisson with rate <span
-class="math inline">\(1\)</span> and Poisson with rate <span
-class="math inline">\(5\)</span>.</p>
+<p>In another attempt to clarify the differences between the log1p model
+and the Poisson NMF model, I simulated data from the log1p model</p>
+<p><span class="math display">\[\begin{align*}
+y_{ij} &amp;\sim Poisson(\lambda_{ij}) \\
+\log(1 + \lambda_{ij}) &amp;= h_{ij} \\
+\boldsymbol{H} &amp;= \boldsymbol{L} \boldsymbol{F}^{T},
+\end{align*}\]</span></p>
+<p>using the following scheme for <span
+class="math inline">\(\boldsymbol{L}\)</span> and <span
+class="math inline">\(\boldsymbol{F}\)</span>:</p>
+<p>All cells are loaded with a value of <span
+class="math inline">\(1\)</span> on factor <span
+class="math inline">\(1\)</span>, which has very low expression for
+genes 1-250 and expression of <span class="math inline">\(1.5\)</span>
+on the log1p scale for genes 251-500. Then, the remaining cells all have
+probability <span class="math inline">\(0.2\)</span> of being loaded
+with a value of <span class="math inline">\(1\)</span> (and <span
+class="math inline">\(0\)</span> otherwise) on the following
+factors:</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Expressed (on the log1p scale) at <span
+class="math inline">\(1.8\)</span> on genes 210-260 and <span
+class="math inline">\(0\)</span> otherwise.</li>
+<li>Expressed at at <span class="math inline">\(1.8\)</span> on genes
+250-300 and <span class="math inline">\(0\)</span> otherwise.</li>
+<li>Expressed at at <span class="math inline">\(1.8\)</span> on genes
+290-340 and <span class="math inline">\(0\)</span> otherwise.</li>
+</ol>
 <pre class="r"><code>library(Matrix)
-set.seed(1)
+set.seed(5)
 n_genes &lt;- 500
-lambda_g1 &lt;- numeric(n_genes)
-lambda_g1[1:250] &lt;- .05
-lambda_g1[251:500] &lt;- 3
-lambda_g2 &lt;- lambda_g1
-diff_idx &lt;- 401:500
-lambda_g2[diff_idx] &lt;- lambda_g2[diff_idx] + c(rep(2, 50), rep(-2, 50))</code></pre>
-<p>Below is a visualization of the description above:</p>
-<p><img src="figure/link_simulations.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
-Past versions of unnamed-chunk-2-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-2-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/78e0b04b32b74049ad0f93e1799eacfa4c40dde2/docs/figure/link_simulations.Rmd/unnamed-chunk-2-1.png" target="_blank">78e0b04</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-20
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>I simulate <span class="math inline">\(1250\)</span> cells per group,
-and store the results as a sparse matrix.</p>
-<pre class="r"><code>n_cells_per_group &lt;- 2500
-
-Y_g1 &lt;- matrix(
+n_cells &lt;- 2500
+K &lt;- 4
+library(passPCA)
+FF &lt;- matrix(
   data = 0,
-  nrow = n_cells_per_group,
-  ncol = n_genes
+  nrow = n_genes,
+  ncol = K
 )
 
-Y_g2 &lt;- matrix(
+LL &lt;- matrix(
   data = 0,
-  nrow = n_cells_per_group,
-  ncol = n_genes
+  nrow = n_cells,
+  ncol = K
 )
 
-for (i in 1:n_cells_per_group) {
-  
-  Y_g1[i, ] &lt;- rpois(n = n_genes, lambda = lambda_g1)
-  
+FF[, 1] &lt;- c(rep(log(1.00225), 250), rep(log(1.5), 250))
+FF[210:260, 2] &lt;- 1.8
+FF[250:300, 3] &lt;- 1.8
+FF[290:340, 4] &lt;- 1.8
+
+LL[, 1] &lt;- 1
+
+for (j in 2:K) {
+
+  LL[, j] &lt;- sample(c(0, 1), size = n_cells, replace = TRUE, prob = c(0.8, 0.2))
+
 }
 
-for (i in 1:n_cells_per_group) {
-  
-  Y_g2[i, ] &lt;- rpois(n = n_genes, lambda = lambda_g2)
-  
-}
+H &lt;- tcrossprod(LL, FF)
+Lambda &lt;- exp(H) - 1
 
-Y &lt;- rbind(Y_g1, Y_g2)
-Y &lt;- as(Y, &quot;sparseMatrix&quot;)
-Y &lt;- Y[,Matrix::colSums(Y) &gt; 0]</code></pre>
-<p>I then fit two Poisson NMF models, one with an identity link and the
-other with a log1p link.</p>
-<pre class="r"><code>library(passPCA)
-library(fastTopics)
-
-ft_mod &lt;- fit_poisson_nmf(
-  X = Y, k = 4
+y &lt;- rpois(n_cells * n_genes, lambda = as.vector(Lambda))
+Y &lt;- matrix(
+  data = y,
+  nrow = n_cells,
+  ncol = n_genes
 )
+Y &lt;- as(Y, &quot;sparseMatrix&quot;)</code></pre>
+<p>For what it’s worth, below is a structure plot of the true loadings
+matrix:</p>
+<pre class="r"><code>fastTopics::structure_plot(LL)</code></pre>
+<pre><code>Running tsne on 2000 x 4 matrix.</code></pre>
+<p><img src="figure/link_simulations2.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>And, here is a visualization of the factors:</p>
+<pre class="r"><code>true_factor_df &lt;- data.frame(
+  val = c(
+    FF[,1], FF[,2], FF[,3], FF[,4]
+  ),
+  factor = c(
+    rep(&quot;1&quot;, 500), rep(&quot;2&quot;, 500), rep(&quot;3&quot;, 500), rep(&quot;4&quot;, 500)
+  ),
+  pos = c(rep(1:500, 4))
+)
+library(ggplot2)
+ggplot(true_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = &quot;identity&quot;) +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = &quot;Value&quot;, y = &quot;Factor&quot;) +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look</code></pre>
+<p><img src="figure/link_simulations2.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Now, I fit both the log1p model with a global quadratic approximation
+to the terms in the log-likelihood with <span
+class="math inline">\(0\)</span> counts. I also fit a standard Poisson
+NMF model using <code>fastTopics</code>. I set the rank of the
+factorization to be 4 in both cases.</p>
+<pre class="r"><code>ft_mod &lt;- fastTopics::fit_poisson_nmf(Y, k=4, numiter = 250)
 
 log1p_mod &lt;- fit_factor_model_log1p_quad_approx_sparse(
-  Y = Y, 
-  K = 4, 
-  approx_range = c(0, 1.25),
-  maxiter = 100,
-  init_method = &quot;frob_nmf&quot;
-  )</code></pre>
-<p>Below is a structure plot and a plot of the factors from the identity
-link model:</p>
-<pre class="r"><code>structure_plot(ft_mod, grouping = c(rep(&quot;g1&quot;, 2500), rep(&quot;g2&quot;, 2500)))</code></pre>
-<pre><code>Running tsne on 1023 x 4 matrix.</code></pre>
-<pre><code>Running tsne on 977 x 4 matrix.</code></pre>
-<p><img src="figure/link_simulations.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
-Past versions of unnamed-chunk-5-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-5-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/78e0b04b32b74049ad0f93e1799eacfa4c40dde2/docs/figure/link_simulations.Rmd/unnamed-chunk-5-1.png" target="_blank">78e0b04</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-20
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p><img src="figure/link_simulations.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
-Past versions of unnamed-chunk-6-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-6-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/78e0b04b32b74049ad0f93e1799eacfa4c40dde2/docs/figure/link_simulations.Rmd/unnamed-chunk-6-1.png" target="_blank">78e0b04</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-20
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>You can see that instead of one dense factor representing the minimum
-of the two groups and two sparse factors representing increases relative
-to that minimum, you can see the model represents all groups as the
-average of three factors.</p>
-<p>For the log1p model, we normalize the results so that the maximum
-value of each loading is 1. Then, we make the same plots as the model
-above.</p>
+  Y=Y, K = 4, approx_range = c(0, 1.25), maxiter = 250
+)</code></pre>
+<p>First, we visualize the results of the log1p model after normalizing
+so that the largest value of each column of <span
+class="math inline">\(\boldsymbol{L}\)</span> is <span
+class="math inline">\(1\)</span>.</p>
 <pre class="r"><code>max_col &lt;- apply(log1p_mod$U, 2, max)
 log1p_LL &lt;- sweep(log1p_mod$U, 2, max_col, FUN = &quot;/&quot;)
 log1p_FF &lt;- sweep(log1p_mod$V, 2, max_col, FUN = &quot;*&quot;)</code></pre>
-<pre class="r"><code>structure_plot(log1p_LL, grouping = c(rep(&quot;g1&quot;, 2500), rep(&quot;g2&quot;, 2500)))</code></pre>
-<pre><code>Running tsne on 1003 x 4 matrix.</code></pre>
-<pre><code>Running tsne on 997 x 4 matrix.</code></pre>
-<p><img src="figure/link_simulations.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
-Past versions of unnamed-chunk-8-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-8-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/78e0b04b32b74049ad0f93e1799eacfa4c40dde2/docs/figure/link_simulations.Rmd/unnamed-chunk-8-1.png" target="_blank">78e0b04</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-20
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p>First, a structure plot of the loadings:</p>
+<pre class="r"><code>fastTopics::structure_plot(log1p_LL)</code></pre>
+<pre><code>Running tsne on 2000 x 4 matrix.</code></pre>
+<p><img src="figure/link_simulations2.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" />
+And here are the factors:</p>
 <pre class="r"><code>log1p_factor_df &lt;- data.frame(
   val = c(
     log1p_FF[,1], log1p_FF[,2], log1p_FF[,3], log1p_FF[,4]
@@ -904,52 +721,51 @@ Eric Weine
   ),
   pos = c(rep(1:500, 4))
 )
-
+library(ggplot2)
 ggplot(log1p_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = &quot;identity&quot;) +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = &quot;Position&quot;, y = &quot;Factor&quot;) +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look</code></pre>
+<p><img src="figure/link_simulations2.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Overall, the fit looks pretty good. We might hope for the third
+factor to be a bit sparser on the genes with higher positions, and we
+would hope for the fourth factor to be constant from 250-500. These
+discrepancies from the true model could be due to lack of
+identifiability, only fitting the model on <span
+class="math inline">\(2,500\)</span> cells, or the approximation to the
+log-likelihood.</p>
+<p>However, it’s quite illuminating the look at the results of Poisson
+NMF on this dataset. Below is the structure plot:</p>
+<pre class="r"><code>fastTopics::structure_plot(ft_mod)</code></pre>
+<pre><code>Running tsne on 2000 x 4 matrix.</code></pre>
+<p><img src="figure/link_simulations2.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" />
+And here are the factors:</p>
+<pre class="r"><code>ft_factor_df &lt;- data.frame(
+  val = c(
+    ft_mod$F[,1], ft_mod$F[,2], ft_mod$F[,3], ft_mod$F[,4]
+  ),
+  factor = c(
+    rep(&quot;1&quot;, 500), rep(&quot;2&quot;, 500), rep(&quot;3&quot;, 500), rep(&quot;4&quot;, 500)
+  ),
+  pos = c(rep(1:500, 4))
+)
+library(ggplot2)
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
   geom_bar(stat = &quot;identity&quot;) +  # Use bars to represent lambda values
   facet_wrap(~ factor) +          # Create a panel for each group
   labs(x = &quot;Position&quot;, y = &quot;Value&quot;) +
   cowplot::theme_cowplot()  # Use a minimal theme for a clean look</code></pre>
-<p><img src="figure/link_simulations.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
-Past versions of unnamed-chunk-9-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-9-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/78e0b04b32b74049ad0f93e1799eacfa4c40dde2/docs/figure/link_simulations.Rmd/unnamed-chunk-9-1.png" target="_blank">78e0b04</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-20
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Again, the results are not really satisfactory, as the model
-represents the cells as an average of 3 dense factors.</p>
+<p><img src="figure/link_simulations2.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Most notably, we can see that the factors are generally dominated by
+the set of genes that are in the “overlapping” areas of the factors. For
+instance, factor 1 is driven by genes in the range of 250-260. These
+genes are (a) in the higher background group and (b) are involved in two
+of the other three factors. Similar patterns can be seen in the other
+factors in the “overlapping” regions.</p>
+<p>Essentially, I believe the identity link has a difficult time
+representing multiplicative changes in gene expression, especially for
+genes which already have somewhat high expression at baseline.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

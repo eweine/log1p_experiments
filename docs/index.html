@@ -13,7 +13,7 @@
 
 <title>Home</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -289,7 +289,7 @@ $(document).ready(function () {
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -300,8 +300,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -310,13 +310,13 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-05-20
+<strong>Last updated:</strong> 2024-05-27
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
@@ -339,33 +339,36 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree78e0b04b32b74049ad0f93e1799eacfa4c40dde2targetblank78e0b04a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree9bbe0bd1b163ea30723feed3f8bc4e52adef5bfdtargetblank9bbe0bda">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/78e0b04b32b74049ad0f93e1799eacfa4c40dde2" target="_blank">78e0b04</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/9bbe0bd1b163ea30723feed3f8bc4e52adef5bfd" target="_blank">9bbe0bd</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree78e0b04b32b74049ad0f93e1799eacfa4c40dde2targetblank78e0b04a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree9bbe0bd1b163ea30723feed3f8bc4e52adef5bfdtargetblank9bbe0bda"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -375,7 +378,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/78e0b04b32b74049ad0f93e1799eacfa4c40dde2" target="_blank">78e0b04</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/9bbe0bd1b163ea30723feed3f8bc4e52adef5bfd" target="_blank">9bbe0bd</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -391,6 +394,13 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rhistory
+
+Untracked files:
+    Untracked:  analysis/link_simulations2.Rmd
+
+Unstaged changes:
+    Modified:   analysis/index.Rmd
+    Modified:   analysis/link_simulations.Rmd
 
 </code></pre>
 <p>
@@ -435,6 +445,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/9bbe0bd1b163ea30723feed3f8bc4e52adef5bfd/docs/index.html" target="_blank">9bbe0bd</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-05-20
+</td>
+<td>
+fixed index html
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -617,6 +644,8 @@ Start workflowr project.
 <p><a href="greedy_init.html">Greedy Fitting</a></p>
 <p><a href="link_simulations.html">Comparing Link Functions with a
 Simple Simulation</a></p>
+<p><a href="link_simulations2.html">Comparing Link Functions with a
+Multi-Group Simulation</a></p>
 
 
 <!-- Adjust MathJax settings so that all math formulae are shown using

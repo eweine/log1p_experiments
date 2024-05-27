@@ -1,0 +1,176 @@
+---
+title: "Log1p vs. Identity Simulations With Multiple Groups"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-05-20"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results='hide')
+```
+
+## Simulation
+
+In another attempt to clarify the differences between the log1p model and the Poisson NMF model, I simulated data from the log1p model
+
+\begin{align*}
+y_{ij} &\sim Poisson(\lambda_{ij}) \\
+\log(1 + \lambda_{ij}) &= h_{ij} \\
+\boldsymbol{H} &= \boldsymbol{L} \boldsymbol{F}^{T},
+\end{align*}
+
+using the following scheme for $\boldsymbol{L}$ and $\boldsymbol{F}$:
+
+All cells are loaded with a value of $1$ on factor $1$, which has very low expression for genes 1-250 and expression of $1.5$ on the log1p scale for genes 251-500. Then, the remaining cells all have probability $0.2$ of being loaded with a value of $1$ (and $0$ otherwise) on the following factors:
+
+(2) Expressed (on the log1p scale) at $1.8$ on genes 210-260 and $0$ otherwise.
+(3) Expressed at at $1.8$ on genes 250-300 and $0$ otherwise.
+(4) Expressed at at $1.8$ on genes 290-340 and $0$ otherwise.
+
+```{r}
+library(Matrix)
+set.seed(5)
+n_genes <- 500
+n_cells <- 2500
+K <- 4
+library(passPCA)
+FF <- matrix(
+  data = 0,
+  nrow = n_genes,
+  ncol = K
+)
+
+LL <- matrix(
+  data = 0,
+  nrow = n_cells,
+  ncol = K
+)
+
+FF[, 1] <- c(rep(log(1.00225), 250), rep(log(1.5), 250))
+FF[210:260, 2] <- 1.8
+FF[250:300, 3] <- 1.8
+FF[290:340, 4] <- 1.8
+
+LL[, 1] <- 1
+
+for (j in 2:K) {
+
+  LL[, j] <- sample(c(0, 1), size = n_cells, replace = TRUE, prob = c(0.8, 0.2))
+
+}
+
+H <- tcrossprod(LL, FF)
+Lambda <- exp(H) - 1
+
+y <- rpois(n_cells * n_genes, lambda = as.vector(Lambda))
+Y <- matrix(
+  data = y,
+  nrow = n_cells,
+  ncol = n_genes
+)
+Y <- as(Y, "sparseMatrix")
+```
+
+For what it's worth, below is a structure plot of the true loadings matrix:
+
+```{r}
+fastTopics::structure_plot(LL)
+```
+
+And, here is a visualization of the factors:
+
+```{r}
+true_factor_df <- data.frame(
+  val = c(
+    FF[,1], FF[,2], FF[,3], FF[,4]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500)
+  ),
+  pos = c(rep(1:500, 4))
+)
+library(ggplot2)
+ggplot(true_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Value", y = "Factor") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+
+```
+
+Now, I fit both the log1p model with a global quadratic approximation to the terms in the log-likelihood with $0$ counts. I also fit a standard Poisson NMF model using `fastTopics`. I set the rank of the factorization to be 4 in both cases.
+
+```{r}
+ft_mod <- fastTopics::fit_poisson_nmf(Y, k=4, numiter = 250)
+
+log1p_mod <- fit_factor_model_log1p_quad_approx_sparse(
+  Y=Y, K = 4, approx_range = c(0, 1.25), maxiter = 250
+)
+```
+
+First, we visualize the results of the log1p model after normalizing so that the largest value of each column of $\boldsymbol{L}$ is $1$.
+
+```{r}
+max_col <- apply(log1p_mod$U, 2, max)
+log1p_LL <- sweep(log1p_mod$U, 2, max_col, FUN = "/")
+log1p_FF <- sweep(log1p_mod$V, 2, max_col, FUN = "*")
+```
+
+First, a structure plot of the loadings:
+
+```{r}
+fastTopics::structure_plot(log1p_LL)
+```
+And here are the factors:
+
+```{r}
+log1p_factor_df <- data.frame(
+  val = c(
+    log1p_FF[,1], log1p_FF[,2], log1p_FF[,3], log1p_FF[,4]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500)
+  ),
+  pos = c(rep(1:500, 4))
+)
+library(ggplot2)
+ggplot(log1p_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Factor") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+
+```
+
+Overall, the fit looks pretty good. We might hope for the third factor to be a bit sparser on the genes with higher positions, and we would hope for the fourth factor to be constant from 250-500. These discrepancies from the true model could be due to lack of identifiability, only fitting the model on $2,500$ cells, or the approximation to the log-likelihood.
+
+However, it's quite illuminating the look at the results of Poisson NMF on this dataset. Below is the structure plot:
+
+```{r}
+fastTopics::structure_plot(ft_mod)
+```
+And here are the factors:
+
+```{r}
+ft_factor_df <- data.frame(
+  val = c(
+    ft_mod$F[,1], ft_mod$F[,2], ft_mod$F[,3], ft_mod$F[,4]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500)
+  ),
+  pos = c(rep(1:500, 4))
+)
+library(ggplot2)
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+
+```
+
+Most notably, we can see that the factors are generally dominated by the set of genes that are in the "overlapping" areas of the factors. For instance, factor 1 is driven by genes in the range of 250-260. These genes are (a) in the higher background group and (b) are involved in two of the other three factors. Similar patterns can be seen in the other factors in the "overlapping" regions.
+
+Essentially, I believe the identity link has a difficult time representing multiplicative changes in gene expression, especially for genes which already have somewhat high expression at baseline.

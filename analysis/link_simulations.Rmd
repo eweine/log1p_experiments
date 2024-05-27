@@ -85,12 +85,12 @@ library(passPCA)
 library(fastTopics)
 
 ft_mod <- fit_poisson_nmf(
-  X = Y, k = 3
+  X = Y, k = 4
 )
 
 log1p_mod <- fit_factor_model_log1p_quad_approx_sparse(
   Y = Y, 
-  K = 3, 
+  K = 4, 
   approx_range = c(0, 1.25),
   maxiter = 100,
   init_method = "frob_nmf"
@@ -106,12 +106,12 @@ structure_plot(ft_mod, grouping = c(rep("g1", 2500), rep("g2", 2500)))
 ```{r, echo=FALSE}
 ft_factor_df <- data.frame(
   val = c(
-    ft_mod$F[,1], ft_mod$F[,2], ft_mod$F[,3]
+    ft_mod$F[,1], ft_mod$F[,2], ft_mod$F[,3], ft_mod$F[,4]
   ),
   factor = c(
-    rep("1", 500), rep("2", 500), rep("3", 500)
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500)
   ),
-  pos = c(rep(1:500, 3))
+  pos = c(rep(1:500, 4))
 )
 
 ggplot(ft_factor_df, aes(x = pos, y = val)) +
@@ -138,12 +138,12 @@ structure_plot(log1p_LL, grouping = c(rep("g1", 2500), rep("g2", 2500)))
 ```{r}
 log1p_factor_df <- data.frame(
   val = c(
-    log1p_FF[,1], log1p_FF[,2], log1p_FF[,3]
+    log1p_FF[,1], log1p_FF[,2], log1p_FF[,3], log1p_FF[,4]
   ),
   factor = c(
-    rep("1", 500), rep("2", 500), rep("3", 500)
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500)
   ),
-  pos = c(rep(1:500, 3))
+  pos = c(rep(1:500, 4))
 )
 
 ggplot(log1p_factor_df, aes(x = pos, y = val)) +
