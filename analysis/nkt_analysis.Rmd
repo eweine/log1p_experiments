@@ -1,0 +1,570 @@
+---
+title: "NKT Dataset Analysis"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-06-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results='hide', message = FALSE, warning = FALSE)
+data_dir <- "~/Documents/data/passPCA/experiment_results"
+```
+
+Here, I analyze data from [this study](https://www.frontiersin.org/articles/10.3389/fcell.2020.00384/full) of the effect of PMA/Ionomycin stimulation on natural killer T cells derived from humans.
+
+In particular, I am interested in understanding the differences in representation between Poisson NMF with a log1p-link and Poisson NMF with an identity link. 
+
+First, I load in the data. 
+
+```{r}
+library(dplyr)
+library(Matrix)
+library(fastTopics)
+
+m1 <- as.matrix(Matrix::readMM(
+  '~/Downloads/GSE128243_RAW/GSM3669244_NKT_HS_Unstim1_matrix.mtx'
+))
+genes1 <- readr::read_tsv("~/Downloads/GSE128243_RAW/GSM3669244_NKT_HS_Unstim1_genes.tsv",
+                          col_names = c("ensembl", "name"))
+rownames(m1) <- genes1$ensembl
+
+m2 <- as.matrix(Matrix::readMM('~/Downloads/GSE128243_RAW/GSM3669245_NKT_HS_Unstim2_matrix.mtx'))
+genes2 <- readr::read_tsv(
+  "~/Downloads/GSE128243_RAW/GSM3669245_NKT_HS_Unstim2_genes.tsv",
+  col_names = c("ensembl", "name")
+)
+rownames(m2) <- genes2$ensembl
+
+m3 <- as.matrix(Matrix::readMM('~/Downloads/GSE128243_RAW/GSM3669246_NKT_HS_Unstim3_matrix.mtx'))
+genes3 <- readr::read_tsv(
+  "~/Downloads/GSE128243_RAW/GSM3669246_NKT_HS_Unstim3_genes.tsv",
+  col_names = c("ensembl", "name")
+)
+rownames(m3) <- genes3$ensembl
+
+
+m4 <- as.matrix(Matrix::readMM('~/Downloads/GSE128243_RAW/GSM3669247_NKT_HS_Stim1_matrix.mtx'))
+genes4 <- readr::read_tsv(
+  "~/Downloads/GSE128243_RAW/GSM3669247_NKT_HS_Stim1_genes.tsv",
+  col_names = c("ensembl", "name")
+)
+rownames(m4) <- genes4$ensembl
+
+m5 <- as.matrix(Matrix::readMM('~/Downloads/GSE128243_RAW/GSM3669248_NKT_HS_Stim2_matrix.mtx'))
+genes5 <- readr::read_tsv("~/Downloads/GSE128243_RAW/GSM3669248_NKT_HS_Stim2_genes.tsv",
+                          col_names = c("ensembl", "name")
+)
+rownames(m5) <- genes5$ensembl
+
+m6 <- as.matrix(Matrix::readMM('~/Downloads/GSE128243_RAW/GSM3669249_NKT_HS_Stim3_matrix.mtx'))
+genes6 <- readr::read_tsv("~/Downloads/GSE128243_RAW/GSM3669249_NKT_HS_Stim3_genes.tsv",
+                          col_names = c("ensembl", "name")
+)
+rownames(m6) <- genes6$ensembl
+
+m <- cbind(
+  m1, m2, m3, m4, m5, m6
+)
+
+samples <- c(
+  rep("Unstim", ncol(m1)),
+  rep("Unstim", ncol(m2)),
+  rep("Unstim", ncol(m3)),
+  rep("Stim", ncol(m4)),
+  rep("Stim", ncol(m5)),
+  rep("Stim", ncol(m6))
+)
+
+rm(m1, m2, m3, m4, m5, m6)
+m <- as(m, "sparseMatrix")
+
+#m <- m[(rowSums(m) >= 10) | (apply(m, 1, max) >= 5), ]
+m <- m[, Matrix::colSums(m) > 0]
+m <- m[Matrix::rowSums(m) > 0, ]
+
+m <- Matrix::t(m)
+
+stim_m <- m[samples == "Stim",]
+unstim_m <- m[samples == "Unstim",]
+```
+
+The experiment has $14,119$ cells, with $17,619$ genes that are expressed in at least $1$ cell. Only $3.6\%$ of entries are non-zero. 
+
+## Exploratory Analysis
+
+Before diving into the matrix factorizations, I wanted to better understand the differences in gene expression between the stimuated and unstimulated conditions. Following Yusha's previous analysis, I suppose that for all observed cells $i = 1, \dots, n$ and genes $j = 1, \dots, m$, we have $$y_{ij} | s_{i}, t \sim Poisson(s_{i} \lambda_{tj}),$$
+where $s_{i}$ is the total number of mRNAs observed in cell $i$, and $c$ is an indicator variable indicating if cell $i$ comes from the stimulated ($t = 1$) or unstimulated ($t = 0$) condition. Now, under the assumption of multiplicative effects, for a given gene $j$ we can write $$\lambda_{tj} = c_{tj} \lambda_{j},$$ where $\lambda_{j}$ is the ``background'' rate for gene $j$ and $c_{tj}$ is the multiplicative effect of treatment $t$. In this case, $$\log(\lambda_{1j} / \lambda_{0j}) = \log(c_{1j} / c_{0j}),$$
+which is independent of $\lambda_{j}$. Alternatively, if effects are more consistent with an additive model, we can write $$\lambda_{tj} = a_{tj} +  \lambda_{j}.$$ In this case, $$\lambda_{1j} - \lambda_{0j} = a_{1j} - a_{0j},$$ which is also independent of $\lambda_{j}$. 
+
+On the NKT dataset, I estimated all values of $\lambda$ above with an MLE and excluded genes that had no counts in the entirety of one condition. Below are the results:
+
+```{r}
+s_stim <- sum(stim_m)
+s_unstim <- sum(unstim_m)
+
+lambda_g <- Matrix::colSums(m) / (s_stim + s_unstim)
+
+lambda_stim <- Matrix::colSums(stim_m) / s_stim
+lambda_unstim <- Matrix::colSums(unstim_m) / s_unstim
+
+lambda_df <- data.frame(
+  lambda_g = lambda_g,
+  lambda_stim = lambda_stim,
+  lambda_unstim = lambda_unstim
+)
+
+# filter out genes that are 0 in one condition
+lambda_df <- lambda_df %>%
+  dplyr::filter(
+    lambda_stim > 0 & lambda_unstim > 0
+  )
+
+lambda_df <- lambda_df %>%
+  dplyr::mutate(
+    add_diff = abs(lambda_stim - lambda_unstim),
+    mult_diff = abs(log(lambda_stim) - log(lambda_unstim))
+  )
+
+library(ggplot2)
+library(latex2exp)
+
+g1 <- ggplot(data = lambda_df) +
+  geom_point(aes(x = lambda_g, y = add_diff)) +
+  geom_smooth(aes(x = lambda_g, y = add_diff)) +
+  xlab(TeX("$\\lambda_{j}$")) +
+  ylab(TeX("$|\\lambda_{1j} - \\lambda_{0j}|$")) +
+  ggtitle("Additive Model")
+
+
+g2 <- ggplot(data = lambda_df) +
+  geom_point(aes(x = lambda_g, y = mult_diff)) +
+  geom_smooth(aes(x = lambda_g, y = mult_diff)) +
+  xlab(TeX("$\\lambda_{j}$")) +
+  ylab(TeX("$|\\log(\\lambda_{1j}) - \\log(\\lambda_{0j})|$")) + 
+  ggtitle("Multiplicative Model")
+
+library(ggpubr)
+
+ggarrange(g1, g2, nrow = 1)
+```
+
+Much like in Yusha's analysis, it seems fairly clear that a multiplicative model is more reasonable than an additive model for this data. One future improvement to this could be de-noising (i.e. mean-regressing) the estimates of $\lambda$. 
+
+## Factor Model Analysis
+
+Given the analysis above, it seems reasonable to expect that a factor model with a $log1p$ link will provide a more ``parsimonious'' representation of the data. In particular, based on previous simulation experiments I have done, I would expect that the factors in the identity link model will be driven by genes that are highest at baseline, where the factors in the $log1p$ model will be driven by changes relative to baseline (which seems more desirable).
+
+To start, I compare the two models with rank $10$ with random initializations. To fit the $log1p$ link, I am using a quadratic approximation to the terms in the log-likelihood corresponding to $0$ counts. 
+
+```{r, eval=FALSE}
+set.seed(1)
+log1p_fit_rand_init <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = m,
+  K = 10,
+  approx_range = c(0, 1.25),
+  maxiter = 100,
+  s = rowSums(m) / mean(rowSums(m))
+)
+
+library(fastTopics)
+# now, I want to fit Poisson NMF models
+set.seed(1)
+nmf_pois_rand_init <- fit_poisson_nmf(
+  m,
+  k = 10,
+  numiter = 100,
+  control = list(nc = 7),
+  init.method = "random"
+)
+```
+
+```{r}
+library(glue)
+# load in fitted model
+log1p_fit_rand_init <- readr::read_rds(glue("{data_dir}/log1p_nkt_rand_init_k10.rds"))
+
+nmf_pois_rand_init <- readr::read_rds(glue("{data_dir}/pois_nmf_nkt_rand_init_k10.rds"))
+```
+
+I first normalize the fits so that the maximum of each column of the loadings is $1$.
+
+```{r}
+max_col <- apply(log1p_fit_rand_init$U, 2, max)
+log1p_LL <- sweep(log1p_fit_rand_init$U, 2, max_col, FUN = "/")
+log1p_FF <- sweep(log1p_fit_rand_init$V, 2, max_col, FUN = "*")
+
+max_col <- apply(nmf_pois_rand_init$L, 2, max)
+nmf_LL <- sweep(nmf_pois_rand_init$L, 2, max_col, FUN = "/")
+nmf_FF <- sweep(nmf_pois_rand_init$F, 2, max_col, FUN = "*")
+```
+
+Now, we can examine the structure plots from the two models:
+
+```{r}
+# cell.type <- factor(samples)
+# 
+# # Downsample the number of cells and sort them using tSNE.
+# set.seed(8675309)
+# cell.idx <- numeric(0)
+# cell.types <- levels(cell.type)
+# for (i in 1:length(cell.types)) {
+#   which.idx <- which(cell.type == cell.types[i])
+#   # Downsample common cell types.
+#   if (length(which.idx) > 4000) {
+#     which.idx <- sample(which.idx, 4000)
+#   }
+#   # Don't include rare cell types.
+#   if (length(which.idx) > 20) {
+#     # Sort using tsne.
+#     tsne.res <- Rtsne::Rtsne(
+#       log1p_LL[which.idx, ],
+#       dims = 1,
+#       pca = FALSE,
+#       normalize = FALSE,
+#       perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+#       theta = 0.1,
+#       max_iter = 1000,
+#       eta = 200,
+#       check_duplicates = FALSE
+#     )$Y[, 1]
+#     which.idx <- which.idx[order(tsne.res)]
+#     cell.idx <- c(cell.idx, which.idx)
+#   }
+# }
+# 
+# cell.type <- cell.type[cell.idx]
+# cell.type <- droplevels(cell.type)
+# 
+# log1p_LL <- log1p_LL[cell.idx, ]
+# nmf_LL <- nmf_LL[cell.idx, ]
+# library(tidyr)
+# library(purrr)
+# library(dplyr)
+# library(stringi)
+# library(stringr)
+# 
+# make.heatmap.tib <- function(LL) {
+#   tib <- as_tibble(scale(LL, center = FALSE, scale = apply(LL, 2, max))) %>%
+#     mutate(Cell.type = cell.type) %>%
+#     arrange(Cell.type) %>%
+#     mutate(Cell.idx = row_number())
+# 
+#   tib <- tib %>%
+#     pivot_longer(
+#       -c(Cell.idx, Cell.type),
+#       names_to = "Factor",
+#       values_to = "Loading",
+#       values_drop_na = TRUE
+#     ) %>%
+#     mutate(Factor = as.numeric(str_extract(Factor, "[0-9]+")))
+# 
+#   return(tib)
+# }
+# 
+# log1p_tib <- make.heatmap.tib(log1p_LL)
+# nmf_tib <- make.heatmap.tib(nmf_LL)
+# 
+# heatmap.tib <- log1p_tib %>% mutate(Method = "log1p Poisson NMF") %>%
+#   bind_rows(nmf_tib %>% mutate(Method = "Identity Poisson NMF")) %>%
+#   mutate(Method = factor(Method, levels = c("log1p Poisson NMF", "Identity Poisson NMF")))
+# 
+# tib <- heatmap.tib %>%
+#   group_by(Cell.type, Cell.idx) %>%
+#   summarize()
+# 
+# cell_type_breaks <- c(1, which(tib$Cell.type[-1] != tib$Cell.type[-nrow(tib)]))
+# label_pos <- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib)) / 2
+# 
+# library(ggplot2)
+# 
+# plt <- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+#   geom_tile() +
+#   scale_fill_gradient(low = "white", high = "firebrick") +
+#   labs(y = "") +
+#   scale_y_continuous(breaks = -label_pos,
+#                      minor_breaks = NULL,
+#                      labels = levels(cell.type)) +
+#   scale_x_continuous(breaks = seq(0, 30, 5)) +
+#   theme_minimal() +
+#   geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+#   facet_wrap(~Method, ncol = 1, axes = "all") +
+#   theme(legend.position = "none",
+#         strip.text = element_text(size = 16))
+# 
+# plt
+```
+
+```{r}
+p1 <- structure_plot(nmf_pois_rand_init, grouping = samples, n=1e6)
+p2 <- structure_plot(log1p_LL, grouping = samples, n=1e6)
+ggarrange(p1, p2, nrow = 2)
+```
+Based on the structure plots, it seems like the log1p link represents the stimulated cells a bit more distinctly than than the unstimulated cells. In the log1p model, factors 4 and 6 are represented strongly in both the stimulated and unstimulated cells. However, factors 8 and 1 are mostly seen in the unstimulated cells. In the NMF model, all factors represented in the unstimulated cells also appear to be represented in the stimulated cells.
+
+```{r}
+library(clusterProfiler)
+library(fgsea)
+library(AnnotationDbi)
+library(org.Hs.eg.db)
+
+rownames(log1p_FF) <- colnames(m)
+
+gv <- genes1$name
+names(gv) <- genes1$ensembl
+
+get_go_terms <- function(V) {
+  
+  K <- ncol(V)
+  
+  genes_vec <- c()
+  go_terms_vec <- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes <- names(sort(V[,k], decreasing = TRUE))[1:20]
+    
+    go_result <- enrichGO(gene = driving_genes,
+                          OrgDb = org.Hs.eg.db,
+                          keyType = "ENSEMBL",
+                          ont = "BP", 
+                          pAdjustMethod = "bonferroni",
+                          pvalueCutoff = 0.01,
+                          qvalueCutoff = 0.05)@result
+    
+    go_result <- go_result %>%
+      dplyr::filter(p.adjust < .01)
+    
+    go_terms <- go_result$Description
+    
+    genes_vec <- c(genes_vec, paste(unname(gv[driving_genes]), collapse = ", "))
+    go_terms_vec <- c(go_terms_vec, paste(go_terms, collapse = ", "))
+    
+  }
+  
+  go_df <- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}
+
+gdf_log1p <- get_go_terms(log1p_FF)
+gdf_nmf <- get_go_terms(nmf_FF)
+```
+
+Below are the GO terms and driving genes for the identity link model:
+
+```{r, results='asis'}
+knitr::kable(gdf_nmf)
+```
+
+Below are the GO terms and driving genes for the log1p link model:
+
+```{r, results='asis'}
+knitr::kable(gdf_log1p)
+```
+
+
+It is difficult to compare the GO terms for the factors from the two models. Both models seem to really only have 1 very interesting factor relevant to stimulation. In the identity link model, that is factor 4, while for the log1p link model that is factor 7. Interestingly, it seems like factor 4 is only represented in a small subset of the stimulated cells in the identity link model, where factor 7 is loaded on almost all stimulated cells in the log1p link model. Without more in depth analysis of the single cell data, it is difficult to know if the stimulation effect really has a much larger effect on a small subset of cells.
+
+To attempt to check this, I summed the top 20 genes in factor 4 of the NMF model and checked their expression before and after stimulation. The results are shown below. 
+
+
+```{r}
+stim_factor4 <- Matrix::rowSums(stim_m[,names(sort(nmf_FF[,4], decreasing = TRUE)[1:20])]) / Matrix::rowSums(stim_m)
+unstim_factor4 <- Matrix::rowSums(unstim_m[,names(sort(nmf_FF[,4], decreasing = TRUE)[1:20])]) / Matrix::rowSums(stim_m)
+
+fact4_df <- data.frame(
+  prop = c(stim_factor4, unstim_factor4),
+  condition = c(rep("stim", length(stim_factor4)), rep("unstim", length(unstim_factor4)))
+)
+
+ggplot(fact4_df) +
+  geom_density(aes(x = prop, fill = condition), alpha = .5) +
+  xlab("Expression / Library Size for Top 20 Genes in Factor 4")
+```
+It seems like after stimulation, the expression of these 20 genes has a much higher baseline than before stimulation, though the highest expression values are not necessarily higher in the stimulated condition. It is not exactly clear which model is representing this effect better.
+
+Overall, you might be able to make a case for the log1p model here, but I don't think there is any extremely compelling evidence.
+
+## Alternative Initializations
+
+Many of the gene sets above seem relatively similar, so I was curious if initializing the model with an intercept factor might help create sparser and more distinct factors. 
+
+To do this, I first fit both models with $k = 1$. Then, I initialized the $k = 10$ models with the same first factor as the rank 1 model, and random initializations for the other 9 factors. 
+
+```{r, eval=FALSE}
+set.seed(1)
+log1p_mod_k1 <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = m,
+  K = 1,
+  approx_range = c(0, 1.25),
+  maxiter = 10,
+  s = rowSums(m) / mean(rowSums(m))
+)
+
+set.seed(1)
+U_init <- cbind(
+  log1p_mod_k1$U,
+  matrix(
+    data = rexp(n = nrow(log1p_mod_k1$U) * 9, rate = 15), nrow = nrow(log1p_mod_k1$U)
+  )
+)
+
+V_init <- cbind(
+  log1p_mod_k1$V,
+  matrix(
+    data = rexp(n = nrow(log1p_mod_k1$V) * 9, rate = 15), nrow = nrow(log1p_mod_k1$V)
+  )
+)
+
+log1p_mod_k1_init <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = m,
+  K = 10, s = rowSums(m) / mean(rowSums(m)),
+  approx_range = c(0, 1.25), maxiter = 100,
+  init_U = U_init, init_V = V_init
+)
+
+nmf_pois_k1 <- fastTopics:::fit_pnmf_rank1(m)
+
+set.seed(1)
+L_init <- cbind(
+  nmf_pois_k1$L,
+  matrix(
+    data = rexp(n = nrow(nmf_pois_k1$L) * 9, rate = 15), nrow = nrow(nmf_pois_k1$L)
+  )
+)
+
+F_init <- cbind(
+  nmf_pois_k1$F,
+  matrix(
+    data = rexp(n = nrow(nmf_pois_k1$F) * 9, rate = 15), nrow = nrow(nmf_pois_k1$F)
+  )
+)
+
+rownames(F_init) <- colnames(m)
+
+set.seed(1)
+
+fit0_pois_nmf <- init_poisson_nmf(
+  X = m,
+  L = L_init,
+  F = F_init
+)
+
+nmf_pois_k1_init <- fit_poisson_nmf(
+  m,
+  numiter = 100,
+  control = list(nc = 7),
+  fit0 = fit0_pois_nmf
+)
+```
+
+```{r}
+nmf_pois_k1_init <- readr::read_rds(
+  glue("{data_dir}/pois_nmf_nkt_k1_init_k10.rds")
+)
+
+log1p_k1_init <- readr::read_rds(
+  glue("{data_dir}/log1p_nkt_k1_init_k10.rds")
+)
+```
+
+```{r}
+max_col <- apply(log1p_k1_init$U, 2, max)
+log1p_LL <- sweep(log1p_k1_init$U, 2, max_col, FUN = "/")
+log1p_FF <- sweep(log1p_k1_init$V, 2, max_col, FUN = "*")
+
+max_col <- apply(nmf_pois_k1_init $L, 2, max)
+nmf_LL <- sweep(nmf_pois_k1_init $L, 2, max_col, FUN = "/")
+nmf_FF <- sweep(nmf_pois_k1_init $F, 2, max_col, FUN = "*")
+```
+
+```{r}
+rownames(log1p_FF) <- colnames(m)
+p1 <- structure_plot(nmf_pois_k1_init, grouping = samples, n=1e6)
+p2 <- structure_plot(log1p_LL, grouping = samples, n=1e6)
+gdf_log1p <- get_go_terms(log1p_FF)
+gdf_nmf <- get_go_terms(nmf_FF)
+ggarrange(p1, p2, nrow = 2)
+```
+Below are the GO terms and driving genes for the identity link model initialized with and intercept:
+
+```{r, results='asis'}
+knitr::kable(gdf_nmf)
+```
+
+Below are the GO terms and driving genes for the log1p link model initialized with an intercept:
+
+```{r, results='asis'}
+knitr::kable(gdf_log1p)
+```
+
+Here, it looks like initializing with the intercept has led to substantially more interpretable factors. In particular, factors 4, 5, and 8 all seem to represent distinct biological processes induced by stimulation. As for the identity link model, it's not all that clear to me that the intercept really makes much of a difference.
+
+## Frobenius NMF with log1p Transformed Data
+
+One very natural and simple alternative to the Poisson model with log1p link is simply taking a log1p transformation of the data (after correcting for the size factor). 
+
+```{r, eval=FALSE}
+Y <- m / (rowSums(m) / mean(rowSums(m)))
+Y_tilde <- MatrixExtra::mapSparse(Y, log1p)
+```
+
+I ran nmf using NNLM, initializing with a rank 1 fit as I did above.
+
+```{r, eval=FALSE}
+frob_nmf_k1 <- NNLM::nnmf(
+  A = as.matrix(Y_tilde), k = 1
+)
+
+W_init <- cbind(
+  frob_nmf_k1$W,
+  matrix(data = rexp(n = 9 * nrow(Y_tilde), rate = 15), nrow = nrow(Y_tilde))
+)
+
+H_init <- rbind(
+  frob_nmf_k1$H,
+  matrix(data = rexp(n = 9 * ncol(Y_tilde), rate = 15), ncol = ncol(Y_tilde))
+)
+
+frob_nmf_k1_init <- NNLM::nnmf(
+  A = as.matrix(Y_tilde), k = 10,
+  n.threads = 0, max.iter = 100,
+  init = list(
+    W = W_init,
+    H = H_init
+  )
+)
+```
+
+Now, we can examine the fit.
+
+```{r}
+frob_nmf_fit <- readr::read_rds(glue("{data_dir}/frob_nmf_nkt_k1_init_k10.rds"))
+
+frob_nmf_LL <- frob_nmf_fit$W
+frob_nmf_FF <- t(frob_nmf_fit$H)
+
+max_col <- apply(frob_nmf_LL, 2, max)
+frob_nmf_LL <- sweep(frob_nmf_LL, 2, max_col, FUN = "/")
+frob_nmf_FF <- sweep(frob_nmf_FF, 2, max_col, FUN = "*")
+```
+
+```{r}
+structure_plot(frob_nmf_LL, grouping = samples, n=1e6)
+```
+```{r, results='asis'}
+gdf_frob <- get_go_terms(frob_nmf_FF)
+knitr::kable(gdf_frob)
+```
+
+One clear difference between the fits seems to be that the frobenius NMF fit is less sparse. The log1p model seems able to represent the unstimulated cells with 4 factors, where the log1p transformation seems to use 6. Looking at the values themselves, the sparsity of the loadings for the frobenius NMF model is about $19.4\%$, compared to $26.6\%$ for the log1p link model. For the factors, the frobenius NMF model is about $48.9\%$ sparse, where for the log1p link model the factors are $51.9\%$ sparse. The differences aren't huge, but it is an effect I have consistently seen in other datasets. As for the gene sets, it seems like the results of the frobenius nmf fit also are not quite as good as the log1p link model. In particular, it only seems like factors 5 and 7 are readily interpretable in the Frobenius NMF model. 
+
+## Conclusion
+
+Overall, I think that the results above are fairly promising. On the dataset analyzed here, I think that the log1p link model shows some fairly small but relatively clear advantages relative to both the Poisson model with identity link and the frobenius NMF approach with a log1p transformation. 

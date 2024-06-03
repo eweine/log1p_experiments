@@ -174,3 +174,45 @@ ggplot(ft_factor_df, aes(x = pos, y = val)) +
 Most notably, we can see that the factors are generally dominated by the set of genes that are in the "overlapping" areas of the factors. For instance, factor 1 is driven by genes in the range of 250-260. These genes are (a) in the higher background group and (b) are involved in two of the other three factors. Similar patterns can be seen in the other factors in the "overlapping" regions.
 
 Essentially, I believe the identity link has a difficult time representing multiplicative changes in gene expression, especially for genes which already have somewhat high expression at baseline.
+
+```{r}
+Y2 <- MatrixExtra::mapSparse(Y, sqrt)
+```
+
+
+```{r}
+library(RcppML)
+```
+
+```{r}
+NMF <- RcppML::nmf(Y2, k=4)
+```
+
+```{r}
+NMF_LL <- NMF$w %*% diag(NMF$d)
+NMF_FF <- t(NMF$h)
+
+max_col <- apply(NMF_LL, 2, max)
+NMF_LL <- sweep(NMF_LL, 2, max_col, FUN = "/")
+NMF_FF <- sweep(NMF_FF, 2, max_col, FUN = "*")
+```
+
+
+```{r}
+ft_factor_df <- data.frame(
+  val = c(
+    NMF_FF[,1], NMF_FF[,2], NMF_FF[,3], NMF_FF[,4]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500)
+  ),
+  pos = c(rep(1:500, 4))
+)
+library(ggplot2)
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+

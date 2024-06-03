@@ -17,3 +17,5 @@ Welcome to my research website.
 [Comparing Link Functions with a Simple Simulation](link_simulations.html)
 
 [Comparing Link Functions with a Multi-Group Simulation](link_simulations2.html)
+
+[Analysis of natural killer T cells](nkt_analysis.html)
