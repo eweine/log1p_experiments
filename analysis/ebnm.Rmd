@@ -1,0 +1,108 @@
+---
+title: "A short investigation of the normal approximation to the Poisson log1p model"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-07-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ebnm)
+```
+
+Here, we consider the model:
+
+\begin{align*}
+y_{i} &\sim \text{Poisson}(\lambda_{i}) \\
+\log(1 + \lambda_{i}) &= b_{i} \\
+b_{1}, \dots, b_{n} & \overset{\text{iid}}{\sim} \pi_{0} \delta_{0} + (1 - \pi_{0}) \cdot \text{Exponential}(\mu)
+\end{align*}
+
+Below, I simulate data from this model with $\pi_{0} = \frac{1}{3}$, $\mu = 2$, and $n = 10,000$.
+
+```{r}
+set.seed(1)
+n <- 10000
+pi0 <- (1/3)
+mu <- 2
+b <- rexp(n = n, rate = mu)
+z <- rbinom(n = n, size = 1, pi0)
+b[which(z == 1)] <- 0
+lambda <- exp(b) - 1
+y <- rpois(n = n, lambda)
+```
+
+In Matthew's vignette, he suggests the following approximation for the likelihood of $b_{i}$ based on a Taylor expansion:
+
+\begin{equation*}
+  L(b_{i}) \approx N(\hat{b}(y_{i}), s^{2}(y_{i})),
+\end{equation*}
+
+where
+
+\begin{equation*}
+  \hat{b}(y_{i}) =
+    \begin{cases}
+      \log(1 + y_{i}) & \text{if $y_{i} > 0$}\\
+      -1 & \text{if $y_{i} = 0$}
+    \end{cases}    
+\end{equation*}
+
+and
+
+\begin{equation*}
+  s^{2}(y_{i}) =
+    \begin{cases}
+      \frac{y_{i}}{(1 + y_{i})^{2}} & \text{if $y_{i} > 0$}\\
+      1 & \text{if $y_{i} = 0$}
+    \end{cases}    
+\end{equation*}
+
+This approximation is implemented below:
+
+```{r}
+b_hat <- log1p(y)
+b_hat[which(y == 0)] <- -1
+s2 <- y / ((1 + y) ^ 2)
+s2[which(y == 0)] <- 1
+```
+
+Now, we estimate the ebnm model.
+
+```{r}
+out <- ebnm(x = b_hat, s = sqrt(s2), prior_family = "point_exponential")
+lambda_pm <- exp(out$posterior$mean) - 1
+df_out <- data.frame(
+  y = y,
+  lambda_pm = lambda_pm,
+  lambda = lambda,
+  b_pm = out$posterior$mean,
+  b = b,
+  b_hat = log1p(y)
+)
+```
+
+The prior estimates don't look great. We get $\hat{\pi}_{0} \approx 0.7$ and $\hat{\mu} \approx 0.75$. Intuitively, this will lead to under-shrinakge for large values of $y$ and over-shrinakge for small values.
+
+```{r}
+library(ggplot2)
+ggplot(data = df_out) +
+  geom_point(aes(x = lambda_pm, y = y)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  xlab("Posterior mean of lambda") +
+  ylab("y")
+```
+
+```{r}
+ggplot(data = df_out) +
+  geom_point(aes(x = lambda_pm, y = lambda)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  xlab("Posterior mean of lambda") +
+  ylab("lambda")
+```

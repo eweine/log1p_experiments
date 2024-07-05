@@ -438,10 +438,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R
-Markdown file created these results, you’ll want to first commit it to
-the Git repo. If you’re still working on the analysis, you can ignore
-this warning. When you’re finished, you can run
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee60f709f8d3c0f0ccdaf0e2bf9d993706425b84etargetblanke60f709a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedbbc5567bb33403cf47169ce8509843f1f14f574targetblankdbbc556a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/e60f709f8d3c0f0ccdaf0e2bf9d993706425b84e" target="_blank">e60f709</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/dbbc5567bb33403cf47169ce8509843f1f14f574" target="_blank">dbbc556</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee60f709f8d3c0f0ccdaf0e2bf9d993706425b84etargetblanke60f709a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedbbc5567bb33403cf47169ce8509843f1f14f574targetblankdbbc556a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/e60f709f8d3c0f0ccdaf0e2bf9d993706425b84e" target="_blank">e60f709</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/dbbc5567bb33403cf47169ce8509843f1f14f574" target="_blank">dbbc556</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -568,12 +568,10 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rhistory
-
-Untracked files:
-    Untracked:  analysis/nkt_analysis.Rmd
+    Ignored:    analysis/figure/
 
 Unstaged changes:
-    Modified:   analysis/link_simulations2.Rmd
+    Modified:   analysis/nkt_analysis.Rmd
 
 </code></pre>
 <p>
@@ -588,10 +586,74 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/nkt_analysis.Rmd</code>) and HTML
+(<code>docs/nkt_analysis.html</code>) files. If you’ve configured a
+remote Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dbbc5567bb33403cf47169ce8509843f1f14f574/analysis/nkt_analysis.Rmd" target="_blank">dbbc556</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-06-03
+</td>
+<td>
+added analysis of nkt dataset
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/dbbc5567bb33403cf47169ce8509843f1f14f574/docs/nkt_analysis.html" target="_blank">dbbc556</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-06-03
+</td>
+<td>
+added analysis of nkt dataset
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -759,6 +821,43 @@ library(ggpubr)
 
 ggarrange(g1, g2, nrow = 1)</code></pre>
 <p><img src="figure/nkt_analysis.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dbbc5567bb33403cf47169ce8509843f1f14f574/docs/figure/nkt_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">dbbc556</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-06-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Much like in Yusha’s analysis, it seems fairly clear that a
 multiplicative model is more reasonable than an additive model for this
 data. One future improvement to this could be de-noising
@@ -908,8 +1007,45 @@ nmf_FF &lt;- sweep(nmf_pois_rand_init$F, 2, max_col, FUN = &quot;*&quot;)</code>
 <pre class="r"><code>p1 &lt;- structure_plot(nmf_pois_rand_init, grouping = samples, n=1e6)
 p2 &lt;- structure_plot(log1p_LL, grouping = samples, n=1e6)
 ggarrange(p1, p2, nrow = 2)</code></pre>
-<p><img src="figure/nkt_analysis.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" />
-Based on the structure plots, it seems like the log1p link represents
+<p><img src="figure/nkt_analysis.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dbbc5567bb33403cf47169ce8509843f1f14f574/docs/figure/nkt_analysis.Rmd/unnamed-chunk-7-1.png" target="_blank">dbbc556</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-06-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Based on the structure plots, it seems like the log1p link represents
 the stimulated cells a bit more distinctly than than the unstimulated
 cells. In the log1p model, factors 4 and 6 are represented strongly in
 both the stimulated and unstimulated cells. However, factors 8 and 1 are
@@ -1299,9 +1435,46 @@ fact4_df &lt;- data.frame(
 ggplot(fact4_df) +
   geom_density(aes(x = prop, fill = condition), alpha = .5) +
   xlab(&quot;Expression / Library Size for Top 20 Genes in Factor 4&quot;)</code></pre>
-<p><img src="figure/nkt_analysis.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" />
-It seems like after stimulation, the expression of these 20 genes has a
-much higher baseline than before stimulation, though the highest
+<p><img src="figure/nkt_analysis.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dbbc5567bb33403cf47169ce8509843f1f14f574/docs/figure/nkt_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">dbbc556</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-06-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>It seems like after stimulation, the expression of these 20 genes has
+a much higher baseline than before stimulation, though the highest
 expression values are not necessarily higher in the stimulated
 condition. It is not exactly clear which model is representing this
 effect better.</p>
@@ -1402,8 +1575,45 @@ p2 &lt;- structure_plot(log1p_LL, grouping = samples, n=1e6)
 gdf_log1p &lt;- get_go_terms(log1p_FF)
 gdf_nmf &lt;- get_go_terms(nmf_FF)
 ggarrange(p1, p2, nrow = 2)</code></pre>
-<p><img src="figure/nkt_analysis.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" />
-Below are the GO terms and driving genes for the identity link model
+<p><img src="figure/nkt_analysis.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-15-1">
+Past versions of unnamed-chunk-15-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-15-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dbbc5567bb33403cf47169ce8509843f1f14f574/docs/figure/nkt_analysis.Rmd/unnamed-chunk-15-1.png" target="_blank">dbbc556</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-06-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Below are the GO terms and driving genes for the identity link model
 initialized with and intercept:</p>
 <pre class="r"><code>knitr::kable(gdf_nmf)</code></pre>
 <table>
@@ -1762,6 +1972,43 @@ frob_nmf_LL &lt;- sweep(frob_nmf_LL, 2, max_col, FUN = &quot;/&quot;)
 frob_nmf_FF &lt;- sweep(frob_nmf_FF, 2, max_col, FUN = &quot;*&quot;)</code></pre>
 <pre class="r"><code>structure_plot(frob_nmf_LL, grouping = samples, n=1e6)</code></pre>
 <p><img src="figure/nkt_analysis.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-21-1">
+Past versions of unnamed-chunk-21-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-21-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dbbc5567bb33403cf47169ce8509843f1f14f574/docs/figure/nkt_analysis.Rmd/unnamed-chunk-21-1.png" target="_blank">dbbc556</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-06-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>gdf_frob &lt;- get_go_terms(frob_nmf_FF)
 knitr::kable(gdf_frob)</code></pre>
 <table>
@@ -1952,6 +2199,184 @@ consistently seen in other datasets. As for the gene sets, it seems like
 the results of the frobenius nmf fit also are not quite as good as the
 log1p link model. In particular, it only seems like factors 5 and 7 are
 readily interpretable in the Frobenius NMF model.</p>
+</div>
+<div id="flash-fit" class="section level2">
+<h2>Flash fit</h2>
+<p>I was also curious what would happen if I fit flash to the data. I
+used a point exponential prior and set the maximum number of factors to
+<span class="math inline">\(10\)</span>.</p>
+<pre class="r"><code>flash_fit &lt;- flashier::flash(
+  data = Y_tilde, greedy_Kmax = 10, backfit = T,
+  ebnm_fn = ebnm::ebnm_point_exponential
+)</code></pre>
+<pre class="r"><code>flash_fit &lt;- readr::read_rds(glue(&quot;{data_dir}/frob_nmf_flash_k10.rds&quot;))
+
+max_col &lt;- apply(flash_fit$L_pm, 2, max)
+flash_LL &lt;- sweep(flash_fit$L_pm, 2, max_col, FUN = &quot;/&quot;)
+flash_FF &lt;- sweep(flash_fit$F_pm, 2, max_col, FUN = &quot;*&quot;)</code></pre>
+<p>Here is the structure plot:</p>
+<pre class="r"><code>structure_plot(flash_LL, grouping = samples)</code></pre>
+<p><img src="figure/nkt_analysis.Rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>And the go terms:</p>
+<pre class="r"><code>gdf_flash &lt;- get_go_terms(flash_FF)
+knitr::kable(gdf_flash)</code></pre>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="90%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">RPS27, RPL34, RPL21, RPL41, RPS29, RPS18, MALAT1,
+RPL13, RPL10, RPL39, RPS14, RPL32, RPS27A, RPS19, RPS6, RPS2, RPL13A,
+RPL18A, RPS15A, RPL7</td>
+<td align="left">cytoplasmic translation, ribosome biogenesis, ribosomal
+small subunit biogenesis, ribosome assembly, ribosomal small subunit
+assembly, rRNA processing, protein-RNA complex assembly, protein-RNA
+complex organization, rRNA metabolic process, ncRNA processing</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">HLA-B, HLA-C, ACTB, HLA-A, MALAT1, IL32, MT-CO3, B2M,
+S100A4, MT-CO1, JUNB, DUSP1, GZMK, PFN1, LTB, TMSB4X, KLRB1, MYL12A,
+NKG7, MT-CO2</td>
+<td align="left">leukocyte mediated cytotoxicity, antigen processing and
+presentation of peptide antigen via MHC class Ib, antigen processing and
+presentation via MHC class Ib, antigen processing and presentation of
+endogenous peptide antigen via MHC class I, mitochondrial electron
+transport, cytochrome c to oxygen, cell killing, regulation of leukocyte
+mediated cytotoxicity, antigen processing and presentation of peptide
+antigen via MHC class I, antigen processing and presentation of
+endogenous peptide antigen, positive regulation of T cell mediated
+cytotoxicity, regulation of cell killing, antigen processing and
+presentation of endogenous antigen, regulation of T cell mediated
+cytotoxicity, regulation of adaptive immune response based on somatic
+recombination of immune receptors built from immunoglobulin superfamily
+domains, T cell mediated cytotoxicity, positive regulation of T cell
+mediated immunity, positive regulation of leukocyte mediated
+cytotoxicity, regulation of adaptive immune response, positive
+regulation of cell killing, regulation of lymphocyte mediated
+immunity</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">CSF2, IFNG, IL2, CD40LG, H3F3B, RGCC, ANXA1, SELK,
+PRNP, MALAT1, MIR155HG, HLA-A, SRGN, SDCBP, B2M, MYC, BCL2A1, EVI2A,
+FTH1, LINC00152</td>
+<td align="left">regulation of leukocyte proliferation, positive
+regulation of T cell activation, positive regulation of leukocyte
+proliferation, positive regulation of leukocyte cell-cell adhesion,
+leukocyte proliferation, regulation of T cell proliferation, positive
+regulation of lymphocyte activation, positive regulation of cell-cell
+adhesion, T cell proliferation, positive regulation of T cell
+proliferation, regulation of lymphocyte proliferation, regulation of
+mononuclear cell proliferation, intracellular iron ion homeostasis,
+positive regulation of lymphocyte proliferation, positive regulation of
+mononuclear cell proliferation, lymphocyte proliferation, mononuclear
+cell proliferation</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">RGCC, FTH1, CCL4, GPR183, ANXA1, CREM, LMNA, VIM, BTG1,
+ZFP36, HLA-B, EIF4A1, SRGN, HLA-A, DUSP2, SELK, MCL1, EIF1, SDCBP,
+GAPDH</td>
+<td align="left"></td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, MT-CO1, MT-CO2, MT-ND4, MT-ND3, MT-CO3,
+MT-ATP6, MT-ND2, MT-CYB, B2M, HNRNPH1, C1orf56, MT-ND1, TMSB4X, CCL5,
+CDC42SE1, RPS27, RPL41, MT-ND5, RPL34</td>
+<td align="left">oxidative phosphorylation, aerobic electron transport
+chain, ATP synthesis coupled electron transport, mitochondrial ATP
+synthesis coupled electron transport, aerobic respiration, respiratory
+electron transport chain, cellular respiration, electron transport
+chain, energy derivation by oxidation of organic compounds, proton
+transmembrane transport, ATP biosynthetic process, purine ribonucleoside
+triphosphate biosynthetic process, purine nucleoside triphosphate
+biosynthetic process, ribonucleoside triphosphate biosynthetic process,
+response to oxygen levels, nucleoside triphosphate biosynthetic process,
+proton motive force-driven mitochondrial ATP synthesis, proton motive
+force-driven ATP synthesis, response to hypoxia, response to decreased
+oxygen levels, purine ribonucleotide biosynthetic process,
+ribonucleotide biosynthetic process, ATP metabolic process, ribose
+phosphate biosynthetic process, purine ribonucleoside triphosphate
+metabolic process, mitochondrial electron transport, NADH to ubiquinone,
+purine nucleotide biosynthetic process, purine nucleoside triphosphate
+metabolic process, ribonucleoside triphosphate metabolic process,
+purine-containing compound biosynthetic process, nucleoside triphosphate
+metabolic process, nucleotide biosynthetic process, nucleoside phosphate
+biosynthetic process, NADH dehydrogenase complex assembly, mitochondrial
+respiratory chain complex I assembly, mitochondrial electron transport,
+cytochrome c to oxygen, mitochondrial respiratory chain complex
+assembly</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">CCL4, CCL3L3, CCL3, CCL4L1, IFNG, CCL5, MALAT1, SRGN,
+CCL4L2, FTH1, CD69, DUSP2, EIF1, KLRB1, BTG1, RPS26, MT-CO2, RPS27,
+NKG7, MT-CO1</td>
+<td align="left"></td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">CCL3L1, CCL4L2, CCL4, CCL5, IFNG, MALAT1, B2M, CCL3,
+RPS27, RPL34, RPL21, RPL41, RPS14, TMSB4X, RPL10, RPS19, RPS18, RPS29,
+RPL3, RPLP1</td>
+<td align="left">cytoplasmic translation, ribosome assembly, ribosomal
+small subunit assembly</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">XCL1, XCL2, IFNG, CCL4, IL4, CCL5, MALAT1, CCL3, RPS27,
+H3F3B, FTH1, SRGN, LINC00152, CD40LG, SELK, B2M, GAPDH, DUSP2, CD69,
+CREM</td>
+<td align="left">positive regulation of T cell activation, positive
+regulation of leukocyte cell-cell adhesion, positive regulation of
+lymphocyte activation, positive regulation of cell-cell adhesion,
+positive regulation of T cell cytokine production, positive regulation
+of T cell migration, positive regulation of T cell proliferation,
+cellular response to type II interferon, positive regulation of
+interleukin-10 production, positive regulation of lymphocyte migration,
+T cell cytokine production, regulation of T cell cytokine production,
+response to type II interferon, cell killing, immunoglobulin production
+involved in immunoglobulin-mediated immune response, regulation of T
+cell migration</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">CCL20, CD69, FTH1, IFNG, CCL4, JUNB, PABPC1, CCL3,
+NFKBIA, MALAT1, DUSP2, ZFP36, SRGN, BTG1, H3F3B, EIF1, GPR183, MT-CO3,
+B2M, TMSB4X</td>
+<td align="left"></td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">MALAT1, B2M, TMSB4X, MT-CO2, RPS26, MT-CO1, MT-ATP6,
+RPL34, MT-ND4, RPL41, RPS27, RPL21, RPS18, TMSB10, RPS14, RPS19, RPL39,
+MT-ND3, RPL7, ACTB</td>
+<td align="left">cytoplasmic translation, oxidative phosphorylation,
+proton transmembrane transport, ribosomal small subunit assembly,
+aerobic respiration, aerobic electron transport chain, ATP biosynthetic
+process, ATP synthesis coupled electron transport, mitochondrial ATP
+synthesis coupled electron transport, cellular respiration, purine
+ribonucleoside triphosphate biosynthetic process, purine nucleoside
+triphosphate biosynthetic process, ribonucleoside triphosphate
+biosynthetic process, respiratory electron transport chain, nucleoside
+triphosphate biosynthetic process, energy derivation by oxidation of
+organic compounds, response to oxygen levels</td>
+<td align="right">10</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>

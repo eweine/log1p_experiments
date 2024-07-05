@@ -10,8 +10,9 @@
 
 
 
+<meta name="date" content="2024-07-03" />
 
-<title>Home</title>
+<title>A short investigation of the normal approximation to the Poisson log1p model</title>
 
 <script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -29,7 +30,11 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
@@ -228,7 +233,73 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
 
 
 
@@ -238,6 +309,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -279,9 +360,19 @@ $(document).ready(function () {
 
 <div id="header">
 
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
 
 
-<h1 class="title toc-ignore">Home</h1>
+
+<h1 class="title toc-ignore">A short investigation of the normal
+approximation to the Poisson log1p model</h1>
+<h4 class="date">2024-07-03</h4>
 
 </div>
 
@@ -314,7 +405,7 @@ aria-hidden="true"></span> </a>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span> 1
 </p>
@@ -348,12 +439,96 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
 </div>
 </div>
 </div>
@@ -395,11 +570,10 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
 
-Unstaged changes:
-    Modified:   analysis/index.Rmd
+Untracked files:
+    Untracked:  analysis/ebnm.Rmd
 
-Staged changes:
-    New:        analysis/ebnm.Rmd
+Unstaged changes:
     Modified:   analysis/nkt_analysis.Rmd
 
 </code></pre>
@@ -415,309 +589,141 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were
-made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML
-(<code>docs/index.html</code>) files. If you’ve configured a remote Git
-repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
-in the table below to view the files as they were in that past version.
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
 </p>
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-File
-</th>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-<th>
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/dbbc5567bb33403cf47169ce8509843f1f14f574/analysis/index.Rmd" target="_blank">dbbc556</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-06-03
-</td>
-<td>
-added analysis of nkt dataset
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/eweine/log1p_experiments/dbbc5567bb33403cf47169ce8509843f1f14f574/docs/index.html" target="_blank">dbbc556</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-06-03
-</td>
-<td>
-added analysis of nkt dataset
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/e60f709f8d3c0f0ccdaf0e2bf9d993706425b84e/analysis/index.Rmd" target="_blank">e60f709</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-27
-</td>
-<td>
-added code for more complex simulation
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/eweine/log1p_experiments/e60f709f8d3c0f0ccdaf0e2bf9d993706425b84e/docs/index.html" target="_blank">e60f709</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-27
-</td>
-<td>
-added code for more complex simulation
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/eweine/log1p_experiments/9bbe0bd1b163ea30723feed3f8bc4e52adef5bfd/docs/index.html" target="_blank">9bbe0bd</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-20
-</td>
-<td>
-fixed index html
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/78e0b04b32b74049ad0f93e1799eacfa4c40dde2/analysis/index.Rmd" target="_blank">78e0b04</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-05-20
-</td>
-<td>
-added simulation study
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/950f789f2b1c3eb293a8e98467f3d34cb511defa/analysis/index.Rmd" target="_blank">950f789</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-04-10
-</td>
-<td>
-added greedy fit analysis
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/eweine/log1p_experiments/950f789f2b1c3eb293a8e98467f3d34cb511defa/docs/index.html" target="_blank">950f789</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-04-10
-</td>
-<td>
-added greedy fit analysis
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/eweine/log1p_experiments/d96292039692d6ee4b263a4746390bf9038ad3fd/docs/index.html" target="_blank">d962920</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-04-02
-</td>
-<td>
-added link to results
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/f220ac34c759c21ebc2064e47eb484e404ba1c29/analysis/index.Rmd" target="_blank">f220ac3</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-04-02
-</td>
-<td>
-added link to results
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/eweine/log1p_experiments/f220ac34c759c21ebc2064e47eb484e404ba1c29/docs/index.html" target="_blank">f220ac3</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-04-02
-</td>
-<td>
-added link to results
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/eweine/log1p_experiments/66ce9959b00fd88ab7b6cac3e558ef2c79fd24ac/docs/index.html" target="_blank">66ce995</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-04-02
-</td>
-<td>
-added index docs
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/94cf37ce545e845c5e52bd001bc1f3ba77812b9a/analysis/index.Rmd" target="_blank">94cf37c</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-04-02
-</td>
-<td>
-added link for results
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/eweine/log1p_experiments/9b6cde2a706759321f27c162c2058a4e3474e57f/docs/index.html" target="_blank">9b6cde2</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-04-02
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/7781edbb9379fd9af591a1f31fdb7bded870a075/analysis/index.Rmd" target="_blank">7781edb</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-04-02
-</td>
-<td>
-Start workflowr project.
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <hr>
 </div>
 </div>
 </div>
-<p>Welcome to my research website.</p>
-<p><a href="pbmc_purified_results.html">PBMC Purified Results</a></p>
-<p><a href="greedy_init.html">Greedy Fitting</a></p>
-<p><a href="link_simulations.html">Comparing Link Functions with a
-Simple Simulation</a></p>
-<p><a href="link_simulations2.html">Comparing Link Functions with a
-Multi-Group Simulation</a></p>
-<p><a href="nkt_analysis.html">Analysis of natural killer T
-cells</a></p>
-<p><a href="ebnm.html">Normal Approximation to log1p Poisson
-Means</a></p>
+<pre class="r"><code>library(ebnm)</code></pre>
+<p>Here, we consider the model:</p>
+<p><span class="math display">\[\begin{align*}
+y_{i} &amp;\sim \text{Poisson}(\lambda_{i}) \\
+\log(1 + \lambda_{i}) &amp;= b_{i} \\
+b_{1}, \dots, b_{n} &amp; \overset{\text{iid}}{\sim} \pi_{0} \delta_{0}
++ (1 - \pi_{0}) \cdot \text{Exponential}(\mu)
+\end{align*}\]</span></p>
+<p>Below, I simulate data from this model with <span
+class="math inline">\(\pi_{0} = \frac{1}{3}\)</span>, <span
+class="math inline">\(\mu = 2\)</span>, and <span
+class="math inline">\(n = 10,000\)</span>.</p>
+<pre class="r"><code>set.seed(1)
+n &lt;- 10000
+pi0 &lt;- (1/3)
+mu &lt;- 2
+b &lt;- rexp(n = n, rate = mu)
+z &lt;- rbinom(n = n, size = 1, pi0)
+b[which(z == 1)] &lt;- 0
+lambda &lt;- exp(b) - 1
+y &lt;- rpois(n = n, lambda)</code></pre>
+<p>In Matthew’s vignette, he suggests the following approximation for
+the likelihood of <span class="math inline">\(b_{i}\)</span> based on a
+Taylor expansion:</p>
+<p><span class="math display">\[\begin{equation*}
+  L(b_{i}) \approx N(\hat{b}(y_{i}), s^{2}(y_{i})),
+\end{equation*}\]</span></p>
+<p>where</p>
+<p><span class="math display">\[\begin{equation*}
+  \hat{b}(y_{i}) =
+    \begin{cases}
+      \log(1 + y_{i}) &amp; \text{if $y_{i} &gt; 0$}\\
+      -1 &amp; \text{if $y_{i} = 0$}
+    \end{cases}    
+\end{equation*}\]</span></p>
+<p>and</p>
+<p><span class="math display">\[\begin{equation*}
+  s^{2}(y_{i}) =
+    \begin{cases}
+      \frac{y_{i}}{(1 + y_{i})^{2}} &amp; \text{if $y_{i} &gt; 0$}\\
+      1 &amp; \text{if $y_{i} = 0$}
+    \end{cases}    
+\end{equation*}\]</span></p>
+<p>This approximation is implemented below:</p>
+<pre class="r"><code>b_hat &lt;- log1p(y)
+b_hat[which(y == 0)] &lt;- -1
+s2 &lt;- y / ((1 + y) ^ 2)
+s2[which(y == 0)] &lt;- 1</code></pre>
+<p>Now, we estimate the ebnm model.</p>
+<pre class="r"><code>out &lt;- ebnm(x = b_hat, s = sqrt(s2), prior_family = &quot;point_exponential&quot;)
+lambda_pm &lt;- exp(out$posterior$mean) - 1
+df_out &lt;- data.frame(
+  y = y,
+  lambda_pm = lambda_pm,
+  lambda = lambda,
+  b_pm = out$posterior$mean,
+  b = b,
+  b_hat = log1p(y)
+)</code></pre>
+<p>The prior estimates don’t look great. We get <span
+class="math inline">\(\hat{\pi}_{0} \approx 0.7\)</span> and <span
+class="math inline">\(\hat{\mu} \approx 0.75\)</span>. Intuitively, this
+will lead to under-shrinakge for large values of <span
+class="math inline">\(y\)</span> and over-shrinakge for small
+values.</p>
+<pre class="r"><code>library(ggplot2)
+ggplot(data = df_out) +
+  geom_point(aes(x = lambda_pm, y = y)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  xlab(&quot;Posterior mean of lambda&quot;) +
+  ylab(&quot;y&quot;)</code></pre>
+<p><img src="figure/ebnm.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(data = df_out) +
+  geom_point(aes(x = lambda_pm, y = lambda)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  xlab(&quot;Posterior mean of lambda&quot;) +
+  ylab(&quot;lambda&quot;)</code></pre>
+<p><img src="figure/ebnm.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/New_York
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_3.5.1 ebnm_1.1-2   
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.9        utf8_1.2.4        generics_0.1.3    ashr_2.2-63      
+ [5] stringi_1.8.4     lattice_0.22-6    digest_0.6.36     magrittr_2.0.3   
+ [9] evaluate_0.24.0   grid_4.4.0        fastmap_1.2.0     rprojroot_2.0.4  
+[13] workflowr_1.7.1   jsonlite_1.8.8    Matrix_1.7-0      mixsqp_0.3-54    
+[17] promises_1.3.0    fansi_1.0.6       scales_1.3.0      truncnorm_1.0-9  
+[21] invgamma_1.1      jquerylib_0.1.4   cli_3.6.3         rlang_1.1.4      
+[25] deconvolveR_1.2-1 cowplot_1.1.3     munsell_0.5.1     splines_4.4.0    
+[29] withr_3.0.0       cachem_1.1.0      yaml_2.3.8        tools_4.4.0      
+[33] SQUAREM_2021.1    dplyr_1.1.4       colorspace_2.1-0  httpuv_1.6.15    
+[37] vctrs_0.6.5       R6_2.5.1          lifecycle_1.0.4   git2r_0.33.0     
+[41] stringr_1.5.1     fs_1.6.4          trust_0.1-8       irlba_2.3.5.1    
+[45] pkgconfig_2.0.3   pillar_1.9.0      bslib_0.7.0       later_1.3.2      
+[49] gtable_0.3.5      glue_1.7.0        Rcpp_1.0.12       highr_0.11       
+[53] xfun_0.45         tibble_3.2.1      tidyselect_1.2.1  rstudioapi_0.16.0
+[57] knitr_1.47        farver_2.1.2      htmltools_0.5.8.1 labeling_0.4.3   
+[61] rmarkdown_2.27    compiler_4.4.0    horseshoe_0.2.0  </code></pre>
+</div>
 
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
@@ -735,6 +741,8 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -766,7 +774,41 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

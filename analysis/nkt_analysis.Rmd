@@ -565,6 +565,39 @@ knitr::kable(gdf_frob)
 
 One clear difference between the fits seems to be that the frobenius NMF fit is less sparse. The log1p model seems able to represent the unstimulated cells with 4 factors, where the log1p transformation seems to use 6. Looking at the values themselves, the sparsity of the loadings for the frobenius NMF model is about $19.4\%$, compared to $26.6\%$ for the log1p link model. For the factors, the frobenius NMF model is about $48.9\%$ sparse, where for the log1p link model the factors are $51.9\%$ sparse. The differences aren't huge, but it is an effect I have consistently seen in other datasets. As for the gene sets, it seems like the results of the frobenius nmf fit also are not quite as good as the log1p link model. In particular, it only seems like factors 5 and 7 are readily interpretable in the Frobenius NMF model. 
 
+## Flash fit
+
+I was also curious what would happen if I fit flash to the data. I used a point exponential prior and set the maximum number of factors to $10$.
+
+```{r, eval=FALSE}
+flash_fit <- flashier::flash(
+  data = Y_tilde, greedy_Kmax = 10, backfit = T,
+  ebnm_fn = ebnm::ebnm_point_exponential
+)
+```
+
+```{r}
+flash_fit <- readr::read_rds(glue("{data_dir}/frob_nmf_flash_k10.rds"))
+
+max_col <- apply(flash_fit$L_pm, 2, max)
+flash_LL <- sweep(flash_fit$L_pm, 2, max_col, FUN = "/")
+flash_FF <- sweep(flash_fit$F_pm, 2, max_col, FUN = "*")
+```
+
+Here is the structure plot:
+
+```{r}
+structure_plot(flash_LL, grouping = samples)
+```
+
+And the go terms:
+
+```{r, results='asis'}
+gdf_flash <- get_go_terms(flash_FF)
+knitr::kable(gdf_flash)
+```
+
+
 ## Conclusion
 
 Overall, I think that the results above are fairly promising. On the dataset analyzed here, I think that the log1p link model shows some fairly small but relatively clear advantages relative to both the Poisson model with identity link and the frobenius NMF approach with a log1p transformation. 
