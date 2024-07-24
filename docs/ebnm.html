@@ -380,7 +380,7 @@ approximation to the Poisson log1p model</h1>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+workflowr <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -391,8 +391,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> </a>
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -405,9 +405,9 @@ aria-hidden="true"></span> </a>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 1
+aria-hidden="true"></span> 0
 </p>
 <p>
 <strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
@@ -430,21 +430,18 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
-<span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
-changes </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguncommittedchanges"
+<div id="strongRMarkdownfilestronguptodate"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
-<code>wflow_publish</code> to commit the R Markdown file and build the
-HTML.</p>
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
 </div>
 </div>
 </div>
@@ -535,15 +532,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree6d263f6df8dd4add6969f42825c3e4639a11cfe0targetblank6d263f6a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedcf69792a31982f186bec2c74a47ac6d507bb265targetblankdcf6979a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/6d263f6df8dd4add6969f42825c3e4639a11cfe0" target="_blank">6d263f6</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/dcf69792a31982f186bec2c74a47ac6d507bb265" target="_blank">dcf6979</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree6d263f6df8dd4add6969f42825c3e4639a11cfe0targetblank6d263f6a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedcf69792a31982f186bec2c74a47ac6d507bb265targetblankdcf6979a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -553,7 +550,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/6d263f6df8dd4add6969f42825c3e4639a11cfe0" target="_blank">6d263f6</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/dcf69792a31982f186bec2c74a47ac6d507bb265" target="_blank">dcf6979</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -569,9 +566,6 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rhistory
-
-Unstaged changes:
-    Modified:   analysis/ebnm.Rmd
 
 </code></pre>
 <p>
@@ -616,6 +610,42 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dcf69792a31982f186bec2c74a47ac6d507bb265/analysis/ebnm.Rmd" target="_blank">dcf6979</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-07-24
+</td>
+<td>
+updated ebnm vignette to compare to Poisson means model with identity
+link
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/dcf69792a31982f186bec2c74a47ac6d507bb265/docs/ebnm.html" target="_blank">dcf6979</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-07-24
+</td>
+<td>
+updated ebnm vignette to compare to Poisson means model with identity
+link
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -844,6 +874,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dcf69792a31982f186bec2c74a47ac6d507bb265/docs/figure/ebnm.Rmd/unnamed-chunk-5-1.png" target="_blank">dcf6979</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-07-24
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/6d263f6df8dd4add6969f42825c3e4639a11cfe0/docs/figure/ebnm.Rmd/unnamed-chunk-5-1.png" target="_blank">6d263f6</a>
 </td>
 <td>
@@ -935,6 +976,43 @@ g3 &lt;- ggplot(data = df_out) +
 
 ggarrange(g1, g2, g3, nrow = 2, ncol = 2)</code></pre>
 <p><img src="figure/ebnm.Rmd/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dcf69792a31982f186bec2c74a47ac6d507bb265/docs/figure/ebnm.Rmd/unnamed-chunk-9-1.png" target="_blank">dcf6979</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-07-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>mae_log1p &lt;- mean(abs(df_out$lambda_pm - df_out$lambda))
 mae_id &lt;- mean(abs(df_out$lambda_pm_id - df_out$lambda))
 mse_log1p &lt;- mean((df_out$lambda_pm - df_out$lambda) ^ 2)
@@ -1006,6 +1084,43 @@ g3 &lt;- ggplot(data = df_out) +
 
 ggarrange(g1, g2, g3, nrow = 2, ncol = 2)</code></pre>
 <p><img src="figure/ebnm.Rmd/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-1">
+Past versions of unnamed-chunk-13-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-13-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dcf69792a31982f186bec2c74a47ac6d507bb265/docs/figure/ebnm.Rmd/unnamed-chunk-13-1.png" target="_blank">dcf6979</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-07-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>mae_log1p &lt;- mean(abs(df_out$lambda_pm - df_out$lambda))
 mae_id &lt;- mean(abs(df_out$lambda_pm_id - df_out$lambda))
 mse_log1p &lt;- mean((df_out$lambda_pm - df_out$lambda) ^ 2)
