@@ -380,7 +380,7 @@ approximation to the Poisson log1p model</h1>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -391,8 +391,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -401,13 +401,13 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-07-24
+<strong>Last updated:</strong> 2024-07-25
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
@@ -430,18 +430,21 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
@@ -532,15 +535,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree191086b701cfd67aace4a19f8150491ee2350acdtargetblank191086ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeba7e710922ad54ff76e8b1491622c2e7623d89bftargetblankba7e710a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/191086b701cfd67aace4a19f8150491ee2350acd" target="_blank">191086b</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/ba7e710922ad54ff76e8b1491622c2e7623d89bf" target="_blank">ba7e710</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree191086b701cfd67aace4a19f8150491ee2350acdtargetblank191086ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeba7e710922ad54ff76e8b1491622c2e7623d89bftargetblankba7e710a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -550,7 +553,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/191086b701cfd67aace4a19f8150491ee2350acd" target="_blank">191086b</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/ba7e710922ad54ff76e8b1491622c2e7623d89bf" target="_blank">ba7e710</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -566,6 +569,9 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rhistory
+
+Unstaged changes:
+    Modified:   analysis/ebnm.Rmd
 
 </code></pre>
 <p>
@@ -610,6 +616,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/ba7e710922ad54ff76e8b1491622c2e7623d89bf/docs/ebnm.html" target="_blank">ba7e710</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-07-24
+</td>
+<td>
+added figures back
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -814,22 +837,70 @@ get_pm &lt;- function(y, pi0, mu) {
   
 }
 
+get_pm_b &lt;- function(y, pi0, mu, nsamps = 5000) {
+  
+  p &lt;- 1 / (1 + mu)
+  post_pi0 &lt;- ifelse(
+    y == 0,
+    pi0 / (
+      pi0 + (1 - pi0) * (1 - p)
+    ),
+    0
+  )
+  
+  # now, I want to take posterior samples to get the posterior mean of b
+  pi0_samps &lt;- rbinom(
+    n = length(y) * nsamps,
+    size = 1,
+    prob = post_pi0
+  )
+  
+  lambda_nz_samps &lt;- rgamma(
+    n = length(y) * nsamps,
+    shape = y + 1,
+    rate = 1 + mu
+  )
+  
+  lambda_samps &lt;- (1 - pi0_samps) * lambda_nz_samps
+  lambda_mat &lt;- matrix(
+    data = lambda_samps,
+    nrow = nsamps,
+    byrow = TRUE
+  )
+  
+  b_mat &lt;- log1p(lambda_mat)
+  b_pm &lt;- colMeans(b_mat)
+  return(b_pm)
+  
+}
+
 solve_pois_mean_id_link &lt;- function(y) {
   
   eb_par &lt;- get_eb_opt(y)
   pm &lt;- get_pm(y, eb_par$pi0, eb_par$mu)
+  pm_b &lt;- get_pm_b(y, eb_par$pi0, eb_par$mu)
   return(
     list(
       pi0 = eb_par$pi0,
       mu = eb_par$mu,
-      pm = pm
+      pm = pm,
+      pm_b = pm_b
     )
   )
   
 }
 
-out &lt;- ebnm(x = b_hat, s = sqrt(s2), prior_family = &quot;point_exponential&quot;)
-lambda_pm &lt;- exp(out$posterior$mean) - 1
+out &lt;- ebnm(
+  x = b_hat, 
+  s = sqrt(s2), 
+  prior_family = &quot;point_exponential&quot;, 
+  output = ebnm_output_all()
+)
+
+post_samps &lt;- out$posterior_sampler(5000)
+lambda_samps &lt;- exp(post_samps) - 1
+lambda_pm &lt;- colMeans(lambda_samps)
+
 id_link_out &lt;- solve_pois_mean_id_link(y)
 df_out &lt;- data.frame(
   y = y,
@@ -837,6 +908,7 @@ df_out &lt;- data.frame(
   lambda_pm_id = id_link_out$pm,
   lambda = lambda,
   b_pm = out$posterior$mean,
+  b_pm_id = id_link_out$pm_b,
   b = b,
   b_hat = log1p(y)
 )</code></pre>
@@ -891,6 +963,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/ba7e710922ad54ff76e8b1491622c2e7623d89bf/docs/figure/ebnm.Rmd/unnamed-chunk-5-1.png" target="_blank">ba7e710</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-07-24
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/191086b701cfd67aace4a19f8150491ee2350acd/docs/figure/ebnm.Rmd/unnamed-chunk-5-1.png" target="_blank">191086b</a>
 </td>
 <td>
@@ -926,25 +1009,113 @@ Eric Weine
 </table>
 </div>
 </div>
+<p>We can also compare the posterior means of <span
+class="math inline">\(b\)</span> in the log1p model above.</p>
+<pre class="r"><code>library(ggplot2)
+g1 &lt;- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm_id)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  ylab(&quot;Posterior mean of b w/ ID link&quot;) +
+  xlab(&quot;b&quot;)
+
+g2 &lt;- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  ylab(&quot;Posterior mean of b w/ log1p link&quot;) +
+  xlab(&quot;b&quot;)
+
+g3 &lt;- ggplot(data = df_out) +
+  geom_point(aes(x = b_pm_id, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  xlab(&quot;Posterior mean of b w/ log1p link&quot;) +
+  ylab(&quot;Posterior mean of b w/ ID link&quot;)
+
+library(ggpubr)
+ggarrange(g1, g2, g3, nrow = 2, ncol = 2)</code></pre>
+<p><img src="figure/ebnm.Rmd/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/191086b701cfd67aace4a19f8150491ee2350acd/docs/figure/ebnm.Rmd/unnamed-chunk-6-1.png" target="_blank">191086b</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-07-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/6d263f6df8dd4add6969f42825c3e4639a11cfe0/docs/figure/ebnm.Rmd/unnamed-chunk-6-1.png" target="_blank">6d263f6</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-07-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>mae_log1p &lt;- mean(abs(df_out$lambda_pm - df_out$lambda))
 mae_id &lt;- mean(abs(df_out$lambda_pm_id - df_out$lambda))
 mse_log1p &lt;- mean((df_out$lambda_pm - df_out$lambda) ^ 2)
 mse_id &lt;- mean((df_out$lambda_pm_id - df_out$lambda) ^ 2)
 
 library(glue)
-print(glue(&quot;MAE of log1p model: {mae_log1p}&quot;))</code></pre>
-<pre><code>MAE of log1p model: 0.357313409812868</code></pre>
-<pre class="r"><code>print(glue(&quot;MAE of id model: {mae_id}&quot;))</code></pre>
-<pre><code>MAE of id model: 0.399484469590449</code></pre>
-<pre class="r"><code>print(glue(&quot;MSE of log1p model: {mse_log1p}&quot;))</code></pre>
-<pre><code>MSE of log1p model: 0.561823148542956</code></pre>
-<pre class="r"><code>print(glue(&quot;MSE of id model: {mse_id}&quot;))</code></pre>
-<pre><code>MSE of id model: 0.938107850431593</code></pre>
+print(glue(&quot;MAE for lambda of log1p model: {mae_log1p}&quot;))</code></pre>
+<pre><code>MAE for lambda of log1p model: 0.353457513537077</code></pre>
+<pre class="r"><code>print(glue(&quot;MAE for lambda of id model: {mae_id}&quot;))</code></pre>
+<pre><code>MAE for lambda of id model: 0.399496441399882</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for lambda of log1p model: {mse_log1p}&quot;))</code></pre>
+<pre><code>MSE for lambda of log1p model: 0.552848506999129</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for lambda of id model: {mse_id}&quot;))</code></pre>
+<pre><code>MSE for lambda of id model: 0.93808857051274</code></pre>
+<pre class="r"><code>mae_log1p &lt;- mean(abs(df_out$b_pm - df_out$b))
+mae_id &lt;- mean(abs(df_out$b_pm_id - df_out$b))
+mse_log1p &lt;- mean((df_out$b_pm - df_out$b) ^ 2)
+mse_id &lt;- mean((df_out$b_pm_id - df_out$b) ^ 2)
+
+print(glue(&quot;MAE for b of log1p model: {mae_log1p}&quot;))</code></pre>
+<pre><code>MAE for b of log1p model: 0.187776360725578</code></pre>
+<pre class="r"><code>print(glue(&quot;MAE for b of id model: {mae_id}&quot;))</code></pre>
+<pre><code>MAE for b of id model: 0.189532568395588</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for b of log1p model: {mse_log1p}&quot;))</code></pre>
+<pre><code>MSE for b of log1p model: 0.0903719733274352</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for b of id model: {mse_id}&quot;))</code></pre>
+<pre><code>MSE for b of id model: 0.0731841345692496</code></pre>
 <p>In this case, it seems like the identity link undershrinks for small
 values of <span class="math inline">\(y\)</span>, where it overshrinks
-for large values of <span class="math inline">\(y\)</span>. It is
-reassuring that the approximation to the true model at least outperforms
-the wrong model in this simple scenario.</p>
+for large values of <span class="math inline">\(y\)</span>. However, the
+id model actually performs slightly better in estimating <span
+class="math inline">\(b\)</span>.</p>
 <p>Now, I’d like to simulate data such that both models introduced above
 are mis-specified and compare the performance of the different fitting
 procedures.</p>
@@ -955,22 +1126,25 @@ y_{i} &amp;\sim \text{Poisson}(\lambda_{i}) \\
 \delta_{0} + (1 - \pi_{0}) \cdot \chi^{2}_{4}
 \end{align*}\]</span></p>
 <p>with <span class="math inline">\(\pi_{0} = \frac{2}{5}\)</span>.
-Below are the posterior means fitting the two models described
-above:</p>
+Below are the posterior means of lambda derived from fitting the two
+models described above:</p>
 <pre class="r"><code>set.seed(10)
 n &lt;- 3000
 pi0 &lt;- (2/5)
 lambda &lt;- rchisq(n = n, df = 4)
 z &lt;- rbinom(n = n, size = 1, pi0)
 lambda[which(z == 1)] &lt;- 0
+b &lt;- log1p(lambda)
 y &lt;- rpois(n = n, lambda)</code></pre>
 <pre class="r"><code>b_hat &lt;- log1p(y)
 b_hat[which(y == 0)] &lt;- -1
 s2 &lt;- y / ((1 + y) ^ 2)
 s2[which(y == 0)] &lt;- 1
 
-out &lt;- ebnm(x = b_hat, s = sqrt(s2), prior_family = &quot;point_exponential&quot;)
-lambda_pm &lt;- exp(out$posterior$mean) - 1
+out &lt;- ebnm(x = b_hat, s = sqrt(s2), prior_family = &quot;point_exponential&quot;, output = ebnm_output_all())
+post_samps &lt;- out$posterior_sampler(5000)
+lambda_samps &lt;- exp(post_samps) - 1
+lambda_pm &lt;- colMeans(lambda_samps)
 id_link_out &lt;- solve_pois_mean_id_link(y)
 df_out &lt;- data.frame(
   y = y,
@@ -978,6 +1152,7 @@ df_out &lt;- data.frame(
   lambda_pm_id = id_link_out$pm,
   lambda = lambda,
   b_pm = out$posterior$mean,
+  b_pm_id = id_link_out$pm_b,
   b = b,
   b_hat = log1p(y)
 )</code></pre>
@@ -1003,68 +1178,60 @@ g3 &lt;- ggplot(data = df_out) +
   ylab(&quot;Posterior mean of lambda w/ ID link&quot;)
 
 ggarrange(g1, g2, g3, nrow = 2, ncol = 2)</code></pre>
-<p><img src="figure/ebnm.Rmd/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
-Past versions of unnamed-chunk-9-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-9-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/191086b701cfd67aace4a19f8150491ee2350acd/docs/figure/ebnm.Rmd/unnamed-chunk-9-1.png" target="_blank">191086b</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-07-24
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/dcf69792a31982f186bec2c74a47ac6d507bb265/docs/figure/ebnm.Rmd/unnamed-chunk-9-1.png" target="_blank">dcf6979</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-07-24
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/ebnm.Rmd/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>We can also get the posterior means of b:</p>
+<pre class="r"><code>library(ggplot2)
+g1 &lt;- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm_id)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  ylab(&quot;Posterior mean of b w/ ID link&quot;) +
+  xlab(&quot;b&quot;)
+
+g2 &lt;- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  ylab(&quot;Posterior mean of b w/ log1p link&quot;) +
+  xlab(&quot;b&quot;)
+
+g3 &lt;- ggplot(data = df_out) +
+  geom_point(aes(x = b_pm_id, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  xlab(&quot;Posterior mean of b w/ log1p link&quot;) +
+  ylab(&quot;Posterior mean of b w/ ID link&quot;)
+
+library(ggpubr)
+ggarrange(g1, g2, g3, nrow = 2, ncol = 2)</code></pre>
+<p><img src="figure/ebnm.Rmd/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>mae_log1p &lt;- mean(abs(df_out$lambda_pm - df_out$lambda))
 mae_id &lt;- mean(abs(df_out$lambda_pm_id - df_out$lambda))
 mse_log1p &lt;- mean((df_out$lambda_pm - df_out$lambda) ^ 2)
 mse_id &lt;- mean((df_out$lambda_pm_id - df_out$lambda) ^ 2)
 
-print(glue(&quot;MAE of log1p model: {mae_log1p}&quot;))</code></pre>
-<pre><code>MAE of log1p model: 1.0251796957126</code></pre>
-<pre class="r"><code>print(glue(&quot;MAE of id model: {mae_id}&quot;))</code></pre>
-<pre><code>MAE of id model: 0.892868312942123</code></pre>
-<pre class="r"><code>print(glue(&quot;MSE of log1p model: {mse_log1p}&quot;))</code></pre>
-<pre><code>MSE of log1p model: 2.43898787053223</code></pre>
-<pre class="r"><code>print(glue(&quot;MSE of id model: {mse_id}&quot;))</code></pre>
-<pre><code>MSE of id model: 1.88633463615161</code></pre>
+library(glue)
+print(glue(&quot;MAE for lambda of log1p model: {mae_log1p}&quot;))</code></pre>
+<pre><code>MAE for lambda of log1p model: 1.03762460572999</code></pre>
+<pre class="r"><code>print(glue(&quot;MAE for lambda of id model: {mae_id}&quot;))</code></pre>
+<pre><code>MAE for lambda of id model: 0.892880997947628</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for lambda of log1p model: {mse_log1p}&quot;))</code></pre>
+<pre><code>MSE for lambda of log1p model: 2.40304040107772</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for lambda of id model: {mse_id}&quot;))</code></pre>
+<pre><code>MSE for lambda of id model: 1.88631688541956</code></pre>
+<pre class="r"><code>mae_log1p &lt;- mean(abs(df_out$b_pm - df_out$b))
+mae_id &lt;- mean(abs(df_out$b_pm_id - df_out$b))
+mse_log1p &lt;- mean((df_out$b_pm - df_out$b) ^ 2)
+mse_id &lt;- mean((df_out$b_pm_id - df_out$b) ^ 2)
+
+print(glue(&quot;MAE for b of log1p model: {mae_log1p}&quot;))</code></pre>
+<pre><code>MAE for b of log1p model: 0.319374136793006</code></pre>
+<pre class="r"><code>print(glue(&quot;MAE for b of id model: {mae_id}&quot;))</code></pre>
+<pre><code>MAE for b of id model: 0.252172345861388</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for b of log1p model: {mse_log1p}&quot;))</code></pre>
+<pre><code>MSE for b of log1p model: 0.148531513604716</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for b of id model: {mse_id}&quot;))</code></pre>
+<pre><code>MSE for b of id model: 0.10570941276893</code></pre>
 <p>Here, it seems that the identity link performs better, but the
 advantage is slight. Changing random seeds generally doesn’t seem to
 change the results greatly.</p>
@@ -1082,14 +1249,17 @@ pi0 &lt;- (1/2)
 lambda &lt;- exp(rnorm(n = n, mean = 0, sd = sqrt(1.25)))
 z &lt;- rbinom(n = n, size = 1, pi0)
 lambda[which(z == 1)] &lt;- 0
-y &lt;- rpois(n = n, lambda)</code></pre>
+y &lt;- rpois(n = n, lambda)
+b &lt;- log1p(lambda)</code></pre>
 <pre class="r"><code>b_hat &lt;- log1p(y)
 b_hat[which(y == 0)] &lt;- -1
 s2 &lt;- y / ((1 + y) ^ 2)
 s2[which(y == 0)] &lt;- 1
 
-out &lt;- ebnm(x = b_hat, s = sqrt(s2), prior_family = &quot;point_exponential&quot;)
-lambda_pm &lt;- exp(out$posterior$mean) - 1
+out &lt;- ebnm(x = b_hat, s = sqrt(s2), prior_family = &quot;point_exponential&quot;, output = ebnm_output_all())
+post_samps &lt;- out$posterior_sampler(5000)
+lambda_samps &lt;- exp(post_samps) - 1
+lambda_pm &lt;- colMeans(lambda_samps)
 id_link_out &lt;- solve_pois_mean_id_link(y)
 df_out &lt;- data.frame(
   y = y,
@@ -1097,6 +1267,7 @@ df_out &lt;- data.frame(
   lambda_pm_id = id_link_out$pm,
   lambda = lambda,
   b_pm = out$posterior$mean,
+  b_pm_id = id_link_out$pm_b,
   b = b,
   b_hat = log1p(y)
 )</code></pre>
@@ -1122,69 +1293,63 @@ g3 &lt;- ggplot(data = df_out) +
   ylab(&quot;Posterior mean of lambda w/ ID link&quot;)
 
 ggarrange(g1, g2, g3, nrow = 2, ncol = 2)</code></pre>
-<p><img src="figure/ebnm.Rmd/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-1">
-Past versions of unnamed-chunk-13-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-13-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/191086b701cfd67aace4a19f8150491ee2350acd/docs/figure/ebnm.Rmd/unnamed-chunk-13-1.png" target="_blank">191086b</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-07-24
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/dcf69792a31982f186bec2c74a47ac6d507bb265/docs/figure/ebnm.Rmd/unnamed-chunk-13-1.png" target="_blank">dcf6979</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-07-24
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/ebnm.Rmd/unnamed-chunk-15-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>We can also get the posterior mean of b:</p>
+<pre class="r"><code>library(ggplot2)
+g1 &lt;- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm_id)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  ylab(&quot;Posterior mean of b w/ ID link&quot;) +
+  xlab(&quot;b&quot;)
+
+g2 &lt;- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  ylab(&quot;Posterior mean of b w/ log1p link&quot;) +
+  xlab(&quot;b&quot;)
+
+g3 &lt;- ggplot(data = df_out) +
+  geom_point(aes(x = b_pm_id, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) + 
+  cowplot::theme_cowplot() +
+  xlab(&quot;Posterior mean of b w/ log1p link&quot;) +
+  ylab(&quot;Posterior mean of b w/ ID link&quot;)
+
+library(ggpubr)
+ggarrange(g1, g2, g3, nrow = 2, ncol = 2)</code></pre>
+<p><img src="figure/ebnm.Rmd/unnamed-chunk-16-1.png" width="768" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>mae_log1p &lt;- mean(abs(df_out$lambda_pm - df_out$lambda))
 mae_id &lt;- mean(abs(df_out$lambda_pm_id - df_out$lambda))
 mse_log1p &lt;- mean((df_out$lambda_pm - df_out$lambda) ^ 2)
 mse_id &lt;- mean((df_out$lambda_pm_id - df_out$lambda) ^ 2)
 
-print(glue(&quot;MAE of log1p model: {mae_log1p}&quot;))</code></pre>
-<pre><code>MAE of log1p model: 0.480419555058786</code></pre>
-<pre class="r"><code>print(glue(&quot;MAE of id model: {mae_id}&quot;))</code></pre>
-<pre><code>MAE of id model: 0.505105333924165</code></pre>
-<pre class="r"><code>print(glue(&quot;MSE of log1p model: {mse_log1p}&quot;))</code></pre>
-<pre><code>MSE of log1p model: 0.869190272754794</code></pre>
-<pre class="r"><code>print(glue(&quot;MSE of id model: {mse_id}&quot;))</code></pre>
-<pre><code>MSE of id model: 1.01999587347074</code></pre>
-<p>Here, we see that the log1p model performs slightly better.</p>
+library(glue)
+print(glue(&quot;MAE for lambda of log1p model: {mae_log1p}&quot;))</code></pre>
+<pre><code>MAE for lambda of log1p model: 0.482619678619209</code></pre>
+<pre class="r"><code>print(glue(&quot;MAE for lambda of id model: {mae_id}&quot;))</code></pre>
+<pre><code>MAE for lambda of id model: 0.505104093288062</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for lambda of log1p model: {mse_log1p}&quot;))</code></pre>
+<pre><code>MSE for lambda of log1p model: 0.843501033258087</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for lambda of id model: {mse_id}&quot;))</code></pre>
+<pre><code>MSE for lambda of id model: 1.01990589323667</code></pre>
+<pre class="r"><code>mae_log1p &lt;- mean(abs(df_out$b_pm - df_out$b))
+mae_id &lt;- mean(abs(df_out$b_pm_id - df_out$b))
+mse_log1p &lt;- mean((df_out$b_pm - df_out$b) ^ 2)
+mse_id &lt;- mean((df_out$b_pm_id - df_out$b) ^ 2)
+
+print(glue(&quot;MAE for b of log1p model: {mae_log1p}&quot;))</code></pre>
+<pre><code>MAE for b of log1p model: 0.216999036863825</code></pre>
+<pre class="r"><code>print(glue(&quot;MAE for b of id model: {mae_id}&quot;))</code></pre>
+<pre><code>MAE for b of id model: 0.205960733945241</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for b of log1p model: {mse_log1p}&quot;))</code></pre>
+<pre><code>MSE for b of log1p model: 0.10473422117687</code></pre>
+<pre class="r"><code>print(glue(&quot;MSE for b of id model: {mse_id}&quot;))</code></pre>
+<pre><code>MSE for b of id model: 0.0851192236866777</code></pre>
+<p>Here, we see that the log1p model performs slightly better for
+estimating <span class="math inline">\(\lambda\)</span> but slightly
+worse for estimating <span class="math inline">\(b\)</span>.</p>
 <div id="conclusion" class="section level1">
 <h1>Conclusion</h1>
 <p>Overall, for the task of finding posterior means, it seems like

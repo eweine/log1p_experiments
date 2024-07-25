@@ -137,22 +137,70 @@ get_pm <- function(y, pi0, mu) {
   
 }
 
+get_pm_b <- function(y, pi0, mu, nsamps = 5000) {
+  
+  p <- 1 / (1 + mu)
+  post_pi0 <- ifelse(
+    y == 0,
+    pi0 / (
+      pi0 + (1 - pi0) * (1 - p)
+    ),
+    0
+  )
+  
+  # now, I want to take posterior samples to get the posterior mean of b
+  pi0_samps <- rbinom(
+    n = length(y) * nsamps,
+    size = 1,
+    prob = post_pi0
+  )
+  
+  lambda_nz_samps <- rgamma(
+    n = length(y) * nsamps,
+    shape = y + 1,
+    rate = 1 + mu
+  )
+  
+  lambda_samps <- (1 - pi0_samps) * lambda_nz_samps
+  lambda_mat <- matrix(
+    data = lambda_samps,
+    nrow = nsamps,
+    byrow = TRUE
+  )
+  
+  b_mat <- log1p(lambda_mat)
+  b_pm <- colMeans(b_mat)
+  return(b_pm)
+  
+}
+
 solve_pois_mean_id_link <- function(y) {
   
   eb_par <- get_eb_opt(y)
   pm <- get_pm(y, eb_par$pi0, eb_par$mu)
+  pm_b <- get_pm_b(y, eb_par$pi0, eb_par$mu)
   return(
     list(
       pi0 = eb_par$pi0,
       mu = eb_par$mu,
-      pm = pm
+      pm = pm,
+      pm_b = pm_b
     )
   )
   
 }
 
-out <- ebnm(x = b_hat, s = sqrt(s2), prior_family = "point_exponential")
-lambda_pm <- exp(out$posterior$mean) - 1
+out <- ebnm(
+  x = b_hat, 
+  s = sqrt(s2), 
+  prior_family = "point_exponential", 
+  output = ebnm_output_all()
+)
+
+post_samps <- out$posterior_sampler(5000)
+lambda_samps <- exp(post_samps) - 1
+lambda_pm <- colMeans(lambda_samps)
+
 id_link_out <- solve_pois_mean_id_link(y)
 df_out <- data.frame(
   y = y,
@@ -160,6 +208,7 @@ df_out <- data.frame(
   lambda_pm_id = id_link_out$pm,
   lambda = lambda,
   b_pm = out$posterior$mean,
+  b_pm_id = id_link_out$pm_b,
   b = b,
   b_hat = log1p(y)
 )
@@ -194,6 +243,35 @@ library(ggpubr)
 ggarrange(g1, g2, g3, nrow = 2, ncol = 2)
 ```
 
+We can also compare the posterior means of $b$ in the log1p model above.
+
+```{r, fig.width=8, fig.height=8}
+library(ggplot2)
+g1 <- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm_id)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  ylab("Posterior mean of b w/ ID link") +
+  xlab("b")
+
+g2 <- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  ylab("Posterior mean of b w/ log1p link") +
+  xlab("b")
+
+g3 <- ggplot(data = df_out) +
+  geom_point(aes(x = b_pm_id, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  xlab("Posterior mean of b w/ log1p link") +
+  ylab("Posterior mean of b w/ ID link")
+
+library(ggpubr)
+ggarrange(g1, g2, g3, nrow = 2, ncol = 2)
+```
+
 ```{r}
 mae_log1p <- mean(abs(df_out$lambda_pm - df_out$lambda))
 mae_id <- mean(abs(df_out$lambda_pm_id - df_out$lambda))
@@ -201,13 +279,23 @@ mse_log1p <- mean((df_out$lambda_pm - df_out$lambda) ^ 2)
 mse_id <- mean((df_out$lambda_pm_id - df_out$lambda) ^ 2)
 
 library(glue)
-print(glue("MAE of log1p model: {mae_log1p}"))
-print(glue("MAE of id model: {mae_id}"))
-print(glue("MSE of log1p model: {mse_log1p}"))
-print(glue("MSE of id model: {mse_id}"))
+print(glue("MAE for lambda of log1p model: {mae_log1p}"))
+print(glue("MAE for lambda of id model: {mae_id}"))
+print(glue("MSE for lambda of log1p model: {mse_log1p}"))
+print(glue("MSE for lambda of id model: {mse_id}"))
+
+mae_log1p <- mean(abs(df_out$b_pm - df_out$b))
+mae_id <- mean(abs(df_out$b_pm_id - df_out$b))
+mse_log1p <- mean((df_out$b_pm - df_out$b) ^ 2)
+mse_id <- mean((df_out$b_pm_id - df_out$b) ^ 2)
+
+print(glue("MAE for b of log1p model: {mae_log1p}"))
+print(glue("MAE for b of id model: {mae_id}"))
+print(glue("MSE for b of log1p model: {mse_log1p}"))
+print(glue("MSE for b of id model: {mse_id}"))
 ```
 
-In this case, it seems like the identity link undershrinks for small values of $y$, where it overshrinks for large values of $y$. It is reassuring that the approximation to the true model at least outperforms the wrong model in this simple scenario. 
+In this case, it seems like the identity link undershrinks for small values of $y$, where it overshrinks for large values of $y$. However, the id model actually performs slightly better in estimating $b$.
 
 Now, I'd like to simulate data such that both models introduced above are mis-specified and compare the performance of the different fitting procedures.
 
@@ -218,7 +306,7 @@ y_{i} &\sim \text{Poisson}(\lambda_{i}) \\
 \lambda_{1}, \dots, \lambda_{n} & \overset{\text{iid}}{\sim} \pi_{0} \delta_{0} + (1 - \pi_{0}) \cdot \chi^{2}_{4}
 \end{align*}
 
-with $\pi_{0} = \frac{2}{5}$. Below are the posterior means fitting the two models described above:
+with $\pi_{0} = \frac{2}{5}$. Below are the posterior means of lambda derived from fitting the two models described above:
 
 ```{r}
 set.seed(10)
@@ -227,6 +315,7 @@ pi0 <- (2/5)
 lambda <- rchisq(n = n, df = 4)
 z <- rbinom(n = n, size = 1, pi0)
 lambda[which(z == 1)] <- 0
+b <- log1p(lambda)
 y <- rpois(n = n, lambda)
 ```
 
@@ -236,8 +325,10 @@ b_hat[which(y == 0)] <- -1
 s2 <- y / ((1 + y) ^ 2)
 s2[which(y == 0)] <- 1
 
-out <- ebnm(x = b_hat, s = sqrt(s2), prior_family = "point_exponential")
-lambda_pm <- exp(out$posterior$mean) - 1
+out <- ebnm(x = b_hat, s = sqrt(s2), prior_family = "point_exponential", output = ebnm_output_all())
+post_samps <- out$posterior_sampler(5000)
+lambda_samps <- exp(post_samps) - 1
+lambda_pm <- colMeans(lambda_samps)
 id_link_out <- solve_pois_mean_id_link(y)
 df_out <- data.frame(
   y = y,
@@ -245,6 +336,7 @@ df_out <- data.frame(
   lambda_pm_id = id_link_out$pm,
   lambda = lambda,
   b_pm = out$posterior$mean,
+  b_pm_id = id_link_out$pm_b,
   b = b,
   b_hat = log1p(y)
 )
@@ -275,16 +367,56 @@ g3 <- ggplot(data = df_out) +
 ggarrange(g1, g2, g3, nrow = 2, ncol = 2)
 ```
 
+We can also get the posterior means of b:
+
+```{r, fig.width=8, fig.height=8}
+library(ggplot2)
+g1 <- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm_id)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  ylab("Posterior mean of b w/ ID link") +
+  xlab("b")
+
+g2 <- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  ylab("Posterior mean of b w/ log1p link") +
+  xlab("b")
+
+g3 <- ggplot(data = df_out) +
+  geom_point(aes(x = b_pm_id, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  xlab("Posterior mean of b w/ log1p link") +
+  ylab("Posterior mean of b w/ ID link")
+
+library(ggpubr)
+ggarrange(g1, g2, g3, nrow = 2, ncol = 2)
+```
+
 ```{r}
 mae_log1p <- mean(abs(df_out$lambda_pm - df_out$lambda))
 mae_id <- mean(abs(df_out$lambda_pm_id - df_out$lambda))
 mse_log1p <- mean((df_out$lambda_pm - df_out$lambda) ^ 2)
 mse_id <- mean((df_out$lambda_pm_id - df_out$lambda) ^ 2)
 
-print(glue("MAE of log1p model: {mae_log1p}"))
-print(glue("MAE of id model: {mae_id}"))
-print(glue("MSE of log1p model: {mse_log1p}"))
-print(glue("MSE of id model: {mse_id}"))
+library(glue)
+print(glue("MAE for lambda of log1p model: {mae_log1p}"))
+print(glue("MAE for lambda of id model: {mae_id}"))
+print(glue("MSE for lambda of log1p model: {mse_log1p}"))
+print(glue("MSE for lambda of id model: {mse_id}"))
+
+mae_log1p <- mean(abs(df_out$b_pm - df_out$b))
+mae_id <- mean(abs(df_out$b_pm_id - df_out$b))
+mse_log1p <- mean((df_out$b_pm - df_out$b) ^ 2)
+mse_id <- mean((df_out$b_pm_id - df_out$b) ^ 2)
+
+print(glue("MAE for b of log1p model: {mae_log1p}"))
+print(glue("MAE for b of id model: {mae_id}"))
+print(glue("MSE for b of log1p model: {mse_log1p}"))
+print(glue("MSE for b of id model: {mse_id}"))
 ```
 
 Here, it seems that the identity link performs better, but the advantage is slight. Changing random seeds generally doesn't seem to change the results greatly.
@@ -306,6 +438,7 @@ lambda <- exp(rnorm(n = n, mean = 0, sd = sqrt(1.25)))
 z <- rbinom(n = n, size = 1, pi0)
 lambda[which(z == 1)] <- 0
 y <- rpois(n = n, lambda)
+b <- log1p(lambda)
 ```
 
 ```{r}
@@ -314,8 +447,10 @@ b_hat[which(y == 0)] <- -1
 s2 <- y / ((1 + y) ^ 2)
 s2[which(y == 0)] <- 1
 
-out <- ebnm(x = b_hat, s = sqrt(s2), prior_family = "point_exponential")
-lambda_pm <- exp(out$posterior$mean) - 1
+out <- ebnm(x = b_hat, s = sqrt(s2), prior_family = "point_exponential", output = ebnm_output_all())
+post_samps <- out$posterior_sampler(5000)
+lambda_samps <- exp(post_samps) - 1
+lambda_pm <- colMeans(lambda_samps)
 id_link_out <- solve_pois_mean_id_link(y)
 df_out <- data.frame(
   y = y,
@@ -323,6 +458,7 @@ df_out <- data.frame(
   lambda_pm_id = id_link_out$pm,
   lambda = lambda,
   b_pm = out$posterior$mean,
+  b_pm_id = id_link_out$pm_b,
   b = b,
   b_hat = log1p(y)
 )
@@ -353,19 +489,59 @@ g3 <- ggplot(data = df_out) +
 ggarrange(g1, g2, g3, nrow = 2, ncol = 2)
 ```
 
+We can also get the posterior mean of b:
+
+```{r, fig.width=8, fig.height=8}
+library(ggplot2)
+g1 <- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm_id)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  ylab("Posterior mean of b w/ ID link") +
+  xlab("b")
+
+g2 <- ggplot(data = df_out) +
+  geom_point(aes(x = b, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  ylab("Posterior mean of b w/ log1p link") +
+  xlab("b")
+
+g3 <- ggplot(data = df_out) +
+  geom_point(aes(x = b_pm_id, y = b_pm)) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + 
+  cowplot::theme_cowplot() +
+  xlab("Posterior mean of b w/ log1p link") +
+  ylab("Posterior mean of b w/ ID link")
+
+library(ggpubr)
+ggarrange(g1, g2, g3, nrow = 2, ncol = 2)
+```
+
 ```{r}
 mae_log1p <- mean(abs(df_out$lambda_pm - df_out$lambda))
 mae_id <- mean(abs(df_out$lambda_pm_id - df_out$lambda))
 mse_log1p <- mean((df_out$lambda_pm - df_out$lambda) ^ 2)
 mse_id <- mean((df_out$lambda_pm_id - df_out$lambda) ^ 2)
 
-print(glue("MAE of log1p model: {mae_log1p}"))
-print(glue("MAE of id model: {mae_id}"))
-print(glue("MSE of log1p model: {mse_log1p}"))
-print(glue("MSE of id model: {mse_id}"))
+library(glue)
+print(glue("MAE for lambda of log1p model: {mae_log1p}"))
+print(glue("MAE for lambda of id model: {mae_id}"))
+print(glue("MSE for lambda of log1p model: {mse_log1p}"))
+print(glue("MSE for lambda of id model: {mse_id}"))
+
+mae_log1p <- mean(abs(df_out$b_pm - df_out$b))
+mae_id <- mean(abs(df_out$b_pm_id - df_out$b))
+mse_log1p <- mean((df_out$b_pm - df_out$b) ^ 2)
+mse_id <- mean((df_out$b_pm_id - df_out$b) ^ 2)
+
+print(glue("MAE for b of log1p model: {mae_log1p}"))
+print(glue("MAE for b of id model: {mae_id}"))
+print(glue("MSE for b of log1p model: {mse_log1p}"))
+print(glue("MSE for b of id model: {mse_id}"))
 ```
 
-Here, we see that the log1p model performs slightly better.
+Here, we see that the log1p model performs slightly better for estimating $\lambda$ but slightly worse for estimating $b$.
 
 # Conclusion
 
