@@ -21,3 +21,5 @@ Welcome to my research website.
 [Analysis of natural killer T cells](nkt_analysis.html)
 
 [Normal Approximation to log1p Poisson Means](ebnm.html)
+
+[Objective Evaluation of flash Approximation to log1p Model](new_log1p_approx_testing.html)
