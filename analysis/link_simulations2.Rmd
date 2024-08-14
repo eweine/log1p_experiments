@@ -175,8 +175,12 @@ Most notably, we can see that the factors are generally dominated by the set of 
 
 Essentially, I believe the identity link has a difficult time representing multiplicative changes in gene expression, especially for genes which already have somewhat high expression at baseline.
 
+# Using a normal likelihood as an approximation
+
+I wanted to explore the effects of using a normal likelihood to approximate the distribution of the data conditional on $L$ and $F$. First, I used maximum likelihood to fit NMF to the log1p transformed counts. The results are shown below:
+
 ```{r}
-Y2 <- MatrixExtra::mapSparse(Y, sqrt)
+Y2 <- MatrixExtra::mapSparse(Y, log1p)
 ```
 
 
@@ -216,3 +220,136 @@ ggplot(ft_factor_df, aes(x = pos, y = val)) +
   cowplot::theme_cowplot()  # Use a minimal theme for a clean look
 ```
 
+This looks relatively similar to the MLE of the log1p Poisson fit. However, this model perhaps deals slightly less well with the overlapping part of the gene expression programs.
+
+Next, I used flashier fit NMF on the log1p transformed counts. I started with a greedy initialization. I'm using a constant value for S based on the flashier vignette. The results are shown below:
+
+```{r}
+library(flashier)
+mhat = 1/nrow(Y2) #estimate of rate
+xx = rpois(1e7, mhat) #random poisson
+S1 <- sd(log(xx + 1)) #sd of log(X+1)
+f <- flash(data = Y2, S = S1, backfit = T, greedy_Kmax = 4, ebnm_fn = ebnm::ebnm_point_exponential)
+```
+
+```{r}
+max_col <- apply(f$L_pm, 2, max)
+f_LL <- sweep(f$L_pm, 2, max_col, FUN = "/")
+f_FF <- sweep(f$F_pm, 2, max_col, FUN = "*")
+```
+
+```{r}
+ft_factor_df <- data.frame(
+  val = c(
+    f_FF[,1], f_FF[,2], f_FF[,3], f_FF[,4]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500)
+  ),
+  pos = c(rep(1:500, 4))
+)
+library(ggplot2)
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+
+These results look quite good. When compared to the MLE of the log1p Poisson model, the results look quite similar, except that there is significantly more shrinkage in the areas where we saw extraneous background showing up in the MLE (e.g. in factors 2 and 3).
+
+Finally, I wanted to try to use Matthew's new approximation with flashier. First, I tried to start with a greedy initialization. However, flash is not able to find a single non-zero factor. I think the reason for this is that I am restricting the factors to be non-negative but the vast majority of the values in the matrix are -1. So, with only one factor, it may not be possible to fit the data any better than with all 0s for the means.
+
+```{r}
+Y3 <- as.matrix(Y2)
+S3 <- Y3 / ((1 + Y3) ^ 2)
+S3 <- apply(S3, c(1, 2), function(x){if(x == 0){1}else{x}})
+Y3 <- apply(Y3, c(1, 2), function(x){if(x == 0){-1}else{x}})
+```
+
+```{r}
+set.seed(1)
+f2 <- flash(data = Y3, S = sqrt(S3), backfit = T, greedy_Kmax = 4, ebnm_fn = ebnm::ebnm_point_exponential)
+```
+
+Now, I try a greedy initialization of flashier (again using Matthew's approximation to transform the data and estimate the variance) with the MLE and then backfit:
+
+```{r}
+fit_flash_new_mle <- flash_init(data = Y3, S = sqrt(S3))
+fit_flash_new_mle <- flash_factors_init(
+  flash = fit_flash_new_mle,
+  init = list(
+    log1p_mod$U, log1p_mod$V
+  ),
+  ebnm_fn = ebnm::ebnm_point_exponential
+)
+
+fit_flash_new_mle <- flash_backfit(fit_flash_new_mle)
+```
+```{r}
+f <- fit_flash_new_mle
+max_col <- apply(f$L_pm, 2, max)
+f_LL <- sweep(f$L_pm, 2, max_col, FUN = "/")
+f_FF <- sweep(f$F_pm, 2, max_col, FUN = "*")
+
+ft_factor_df <- data.frame(
+  val = c(
+    f_FF[,1], f_FF[,2], f_FF[,3], f_FF[,4]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500)
+  ),
+  pos = c(rep(1:500, 4))
+)
+library(ggplot2)
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+This looks very good, probably the best so far. These results are quite close to the true model. 
+
+This begs the question, if I had initialized using the current flashier pipeline, would the results have been similar. I try this below:
+
+
+```{r}
+fit_flash_new_mle <- flash_init(data = Y2, S = S1)
+fit_flash_new_mle <- flash_factors_init(
+  flash = fit_flash_new_mle,
+  init = list(
+    log1p_mod$U, log1p_mod$V
+  ),
+  ebnm_fn = ebnm::ebnm_point_exponential
+)
+
+fit_flash_new_mle <- flash_backfit(fit_flash_new_mle)
+```
+
+```{r}
+f <- fit_flash_new_mle
+max_col <- apply(f$L_pm, 2, max)
+f_LL <- sweep(f$L_pm, 2, max_col, FUN = "/")
+f_FF <- sweep(f$F_pm, 2, max_col, FUN = "*")
+
+ft_factor_df <- data.frame(
+  val = c(
+    f_FF[,1], f_FF[,2], f_FF[,3], f_FF[,4]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500)
+  ),
+  pos = c(rep(1:500, 4))
+)
+library(ggplot2)
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+The answer appears to be no...
+
+# Conclusion
+
+In this particular scenario, it seems like Matthew's new approximation works quite well. However, an important caveat to this is that the greedy initialization appears to work very poorly for this approximation.
