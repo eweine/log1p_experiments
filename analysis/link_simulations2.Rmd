@@ -350,6 +350,124 @@ ggplot(ft_factor_df, aes(x = pos, y = val)) +
 ```
 The answer appears to be no...
 
-# Conclusion
+# Greedy initialization using the MLE to initialize factors
 
-In this particular scenario, it seems like Matthew's new approximation works quite well. However, an important caveat to this is that the greedy initialization appears to work very poorly for this approximation.
+Matthew suggested that the poor performance of the greedy initialization above could be due to the fact that `flashier`'s initializtion function does not take standard errors into account.
+
+To remedy this, I will instead provide a custom initialization function to `flashier`. I will set the initial values in this function to the posterior expectations of `L` and `F`. Then, I will add an additional factor to maximize the likelihood of the Poisson log1p model using the un-transformed data Y.
+
+```{r}
+make_log1p_init_fn <- function(Y) {
+  
+  log1p_init_fn <- function(f) {
+    
+    if (is.null(f$EF)) {
+      
+      L_init <- matrix(
+        data = rexp(n = nrow(Y), rate = 15),
+        nrow = nrow(Y)
+      )
+      F_init <- matrix(
+        data = rexp(n = ncol(Y), rate = 15),
+        nrow = ncol(Y)
+      )
+      new_factor_num <- 1
+      
+    } else {
+      
+      L_init <- cbind(f$EF[[1]], rexp(n = nrow(Y), rate = 15))
+      F_init <- cbind(f$EF[[2]], rexp(n = ncol(Y), rate = 15))
+      new_factor_num <- 1 + ncol(f$EF[[1]])
+      
+    }
+    
+    new_fit <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+      Y = Y,
+      K = new_factor_num,
+      maxiter = 15,
+      init_U = L_init,
+      init_V = F_init,
+      update_idx = c(new_factor_num),
+      approx_range = c(0, 1.25)
+    )
+    
+    return(
+      list(
+        new_fit$U[,new_factor_num], new_fit$V[,new_factor_num]
+      )
+    )
+    
+  }
+  
+  return(log1p_init_fn)
+  
+}
+```
+
+```{r}
+set.seed(1)
+f_log1p_init <- flash_init(data = Y3, S = sqrt(S3))
+f_log1p_init <- flash_greedy(
+  flash = f_log1p_init,
+  Kmax = 10, 
+  ebnm_fn = ebnm::ebnm_point_exponential,
+  init_fn = make_log1p_init_fn(Y)
+)
+```
+
+Using this greedy approach, flash adds 5 factors, just 1 off from the truth. They are visualized below
+
+```{r}
+f <- f_log1p_init
+max_col <- apply(f$L_pm, 2, max)
+f_LL <- sweep(f$L_pm, 2, max_col, FUN = "/")
+f_FF <- sweep(f$F_pm, 2, max_col, FUN = "*")
+
+ft_factor_df <- data.frame(
+  val = c(
+    f_FF[,1], f_FF[,2], f_FF[,3], f_FF[,4], f_FF[,5]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500), rep("5", 500)
+  ),
+  pos = c(rep(1:500, 5))
+)
+library(ggplot2)
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+
+These look a bit wonky, but let's see if a backfit improves things...
+
+```{r}
+f_log1p_init <- flash_backfit(
+  f_log1p_init
+)
+```
+```{r}
+f <- f_log1p_init
+max_col <- apply(f$L_pm, 2, max)
+f_LL <- sweep(f$L_pm, 2, max_col, FUN = "/")
+f_FF <- sweep(f$F_pm, 2, max_col, FUN = "*")
+
+ft_factor_df <- data.frame(
+  val = c(
+    f_FF[,1], f_FF[,2], f_FF[,3], f_FF[,4], f_FF[,5]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500), rep("5", 500)
+  ),
+  pos = c(rep(1:500, 5))
+)
+library(ggplot2)
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+
+Things seem to look better after the backfit. 
