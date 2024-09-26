@@ -23,3 +23,5 @@ Welcome to my research website.
 [Normal Approximation to log1p Poisson Means](ebnm.html)
 
 [Objective Evaluation of flash Approximation to log1p Model](new_log1p_approx_testing.html)
+
+[Exploration of normal approximations to log1p model](log1p_explorations.html)

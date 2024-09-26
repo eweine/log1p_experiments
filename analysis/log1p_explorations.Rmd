@@ -1,0 +1,91 @@
+---
+title: "Exploring the log1p approximation"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-09-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Here, I will explore some issues related to the precise approximation that we will use in flashier to estimate the log1p model. 
+
+## Current approach to using flash
+
+First, consider the log1p model with one observation
+
+\begin{align}
+y &\sim Poisson(\lambda) \\
+\log(1 + \lambda) &= b,
+\end{align}
+
+where $b \geq 0$. Taking a second order taylor approximation about $\hat{b} = \log(1 + y)$, we have
+
+$$\ell_{pm}(b) \approx \ell_{pm}(\hat{b}) + \ell_{pm}^{'}(\hat{b}) (b - \hat{b}) + \frac{1}{2}\ell_{pm}^{''}(\hat{b})(b - \hat{b})^{2}$$
+Now, when $y \neq 0$, $\ell_{pm}^{'}(\hat{b}) = 0$, and the above equation becomes
+
+$$\ell_{pm}(b) \approx \frac{1}{2}\ell_{pm}^{''}(\hat{b})(b - \hat{b})^{2},$$
+where I've omitted constants with respect to $b$. As Matthew has pointed out previously, we can adjust for the derivative of the log-likelihood when $y = 0$.
+
+Now, how does this generalize to the matrix factorization case? Let $Y \in \mathbb{R}^{n \times p}$. First, we will consider a full rank case, where $B \in \mathbb{R}^{n \times p}$. That is,
+
+\begin{align*}
+y_{ij} &\sim Poisson(\lambda_{ij}) \\
+\log(1 + \lambda_{ij}) &= b_{ij}
+\end{align*}
+
+In this case, we can write the log likelihood of the above model as 
+
+$$\ell_{PMF}(Y) = \sum_{i = 1}^{n}\sum_{j = 1}^{p} \ell_{pm}(y_{ij}, b_{ij})$$
+
+Now, taking a second order Taylor approximation of $\ell_{PMF}$ about $\hat{B}$, we have
+
+$$\ell_{PMF}(Y) \approx \sum_{i = 1}^{n}\sum_{j = 1}^{p} \ell_{pm}(\hat{b}_{ij}) + \ell_{pm}^{'}(\hat{b}_{ij}) (b_{ij} - \hat{b}_{ij}) + \frac{1}{2}\ell_{pm}^{''}(\hat{b})(b_{ij} - \hat{b}_{ij})^{2}.$$
+
+Noting again that the derivative terms will go to $0$ when $y_{ij} = 0$ and acknowledging that we will adjust otherwise, we can see that this log-likelihood is simply that of a sum of $n \times p$ normal log-likelihoods. 
+
+Now, the problem we'd really like to solve can be formulated as follows:
+
+\begin{align*}
+y_{ij} &\sim Poisson(\lambda_{ij}) \\
+B^{(K)} &= LF^{T} \\
+\log(1 + \lambda_{ij}) &= b_{ij},
+\end{align*}
+
+where $rank(L) = rank(F) = K \ll min(n, p)$ and all elements of $L$ and $F$ are non-negative. Now, when $B^{(K)}$ is "close" to $\hat{B}$, we can use the equation for $\ell_{PMF}$ as a reasonable approximation to the log-likelihood of the low-rank model. I think this should be okay when $K$ is set large enough.
+
+
+## Another perspective - Peter's idea
+
+Peter suggested an idea that I think is worth considering. The algorithm would go as follows:
+
+**Input:** $L_{0}, F_{0}$ 
+
+$L = L_{0}$, $F = F_{0}$ 
+
+**While** not converged:
+
+(1) $\hat{F} = MLE(F | Y, L)$
+(2) $F = EBNM(F| \hat{F}, Y, L)$
+(3) $\hat{L} = MLE(L | Y, F)$
+(4) $L = EBNM(L| \hat{L}, Y, F)$
+
+Here, the function $MLE()$ simply returns the MLE of the first argument under the log1p Poisson model. I already have this implemented, and it is easy and fast. The EBNM step is a bit more complicated. Take step 2 as an example:
+
+Consider the log1p matrix factorization model where $L$ is fixed. Then, by taking a second order Taylor approximation of the log-likelihood of this model about $vec(\hat{F})$, we have
+
+\begin{align*}
+\ell_{PMF}(vec(F)) & \approx \ell_{PMF}(vec(\hat{F})) + \\
+& \nabla \ell_{PMF}(vec(\hat{F}))^{T} (vec(F) - vec(\hat{F})) + \\
+& \frac{1}{2} (vec(F) - vec(\hat{F}))^{T} H(vec(\hat{F}))(vec(F) - vec(\hat{F})),
+\end{align*}
+
+where $H$ represents the hessian of $\ell_{PMF}$. Unfortunately, we cannot necessarily expect $\nabla \ell_{PMF}$ to be $0$ at $vec(\hat{F})$ because we are taking the MLE over a restricted parameter space. It is also worth noting that while $H$ will be quite large I believe it is generally very sparse. 
+
+To solve this with existing EBNM tools, my guess is that we would need to apply a whitening transformation and then maybe feed this into `mr.ash`? Perhaps there is an easier way...
+
+The main benefits of the above approach are (a) you don't need to store a dense matrix and (b) the normal assumption could potentially be more reasonable for the terms where the gradient goes to $0$, as with enough data asymptotic normality should probably roughly apply. The downside of this approach is that it isn't actually clear what objective function we are maximizing.
