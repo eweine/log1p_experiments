@@ -597,7 +597,6 @@ gdf_flash <- get_go_terms(flash_FF)
 knitr::kable(gdf_flash)
 ```
 
-
 ## Conclusion
 
 Overall, I think that the results above are fairly promising. On the dataset analyzed here, I think that the log1p link model shows some fairly small but relatively clear advantages relative to both the Poisson model with identity link and the frobenius NMF approach with a log1p transformation. 

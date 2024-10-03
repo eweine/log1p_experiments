@@ -1,0 +1,249 @@
+---
+title: "Applying the log1p normal approximatio to real data"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-10-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results='hide', message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(Matrix)
+library(fastTopics)
+
+m <- pbmc_facs$counts
+m <- m[,Matrix::colSums(m) >= 100]
+```
+
+## Introduction
+
+Here, I wanted to try out Matthew's idea for a normal approximation to the log1p Poisson model on some real data. Note that I am not adjusting for size factors here, which probably isn't optimal but I don't think will make a huge difference.
+
+## PBMC-FACS
+
+Here, I am fitting to the pbmc facs dataset exported from `fasttopics`.
+
+I fit four models here. 
+
+(1) log1p Poisson MLE with K = 6.
+(2) log1p normal approximation (Matthew's idea) with flashier greedy initialization.
+(3) log1p normal approximation with MLE init where K = 6.
+(4) Current flashier pipeline for single cell data.
+
+```{r, eval=FALSE}
+set.seed(1)
+log1p_mod <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = m,
+  K = 6,
+  maxiter = 100,
+  approx_range = c(0, 1.25)
+)
+
+set.seed(1)
+ff <- passPCA::run_flash_log1p_with_greedy_init(
+  Y = m,
+  var_type = 2
+)
+
+set.seed(1)
+ff2 <- passPCA::run_flash_log1p_with_MLE_init(
+  Y = m,
+  K = 6
+)
+
+m_tilde <- MatrixExtra::mapSparse(m, log1p)
+n  <- nrow(m)
+x  <- rpois(1e7, 1/n)
+s1 <- sd(log(x + 1))
+
+ff3 <- flashier::flash(m_tilde,
+             ebnm_fn = ebnm::ebnm_point_exponential,
+             var_type = 2,
+             greedy_Kmax = 10,
+             S = s1,
+             backfit = TRUE)
+```
+
+```{r, include=FALSE}
+log1p_mod <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/pbmc_facs_k6_mle.rds"
+)
+
+ff <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/pbmc_facs_flash_greedy_init.rds"
+)
+
+ff2 <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/pbmc_facs_flash_mle_init.rds"
+)
+
+ff3 <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/pbmc_facs_flash_old.rds"
+)
+```
+
+```{r}
+normalize_bars <- function(LL) {
+  
+  max_col <- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = "/")
+  
+}
+```
+
+Below are the results of the MLE with K = 6:
+
+```{r}
+LL <- log1p_mod$U
+LL <- normalize_bars(LL)
+structure_plot(LL, grouping = pbmc_facs$samples$subpop)
+```
+This looks fairly reasonable. There is a baseline factor (green), a B cell factor (purple), a CD34+ factor (red), a CD14+ factor (yellow), an NK factor (orange), and a T cell factor (blue).
+
+Below are the results from the flash greedy fit:
+
+```{r}
+LL <- ff$L_pm
+LL <- normalize_bars(LL)
+structure_plot(LL, grouping = pbmc_facs$samples$subpop)
+```
+This doesn't look quite as good. The model seems to be nicely picking up the CD34+ group and the NK group, but doesn't pickup the other groups very well. It seems to group the T cell and NK cells together, which isn't horribly unreasonable...
+
+Now, what happens when we take the MLE fit and run flash backfit?
+
+```{r}
+LL <- ff2$L_pm
+LL <- normalize_bars(LL)
+structure_plot(LL, grouping = pbmc_facs$samples$subpop)
+```
+This looks more or less the same as the MLE fit, but the solution is a bit sparser which is nice. 
+
+Finally, the current flashier pipeline:
+
+```{r}
+LL <- ff3$L_pm
+LL <- normalize_bars(LL)
+structure_plot(LL, grouping = pbmc_facs$samples$subpop)
+```
+This fit also looks reasonably good. It is hard to know if some of the additional factors that are added related to the MLE are capturing real signal or just noise.
+
+## NKT Stimulation Dataset
+
+I also wanted to analyze a natural killer T cell stimulation dataset that I looked at previously [here](nkt_analysis.html). I'm only looking at the first donor's stimulated and unstimulated cells (mostly for computational tractability with the new flashier idea). Here, I only fit:
+
+(1) log1p Poisson MLE with K = 5.
+(2) log1p normal approximation (Matthew's idea) with flashier greedy initialization.
+(3) Current flashier pipeline for single cell data.
+
+```{r}
+m1 <- as.matrix(Matrix::readMM(
+  '~/Downloads/GSE128243_RAW/GSM3669244_NKT_HS_Unstim1_matrix.mtx'
+))
+genes1 <- readr::read_tsv("~/Downloads/GSE128243_RAW/GSM3669244_NKT_HS_Unstim1_genes.tsv",
+                          col_names = c("ensembl", "name"))
+rownames(m1) <- genes1$ensembl
+
+m4 <- as.matrix(Matrix::readMM('~/Downloads/GSE128243_RAW/GSM3669247_NKT_HS_Stim1_matrix.mtx'))
+genes4 <- readr::read_tsv(
+  "~/Downloads/GSE128243_RAW/GSM3669247_NKT_HS_Stim1_genes.tsv",
+  col_names = c("ensembl", "name")
+)
+rownames(m4) <- genes4$ensembl
+
+m <- cbind(
+  m1, m4
+)
+
+samples <- c(
+  rep("Unstim", ncol(m1)),
+  rep("Stim", ncol(m4))
+)
+
+rm(m1, m4)
+m <- as(m, "sparseMatrix")
+m <- Matrix::t(m)
+m <- m[,Matrix::colSums(m) >= 100]
+```
+
+```{r, eval=FALSE}
+set.seed(1)
+log1p_mod <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = m,
+  K = 10,
+  maxiter = 100,
+  approx_range = c(0, 1.25)
+)
+
+set.seed(1)
+ff <- passPCA::run_flash_log1p_with_greedy_init(
+  Y = m,
+  var_type = 2
+)
+
+set.seed(1)
+ff2 <- passPCA::run_flash_log1p_with_MLE_init(
+  Y = m,
+  K = 10
+)
+
+m_tilde <- MatrixExtra::mapSparse(m, log1p)
+n  <- nrow(m)
+x  <- rpois(1e7, 1/n)
+s1 <- sd(log(x + 1))
+
+ff3 <- flashier::flash(m_tilde,
+                       ebnm_fn = ebnm::ebnm_point_exponential,
+                       var_type = 2,
+                       greedy_Kmax = 10,
+                       S = s1,
+                       backfit = TRUE)
+```
+
+```{r, include=FALSE}
+log1p_mod <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/nkt_k5_mle.rds"
+)
+
+ff <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/nkt_flash_greedy_init.rds"
+)
+
+ff3 <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/nkt_flash_old.rds"
+)
+```
+
+Here is the MLE:
+
+```{r}
+LL <- log1p_mod$U
+LL <- normalize_bars(LL)
+structure_plot(LL, grouping = samples)
+```
+There is clearly one unique factor for the unstimulated cells and then a number of factors for the stimulated cells. 
+
+Here are the results of applying Matthew's idea using flashier:
+
+```{r}
+LL <- ff$L_pm
+LL <- normalize_bars(LL)
+structure_plot(LL, grouping = samples)
+```
+You can see that basically all that is happening is that the stimulated and unstimulated cells are being separated. That might be okay?
+
+Finally, I'll look at the old flash pipeline:
+
+```{r}
+LL <- ff3$L_pm
+LL <- normalize_bars(LL)
+structure_plot(LL, grouping = samples)
+```
+We get far more factors here. 
+
+# Conclusion
+
+In these two datasets, it's clear that proposed flash pipeline will probably lead to solutions with far fewer factors. That may or may not be a good thing...
