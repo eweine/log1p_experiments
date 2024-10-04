@@ -1,0 +1,199 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-10-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+usage_df <- readr::read_csv(
+  "~/Documents/data/passPCA/experiment_results/cNMF_pbmc_facs_usage.csv"
+)
+
+top_genes_df <- readr::read_csv(
+  "~/Documents/data/passPCA/experiment_results/cNMF_pbmc_facs_top_genes.csv"
+)
+
+library(fastTopics)
+
+cNMF_LL <- usage_df %>% 
+  dplyr::select(-barcode) %>%
+  as.matrix()
+
+structure_plot(cNMF_LL, grouping = pbmc_facs$samples$subpop)
+
+library(passPCA)
+log1p_k1 <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = pbmc_facs$counts,
+  K = 1,
+  approx_range = c(0, 1.25),
+  maxiter = 10,
+  s = Matrix::rowSums(pbmc_facs$counts) / mean(Matrix::rowSums(pbmc_facs$counts))
+)
+
+n <- nrow(pbmc_facs$counts)
+p <- ncol(pbmc_facs$counts)
+K <- 6
+
+init_LL <- log1p_k1$U %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+
+init_FF <- log1p_k1$V %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+log1p_k1 <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = pbmc_facs$counts,
+  K = 6,
+  maxiter = 100,
+  approx_range = c(0, 1.25),
+  init_U = init_LL,
+  init_V = init_FF,
+  s = Matrix::rowSums(pbmc_facs$counts) / mean(Matrix::rowSums(pbmc_facs$counts))
+)
+
+normalize_bars <- function(LL) {
+  
+  max_col <- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = "/")
+  
+}
+
+LL <- log1p_k1$U
+LL <- normalize_bars(LL)
+
+structure_plot(LL, grouping = pbmc_facs$samples$subpop)
+
+```
+
+```{r}
+FF <- log1p_k1$V
+rownames(FF) <- colnames(pbmc_facs$counts)
+```
+
+
+```{r}
+library(clusterProfiler)
+library(fgsea)
+library(AnnotationDbi)
+library(org.Hs.eg.db)
+
+gv <- pbmc_facs$genes$symbol
+names(gv) <- pbmc_facs$genes$ensembl
+
+top_genes_df <- top_genes_df %>%
+  dplyr::select(-`...1`)
+
+get_go_terms <- function(V) {
+  
+  K <- ncol(V)
+  
+  genes_vec <- c()
+  go_terms_vec <- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes <- names(sort(V[,k], decreasing = TRUE))[1:20]
+    
+    go_result <- enrichGO(gene = driving_genes,
+                          OrgDb = org.Hs.eg.db,
+                          keyType = "ENSEMBL",
+                          ont = "BP", 
+                          pAdjustMethod = "bonferroni",
+                          pvalueCutoff = 0.05,
+                          qvalueCutoff = 0.1)@result
+    
+    go_result <- go_result %>%
+      dplyr::filter(p.adjust < .01)
+    
+    go_terms <- go_result$Description
+    
+    genes_vec <- c(genes_vec, paste(unname(gv[driving_genes]), collapse = ", "))
+    go_terms_vec <- c(go_terms_vec, paste(go_terms, collapse = ", "))
+    
+  }
+  
+  go_df <- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}
+
+get_go_terms_cNMF <- function(sets_df) {
+  
+  K <- ncol(sets_df)
+  
+  genes_vec <- c()
+  go_terms_vec <- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes <- (sets_df[[k]])[1:20]
+    
+    go_result <- enrichGO(gene = driving_genes,
+                          OrgDb = org.Hs.eg.db,
+                          keyType = "ENSEMBL",
+                          ont = "BP", 
+                          pAdjustMethod = "bonferroni",
+                          pvalueCutoff = 0.05,
+                          qvalueCutoff = 0.1)@result
+    
+    go_result <- go_result %>%
+      dplyr::filter(p.adjust < .01)
+    
+    go_terms <- go_result$Description
+    
+    genes_vec <- c(genes_vec, paste(unname(gv[driving_genes]), collapse = ", "))
+    go_terms_vec <- c(go_terms_vec, paste(go_terms, collapse = ", "))
+    
+  }
+  
+  go_df <- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}
+
+gdf_log1p <- get_go_terms(FF)
+gdf_cNMF <- get_go_terms_cNMF(top_genes_df)
+```
+
+The log1p go terms:
+
+```{r}
+knitr::kable(gdf_log1p)
+```
+
+The cNMF go terms:
+
+```{r}
+knitr::kable(gdf_cNMF)
+```
+

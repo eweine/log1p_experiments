@@ -27,3 +27,5 @@ Welcome to my research website.
 [Exploration of normal approximations to log1p model](log1p_explorations.html)
 
 [Application of normal approximation to real data](flash_approx.html)
+
+[NMF Comparison on Mouse Brain Dataset](mouse_brain_stim.html)

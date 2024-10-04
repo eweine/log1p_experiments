@@ -1,0 +1,261 @@
+---
+title: "Applying NMF models to Mouse Brain Stimulation"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-10-04"
+---
+
+## Introduction
+
+Here, I analyzed the dataset from "Single-cell analysis of experience-dependent transcriptomic states in the mouse visual cortex" by Hrvatin et al. Here, brain cells in mice were sequenced after prolonged darkness (0h), exposure to light for one hour (1h), and exposure to light for four hours (4h). 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, comment = FALSE, message = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(Matrix)
+library(fastTopics)
+load("~/Downloads/mouse_brain_stim.Rdata")
+
+cells <- cells %>% dplyr::filter(!is.na(maintype))
+
+counts <- counts[rownames(counts) %in% cells$`...1`, ]
+counts <- counts[, Matrix::colSums(counts) > 0]
+counts <- counts[Matrix::rowSums(counts) > 0, ]
+```
+
+```{r, eval=FALSE}
+n <- nrow(counts)
+p <- ncol(counts)
+K <- 15
+
+rs <- Matrix::rowSums(counts)
+s <- rs / mean(rs)
+
+set.seed(1)
+log1p_k1 <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = counts,
+  K = 1,
+  maxiter = 10,
+  approx_range = c(0, 1.25),
+  s = s
+)
+
+init_LL <- log1p_k1$U %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+
+init_FF <- log1p_k1$V %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+set.seed(1)
+log1p_k15 <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = counts,
+  K = 15,
+  maxiter = 100,
+  approx_range = c(0, 1.25),
+  s = s,
+  init_U = init_LL,
+  init_V = init_FF
+)
+```
+
+
+```{r}
+normalize_bars <- function(LL) {
+
+  max_col <- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = "/")
+
+}
+```
+
+## Log1p Poisson Model
+
+```{r}
+log1p_k15 <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/mouse_brain_k15.rds"
+  )
+```
+
+```{r}
+LL <- normalize_bars(log1p_k15$U)
+```
+
+```{r, results='hide'}
+cell_stim <- paste(cells$maintype, cells$stim)
+
+sp <- structure_plot(LL, grouping = cell_stim, gap = 25)
+rownames(log1p_k15$V) <- colnames(counts)
+```
+
+```{r}
+sp
+```
+
+
+```{r}
+library(clusterProfiler)
+library(fgsea)
+library(AnnotationDbi)
+library(org.Mm.eg.db)
+
+get_go_terms <- function(V) {
+  
+  K <- ncol(V)
+  
+  genes_vec <- c()
+  go_terms_vec <- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes <- names(sort(V[,k], decreasing = TRUE))[1:20]
+    
+    go_result <- enrichGO(gene = driving_genes,
+                          OrgDb = org.Mm.eg.db,
+                          keyType = "SYMBOL",
+                          ont = "BP", 
+                          pAdjustMethod = "bonferroni",
+                          pvalueCutoff = 0.05,
+                          qvalueCutoff = 0.1)@result
+    
+    go_result <- go_result %>%
+      dplyr::filter(p.adjust < .01)
+    
+    go_terms <- go_result$Description
+    
+    genes_vec <- c(genes_vec, paste(driving_genes, collapse = ", "))
+    go_terms_vec <- c(go_terms_vec, paste(go_terms, collapse = ", "))
+    
+  }
+  
+  go_df <- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}
+```
+
+```{r}
+gdf <- get_go_terms(log1p_k15$V)
+knitr::kable(gdf)
+```
+
+## log1p transformation
+
+```{r, results='hide'}
+nmf_fit <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/rcppML_nmf_k15.rds"
+  )
+
+nmf_LL <- nmf_fit$w %*% diag(x = nmf_fit$d)
+nmf_LL <- normalize_bars(nmf_LL)
+
+nmf_FF <- t(diag(x = nmf_fit$d) %*% nmf_fit$h)
+rownames(nmf_FF) <- colnames(counts)
+sp <- structure_plot(nmf_LL, grouping = cell_stim, gap = 25)
+```
+
+```{r}
+sp
+```
+
+```{r}
+gdf <- get_go_terms(nmf_FF)
+knitr::kable(gdf)
+```
+
+
+## cNMF
+
+```{r, results='hide'}
+usage_df <- readr::read_csv(
+  "~/Documents/data/passPCA/mouse_brain_cnmf_usage.csv"
+)
+
+top_genes_df <- readr::read_csv(
+  "~/Documents/data/passPCA/mouse_brain_cnmf_top_usage.csv"
+)
+
+top_genes_df <- top_genes_df %>%
+  dplyr::select(-`...1`)
+
+cNMF_LL <- usage_df %>%
+  dplyr::select(-bc) %>%
+  as.matrix()
+
+sp <- structure_plot(cNMF_LL, grouping = cell_stim, gap = 25)
+```
+
+```{r}
+sp
+```
+
+
+```{r}
+get_go_terms_cNMF <- function(sets_df) {
+  
+  K <- ncol(sets_df)
+  
+  genes_vec <- c()
+  go_terms_vec <- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes <- (sets_df[[k]])[1:20]
+    
+    go_result <- enrichGO(gene = driving_genes,
+                          OrgDb = org.Mm.eg.db,
+                          keyType = "SYMBOL",
+                          ont = "BP", 
+                          pAdjustMethod = "bonferroni",
+                          pvalueCutoff = 0.05,
+                          qvalueCutoff = 0.1)@result
+    
+    go_result <- go_result %>%
+      dplyr::filter(p.adjust < .01)
+    
+    go_terms <- go_result$Description
+    
+    genes_vec <- c(genes_vec, paste(driving_genes, collapse = ", "))
+    go_terms_vec <- c(go_terms_vec, paste(go_terms, collapse = ", "))
+    
+  }
+  
+  go_df <- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}
+
+gdf_cNMF <- get_go_terms_cNMF(top_genes_df)
+knitr::kable(gdf_cNMF)
+```
+
+

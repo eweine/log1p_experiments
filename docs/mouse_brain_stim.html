@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2024-10-04" />
+
+<title>Applying NMF models to Mouse Brain Stimulation</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Applying NMF models to Mouse Brain
+Stimulation</h1>
+<h4 class="date">2024-10-04</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-10-04
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree7419934aaaee9bb7ce4a2076757fda2a9a5230d4targetblank7419934a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/7419934aaaee9bb7ce4a2076757fda2a9a5230d4" target="_blank">7419934</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree7419934aaaee9bb7ce4a2076757fda2a9a5230d4targetblank7419934a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/7419934aaaee9bb7ce4a2076757fda2a9a5230d4" target="_blank">7419934</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+
+Untracked files:
+    Untracked:  analysis/cnmf_comparison.Rmd
+    Untracked:  analysis/mouse_brain_stim.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Here, I analyzed the dataset from “Single-cell analysis of
+experience-dependent transcriptomic states in the mouse visual cortex”
+by Hrvatin et al. Here, brain cells in mice were sequenced after
+prolonged darkness (0h), exposure to light for one hour (1h), and
+exposure to light for four hours (4h).</p>
+<pre class="r"><code>library(dplyr)
+library(Matrix)
+library(fastTopics)
+load(&quot;~/Downloads/mouse_brain_stim.Rdata&quot;)
+
+cells &lt;- cells %&gt;% dplyr::filter(!is.na(maintype))
+
+counts &lt;- counts[rownames(counts) %in% cells$`...1`, ]
+counts &lt;- counts[, Matrix::colSums(counts) &gt; 0]
+counts &lt;- counts[Matrix::rowSums(counts) &gt; 0, ]</code></pre>
+<pre class="r"><code>n &lt;- nrow(counts)
+p &lt;- ncol(counts)
+K &lt;- 15
+
+rs &lt;- Matrix::rowSums(counts)
+s &lt;- rs / mean(rs)
+
+set.seed(1)
+log1p_k1 &lt;- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = counts,
+  K = 1,
+  maxiter = 10,
+  approx_range = c(0, 1.25),
+  s = s
+)
+
+init_LL &lt;- log1p_k1$U %&gt;%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+
+init_FF &lt;- log1p_k1$V %&gt;%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+set.seed(1)
+log1p_k15 &lt;- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = counts,
+  K = 15,
+  maxiter = 100,
+  approx_range = c(0, 1.25),
+  s = s,
+  init_U = init_LL,
+  init_V = init_FF
+)</code></pre>
+<pre class="r"><code>normalize_bars &lt;- function(LL) {
+
+  max_col &lt;- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = &quot;/&quot;)
+
+}</code></pre>
+</div>
+<div id="log1p-poisson-model" class="section level2">
+<h2>Log1p Poisson Model</h2>
+<pre class="r"><code>log1p_k15 &lt;- readr::read_rds(
+  &quot;~/Documents/data/passPCA/experiment_results/mouse_brain_k15.rds&quot;
+  )</code></pre>
+<pre class="r"><code>LL &lt;- normalize_bars(log1p_k15$U)</code></pre>
+<pre class="r"><code>cell_stim &lt;- paste(cells$maintype, cells$stim)
+
+sp &lt;- structure_plot(LL, grouping = cell_stim, gap = 25)
+rownames(log1p_k15$V) &lt;- colnames(counts)</code></pre>
+<pre class="r"><code>sp</code></pre>
+<p><img src="figure/mouse_brain_stim.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>library(clusterProfiler)
+library(fgsea)
+library(AnnotationDbi)
+library(org.Mm.eg.db)
+
+get_go_terms &lt;- function(V) {
+  
+  K &lt;- ncol(V)
+  
+  genes_vec &lt;- c()
+  go_terms_vec &lt;- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes &lt;- names(sort(V[,k], decreasing = TRUE))[1:20]
+    
+    go_result &lt;- enrichGO(gene = driving_genes,
+                          OrgDb = org.Mm.eg.db,
+                          keyType = &quot;SYMBOL&quot;,
+                          ont = &quot;BP&quot;, 
+                          pAdjustMethod = &quot;bonferroni&quot;,
+                          pvalueCutoff = 0.05,
+                          qvalueCutoff = 0.1)@result
+    
+    go_result &lt;- go_result %&gt;%
+      dplyr::filter(p.adjust &lt; .01)
+    
+    go_terms &lt;- go_result$Description
+    
+    genes_vec &lt;- c(genes_vec, paste(driving_genes, collapse = &quot;, &quot;))
+    go_terms_vec &lt;- c(go_terms_vec, paste(go_terms, collapse = &quot;, &quot;))
+    
+  }
+  
+  go_df &lt;- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}</code></pre>
+<pre class="r"><code>gdf &lt;- get_go_terms(log1p_k15$V)
+knitr::kable(gdf)</code></pre>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="91%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Mbp, Fth1, Tpt1, Rps29, Bcas1, Gm20594, Rps23, Mobp,
+Kif5b, Rps3a1, Eef1a1, Rps3, Rps24, Rps27a, Kif5a, Rps21, Rpl26,
+Plekhb1, Rpl23, Gas5</td>
+<td align="left">cytoplasmic translation, translation at presynapse,
+translation at synapse, translation at postsynapse, ribosomal small
+subunit biogenesis, ribosome biogenesis, regulation of intrinsic
+apoptotic signaling pathway in response to DNA damage, ribonucleoprotein
+complex biogenesis, axo-dendritic protein transport, positive regulation
+of intrinsic apoptotic signaling pathway in response to DNA damage,
+dense core granule cytoskeletal transport</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Snap25, Syt1, Ndrg4, Nrgn, Stmn1, Calm2, Mef2c, Ppia,
+App, Gpm6a, Ppp3ca, Meg3, Rtn1, Calm1, Itm2b, Camk2n1, Gnas, Atp1b1,
+Stxbp1, Rtn3</td>
+<td align="left">response to calcium ion, positive regulation of
+secretion, detection of calcium ion, positive regulation of
+dephosphorylation, response to metal ion, cognition, positive regulation
+of secretion by cell, amyloid precursor protein metabolic process,
+organelle localization by membrane tethering, regulation of monoatomic
+ion transmembrane transporter activity, membrane docking, regulation of
+transmembrane transporter activity, regulation of transporter activity,
+positive regulation of calcium ion transmembrane transport, positive
+regulation of monoatomic ion transport, calcium ion-regulated exocytosis
+of neurotransmitter, positive regulation of phosphatase activity,
+regulation of muscle system process, regulation of dephosphorylation,
+synaptic vesicle fusion to presynaptic active zone membrane, positive
+regulation of calcium ion transmembrane transporter activity, vesicle
+fusion to plasma membrane, synaptic vesicle membrane organization,
+dephosphorylation, positive regulation of calcium ion transport,
+regulation of monoatomic cation transmembrane transport, learning or
+memory, positive regulation of synaptic transmission, positive
+regulation of cation transmembrane transport, positive regulation of
+protein dephosphorylation, regulation of monoatomic ion transmembrane
+transport, regulation of amyloid precursor protein catabolic process,
+positive regulation of monoatomic ion transmembrane transport,
+neurotransmitter secretion, signal release from synapse, regulation of
+synaptic plasticity, negative regulation of calcium ion transmembrane
+transport, regulation of calcium ion transmembrane transport</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">Sst, Meg3, Atp1b1, Syt1, Ndrg4, Npy, Snap25, Gad1,
+Slc6a1, Gnas, Serpini1, Tspyl4, Nap1l5, Atp6v0c, Gad2, Rtn3, Ywhab,
+Snhg11, Cplx1, Sparcl1</td>
+<td align="left">neurotransmitter transport, synaptic vesicle
+exocytosis, synaptic vesicle fusion to presynaptic active zone membrane,
+vesicle fusion to plasma membrane, synaptic vesicle membrane
+organization, neurotransmitter secretion, signal release from synapse,
+synaptic vesicle cycle</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">Tmsb4x, Flt1, Epas1, Spock2, Itm2a, Slc6a6, Bsg, Sparc,
+Actg1, Cldn5, Ly6a, Slco1a4, Slc2a1, B2m, Pltp, Sptbn1, Actb, Cxcl12,
+Tpt1, Ptprb</td>
+<td align="left"></td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">Meg3, Nrgn, Snhg11, Ppp3ca, Camk2n1, H2-Q4, Gm37065,
+Rtn1, Nkain3, Lin54, Baiap2, Bicd1, Calm1, Klf9, Elavl3, Atp1a1, Syt11,
+Ttc3, Basp1, Cmip</td>
+<td align="left"></td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">Nrgn, Camk2n1, Snap25, Ppp3ca, Calm2, Meg3, Gpm6a, Cck,
+Enc1, Itm2c, Ndrg4, Syt1, Calm1, Tmsb4x, Ppp3r1, Fkbp1a, Ywhab, App,
+Uchl1, Lmo4</td>
+<td align="left">response to calcium ion, detection of calcium ion,
+negative regulation of calcium ion transmembrane transport, regulation
+of monoatomic cation transmembrane transport, regulation of monoatomic
+ion transmembrane transport, regulation of calcium ion transmembrane
+transport, negative regulation of calcium ion transport, calcium ion
+transmembrane import into cytosol, regulation of ryanodine-sensitive
+calcium-release channel activity, negative regulation of cation
+transmembrane transport, protein dephosphorylation, positive regulation
+of calcium ion transmembrane transport, negative regulation of
+monoatomic ion transmembrane transport, regulation of calcium-mediated
+signaling, regulation of cation channel activity, regulation of calcium
+ion transport, associative learning, response to metal ion, negative
+regulation of transmembrane transport, dephosphorylation, positive
+regulation of calcium ion transport, negative regulation of monoatomic
+ion transport, postsynaptic modulation of chemical synaptic
+transmission, learning or memory, calcium ion transmembrane transport,
+positive regulation of cation transmembrane transport, maintenance of
+location, cognition, memory, positive regulation of monoatomic ion
+transmembrane transport, learning, positive regulation of
+calcium-mediated signaling, regulation of metal ion transport</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">Pcp4, Snap25, Nrgn, Meg3, Calm2, Syt1, Ncald,
+3110035E14Rik, Ndrg4, Basp1, Stmn1, Gnas, Rtn1, Ywhab, Gpm6a, Uchl1,
+Atp6v0c, Ppia, Atp1b1, Cpe</td>
+<td align="left">positive regulation of secretion by cell, positive
+regulation of secretion</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">Pdgfra, Cspg5, Gpr17, Ptprz1, Olig1, Tuba1a, Sulf2,
+Serpine2, Cd9, Marcks, Bcan, Sdc3, Vcan, Sirt2, S100a16, Fyn, Tnr,
+Tubb2b, Mpzl1, Actb</td>
+<td align="left">gliogenesis, glial cell differentiation, regulation of
+neurogenesis, negative regulation of platelet activation, negative
+regulation of response to wounding, positive regulation of neuron
+projection development, regulation of neural precursor cell
+proliferation, positive regulation of neurogenesis, regulation of
+platelet activation, negative regulation of blood coagulation, negative
+regulation of hemostasis, positive regulation of nervous system
+development, negative regulation of coagulation, regulation of response
+to wounding, forebrain development, myelination, ensheathment of
+neurons, axon ensheathment, platelet aggregation, neuron migration,
+positive regulation of cell projection organization, negative regulation
+of response to external stimulus, regulation of blood coagulation</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">Scg2, Homer1, Egr1, Nefl, Nefm, Bdnf, Arpp21, Nrgn,
+Cx3cl1, Meg3, Nr4a2, Snap25, Rab6a, Arc, Nrn1, Nr4a1, Vgf, Ppp3ca,
+Atp1b1, Camk2n1</td>
+<td align="left">long-term memory, learning or memory, memory,
+cognition, muscle organ development, regulation of neuronal synaptic
+plasticity, regulation of synaptic plasticity, skeletal muscle tissue
+development, skeletal muscle organ development, positive regulation of
+monoatomic ion transport, regulation of neuron apoptotic process,
+positive regulation of calcium ion transport, postsynaptic modulation of
+chemical synaptic transmission, regulation of monoatomic ion
+transmembrane transport, positive regulation of monoatomic ion
+transmembrane transport, neuron apoptotic process, response to peptide
+hormone</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">Apoe, Ctsb, Tmsb4x, Fth1, C1qc, Lyz2, Mrc1, Itm2b,
+Dab2, C1qa, Csf1r, B2m, Tpt1, Rps29, Ctsc, Serinc3, C1qb, Maf, Eef1a1,
+Actb</td>
+<td align="left">synapse pruning, positive regulation by host of viral
+process, cell junction disassembly, complement activation, classical
+pathway, modulation by host of viral process, microglial cell
+activation, leukocyte activation involved in inflammatory response,
+humoral immune response mediated by circulating immunoglobulin, glial
+cell activation, regulation of protein binding</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">Slc1a2, Glul, Atp1a2, Plpp3, Aldoc, Sparcl1, Apoe,
+Slc1a3, Clu, Cst3, S1pr1, Tspan7, Mt1, Cpe, Atp1b2, Ndrg2, Gstm1, Gpm6a,
+Gja1, Gpr37l1</td>
+<td align="left">intracellular sodium ion homeostasis, sodium ion
+homeostasis, behavioral fear response, behavioral defense response</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">Plp1, Cldn11, Mbp, Nfasc, Marcks, Ttll1, Cnp, Sirt2,
+Mag, Mobp, Cd81, Marcksl1, Secisbp2l, Ubl3, Scd2, Aplp1, Tspan2, Tuba1a,
+Syt11, Qk</td>
+<td align="left">ensheathment of neurons, axon ensheathment,
+myelination, oligodendrocyte differentiation, glial cell
+differentiation, gliogenesis, glial cell development</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">Plp1, Mal, Ttll1, Cldn11, Ptgds, Scd2, Fth1, Cnp,
+Aplp1, Mog, Car2, Trf, Mag, Mobp, Syt11, Enpp2, Glul, App, Mbp,
+Tspan2</td>
+<td align="left">ensheathment of neurons, axon ensheathment,
+gliogenesis, oligodendrocyte differentiation, glial cell
+differentiation, myelination, glial cell development, astrocyte
+differentiation, central nervous system myelination, axon ensheathment
+in central nervous system, astrocyte development, oligodendrocyte
+development</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">Hbb-bs, Hba-a2, Hbb-bt, Rgs5, Atp1a2, Vtn, Hba-a1,
+Cald1, Abcc9, Mgp, Notch3, Ptn, Pdgfrb, Epas1, Igfbp7, Myl9, Zic1, Rgs4,
+Itm2b, Sparcl1</td>
+<td align="left">regulation of heart contraction</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">Cst3, Sparc, Tmsb4x, Csf1r, C1qc, C1qa, Itm2b, Serinc3,
+Ctss, Hexb, B2m, Eef1a1, C1qb, P2ry12, Cx3cr1, Marcks, Ctsb, Actb,
+Laptm5, Lgmn</td>
+<td align="left">synapse pruning, cell junction disassembly, antigen
+processing and presentation of exogenous peptide antigen via MHC class
+II, antigen processing and presentation of peptide antigen via MHC class
+II, cellular component disassembly, antigen processing and presentation
+of peptide or polysaccharide antigen via MHC class II, positive
+regulation of macrophage migration, collagen catabolic process,
+complement activation, classical pathway, positive regulation of
+chemotaxis, regulation of macrophage migration, microglial cell
+activation, gliogenesis, positive regulation of leukocyte migration,
+antigen processing and presentation of exogenous peptide antigen,
+leukocyte activation involved in inflammatory response, humoral immune
+response mediated by circulating immunoglobulin, glial cell activation,
+antigen processing and presentation of exogenous antigen</td>
+<td align="right">15</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="log1p-transformation" class="section level2">
+<h2>log1p transformation</h2>
+<pre class="r"><code>nmf_fit &lt;- readr::read_rds(
+  &quot;~/Documents/data/passPCA/experiment_results/rcppML_nmf_k15.rds&quot;
+  )
+
+nmf_LL &lt;- nmf_fit$w %*% diag(x = nmf_fit$d)
+nmf_LL &lt;- normalize_bars(nmf_LL)
+
+nmf_FF &lt;- t(diag(x = nmf_fit$d) %*% nmf_fit$h)
+rownames(nmf_FF) &lt;- colnames(counts)
+sp &lt;- structure_plot(nmf_LL, grouping = cell_stim, gap = 25)</code></pre>
+<pre class="r"><code>sp</code></pre>
+<p><img src="figure/mouse_brain_stim.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>gdf &lt;- get_go_terms(nmf_FF)
+knitr::kable(gdf)</code></pre>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="87%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Nrgn, Snap25, Meg3, Camk2n1, Ppp3ca, Calm2, Syt1,
+Calm1, Rtn1, Ndrg4, App, Gpm6a, Mef2c, Atp1b1, Olfm1, Stmn1, Rab6a,
+Ywhab, Atp6v0c, Lmo4</td>
+<td align="left">response to calcium ion, detection of calcium ion,
+response to metal ion, negative regulation of G protein-coupled receptor
+signaling pathway, regulation of monoatomic ion transmembrane
+transporter activity, regulation of transmembrane transporter activity,
+regulation of transporter activity, positive regulation of calcium ion
+transmembrane transport, positive regulation of phosphatase activity,
+regulation of muscle system process, regulation of dephosphorylation,
+positive regulation of calcium ion transmembrane transporter activity,
+dephosphorylation, positive regulation of calcium ion transport,
+regulation of monoatomic cation transmembrane transport, learning or
+memory, regulation of G protein-coupled receptor signaling pathway,
+positive regulation of cation transmembrane transport, regulation of
+monoatomic ion transmembrane transport, cognition, positive regulation
+of monoatomic ion transmembrane transport, negative regulation of
+calcium ion transmembrane transport, regulation of calcium ion
+transmembrane transport, positive regulation of dephosphorylation</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Cst3, Sparc, Csf1r, C1qc, C1qa, Itm2b, Hexb, Ctss,
+Serinc3, B2m, Tmsb4x, C1qb, P2ry12, Cx3cr1, Marcks, Lgmn, Laptm5, Ctsd,
+Psap, Fcrls</td>
+<td align="left">synapse pruning, cell junction disassembly, antigen
+processing and presentation of exogenous peptide antigen via MHC class
+II, cellular component disassembly, antigen processing and presentation
+of peptide antigen via MHC class II, antigen processing and presentation
+of peptide or polysaccharide antigen via MHC class II, positive
+regulation of macrophage migration, antigen processing and presentation,
+complement activation, classical pathway, positive regulation of
+chemotaxis, regulation of macrophage migration, microglial cell
+activation, gliogenesis, positive regulation of leukocyte migration,
+antigen processing and presentation of exogenous peptide antigen,
+leukocyte activation involved in inflammatory response, positive
+regulation of peptidase activity, regulation of peptidase activity,
+humoral immune response mediated by circulating immunoglobulin, glial
+cell activation, antigen processing and presentation of exogenous
+antigen</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">Plp1, Cldn11, Ttll1, Mal, Fth1, Scd2, Cnp, Aplp1,
+Ptgds, Mbp, Mobp, Trf, Mog, Syt11, Car2, App, Mag, Enpp2, Csrp1,
+Glul</td>
+<td align="left">ensheathment of neurons, axon ensheathment,
+gliogenesis, oligodendrocyte differentiation, glial cell
+differentiation, myelination, central nervous system myelination, axon
+ensheathment in central nervous system, glial cell development,
+oligodendrocyte development</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">Hspa5, Ptma, Ppia, Actg1, Arf1, Tuba1b, Calr, Tmsb4x,
+Hsp90ab1, Eef1a1, Hnrnpk, Srsf2, Cd9, Ybx1, Hspa8, Chchd2, Mrfap1,
+Eif4g2, Epb41l2, H3f3a</td>
+<td align="left">protein folding, cellular response to interleukin-4,
+response to interleukin-4, positive regulation of dendritic spine
+development</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">Meg3, Syt1, Atp1b1, Ndrg4, Snap25, Gnas, Rtn3, Stmn1,
+Atp6v0c, Pcp4, Gpm6a, Tspyl4, Calm2, Uchl1, Ywhab, Ncald, Snrpn,
+Serpini1, Rtn1, Ywhag</td>
+<td align="left"></td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">Plpp3, Atp1a2, Slc1a2, Slc1a3, Apoe, Sparcl1, S1pr1,
+Clu, Gja1, Glul, Gpm6a, Gpr37l1, Cst3, Atp1b2, Tspan7, Aldoc, Cpe,
+Htra1, Bcan, Prnp</td>
+<td align="left">import across plasma membrane, negative regulation of
+amyloid-beta formation, negative regulation of amyloid precursor protein
+catabolic process, intracellular sodium ion homeostasis, regulation of
+amyloid-beta formation, sodium ion homeostasis, regulation of amyloid
+precursor protein catabolic process, amyloid-beta formation,
+gliogenesis, amyloid-beta metabolic process, behavioral fear response,
+potassium ion transmembrane transport, behavioral defense response,
+amyloid precursor protein catabolic process</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">Nrgn, Meg3, Baiap2, Rtn1, Ppp3ca, Basp1, Klf9, Calm1,
+Snhg11, Hsp90aa1, Ywhab, Pcp4, Ina, 3110035E14Rik, Cmip, Gria2, Syt11,
+Rab6a, Elavl3, Rnf112</td>
+<td align="left">postsynaptic modulation of chemical synaptic
+transmission</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">Glul, Aldoc, Mt1, Ndrg2, Gstm1, Fam107a, Mt2, Prdx6,
+Mt3, Ckb, Csrp1, Gapdh, Fth1, Ppia, Slc1a2, Tubb2b, Cox8a, Ywhae,
+Tsc22d4, Ddah1</td>
+<td align="left">stress response to metal ion, detoxification of
+inorganic compound, detoxification, cellular response to zinc ion,
+cellular response to copper ion, intracellular zinc ion homeostasis,
+cellular response to cadmium ion, response to copper ion, nitric oxide
+mediated signal transduction, response to toxic substance, response to
+zinc ion, response to cadmium ion</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">Plp1, Nfasc, Cldn11, Mbp, Sirt2, Cnp, Ttll1, Marcks,
+Mag, Cd81, Marcksl1, Mobp, Scd2, Aplp1, Secisbp2l, Ubl3, Syt11, Qk,
+Tuba1a, Ugt8a</td>
+<td align="left">ensheathment of neurons, axon ensheathment,
+myelination, myelin assembly, glial cell differentiation,
+oligodendrocyte differentiation, gliogenesis</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">Actg1, Epas1, Ly6a, Slc2a1, Slc6a6, Actb, Flt1, Clic4,
+Glul, Tmsb4x, B2m, Sparc, Ptma, Hspb1, Tm4sf1, Timp3, Sptbn1, Cxcl12,
+Tinagl1, Tsc22d1</td>
+<td align="left">regulation of vasculature development, regulation of
+epithelial cell proliferation</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">Ptprz1, Cspg5, Pdgfra, Olig1, Marcks, Serpine2, Bcan,
+Sulf2, Gpr17, Sdc3, Gpm6b, Cntn1, S100a16, Syt11, Scd2, Vcan, Pllp,
+Tuba1a, Cacng4, Sparcl1</td>
+<td align="left">glial cell differentiation, gliogenesis,
+oligodendrocyte differentiation, glial cell development, positive
+regulation of neurogenesis, cell-substrate adhesion, oligodendrocyte
+development, positive regulation of nervous system development,
+myelination, ensheathment of neurons, axon ensheathment</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">Itm2a, Spock2, Bsg, Cldn5, Slco1a4, Slc7a5, Sparcl1,
+Pltp, Rps29, Tmsb4x, Car4, Sparc, Flt1, Tpt1, Sptbn1, Slc16a1, Ly6e,
+Itm2b, Igf1r, Kdr</td>
+<td align="left"></td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">Rgs5, Atp1a2, Vtn, Ptn, Cald1, Itm2b, Sparcl1, Pdgfrb,
+Abcc9, Laptm4a, Igfbp7, Notch3, Epas1, Sparc, Serinc3, Tmsb4x, Slc6a20a,
+Rgs4, Atp13a5, Zic1</td>
+<td align="left">regulation of heart contraction, import across plasma
+membrane</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">Apoe, Ctsb, Tmsb4x, Fth1, C1qc, Itm2b, Lyz2, Mrc1,
+C1qa, Csf1r, Rps29, Serinc3, Dab2, B2m, Ctsc, Tpt1, C1qb, Maf, Cst3,
+Actb</td>
+<td align="left">synapse pruning, cell junction disassembly, complement
+activation, classical pathway, microglial cell activation, leukocyte
+activation involved in inflammatory response, humoral immune response
+mediated by circulating immunoglobulin, glial cell activation,
+regulation of protein binding</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">Mbp, Fth1, Tpt1, Rps29, Rps23, Gm20594, Mobp, Bcas1,
+Eef1a1, Rps3a1, Rps3, Rps24, Kif5b, Plp1, Rps27a, Rps21, Rpl26, Rpl23,
+Gas5, Rpl37</td>
+<td align="left">cytoplasmic translation, translation at presynapse,
+translation at synapse, translation at postsynapse, ribosomal small
+subunit biogenesis, positive regulation of signal transduction by p53
+class mediator, ribosome biogenesis, regulation of intrinsic apoptotic
+signaling pathway in response to DNA damage, ribonucleoprotein complex
+biogenesis, positive regulation of intrinsic apoptotic signaling pathway
+in response to DNA damage, regulation of signal transduction by p53
+class mediator</td>
+<td align="right">15</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="cnmf" class="section level2">
+<h2>cNMF</h2>
+<pre class="r"><code>usage_df &lt;- readr::read_csv(
+  &quot;~/Documents/data/passPCA/mouse_brain_cnmf_usage.csv&quot;
+)
+
+top_genes_df &lt;- readr::read_csv(
+  &quot;~/Documents/data/passPCA/mouse_brain_cnmf_top_usage.csv&quot;
+)
+
+top_genes_df &lt;- top_genes_df %&gt;%
+  dplyr::select(-`...1`)
+
+cNMF_LL &lt;- usage_df %&gt;%
+  dplyr::select(-bc) %&gt;%
+  as.matrix()
+
+sp &lt;- structure_plot(cNMF_LL, grouping = cell_stim, gap = 25)</code></pre>
+<pre class="r"><code>sp</code></pre>
+<p><img src="figure/mouse_brain_stim.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>get_go_terms_cNMF &lt;- function(sets_df) {
+  
+  K &lt;- ncol(sets_df)
+  
+  genes_vec &lt;- c()
+  go_terms_vec &lt;- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes &lt;- (sets_df[[k]])[1:20]
+    
+    go_result &lt;- enrichGO(gene = driving_genes,
+                          OrgDb = org.Mm.eg.db,
+                          keyType = &quot;SYMBOL&quot;,
+                          ont = &quot;BP&quot;, 
+                          pAdjustMethod = &quot;bonferroni&quot;,
+                          pvalueCutoff = 0.05,
+                          qvalueCutoff = 0.1)@result
+    
+    go_result &lt;- go_result %&gt;%
+      dplyr::filter(p.adjust &lt; .01)
+    
+    go_terms &lt;- go_result$Description
+    
+    genes_vec &lt;- c(genes_vec, paste(driving_genes, collapse = &quot;, &quot;))
+    go_terms_vec &lt;- c(go_terms_vec, paste(go_terms, collapse = &quot;, &quot;))
+    
+  }
+  
+  go_df &lt;- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}
+
+gdf_cNMF &lt;- get_go_terms_cNMF(top_genes_df)
+knitr::kable(gdf_cNMF)</code></pre>
+<table>
+<colgroup>
+<col width="4%" />
+<col width="94%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Nrgn, Snap25, Olfm1, Calm2, Rtn1, Calm1, Chn1, Ndrg4,
+Ppp3ca, Syt1, Cx3cl1, Sv2b, Ppp3r1, Stxbp1, Snca, Camk2b, Camk2a,
+Pgm2l1, Vsnl1, Uchl1</td>
+<td align="left">positive regulation of calcium ion transport, positive
+regulation of calcium ion transmembrane transport, synaptic vesicle
+exocytosis, synaptic vesicle cycle, positive regulation of monoatomic
+ion transport, calcium ion transport, vesicle-mediated transport in
+synapse, regulation of calcium ion transport, positive regulation of
+cation transmembrane transport, positive regulation of monoatomic ion
+transmembrane transport, neurotransmitter secretion, signal release from
+synapse, regulation of calcium ion transmembrane transport, organelle
+localization by membrane tethering, membrane docking, calcium ion
+transmembrane import into cytosol, exocytosis, exocytic process,
+neurotransmitter transport, regulation of neurotransmitter secretion,
+regulation of metal ion transport, positive regulation of transmembrane
+transport, positive regulation of release of sequestered calcium ion
+into cytosol, regulated exocytosis, regulation of neurotransmitter
+transport, detection of calcium ion, negative regulation of calcium ion
+transmembrane transport, response to type II interferon, response to
+metal ion, regulation of monoatomic cation transmembrane transport,
+calcium ion transmembrane transport, positive regulation of synaptic
+transmission, vesicle docking, regulation of monoatomic ion
+transmembrane transport, negative regulation of calcium ion transport,
+regulation of synaptic plasticity, SNARE complex assembly, regulation of
+release of sequestered calcium ion into cytosol, positive regulation of
+secretion, regulation of exocytosis, negative regulation of cation
+transmembrane transport, positive regulation of neurotransmitter
+secretion, negative regulation of monoatomic ion transmembrane
+transport, calcium ion-regulated exocytosis of neurotransmitter,
+positive regulation of exocytosis, negative regulation of transport,
+synaptic vesicle priming, positive regulation of neurotransmitter
+transport, synaptic vesicle fusion to presynaptic active zone membrane,
+vesicle fusion to plasma membrane, cellular response to type II
+interferon, regulation of vesicle fusion, vesicle fusion, organelle
+membrane fusion, synaptic vesicle membrane organization, negative
+regulation of transmembrane transport, release of sequestered calcium
+ion into cytosol, negative regulation of sequestering of calcium ion,
+regulation of sequestering of calcium ion, intracellular calcium ion
+homeostasis, sequestering of calcium ion, negative regulation of
+monoatomic ion transport, postsynaptic modulation of chemical synaptic
+transmission, regulation of G protein-coupled receptor signaling
+pathway, response to calcium ion, calcium ion homeostasis, response to
+ischemia, membrane fusion, organelle fusion, positive regulation of
+secretion by cell, protein localization to cell periphery</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Cst3, C1qc, Csf1r, Hexb, C1qa, Cx3cr1, Ctss, C1qb,
+Sparc, P2ry12, Laptm5, Lgmn, Ctsd, Fcrls, Selplg, Ly86, Serinc3, Rnase4,
+Gpr34, Itgam</td>
+<td align="left">synapse pruning, cell junction disassembly, cellular
+component disassembly, microglial cell activation, leukocyte activation
+involved in inflammatory response, glial cell activation, gliogenesis,
+leukocyte migration, neuroinflammatory response, myeloid leukocyte
+migration, macrophage activation, positive regulation of macrophage
+migration, complement activation, classical pathway, positive regulation
+of chemotaxis, regulation of macrophage migration, positive regulation
+of leukocyte migration, positive regulation of peptidase activity,
+leukocyte adhesion to vascular endothelial cell, regulation of peptidase
+activity, humoral immune response mediated by circulating
+immunoglobulin, macrophage differentiation, chemotaxis, taxis,
+complement activation, macrophage migration, regulation of cysteine-type
+endopeptidase activity</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">Aldoc, Plpp3, Slc1a3, Gja1, Slc1a2, Ndrg2, Clu, Gstm1,
+S1pr1, Glul, Mt1, Atp1b2, Sparcl1, Gpr37l1, Htra1, Prdx6, Scg3, Acsbg1,
+Pla2g7, Mt2</td>
+<td align="left"></td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">Trf, Mal, Aplp1, Mog, Scd2, Apod, Enpp2, Cryab, Car2,
+Plp1, Ermn, Ttll1, Sept4, Stmn4, Efnb3, Tmem88b, Csrp1, Cntn2, Gpr37,
+Ptgds</td>
+<td align="left"></td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">Bsg, Cldn5, Flt1, Itm2a, Pltp, Abcb1a, Slco1a4, Spock2,
+Ptprb, Fn1, Esam, Slc2a1, Slc6a6, Ly6a, Sptbn1, Ahnak, Kdr, Egfl7,
+Adgrl4, Sgms1</td>
+<td align="left"></td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">Slc32a1, Gad2, Gad1, Gad1-ps, Sst, Npy, Cplx1,
+Serpini1, Nap1l5, Pnoc, Synpr, Elavl2, Rab3b, Kcnc1, Dlx1, Zcchc12,
+Rab3c, Cntnap2, Rpp25, Tspyl4</td>
+<td align="left">regulation of exocytosis, neurotransmitter transport,
+synaptic vesicle cycle</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">Fyn, Tuba1a, Bmp4, Gpr17, Tmem108, Mpzl1, Chn2, Neu4,
+Tnr, Sirt2, Ust, Mycl, Lims2, Cd9, Susd4, Arsb, Gp1bb, Rnd2, Matn1,
+Brca1</td>
+<td align="left">negative regulation of reactive oxygen species
+metabolic process, forebrain development</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">Ddr1, Ctps, Marcksl1, Tspan2, Mag, Igsf8, Onecut2,
+Kndc1, Ank3, Tmem141, Tmeff2, Sh3gl3, Fam214a, Mcam, Mobp, Ptprd,
+Sema6a, Plat, Hmgcs1, Cd81</td>
+<td align="left"></td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">Pdgfra, Cacng4, C1ql1, Matn4, Lhfpl3, Sdc3, Ptprz1,
+Cspg5, Olig1, Cdo1, Cntn1, Vcan, Rlbp1, Cspg4, Serpine2, Megf11, Plppr5,
+Emid1, Ccnd1, Sulf2</td>
+<td align="left">gliogenesis, glial cell differentiation, positive
+regulation of peptidyl-tyrosine phosphorylation, gland development,
+glial cell migration, positive regulation of neuron projection
+development</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">Tmem2, Cnksr3, Nfasc, Tmem163, Rras2, Enpp6, Tcf7l2,
+Rnd2, Rnf122, Marcks, Gsto1, Sema5a, Idh1, Secisbp2l, Ubl3, Bace1,
+Steap2, Pik3r3, Reep5, Sema6a</td>
+<td align="left"></td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">Vtn, Rgs5, Pdgfrb, Atp13a5, Cald1, Abcc9, Slc6a20a,
+Notch3, Zic1, Nbl1, Ndufa4l2, Art3, P2ry14, Sod3, Kcnj8, Myl9, Slc19a1,
+Higd1b, Enpep, Lamc1</td>
+<td align="left">import across plasma membrane, glomerulus
+development</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">Mbp, Kif5a, Bcas1, Fth1, Kif5b, Plekhb1, Prr18, Gas5,
+Pkp4, Rapgef4, Tpt1, Lrrc17, Gm20594, Trp53inp2, Rps3a1, Trak2, Rpl37,
+Rps23, Rpl30, Rps3</td>
+<td align="left">dendritic transport, cytoplasmic translation, vesicle
+transport along microtubule, anterograde axonal transport, vesicle
+cytoskeletal trafficking, axonal transport, axo-dendritic protein
+transport, axo-dendritic transport, receptor localization to
+synapse</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">Mrc1, Cbr2, Dab2, Lyz2, Pf4, F13a1, Cd36, Cybb, Ms4a7,
+Cd163, Clec4n, Clec10a, Wfdc17, Clec4a1, Stab1, Ctsc, Arhgap19, Apoe,
+Lilrb4a, Igf1</td>
+<td align="left">wound healing, receptor-mediated endocytosis, positive
+regulation of steroid metabolic process, blood coagulation, negative
+regulation of MAPK cascade, coagulation, hemostasis</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">Tagln, Myh11, Acta2, Gkn3, Sema3g, Eln, Mgp, Col18a1,
+Tpm2, Crip1, Sncg, Pln, Ntn4, Egfl8, Timp3, Olfr558, Emp1, Vegfc,
+Tm4sf1, Bmx</td>
+<td align="left">extracellular matrix assembly</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">Prc1, Ube2c, Fam64a, Cdca3, Aspm, Racgap1, Ccna2,
+Ckap2, Top2a, Pbk, Ckap2l, Ect2, Spc25, Cdca8, Ccnb2, Kif11, Kif20a,
+Ccnb1, Troap, Plk1</td>
+<td align="left">nuclear chromosome segregation, chromosome segregation,
+nuclear division, spindle organization, sister chromatid segregation,
+mitotic sister chromatid segregation, spindle assembly, mitotic spindle
+organization, mitotic nuclear division, microtubule cytoskeleton
+organization involved in mitosis, mitotic cytokinesis, chromosome
+separation, regulation of cell division, cytokinesis, regulation of
+cytokinesis, cytoskeleton-dependent cytokinesis, spindle elongation,
+attachment of spindle microtubules to kinetochore, regulation of mitotic
+sister chromatid separation, mitotic sister chromatid separation,
+regulation of attachment of spindle microtubules to kinetochore, mitotic
+spindle assembly, regulation of chromosome separation, regulation of
+mitotic metaphase/anaphase transition, regulation of metaphase/anaphase
+transition of cell cycle, metaphase/anaphase transition of mitotic cell
+cycle, metaphase/anaphase transition of cell cycle, metaphase chromosome
+alignment, negative regulation of chromosome organization,
+non-membrane-bounded organelle assembly, regulation of sister chromatid
+segregation, mitotic cell cycle phase transition, regulation of
+chromosome organization, establishment of chromosome localization,
+regulation of mitotic nuclear division, chromosome localization,
+regulation of chromosome segregation, mitotic spindle assembly
+checkpoint signaling, spindle assembly checkpoint signaling, spindle
+midzone assembly, negative regulation of sister chromatid segregation,
+negative regulation of mitotic sister chromatid segregation, negative
+regulation of mitotic metaphase/anaphase transition, mitotic spindle
+checkpoint signaling, negative regulation of mitotic sister chromatid
+separation, negative regulation of metaphase/anaphase transition of cell
+cycle, negative regulation of chromosome separation, regulation of
+nuclear division, spindle checkpoint signaling, negative regulation of
+chromosome segregation, regulation of mitotic sister chromatid
+segregation, negative regulation of mitotic nuclear division, regulation
+of cyclin-dependent protein serine/threonine kinase activity, female
+gamete generation, regulation of cyclin-dependent protein kinase
+activity, negative regulation of nuclear division, negative regulation
+of organelle organization, meiotic chromosome segregation, establishment
+of organelle localization, positive regulation of cell cycle process,
+regulation of mitotic cell cycle phase transition, cytokinetic process,
+mitotic cell cycle checkpoint signaling, cell cycle G2/M phase
+transition, positive regulation of cell cycle, female meiotic nuclear
+division, positive regulation of cytokinesis, negative regulation of
+mitotic cell cycle phase transition, cell cycle checkpoint signaling,
+regulation of cell cycle phase transition, meiotic nuclear division,
+meiotic cell cycle process, negative regulation of mitotic cell
+cycle</td>
+<td align="right">15</td>
+</tr>
+</tbody>
+</table>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>FALSE R version 4.4.0 (2024-04-24)
+FALSE Platform: aarch64-apple-darwin20
+FALSE Running under: macOS Ventura 13.5
+FALSE 
+FALSE Matrix products: default
+FALSE BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+FALSE LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+FALSE 
+FALSE locale:
+FALSE [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+FALSE 
+FALSE time zone: America/New_York
+FALSE tzcode source: internal
+FALSE 
+FALSE attached base packages:
+FALSE [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+FALSE [8] base     
+FALSE 
+FALSE other attached packages:
+FALSE  [1] org.Mm.eg.db_3.19.1    AnnotationDbi_1.66.0   IRanges_2.38.0        
+FALSE  [4] S4Vectors_0.42.0       Biobase_2.64.0         BiocGenerics_0.50.0   
+FALSE  [7] fgsea_1.30.0           clusterProfiler_4.12.0 fastTopics_0.6-175    
+FALSE [10] Matrix_1.7-0           dplyr_1.1.4           
+FALSE 
+FALSE loaded via a namespace (and not attached):
+FALSE   [1] RColorBrewer_1.1-3      rstudioapi_0.16.0       jsonlite_1.8.8         
+FALSE   [4] magrittr_2.0.3          farver_2.1.2            rmarkdown_2.27         
+FALSE   [7] fs_1.6.4                zlibbioc_1.50.0         vctrs_0.6.5            
+FALSE  [10] memoise_2.0.1           ggtree_3.12.0           SQUAREM_2021.1         
+FALSE  [13] mixsqp_0.3-54           htmltools_0.5.8.1       progress_1.2.3         
+FALSE  [16] truncnorm_1.0-9         gridGraphics_0.5-1      sass_0.4.9             
+FALSE  [19] bslib_0.7.0             htmlwidgets_1.6.4       plyr_1.8.9             
+FALSE  [22] plotly_4.10.4           cachem_1.1.0            igraph_2.0.3           
+FALSE  [25] lifecycle_1.0.4         pkgconfig_2.0.3         gson_0.1.0             
+FALSE  [28] R6_2.5.1                fastmap_1.2.0           GenomeInfoDbData_1.2.12
+FALSE  [31] aplot_0.2.3             digest_0.6.36           enrichplot_1.24.0      
+FALSE  [34] colorspace_2.1-0        patchwork_1.2.0         rprojroot_2.0.4        
+FALSE  [37] irlba_2.3.5.1           RSQLite_2.3.7           invgamma_1.1           
+FALSE  [40] labeling_0.4.3          fansi_1.0.6             httr_1.4.7             
+FALSE  [43] polyclip_1.10-6         compiler_4.4.0          bit64_4.0.5            
+FALSE  [46] withr_3.0.0             BiocParallel_1.38.0     viridis_0.6.5          
+FALSE  [49] DBI_1.2.3               highr_0.11              ggforce_0.4.2          
+FALSE  [52] MASS_7.3-61             HDO.db_0.99.1           gtools_3.9.5           
+FALSE  [55] tools_4.4.0             scatterpie_0.2.3        ape_5.8                
+FALSE  [58] httpuv_1.6.15           glue_1.7.0              quadprog_1.5-8         
+FALSE  [61] nlme_3.1-165            GOSemSim_2.30.0         promises_1.3.0         
+FALSE  [64] shadowtext_0.1.3        grid_4.4.0              Rtsne_0.17             
+FALSE  [67] reshape2_1.4.4          generics_0.1.3          gtable_0.3.5           
+FALSE  [70] tzdb_0.4.0              tidyr_1.3.1             data.table_1.15.4      
+FALSE  [73] hms_1.1.3               tidygraph_1.3.1         utf8_1.2.4             
+FALSE  [76] XVector_0.44.0          ggrepel_0.9.5           pillar_1.9.0           
+FALSE  [79] stringr_1.5.1           vroom_1.6.5             yulab.utils_0.1.4      
+FALSE  [82] later_1.3.2             splines_4.4.0           tweenr_2.0.3           
+FALSE  [85] treeio_1.28.0           lattice_0.22-6          bit_4.0.5              
+FALSE  [88] tidyselect_1.2.1        GO.db_3.19.1            Biostrings_2.72.1      
+FALSE  [91] pbapply_1.7-2           knitr_1.47              git2r_0.33.0           
+FALSE  [94] gridExtra_2.3           RhpcBLASctl_0.23-42     xfun_0.45              
+FALSE  [97] graphlayouts_1.1.1      stringi_1.8.4           UCSC.utils_1.0.0       
+FALSE [100] ggfun_0.1.5             workflowr_1.7.1         lazyeval_0.2.2         
+FALSE [103] yaml_2.3.8              evaluate_0.24.0         codetools_0.2-20       
+FALSE [106] ggraph_2.2.1            tibble_3.2.1            qvalue_2.36.0          
+FALSE [109] ggplotify_0.1.2         cli_3.6.3               uwot_0.2.2             
+FALSE [112] RcppParallel_5.1.7      munsell_0.5.1           jquerylib_0.1.4        
+FALSE [115] Rcpp_1.0.13             GenomeInfoDb_1.40.1     png_0.1-8              
+FALSE [118] parallel_4.4.0          ggplot2_3.5.1           readr_2.1.5            
+FALSE [121] blob_1.2.4              prettyunits_1.2.0       DOSE_3.30.1            
+FALSE [124] tidytree_0.4.6          viridisLite_0.4.2       scales_1.3.0           
+FALSE [127] purrr_1.0.2             crayon_1.5.3            rlang_1.1.4            
+FALSE [130] cowplot_1.1.3           fastmatch_1.1-4         ashr_2.2-63            
+FALSE [133] KEGGREST_1.44.1</code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
