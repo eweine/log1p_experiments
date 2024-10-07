@@ -258,4 +258,127 @@ gdf_cNMF <- get_go_terms_cNMF(top_genes_df)
 knitr::kable(gdf_cNMF)
 ```
 
+## Subsetting the data and fitting the new flash approximation
+
+Here, I took a subset of $7.5$K cells (of a total ~ $40$K), and ran both the log1p Poisson model (with K fixed to $10$) and the new flash approximation proposed by Matthew. Below are the structure plots of the two models:
+
+```{r, eval=FALSE}
+set.seed(1)
+cells <- cells %>% dplyr::filter(!is.na(maintype))
+
+
+counts <- counts[rownames(counts) %in% cells$...1, ]
+counts <- counts[Matrix::rowSums(counts) > 0, ]
+
+counts <- counts[sample(x = rownames(counts), size = 7500, replace = FALSE), ]
+counts <- counts[, Matrix::colSums(counts) > 0]
+counts <- as(counts, "CsparseMatrix")
+
+ff <- passPCA::run_flash_log1p_with_greedy_init(
+  Y = counts,
+  var_type = 2,
+  greedy_Kmax = 20
+)
+
+out <- list(
+  LL = ff$L_pm,
+  FF = ff$F_pm
+)
+
+n <- nrow(counts)
+p <- ncol(counts)
+K <- 10
+
+rs <- Matrix::rowSums(counts)
+s <- rs / mean(rs)
+
+set.seed(1)
+log1p_k1 <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = counts,
+  K = 1,
+  maxiter = 10,
+  approx_range = c(0, 1.25),
+  s = s
+)
+
+init_LL <- log1p_k1$U %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+
+init_FF <- log1p_k1$V %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+set.seed(1)
+log1p_k10 <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+  Y = counts,
+  K = K,
+  maxiter = 100,
+  approx_range = c(0, 1.25),
+  s = s,
+  init_U = init_LL,
+  init_V = init_FF
+)
+```
+
+
+```{r}
+set.seed(1)
+cells <- cells %>% dplyr::filter(!is.na(maintype))
+
+
+counts <- counts[rownames(counts) %in% cells$...1, ]
+#counts <- counts[, Matrix::colSums(counts) > 0]
+counts <- counts[Matrix::rowSums(counts) > 0, ]
+
+counts <- counts[sample(x = rownames(counts), size = 7500, replace = FALSE), ]
+counts <- counts[, Matrix::colSums(counts) > 0]
+counts <- as(counts, "CsparseMatrix")
+
+log1p_k10 <- readr::read_rds("~/Documents/data/passPCA/experiment_results/mouse_brain_k10.rds")
+cells_sub <- cells %>%
+  dplyr::filter(
+    `...1` %in% rownames(counts)
+  )
+
+LL <- log1p_k10$U
+
+LL <- normalize_bars(LL)
+
+ct <- cells_sub$maintype
+names(ct) <- cells_sub$...1
+ct <- ct[rownames(counts)]
+
+#structure_plot(LL, grouping = ct)
+
+flash_mod <- readr::read_rds("~/Documents/data/passPCA/experiment_results/mouse_brain_flash_fit_out.rds")
+
+LL2 <- normalize_bars(flash_mod$LL)
+
+#structure_plot(LL2, grouping = ct, gap = 25)
+```
+
+```{r, results='hide'}
+sp1 <- structure_plot(LL, grouping = ct, gap = 25)
+sp2 <- structure_plot(LL2, grouping = ct, gap = 25)
+```
+
+```{r}
+sp1
+sp2
+```
 
