@@ -382,3 +382,44 @@ sp1
 sp2
 ```
 
+I also tried first fitting a $K = 10$ model with the log1p MLE and then backfitting with flash. The results are below:
+
+```{r, eval=FALSE}
+ff <- passPCA::run_flash_log1p_with_MLE_init(
+  Y = counts,
+  var_type = 2,
+  K = 10
+)
+```
+
+```{r}
+ff <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/mouse_brain_flash_fit_mle_init_out.rds"
+)
+LL3 <- normalize_bars(ff$LL)
+```
+
+```{r, results='hide'}
+sp3 <- structure_plot(LL3, grouping = ct, gap = 25)
+```
+
+```{r}
+sp3
+```
+
+Finally, I tried fitting the model with flash greedily and setting the residual variance to be $0$ for all entries. Flash ended up fitting 9 factors this time. The structure plot is below:
+
+```{r}
+ff <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/mouse_brain_flash_fit_var_type_null.rds"
+)
+LL4 <- normalize_bars(ff$LL)
+```
+
+```{r, results='hide'}
+sp4 <- structure_plot(LL4, grouping = ct, gap = 25)
+```
+
+```{r}
+sp4
+```
