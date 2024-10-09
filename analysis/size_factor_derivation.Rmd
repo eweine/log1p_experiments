@@ -1,0 +1,79 @@
+---
+title: "Log1p Approximation Size Factor Derivation"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-10-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Model
+
+Consider the model:
+
+\begin{align*}
+y | s &\sim \textrm{Poisson}(s\lambda) \\
+\log(1 + \lambda) &= b
+\end{align*}
+
+Under this model, $\hat{b} = \log(1 + y/s)$.
+
+For $y > 0$, the variance estimate derived from a second order Taylor approximation to the log-likelihood about $\hat{b}$ is
+
+$$\frac{\frac{y}{s^{2}}}{\left(1 + \frac{y}{s}\right)^{2}}.$$
+
+Thus, for $y > 0$ we can approximate the log-likelihood as normal with mean $\hat{b}$ and variance given as above.
+
+Now, when $y = 0$, the variance estimate is $\frac{1}{s}$. Since the derivative does not dissapear at $\hat{b}$ but is instead $-s$, for $y = 0$ we can approximate the log-likelihood as normal with mean $-1$ and variance $\frac{1}{s}$. Below are some plots to verify these calculations:
+
+```{r}
+l_hess <- function(y, s) {
+  
+  - (((y/s) + 1)^2) / (y / (s^2))
+  
+}
+
+loglik <- function(y, b, s) {
+
+  if (y == 0) {
+    
+    -s * exp(b)
+    
+  } else {
+    
+    y * log(exp(b) - 1) - s * exp(b)
+    
+  }
+
+}
+```
+
+
+```{r}
+b = seq(0,3,length=100)
+y = 2
+s = 0.5
+ll = loglik(y, b, s)
+plot(b,ll-max(ll),type="l",xlab="b",ylab="log-likelihood",main="log-likelihood for Y=2 and s=0.5")
+s2 = -1/l_hess(y,s)
+bhat = log((y/s)+1)
+ll_approx = dnorm(b,bhat,sqrt(s2),log=TRUE)
+lines(b,ll_approx-max(ll_approx),col="red")
+```
+
+```{r}
+b = seq(0,1,length=100)
+y = 0
+s = 0.25
+ll = loglik(y, b, s)
+plot(b,ll-max(ll),type="l",xlab="b",ylab="log-likelihood",main="log-likelihood for Y=0 and s=0.25")
+s2 = 1/s
+bhat = -1
+ll_approx = dnorm(b,bhat,sqrt(s2),log=TRUE)
+
+lines(b,ll_approx-max(ll_approx),col="red")
+```
+

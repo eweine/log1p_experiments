@@ -29,3 +29,5 @@ Welcome to my research website.
 [Application of normal approximation to real data](flash_approx.html)
 
 [NMF Comparison on Mouse Brain Dataset](mouse_brain_stim.html)
+
+[Derivation of normal approximation with size factors](size_factor_derivation.html)
