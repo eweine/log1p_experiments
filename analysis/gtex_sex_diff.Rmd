@@ -1,0 +1,154 @@
+---
+title: "GTEX Sex Differences"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-10-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Introduction
+
+Here, I wanted to again examine the thesis of multiplicative vs. additive effects by analysis differences in expression between the sexes in GTEX data. Below, I look at GTEX data from the coronary artery. I fit a negative binomial regression model for each gene where the only regression variable is sex. That is, for each gene $j$ I fit the model:
+
+\begin{align*}
+y_{ij} &\sim NB(s_{i} \mu_{ij}, \phi_{j}) \\
+\mu_{ij} &= \log(\alpha_{j} + \beta_{j}M_{i}),
+\end{align*}
+
+where $s_{i}$ is the total library size and $M_{i}$ is $1$ if the sample is from a male and $0$ otherwise. I also perform shrinkage on the values of $\beta_{j}$ using `ashr`. 
+
+```{r, eval=FALSE}
+df <- read.delim(file="~/Downloads/gene_reads_2017-06-05_v8_artery_coronary.gct", skip = 2)
+
+counts <- df %>%
+  dplyr::select(-c(id, Name, Description)) %>%
+  as.matrix()
+
+rownames(counts) <- df$Description
+
+# filter out very low expression genes
+counts <- counts[Matrix::rowSums(counts) >= 100, ]
+
+md <- read.delim("~/Downloads/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt")
+
+col_obs_ids <- sub("\\..*", "", sub("\\.", "-", colnames(counts)))
+
+md <- md %>% dplyr::filter(SUBJID %in% col_obs_ids)
+colnames(counts) <- col_obs_ids
+
+md$gender <- as.factor(ifelse(md$SEX == 1, "M", "F"))
+
+counts <- counts[,md$SUBJID]
+tot <- Matrix::colSums(counts)
+md$tot <- tot
+b0_vec <- c()
+b1_vec <- c()
+b1_se_vec <- c()
+gene_vec <- c()
+
+it <- 1
+
+for (gene in rownames(counts)) {
+
+  print(round(it / nrow(counts), 2))
+
+  md$expr <- counts[gene, ]
+
+  # Wrap the model fitting and extraction in tryCatch
+  tryCatch({
+    mod <- MASS::glm.nb(
+      expr ~ gender + offset(log(tot)),
+      data = md
+    )
+
+    b0_vec <- c(b0_vec, coef(summary(mod))["(Intercept)", "Estimate"])
+    b1_vec <- c(b1_vec, coef(summary(mod))["genderM", "Estimate"])
+    b1_se_vec <- c(b1_se_vec, coef(summary(mod))["genderM", "Std. Error"])
+    gene_vec <- c(gene_vec, gene)
+
+  }, error = function(e) {
+    message(paste("Error with gene:", gene, "- Skipping this gene"))
+  })
+
+  it <- it + 1
+}
+
+out_df <- data.frame(
+  gene = gene_vec,
+  b1 = b1_vec,
+  b0 = b0_vec,
+  b1_se = b1_se_vec
+)
+
+library(ashr)
+a_out <- ash(betahat = out_df$b1, sebetahat = out_df$b1_se)
+
+out_df$b1_pm <- ashr::get_pm(a_out)
+
+off_m <- mean(tot)
+
+out_df <- out_df %>%
+  dplyr::mutate(
+    pred_diff = off_m * exp(b0) - off_m * exp(b0 + b1_pm)
+  )
+
+out_df <- out_df %>%
+  dplyr::mutate(
+    baseline = if_else(
+      pred_diff > 0, off_m * exp(b0), off_m * exp(b0 + b1)
+    )
+  )
+```
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+out_df <- readr::read_rds("~/Documents/data/passPCA/experiment_results/gtex_artery_sex_diff.rds")
+```
+
+The plot below is for all genes:
+
+```{r}
+g1 <- ggplot(data = out_df, aes(x = baseline, y = abs(pred_diff))) +
+  geom_point() +
+  geom_smooth() +
+  ggtitle(glue::glue("Rank correlation = {round(cor(out_df$baseline, abs(out_df$pred_diff), method = 'spearman'), 2)}")) +
+  xlab("Baseline Expression") +
+  ylab("|Difference in Expression|")
+
+g2 <- ggplot(data = out_df, aes(x = log(baseline), y = abs(b1_pm))) +
+  geom_point() +
+  geom_smooth() +
+  ggtitle(glue::glue("Rank correlation = {round(cor(log(out_df$baseline), abs(out_df$b1_pm), method = 'spearman'), 2)}"))  +
+  xlab("log(Baseline Expression)") +
+  ylab("|LFC|")
+
+ggarrange(g1, g2, nrow = 1, ncol = 2)
+```
+The plot below is for genes $j$ where $lfsr(\beta_{j}) < 0.05$:
+
+```{r}
+out_sig_df <- out_df %>% dplyr::filter(lfsr < 0.05)
+
+g1 <- ggplot(data = out_sig_df, aes(x = baseline, y = abs(pred_diff))) +
+  geom_point() +
+  geom_smooth() +
+  ggtitle(glue::glue("Rank correlation = {round(cor(out_sig_df$baseline, abs(out_sig_df$pred_diff), method = 'spearman'), 2)}")) +
+  xlab("Baseline Expression") +
+  ylab("|Difference in Expression|")
+
+g2 <- ggplot(data = out_sig_df, aes(x = log(baseline), y = abs(b1_pm))) +
+  geom_point() +
+  geom_smooth() +
+  ggtitle(glue::glue("Rank correlation = {round(cor(log(out_sig_df$baseline), abs(out_sig_df$b1_pm), method = 'spearman'), 2)}")) +
+  xlab("log(Baseline Expression)") +
+  ylab("|LFC|")
+
+ggarrange(g1, g2, nrow = 1, ncol = 2)
+```
+
+

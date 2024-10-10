@@ -10,7 +10,7 @@ editor_options:
 
 Welcome to my research website.
 
-[PBMC Purified Results](pbmc_purified_results.html)
+## Simulations
 
 [Greedy Fitting](greedy_init.html)
 
@@ -18,16 +18,24 @@ Welcome to my research website.
 
 [Comparing Link Functions with a Multi-Group Simulation](link_simulations2.html)
 
-[Analysis of natural killer T cells](nkt_analysis.html)
-
 [Normal Approximation to log1p Poisson Means](ebnm.html)
 
 [Objective Evaluation of flash Approximation to log1p Model](new_log1p_approx_testing.html)
 
 [Exploration of normal approximations to log1p model](log1p_explorations.html)
 
+[Derivation of normal approximation with size factors](size_factor_derivation.html)
+
+## Data Analysis
+
+[PBMC Purified Results](pbmc_purified_results.html)
+
+[Analysis of natural killer T cells](nkt_analysis.html)
+
 [Application of normal approximation to real data](flash_approx.html)
 
 [NMF Comparison on Mouse Brain Dataset](mouse_brain_stim.html)
 
-[Derivation of normal approximation with size factors](size_factor_derivation.html)
+[Analysis of Sex Differences in GTEX](gtex_sex_diff.html)
+
+
