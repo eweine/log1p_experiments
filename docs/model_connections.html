@@ -439,10 +439,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R
-Markdown file created these results, you’ll want to first commit it to
-the Git repo. If you’re still working on the analysis, you can ignore
-this warning. When you’re finished, you can run
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -535,15 +535,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea285984d9693ea92140da7a91df3db27ae0d355btargetblanka285984a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree96f183e534f6e5b732ddf701b3ff5bf993349051targetblank96f183ea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/a285984d9693ea92140da7a91df3db27ae0d355b" target="_blank">a285984</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/96f183e534f6e5b732ddf701b3ff5bf993349051" target="_blank">96f183e</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea285984d9693ea92140da7a91df3db27ae0d355btargetblanka285984a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree96f183e534f6e5b732ddf701b3ff5bf993349051targetblank96f183ea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -553,7 +553,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/a285984d9693ea92140da7a91df3db27ae0d355b" target="_blank">a285984</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/96f183e534f6e5b732ddf701b3ff5bf993349051" target="_blank">96f183e</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -570,13 +570,8 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
 
-Untracked files:
-    Untracked:  analysis/model_connections.Rmd
-    Untracked:  model_connections.Rmd
-    Untracked:  model_connections.html
-
 Unstaged changes:
-    Modified:   analysis/mouse_brain_stim.Rmd
+    Modified:   analysis/model_connections.Rmd
 
 </code></pre>
 <p>
@@ -591,10 +586,74 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/model_connections.Rmd</code>) and
+HTML (<code>docs/model_connections.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/96f183e534f6e5b732ddf701b3ff5bf993349051/analysis/model_connections.Rmd" target="_blank">96f183e</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-10-28
+</td>
+<td>
+added formal connection argument
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/96f183e534f6e5b732ddf701b3ff5bf993349051/docs/model_connections.html" target="_blank">96f183e</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-10-28
+</td>
+<td>
+added formal connection argument
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -783,6 +842,108 @@ log-likelihood, we have</p>
 \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \left(\sum_{k = 1}^{K} \ell_{ik}
 f_{jk} \right) - \exp\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk}\right) =
 \ell_{GPCA}(\boldsymbol{L}, \boldsymbol{F}).\]</span></p>
+</div>
+<div id="experiments" class="section level1">
+<h1>Experiments</h1>
+<p>Below, I investigate empirically if larger values of <span
+class="math inline">\(c\)</span> allow the <code>log1p</code> model to
+converge to either the topic model or GLMPCA.</p>
+<p>First, I generate data from a rank-4 topic model and run the
+<code>log1p</code> model until convergence with increasing values of
+<span class="math inline">\(c\)</span>. The dashed red line below
+represents the log-likelihood of the topic model obtained via
+<code>fastTopics</code>.</p>
+<pre class="r"><code>set.seed(1)
+n &lt;- 500
+p &lt;- 250
+K &lt;- 4
+
+library(distr)
+library(Matrix)
+
+l_dist &lt;- UnivarMixingDistribution(
+  Unif(0,0.05),
+  Exp(rate = 1.75),
+  mixCoeff = rep(1/2,2)
+)
+
+f_dist &lt;- UnivarMixingDistribution(
+  Unif(0,0.05),
+  Exp(rate = 1.75),
+  mixCoeff = rep(1/2,2)
+)
+
+l_sampler &lt;- distr::r(l_dist)
+f_sampler &lt;- distr::r(f_dist)
+
+LL &lt;- matrix(
+  data = l_sampler(n = n * K),
+  nrow = n,
+  ncol = K
+)
+
+FF &lt;- matrix(
+  data = f_sampler(n = p * K),
+  nrow = p,
+  ncol = K
+)
+
+Lambda &lt;- LL %*% t(FF)
+
+Y &lt;- matrix(
+  data = rpois(n = prod(dim(Lambda)), lambda = as.vector(Lambda)),
+  nrow = n,
+  ncol = p
+)
+
+Y_dense &lt;- Y
+Y &lt;- as(Y, &quot;CsparseMatrix&quot;)
+
+c_vec &lt;- c(
+  0.01, 0.1, 0.25, 0.5, 0.75, 1, 2.5,
+  5, 7.5, 10, 25, 50, 75, 100, 250,
+  500, 750, 1000, 2500, 5000, 7500, 10000
+  )
+ll_vec &lt;- numeric(length(c_vec))
+
+for (i in 1:length(c_vec)) {
+  
+  set.seed(1)
+  log1p &lt;- passPCA::fit_factor_model_log1p_exact(
+    Y = Y,
+    K = 4,
+    maxiter = 10000,
+    s = rep(c_vec[i], n)
+  )
+  
+  H &lt;- exp(log1p$U %*% t(log1p$V)) - 1
+  
+  ll_vec[i] &lt;- sum(
+    dpois(
+      x = as.vector(Y_dense),
+      lambda = c_vec[i] * as.vector(H),
+      log = TRUE
+    )
+  )
+  
+}
+
+library(fastTopics)
+
+set.seed(1)
+tm &lt;- fit_poisson_nmf(
+  X = Y, k = 4,
+  numiter = 1000
+)
+
+ll_tm &lt;- sum(
+  dpois(
+    x = as.vector(Y_dense),
+    lambda = as.vector(tm$L %*% t(tm$F)),
+    log = TRUE
+  )
+)</code></pre>
+<p><img src="figure/model_connections.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -809,17 +970,24 @@ tzcode source: internal
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
+other attached packages:
+[1] ggplot2_3.5.1
+
 loaded via a namespace (and not attached):
- [1] vctrs_0.6.5       cli_3.6.3         knitr_1.47        rlang_1.1.4      
- [5] xfun_0.45         stringi_1.8.4     promises_1.3.0    jsonlite_1.8.8   
- [9] workflowr_1.7.1   glue_1.7.0        rprojroot_2.0.4   git2r_0.33.0     
-[13] htmltools_0.5.8.1 httpuv_1.6.15     sass_0.4.9        fansi_1.0.6      
-[17] rmarkdown_2.27    jquerylib_0.1.4   evaluate_0.24.0   tibble_3.2.1     
-[21] fastmap_1.2.0     yaml_2.3.8        lifecycle_1.0.4   stringr_1.5.1    
-[25] compiler_4.4.0    fs_1.6.4          Rcpp_1.0.13       pkgconfig_2.0.3  
-[29] rstudioapi_0.16.0 later_1.3.2       digest_0.6.36     R6_2.5.1         
-[33] utf8_1.2.4        pillar_1.9.0      magrittr_2.0.3    bslib_0.7.0      
-[37] tools_4.4.0       cachem_1.1.0     </code></pre>
+ [1] gtable_0.3.5      jsonlite_1.8.8    highr_0.11        dplyr_1.1.4      
+ [5] compiler_4.4.0    promises_1.3.0    tidyselect_1.2.1  Rcpp_1.0.13      
+ [9] stringr_1.5.1     git2r_0.33.0      later_1.3.2       jquerylib_0.1.4  
+[13] scales_1.3.0      yaml_2.3.8        fastmap_1.2.0     readr_2.1.5      
+[17] R6_2.5.1          labeling_0.4.3    generics_0.1.3    workflowr_1.7.1  
+[21] knitr_1.47        tibble_3.2.1      munsell_0.5.1     rprojroot_2.0.4  
+[25] bslib_0.7.0       pillar_1.9.0      tzdb_0.4.0        rlang_1.1.4      
+[29] utf8_1.2.4        cachem_1.1.0      stringi_1.8.4     httpuv_1.6.15    
+[33] xfun_0.45         fs_1.6.4          sass_0.4.9        cli_3.6.3        
+[37] withr_3.0.0       magrittr_2.0.3    grid_4.4.0        digest_0.6.36    
+[41] rstudioapi_0.16.0 hms_1.1.3         cowplot_1.1.3     lifecycle_1.0.4  
+[45] vctrs_0.6.5       evaluate_0.24.0   glue_1.7.0        farver_2.1.2     
+[49] whisker_0.4.1     colorspace_2.1-0  fansi_1.0.6       rmarkdown_2.27   
+[53] tools_4.4.0       pkgconfig_2.0.3   htmltools_0.5.8.1</code></pre>
 </div>
 </div>
 
