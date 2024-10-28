@@ -1,0 +1,140 @@
+---
+title: "Connections Between Poisson Matrix Factorization Methods"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-10-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Three Different Models
+
+Suppose that for $(i, j) \in \{1, \dots, n\} \times \{1, \dots, m\}$, $$y_{ij} \sim \textrm{Poisson}(\lambda_{ij}).$$ The log-likelihood of this model is $$\sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log(\lambda_{ij}) - \lambda_{ij}.$$
+
+### Topic Model / Poisson NMF with Identity Link
+
+Suppose that
+
+\begin{align}
+y_{ij} &\sim \textrm{Poisson}(\lambda_{ij}) \\
+\boldsymbol{\Lambda} &= \boldsymbol{L}\boldsymbol{F}^{T},
+\end{align}
+
+where $\boldsymbol{L}$ and $\boldsymbol{F}$ are both rank-K elementwise non-negative matrices. Define the log-likelihood of this model as 
+
+$$\ell_{TM}(\boldsymbol{L}, \boldsymbol{F}) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) - \sum_{k = 1}^{K} \ell_{ik} f_{jk}.$$
+
+### GLM-PCA
+
+Suppose that
+
+\begin{align}
+y_{ij} &\sim \textrm{Poisson}(\lambda_{ij}) \\
+\log(\lambda_{ij}) &= b_{ij} \\
+\boldsymbol{B} &= \boldsymbol{L}\boldsymbol{F}^{T},
+\end{align}
+
+where $\boldsymbol{L}$ and $\boldsymbol{F}$ are both rank-K matrices. Define the log-likelihood of this model as 
+
+$$\ell_{GPCA}(\boldsymbol{L}, \boldsymbol{F}) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \left(\sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) - \exp\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk}\right).$$
+
+### Poisson NMF with log1p Link
+
+Suppose that
+
+\begin{align}
+y_{ij} &\sim \textrm{Poisson}(\lambda_{ij}) \\
+\log\left(1 + \frac{\lambda_{ij}}c\right) &= b_{ij} \\
+\boldsymbol{B} &= \boldsymbol{L}\boldsymbol{F}^{T},
+\end{align}
+
+where $\boldsymbol{L}$ and $\boldsymbol{F}$ are both rank-K elementwise non-negative matrices and $c$ is a positive constant. Define the log-likelihood of this model as 
+
+$$\ell_{log1p}(\boldsymbol{L}, \boldsymbol{F}, c) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(c \cdot \exp\left\{ \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - c \right) - c \cdot \exp\left( \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) + c.$$
+
+## Unifying the Three Models
+
+Suppose that we fix each value of $\lambda_{ij}$ in the log1p model. Then, if we set $c$ to be very large, then $\frac{\lambda_{ij}}{c}$ will be small and thus $\log\left(1 + \frac{\lambda_{ij}}{c}\right) \approx \frac{\lambda_{ij}}{c}$. Thus, when $c$ is large we should expect that the log1p model should look like the topic model. Now, suppose that we set $c$ to be a very small (positive) number. Then, $\frac{\lambda_{ij}}{c}$ will be large and thus $\log\left(1 + \frac{\lambda_{ij}}{c}\right) \approx \log\left(\frac{\lambda_{ij}}{c}\right).$ In this case, we should expect that the log1p model will act like GLM-PCA. 
+
+# Connection of log1p Model to the Topic Model
+
+Formally, we have 
+
+$$\lim_{c \rightarrow \infty} \ell_{log1p}\left(\frac{1}{\sqrt{c}}\boldsymbol{L}, \frac{1}{\sqrt{c}}\boldsymbol{F}, c\right) = \ell_{TM}(\boldsymbol{L}, \boldsymbol{F})$$
+
+We prove this below:
+
+First, note that
+
+\begin{equation*}
+\ell_{log1p}\left(\frac{1}{\sqrt{c}}\boldsymbol{L}, \frac{1}{\sqrt{c}}\boldsymbol{F}, c\right) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(c \cdot \exp\left\{ \frac{1}{c} \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - c \right) - c \cdot \exp\left( \frac{1}{c} \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) + c
+\end{equation*}
+
+Now, separating out the term that depends on $c$ and taking the limit, we have
+
+\begin{align*}
+\lim_{c \rightarrow \infty} c \cdot \exp\left\{ \frac{1}{c} \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - c &= \lim_{c \rightarrow \infty} c \cdot \left[ \exp\left\{ \frac{1}{c} \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - 1 \right]
+\end{align*}
+
+Now, substitute in $b_{ij} = \sum_{k = 1}^{K} \ell_{ik} f_{jk}$ and let $x = \frac{b_{ij}}{c}$. Then, we can write
+
+$$\lim_{c \rightarrow \infty} c \cdot \left[ \exp\left\{ \frac{1}{c} \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - 1 \right] = \lim_{x \rightarrow 0^{+}} \frac{b_{ij}}{x} (e^{x} - 1)$$
+
+Now, recall that the Taylor series expansion of $e^{x}$ about $x = 0$ is
+
+$$e^{x} = \sum_{n = 0}^{\infty} \frac{x^{n}}{n!} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \dots$$
+Thus, the Taylor series expansion of $e^{x} - 1$ about $x = 0$ is
+
+$$e^{x} - 1 = \sum_{n = 1}^{\infty} \frac{x^{n}}{n!} = x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \dots$$
+
+Now, we can write 
+
+\begin{align*}
+\lim_{x \rightarrow 0^{+}} \frac{b_{ij}}{x} (e^{x} - 1) &= \lim_{x \rightarrow 0^{+}} \frac{b_{ij}}{x} \left(x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \dots \right) \\
+&= \lim_{x \rightarrow 0^{+}} \left(b_{ij} + \frac{b_{ij}x}{2!} + \frac{b_{ij} x^{2}}{3!} + \dots \right) \\
+&= b_{ij}.
+\end{align*}
+
+Substituting this back into the equation above, we have
+
+$$\lim_{c \rightarrow \infty} c \cdot \left[ \exp\left\{ \frac{1}{c} \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - 1 \right] = \sum_{k = 1}^{K} \ell_{ik} f_{jk}.$$
+
+Finally, substituting this back into the equation for $\ell_{log1p}$, we have
+
+$$\lim_{c \rightarrow \infty} \ell_{log1p}\left(\frac{1}{\sqrt{c}}\boldsymbol{L}, \frac{1}{\sqrt{c}}\boldsymbol{F}, c\right)  = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) - \sum_{k = 1}^{K} \ell_{ik} f_{jk} = \ell_{TM}(\boldsymbol{L}, \boldsymbol{F})$$
+
+# Connection of log1p Model to GLM-PCA
+
+To make the connection with GLM-PCA explicit, we have to slightly modify the log1p model. Specifically, we now take
+
+\begin{align}
+y_{ij} &\sim \textrm{Poisson}(\lambda_{ij}) \\
+\log\left(1 + \frac{\lambda_{ij}}c\right) &= \alpha + b_{ij} \\
+\boldsymbol{B} &= \boldsymbol{L}\boldsymbol{F}^{T},
+\end{align}
+
+where the variables are defined as above except for $\alpha$, which is a positive constant. We can write the log-likelihood of this model as 
+
+$$\ell_{log1p_\alpha}(\boldsymbol{L}, \boldsymbol{F}, c, \alpha) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(c \cdot \exp\left\{ \alpha + \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - c \right) - c \cdot \exp\left( \alpha + \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) + c.$$
+Now, formally we will prove that 
+
+$$\lim_{c \rightarrow 0^{+}} \ell_{log1p_\alpha}\left(\boldsymbol{L}, \boldsymbol{F}, c, \log(1/c) \right) = \ell_{GPCA}(\boldsymbol{L}, \boldsymbol{F}).$$
+
+First, we can write
+
+$$\ell_{log1p_\alpha}(\boldsymbol{L}, \boldsymbol{F}, c, \log(1/c)) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(c \cdot \exp\left\{ \log(1/c) + \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - c \right) - c \cdot \exp\left( \log(1/c) + \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) + c.$$
+
+Now, observe that 
+
+\begin{align*}
+\lim_{c \rightarrow 0^{+}} c [\exp\{\log(1 / c) + x\} - 1] &= \lim_{c \rightarrow 0^{+}} c [\exp\{\log(1 / c)\}\exp(x) - 1] \\
+&= \lim_{c \rightarrow 0^{+}} c \frac{1}{c} \exp(x) - c \\
+&= \exp(x).
+\end{align*}
+
+Plugging this relationship back into the equation for the log-likelihood, we have
+
+$$\lim_{c \rightarrow 0^{+}} \ell_{log1p_\alpha}(\boldsymbol{L}, \boldsymbol{F}, c, \log(1/c)) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \left(\sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) - \exp\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk}\right) = \ell_{GPCA}(\boldsymbol{L}, \boldsymbol{F}).$$
