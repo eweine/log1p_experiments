@@ -143,7 +143,7 @@ $$\lim_{c \rightarrow 0^{+}} \ell_{log1p_\alpha}(\boldsymbol{L}, \boldsymbol{F},
 
 Below, I investigate empirically if larger values of $c$ allow the `log1p` model to converge to either the topic model or GLMPCA.
 
-First, I generate data from a rank-4 topic model and run the `log1p` model until convergence with increasing values of $c$. The dashed red line below represents the log-likelihood of the topic model obtained via `fastTopics`.
+First, I generate data from a rank-4 topic model and ran the `log1p` model until convergence with increasing values of $c$. The dashed red line below represents the log-likelihood of the topic model obtained via `fastTopics`.
 
 ```{r, eval=FALSE}
 set.seed(1)
@@ -253,4 +253,121 @@ ggplot(data = out_list$ll_df) +
   cowplot::theme_cowplot()
 ```
 
+Next, I generated data from a rank-4 GLM-PCA model (with non-negative $\boldsymbol{L}$ and $\boldsymbol{F}$) and ran the `log1p` model until convergence with increasing values of $c$ (without any computational approximation). The dashed red line below represents the log-likelihood of the GLM-PCA model obtained via `fastglmpca`.
 
+```{r, eval=FALSE}
+set.seed(1)
+n <- 500
+p <- 250
+K <- 4
+
+library(distr)
+library(Matrix)
+
+l_dist <- UnivarMixingDistribution(
+  Dirac(0),
+  Exp(rate = 3),
+  mixCoeff = rep(1/2,2)
+)
+
+f_dist <- UnivarMixingDistribution(
+  Dirac(0),
+  Exp(rate = 3),
+  mixCoeff = rep(1/2,2)
+)
+
+l_sampler <- distr::r(l_dist)
+f_sampler <- distr::r(f_dist)
+
+LL <- matrix(
+  data = l_sampler(n = n * K),
+  nrow = n,
+  ncol = K
+)
+
+FF <- matrix(
+  data = f_sampler(n = p * K),
+  nrow = p,
+  ncol = K
+)
+
+Lambda <- exp(LL %*% t(FF))
+
+Y <- matrix(
+  data = rpois(n = prod(dim(Lambda)), lambda = as.vector(Lambda)),
+  nrow = n,
+  ncol = p
+)
+
+Y_dense <- Y
+Y <- as(Y, "CsparseMatrix")
+
+library(fastglmpca)
+
+set.seed(1)
+glmpca_init <- init_glmpca_pois(
+  col_size_factor = FALSE,
+  row_intercept = FALSE,
+  Y = Y,
+  K = 4
+)
+
+glmpca_fit <- fit_glmpca_pois(
+  Y = Y,
+  fit0 = glmpca_init
+)
+
+c_vec <- c(
+  0.001, 0.01, 0.1, 0.25, 0.5, 0.75, 1, 2.5,
+  5, 7.5, 10, 25, 50, 75, 100, 250,
+  500, 750, 1000, 2500, 5000, 7500, 10000
+)
+ll_vec <- numeric(length(c_vec))
+
+for (i in 1:length(c_vec)) {
+  
+  set.seed(1)
+  log1p <- passPCA::fit_factor_model_log1p_exact(
+    Y = Y,
+    K = 4,
+    maxiter = 100000,
+    s = rep(c_vec[i], n)
+  )
+  
+  H <- exp(log1p$U %*% t(log1p$V)) - 1
+  
+  ll_vec[i] <- sum(
+    dpois(
+      x = as.vector(Y_dense),
+      lambda = c_vec[i] * as.vector(H),
+      log = TRUE
+    )
+  )
+  
+}
+
+out_df <- data.frame(
+  c = c_vec,
+  ll = ll_vec
+)
+
+out_list <- list(
+  df = out_df,
+  glmpca_ll = glmpca_fit$loglik
+)
+```
+
+```{r, echo=FALSE}
+out_list <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/c_scaling_glmpca.rds"
+)
+
+ggplot(data = out_list$df) +
+  geom_point(aes(x = c, y = ll), size = 1.5) +
+  scale_x_log10() +
+  ylab("log-likelihood") +
+  geom_hline(yintercept = out_list$glmpca_ll, color = "red", linetype = "dashed") +
+  cowplot::theme_cowplot()
+```
+
+This trend is as expected. The gap between the best log-likelihood from the `log1p` model and the `GLM-PCA` model is probably because we actually need to add a constant to the `log1p` model for the log-likelihoods from the two models to be equal.

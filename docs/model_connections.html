@@ -401,7 +401,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-10-28
+<strong>Last updated:</strong> 2024-10-29
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -535,15 +535,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree96f183e534f6e5b732ddf701b3ff5bf993349051targetblank96f183ea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree507e75296230f7843c92ff21f09050484fb16a46targetblank507e752a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/96f183e534f6e5b732ddf701b3ff5bf993349051" target="_blank">96f183e</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/507e75296230f7843c92ff21f09050484fb16a46" target="_blank">507e752</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree96f183e534f6e5b732ddf701b3ff5bf993349051targetblank96f183ea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree507e75296230f7843c92ff21f09050484fb16a46targetblank507e752a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -553,7 +553,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/96f183e534f6e5b732ddf701b3ff5bf993349051" target="_blank">96f183e</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/507e75296230f7843c92ff21f09050484fb16a46" target="_blank">507e752</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -617,6 +617,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/507e75296230f7843c92ff21f09050484fb16a46/analysis/model_connections.Rmd" target="_blank">507e752</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-10-28
+</td>
+<td>
+added empirical example for topic model
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/507e75296230f7843c92ff21f09050484fb16a46/docs/model_connections.html" target="_blank">507e752</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-10-28
+</td>
+<td>
+added empirical example for topic model
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -848,7 +882,7 @@ f_{jk} \right) - \exp\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk}\right) =
 <p>Below, I investigate empirically if larger values of <span
 class="math inline">\(c\)</span> allow the <code>log1p</code> model to
 converge to either the topic model or GLMPCA.</p>
-<p>First, I generate data from a rank-4 topic model and run the
+<p>First, I generate data from a rank-4 topic model and ran the
 <code>log1p</code> model until convergence with increasing values of
 <span class="math inline">\(c\)</span>. The dashed red line below
 represents the log-likelihood of the topic model obtained via
@@ -944,6 +978,155 @@ ll_tm &lt;- sum(
   )
 )</code></pre>
 <p><img src="figure/model_connections.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/507e75296230f7843c92ff21f09050484fb16a46/docs/figure/model_connections.Rmd/unnamed-chunk-2-1.png" target="_blank">507e752</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-10-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Next, I generated data from a rank-4 GLM-PCA model (with non-negative
+<span class="math inline">\(\boldsymbol{L}\)</span> and <span
+class="math inline">\(\boldsymbol{F}\)</span>) and ran the
+<code>log1p</code> model until convergence with increasing values of
+<span class="math inline">\(c\)</span> (without any computational
+approximation). The dashed red line below represents the log-likelihood
+of the GLM-PCA model obtained via <code>fastglmpca</code>.</p>
+<pre class="r"><code>set.seed(1)
+n &lt;- 500
+p &lt;- 250
+K &lt;- 4
+
+library(distr)
+library(Matrix)
+
+l_dist &lt;- UnivarMixingDistribution(
+  Dirac(0),
+  Exp(rate = 3),
+  mixCoeff = rep(1/2,2)
+)
+
+f_dist &lt;- UnivarMixingDistribution(
+  Dirac(0),
+  Exp(rate = 3),
+  mixCoeff = rep(1/2,2)
+)
+
+l_sampler &lt;- distr::r(l_dist)
+f_sampler &lt;- distr::r(f_dist)
+
+LL &lt;- matrix(
+  data = l_sampler(n = n * K),
+  nrow = n,
+  ncol = K
+)
+
+FF &lt;- matrix(
+  data = f_sampler(n = p * K),
+  nrow = p,
+  ncol = K
+)
+
+Lambda &lt;- exp(LL %*% t(FF))
+
+Y &lt;- matrix(
+  data = rpois(n = prod(dim(Lambda)), lambda = as.vector(Lambda)),
+  nrow = n,
+  ncol = p
+)
+
+Y_dense &lt;- Y
+Y &lt;- as(Y, &quot;CsparseMatrix&quot;)
+
+library(fastglmpca)
+
+set.seed(1)
+glmpca_init &lt;- init_glmpca_pois(
+  col_size_factor = FALSE,
+  row_intercept = FALSE,
+  Y = Y,
+  K = 4
+)
+
+glmpca_fit &lt;- fit_glmpca_pois(
+  Y = Y,
+  fit0 = glmpca_init
+)
+
+c_vec &lt;- c(
+  0.001, 0.01, 0.1, 0.25, 0.5, 0.75, 1, 2.5,
+  5, 7.5, 10, 25, 50, 75, 100, 250,
+  500, 750, 1000, 2500, 5000, 7500, 10000
+)
+ll_vec &lt;- numeric(length(c_vec))
+
+for (i in 1:length(c_vec)) {
+  
+  set.seed(1)
+  log1p &lt;- passPCA::fit_factor_model_log1p_exact(
+    Y = Y,
+    K = 4,
+    maxiter = 100000,
+    s = rep(c_vec[i], n)
+  )
+  
+  H &lt;- exp(log1p$U %*% t(log1p$V)) - 1
+  
+  ll_vec[i] &lt;- sum(
+    dpois(
+      x = as.vector(Y_dense),
+      lambda = c_vec[i] * as.vector(H),
+      log = TRUE
+    )
+  )
+  
+}
+
+out_df &lt;- data.frame(
+  c = c_vec,
+  ll = ll_vec
+)
+
+out_list &lt;- list(
+  df = out_df,
+  glmpca_ll = glmpca_fit$loglik
+)</code></pre>
+<p><img src="figure/model_connections.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This trend is as expected. The gap between the best log-likelihood
+from the <code>log1p</code> model and the <code>GLM-PCA</code> model is
+probably because we actually need to add a constant to the
+<code>log1p</code> model for the log-likelihoods from the two models to
+be equal.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
