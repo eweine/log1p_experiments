@@ -42,4 +42,6 @@ Welcome to my research website.
 
 [Formal Connections Between Factor Models](model_connections.html)
 
+[Log-likelihood Approximation and Computational Considerations](computational_complexity_analysis.html)
+
 

@@ -1,0 +1,290 @@
+---
+title: "Computational Considerations"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-10-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Computational Complexity of Computing the log-likelihoods of PMF Models
+
+## Topic model
+
+Recall that the log-likelihood of the topic model can be written as:
+
+$$\ell_{TM}(\boldsymbol{L}, \boldsymbol{F}) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) - \sum_{k = 1}^{K} \ell_{ik} f_{jk}.$$
+Define the set $\mathcal{I}_{0} = \{(i, j): y_{ij} = 0\}$. Then, the computational complexity of computing $\ell_{TM}$ is 
+
+$$\mathcal{O}((|n \cdot m - \mathcal{I}_{0}|)\cdot k) + \mathcal{O}\left((n+m)\cdot k\right).$$
+
+## GLM-PCA
+
+Recall that the log-likelihood of the GLM-PCA model can be written as
+
+$$\ell_{GPCA}(\boldsymbol{L}, \boldsymbol{F}) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \left(\sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) - \exp\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk}\right).$$
+This has a much worse computational complexity of $\mathcal{O}\left(n \cdot m \cdot k\right).$
+
+## log1p model
+
+We can write the log-likelihood of the `log1p` model as
+
+$$\ell_{log1p}(\boldsymbol{L}, \boldsymbol{F}, c) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(c \cdot \exp\left\{ \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - c \right) - c \cdot \exp\left( \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) + c.$$
+This will also have a computational complexity of $\mathcal{O}\left(n \cdot m \cdot k\right).$ However, consider approximating the function $\exp(x) = a_{0} + a_{1}x + a_{2}x^{2}$ for fixed constants $a_{0}, a_{1}, a_{2}$. This approximation will not work well for a large range of $x$. However, for $y_{ij} = 0$, we can expect that $\sum_{k = 1}^{K} \ell_{ik} f_{jk}$ to be close to $0$. This motivates the following approximation:
+
+\begin{align*}
+\ell_{log1p}(\boldsymbol{L}, \boldsymbol{F}, c) &\approx \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(c \cdot \exp\left\{ \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - c \right) - c\sum_{(i,j) \notin \mathcal{I}_{0}} \exp\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk}\right)\\
+& - ca_{1} \sum_{(i,j) \in \mathcal{I}_{0}} \sum_{k = 1}^{K} \ell_{ik} f_{jk} - ca_{2}\sum_{(i,j) \in \mathcal{I}_{0}} \left(\sum_{k = 1}^{K} \ell_{ik} f_{jk}\right)^{2} + c,
+\end{align*}
+
+where we select the constants $a_{1}$ and $a_{2}$ to approximate $\exp(x)$ well near $0$. 
+
+This has computational complexity
+
+$$\mathcal{O}((n \cdot m - |\mathcal{I}_{0}|)\cdot k) + \mathcal{O}((n + m) \cdot k) + \mathcal{O}((n + m) \cdot k^{2}).$$
+
+The reason for this is that to compute the quadratic and linear approximation terms, you can first compute $\sum_{i = 1}^{n}\sum_{j = 1}^{m} \sum_{k = 1}^{K} \ell_{ik} f_{jk}$ in $\mathcal{O}((n + m) \cdot k)$ time and then you can compute $\sum_{i = 1}^{n}\sum_{j = 1}^{m} \left( \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right)^{2} = \textrm{trace}\left(\boldsymbol{F} \boldsymbol{L}^{T} \boldsymbol{L} \boldsymbol{F}^{T} \right)$ in $\mathcal{O}((n + m) \cdot k^{2})$. To compute these terms *only* for the terms in $\mathcal{I}_{0}$, we can simply subtract off the values of $\sum_{k = 1}^{K} \ell_{ik} f_{jk}$ and $\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk}\right)^{2}$ from the full linear and quadratic terms, respectively. Since we already have to compute these terms in order to calculate the first and second terms of the approximate log-likelihood, this final step adds only $\mathcal{O}(n \cdot m - |\mathcal{I}_{0}|)$ operations, which I have ommitted from the computational complexity formula above.
+
+```{r}
+get_glmpca_o <- function(n, m, k) {
+  
+  n * m * k
+  
+}
+
+get_tm_o <- function(n, m, k, pct_0) {
+  
+  size_nz <- n * m * (1 - pct_0)
+  ((n + m) * k) + size_nz * k
+  
+}
+
+get_log1p_approx_o <- function(n, m, k, pct_0) {
+  
+  size_nz <- n * m * (1 - pct_0)
+  ((n + m) * (k + k^2)) + size_nz * k
+  
+}
+```
+
+
+```{r}
+m <- 20000
+n_vec <- seq(10, 1000000, 1000)
+k <- 25
+pct_0 <- 0.95
+
+o_glmpca <- numeric(length(n_vec))
+o_tm <- numeric(length(n_vec))
+o_log1p_approx <- numeric(length(n_vec))
+
+for (i in 1:length(n_vec)) {
+  
+  o_glmpca[i] <- get_glmpca_o(n_vec[i], m, k)
+  o_tm[i] <- get_tm_o(n_vec[i], m, k, pct_0)
+  o_log1p_approx[i] <- get_log1p_approx_o(n_vec[i], m, k, pct_0)
+  
+}
+
+o_df <- data.frame(
+  o = c(
+    o_glmpca,
+    o_tm,
+    o_log1p_approx
+  ),
+  model = c(
+    rep("GLMPCA", length(o_glmpca)),
+    rep("Topic Model", length(o_tm)),
+    rep("log1p Approximation", length(o_tm))
+  ),
+  n = rep(n_vec, 3)
+)
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(data = o_df, aes(x = n, y = o, color = model)) +
+  geom_point() +
+  geom_line() +
+  scale_y_log10() +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE)) +
+  ylab("Computational Complexity") +
+  cowplot::theme_cowplot() +
+  ggtitle("Computational Scaling for m = 20,000, K = 25")
+```
+
+
+```{r}
+m <- 20000
+n <- 10000
+k_vec <- seq(1, 200, 1)
+pct_0 <- 0.95
+
+o_glmpca <- numeric(length(k_vec))
+o_tm <- numeric(length(k_vec))
+o_log1p_approx <- numeric(length(k_vec))
+
+for (i in 1:length(k_vec)) {
+  
+  o_glmpca[i] <- get_glmpca_o(n, m, k_vec[i])
+  o_tm[i] <- get_tm_o(n, m, k_vec[i], pct_0)
+  o_log1p_approx[i] <- get_log1p_approx_o(n, m, k_vec[i], pct_0)
+  
+}
+
+o_df <- data.frame(
+  o = c(
+    o_glmpca,
+    o_tm,
+    o_log1p_approx
+  ),
+  model = c(
+    rep("GLMPCA", length(o_glmpca)),
+    rep("Topic Model", length(o_tm)),
+    rep("log1p Approximation", length(o_tm))
+  ),
+  k = rep(k_vec, 3)
+)
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(data = o_df, aes(x = k, y = o, color = model)) +
+  geom_point() +
+  geom_line() +
+  scale_y_log10() +
+  ylab("Computational Complexity") +
+  cowplot::theme_cowplot() +
+  ggtitle("Computational Scaling for m = 20,000, n = 10,000")
+```
+
+
+## Experiments
+
+One important aspect to consider is how accurate the approximation is for different values of $c$. In particular, for large values of $c$, the values of $\boldsymbol{L}$ and $\boldsymbol{F}$ will get smaller, which will cause the approximation of $\exp(x)$ near $x = 0$ to be increasingly accurate for the $0$ counts. On the other hand, for small values of $c$, even a $0$ count could correspond to a large value of $\sum_{k = 1}^{K} \ell_{ik}f_{jk}$, and thus I would expect the approximation to perform poorly. I test this hypothesis below:
+
+I generated data from a topic model with $K = 4$. I then fit a $K = 4$ log1p model with increasing values of $c$ using both an exact MLE method and the approximate method setting $a_{1}$ and $a_{2}$ to be the coefficients of a second order Taylor approximation of $\exp(x)$ about $x = 0$. 
+
+```{r, eval=FALSE}
+set.seed(1)
+n <- 500
+p <- 250
+K <- 4
+
+library(distr)
+library(Matrix)
+
+l_dist <- UnivarMixingDistribution(
+  Unif(0,0.05),
+  Exp(rate = 1.75),
+  mixCoeff = rep(1/2,2)
+)
+
+f_dist <- UnivarMixingDistribution(
+  Unif(0,0.05),
+  Exp(rate = 1.75),
+  mixCoeff = rep(1/2,2)
+)
+
+l_sampler <- distr::r(l_dist)
+f_sampler <- distr::r(f_dist)
+
+LL <- matrix(
+  data = l_sampler(n = n * K),
+  nrow = n,
+  ncol = K
+)
+
+FF <- matrix(
+  data = f_sampler(n = p * K),
+  nrow = p,
+  ncol = K
+)
+
+Lambda <- LL %*% t(FF)
+
+Y <- matrix(
+  data = rpois(n = prod(dim(Lambda)), lambda = as.vector(Lambda)),
+  nrow = n,
+  ncol = p
+)
+
+Y_dense <- Y
+Y <- as(Y, "CsparseMatrix")
+
+c_vec <- c(
+  0.01, 0.1, 0.25, 0.5, 0.75, 1, 2.5,
+  5, 7.5, 10, 25, 50, 75, 100, 250,
+  500, 750, 1000, 2500, 5000, 7500, 10000
+)
+ll_vec <- numeric(length(c_vec))
+ll_vec_approx <- numeric(length(c_vec))
+
+for (i in 1:length(c_vec)) {
+  
+  set.seed(1)
+  log1p <- passPCA::fit_factor_model_log1p_exact(
+    Y = Y,
+    K = 4,
+    maxiter = 10000,
+    s = rep(c_vec[i], n)
+  )
+  
+  log1p_approx <- passPCA::fit_factor_model_log1p_quad_approx_sparse(
+    Y = Y,
+    K = 4,
+    maxiter = 10000,
+    s = rep(c_vec[i], n),
+    approx_method = "taylor"
+  )
+  
+  H <- exp(log1p$U %*% t(log1p$V)) - 1
+  H_approx <- exp(log1p_approx$U %*% t(log1p_approx$V)) - 1
+  
+  ll_vec[i] <- sum(
+    dpois(
+      x = as.vector(Y_dense),
+      lambda = c_vec[i] * as.vector(H),
+      log = TRUE
+    )
+  )
+  
+  ll_vec_approx[i] <- sum(
+    dpois(
+      x = as.vector(Y_dense),
+      lambda = c_vec[i] * as.vector(H_approx),
+      log = TRUE
+    )
+  )
+  
+}
+
+df <- data.frame(
+  c_val = rep(c_vec, 2),
+  ll = c(ll_vec, ll_vec_approx),
+  algorithm = c(rep("exact", length(c_vec)), rep("approximate", length(c_vec)))
+)
+```
+
+```{r}
+df <- readr::read_rds(
+  "~/Documents/data/passPCA/experiment_results/c_approx_accuracy.rds"
+  )
+
+library(ggplot2)
+
+ggplot(data = df, aes(x = c_val, y = ll, color = algorithm)) +
+  geom_point() +
+  geom_line() +
+  scale_x_log10() +
+  xlab("c") +
+  ylab("log-likelihood") +
+  cowplot::theme_cowplot()
+```
+Here, we can see that the approximation can be quite bad for small values of $c$, but for large values of $c$ it seems to work quite well. Exactly where the approximation breaks down should be investigated further, but in my computational experiments I have found that the approximation seems typically seems to work reasonably well for $c = 1$.
+
