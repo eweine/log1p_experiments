@@ -392,6 +392,8 @@ y_{ij} &\sim \textrm{Poisson}(\lambda_{ij}) \\
 \boldsymbol{B} &= \boldsymbol{L}\boldsymbol{F}^{T}.
 \end{align}
 
+I simulated data under the same GLM-PCA model as above and compared the results of fitting the log1p models with various values of c without adding a constant and with adding a constant. The results are shown below.
+
 ```{r, eval=FALSE}
 set.seed(10)
 n <- 500
@@ -541,4 +543,4 @@ ggplot(data = df_plot) +
   cowplot::theme_cowplot() +
   xlab("c")
 ```
-
+The results are surprising, but I think possibly what is going on is that as you make the value of $c$ smaller, you are forcing the minimum value of lambda approach $1$. Now, you might think this would be fine because the true minimum value of lambda is $1$. However, looking at the GLM-PCA model, the minimum fitted value of lambda is about $0.25$. So, I think what might be going on here is that GLM-PCA has an advantage because it is optimizing over an un-constrained parameter space where the log1p model with a constant is not. Perhaps if I refit the log1p model but instead of thresholding $\boldsymbol{L}$ and $\boldsymbol{F}$ at $0$, I threshold them at $\log(c)$, then the results of this model will approach the same log-likelihood of the GLM-PCA model. On the other hand, this will no longer be a non-negative matrix factorization... 
