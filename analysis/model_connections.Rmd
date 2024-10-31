@@ -371,3 +371,174 @@ ggplot(data = out_list$df) +
 ```
 
 This trend is as expected. The gap between the best log-likelihood from the `log1p` model and the `GLM-PCA` model is probably because we actually need to add a constant to the `log1p` model for the log-likelihoods from the two models to be equal.
+
+# Adding a constant to the log1p model
+
+For a fixed value of $c$, I will fit the model
+
+\begin{align}
+y_{ij} &\sim \textrm{Poisson}(\lambda_{ij}) \\
+\log\left(1 + \frac{\lambda_{ij}}c\right) &= \log(1/c) + b_{ij} \\
+\boldsymbol{B} &= \boldsymbol{L}\boldsymbol{F}^{T},
+\end{align}
+
+in an attempt to establish the connection between GLM-PCA and the log1p model. 
+
+A simple calculation shows that this is equivalent to fitting the model
+
+\begin{align}
+y_{ij} &\sim \textrm{Poisson}(\lambda_{ij}) \\
+\log\left(\lambda_{ij} + c\right) &= b_{ij} \\
+\boldsymbol{B} &= \boldsymbol{L}\boldsymbol{F}^{T}.
+\end{align}
+
+```{r, eval=FALSE}
+set.seed(10)
+n <- 500
+p <- 250
+K <- 4
+
+library(distr)
+library(Matrix)
+#library(MatrixExtra)
+
+l_dist <- UnivarMixingDistribution(
+  Dirac(0),
+  Exp(rate = 3),
+  mixCoeff = rep(1/2,2)
+)
+
+f_dist <- UnivarMixingDistribution(
+  Dirac(0),
+  Exp(rate = 3),
+  mixCoeff = rep(1/2,2)
+)
+
+l_sampler <- distr::r(l_dist)
+f_sampler <- distr::r(f_dist)
+
+LL <- matrix(
+  data = l_sampler(n = n * K),
+  nrow = n,
+  ncol = K
+)
+
+FF <- matrix(
+  data = f_sampler(n = p * K),
+  nrow = p,
+  ncol = K
+)
+
+Lambda <- exp(LL %*% t(FF))
+
+Y <- matrix(
+  data = rpois(n = prod(dim(Lambda)), lambda = as.vector(Lambda)),
+  nrow = n,
+  ncol = p
+)
+
+Y_dense <- Y
+Y <- as(Y, "CsparseMatrix")
+
+ll_const <- sum(lfactorial(Y_dense))
+
+cc_vec <- c()
+ll_vec <- c()
+ll2_vec <- c()
+
+for (cc in c(1e-5, 1e-4, 1e-3, 1e-1, 1)) {
+  
+  cc_vec <- c(cc_vec, cc)
+  
+  set.seed(1)
+  log1p_alpha <- passPCA:::fit_factor_model_log1p_exact_add_const(
+    Y = Y,
+    K = 4,
+    maxiter = 10000,
+    cc = cc
+  )
+  
+  H_alpha <- exp(log1p_alpha$U %*% t(log1p_alpha$V)) - cc
+  
+  ll <- sum(
+    dpois(
+      x = as.vector(Y_dense),
+      lambda = as.vector(H_alpha),
+      log = TRUE
+    )
+  )
+  
+  ll_vec <- c(ll_vec, ll)
+  
+  set.seed(1)
+  log1p <- passPCA::fit_factor_model_log1p_exact(
+    Y = Y,
+    K = 4,
+    maxiter = 100000,
+    s = rep(cc, n)
+  )
+  
+  H <- exp(log1p$U %*% t(log1p$V)) - 1
+  
+  ll2 <- sum(
+    dpois(
+      x = as.vector(Y_dense),
+      lambda = cc * as.vector(H),
+      log = TRUE
+    )
+  )
+  
+  ll2_vec <- c(ll2_vec, ll2)
+  
+}
+
+res_df <- data.frame(
+  cc = cc_vec,
+  ll_add_const = ll_vec,
+  ll_no_const = ll2_vec
+)
+
+library(fastglmpca)
+set.seed(1)
+glmpca_init <- init_glmpca_pois(
+  col_size_factor = FALSE,
+  row_intercept = FALSE,
+  Y = Y,
+  K = 4
+)
+
+glmpca_fit <- fit_glmpca_pois(
+  Y = Y,
+  fit0 = glmpca_init
+)
+
+add_const_res <- list(
+  df = res_df,
+  glmpca_ll = glmpca_fit$loglik
+)
+```
+
+```{r}
+add_const_res <- readr::read_rds("~/Documents/data/passPCA/experiment_results/add_const_res.rds")
+
+df_plot <- data.frame(
+  ll = c(
+    add_const_res$df$ll_no_const, add_const_res$df$ll_add_const
+    ),
+  model = c(
+    rep("log1p model with log(1/c) constant", nrow(add_const_res$df)), 
+    rep("standard log1p model", nrow(add_const_res$df))
+    ),
+  cc = rep(add_const_res$df$cc, 2)
+)
+
+ggplot(data = df_plot) +
+  geom_point(aes(x = cc, y = ll, color = model), size = 1.5) +
+  geom_line(aes(x = cc, y = ll, color = model)) +
+  scale_x_log10() +
+  ylab("log-likelihood") +
+  geom_hline(yintercept = add_const_res$glmpca_ll, color = "red", linetype = "dashed") +
+  cowplot::theme_cowplot() +
+  xlab("c")
+```
+

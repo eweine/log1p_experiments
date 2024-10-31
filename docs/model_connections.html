@@ -401,7 +401,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-10-29
+<strong>Last updated:</strong> 2024-10-31
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -535,15 +535,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree507e75296230f7843c92ff21f09050484fb16a46targetblank507e752a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree8edac006b9fa0bdd2f8b75fff0611de303792343targetblank8edac00a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/507e75296230f7843c92ff21f09050484fb16a46" target="_blank">507e752</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/8edac006b9fa0bdd2f8b75fff0611de303792343" target="_blank">8edac00</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree507e75296230f7843c92ff21f09050484fb16a46targetblank507e752a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree8edac006b9fa0bdd2f8b75fff0611de303792343targetblank8edac00a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -553,7 +553,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/507e75296230f7843c92ff21f09050484fb16a46" target="_blank">507e752</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/8edac006b9fa0bdd2f8b75fff0611de303792343" target="_blank">8edac00</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -617,6 +617,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/5f73c5dff925332539a537a56399475e3154e7c1/analysis/model_connections.Rmd" target="_blank">5f73c5d</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-10-29
+</td>
+<td>
+added additional experiments for log1p model
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/5f73c5dff925332539a537a56399475e3154e7c1/docs/model_connections.html" target="_blank">5f73c5d</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-10-29
+</td>
+<td>
+added additional experiments for log1p model
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1122,11 +1156,212 @@ out_list &lt;- list(
   glmpca_ll = glmpca_fit$loglik
 )</code></pre>
 <p><img src="figure/model_connections.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/5f73c5dff925332539a537a56399475e3154e7c1/docs/figure/model_connections.Rmd/unnamed-chunk-4-1.png" target="_blank">5f73c5d</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-10-29
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This trend is as expected. The gap between the best log-likelihood
 from the <code>log1p</code> model and the <code>GLM-PCA</code> model is
 probably because we actually need to add a constant to the
 <code>log1p</code> model for the log-likelihoods from the two models to
 be equal.</p>
+</div>
+<div id="adding-a-constant-to-the-log1p-model" class="section level1">
+<h1>Adding a constant to the log1p model</h1>
+<p>For a fixed value of <span class="math inline">\(c\)</span>, I will
+fit the model</p>
+<p><span class="math display">\[\begin{align}
+y_{ij} &amp;\sim \textrm{Poisson}(\lambda_{ij}) \\
+\log\left(1 + \frac{\lambda_{ij}}c\right) &amp;= \log(1/c) + b_{ij} \\
+\boldsymbol{B} &amp;= \boldsymbol{L}\boldsymbol{F}^{T},
+\end{align}\]</span></p>
+<p>in an attempt to establish the connection between GLM-PCA and the
+log1p model.</p>
+<p>A simple calculation shows that this is equivalent to fitting the
+model</p>
+<p><span class="math display">\[\begin{align}
+y_{ij} &amp;\sim \textrm{Poisson}(\lambda_{ij}) \\
+\log\left(\lambda_{ij} + c\right) &amp;= b_{ij} \\
+\boldsymbol{B} &amp;= \boldsymbol{L}\boldsymbol{F}^{T}.
+\end{align}\]</span></p>
+<pre class="r"><code>set.seed(10)
+n &lt;- 500
+p &lt;- 250
+K &lt;- 4
+
+library(distr)
+library(Matrix)
+#library(MatrixExtra)
+
+l_dist &lt;- UnivarMixingDistribution(
+  Dirac(0),
+  Exp(rate = 3),
+  mixCoeff = rep(1/2,2)
+)
+
+f_dist &lt;- UnivarMixingDistribution(
+  Dirac(0),
+  Exp(rate = 3),
+  mixCoeff = rep(1/2,2)
+)
+
+l_sampler &lt;- distr::r(l_dist)
+f_sampler &lt;- distr::r(f_dist)
+
+LL &lt;- matrix(
+  data = l_sampler(n = n * K),
+  nrow = n,
+  ncol = K
+)
+
+FF &lt;- matrix(
+  data = f_sampler(n = p * K),
+  nrow = p,
+  ncol = K
+)
+
+Lambda &lt;- exp(LL %*% t(FF))
+
+Y &lt;- matrix(
+  data = rpois(n = prod(dim(Lambda)), lambda = as.vector(Lambda)),
+  nrow = n,
+  ncol = p
+)
+
+Y_dense &lt;- Y
+Y &lt;- as(Y, &quot;CsparseMatrix&quot;)
+
+ll_const &lt;- sum(lfactorial(Y_dense))
+
+cc_vec &lt;- c()
+ll_vec &lt;- c()
+ll2_vec &lt;- c()
+
+for (cc in c(1e-5, 1e-4, 1e-3, 1e-1, 1)) {
+  
+  cc_vec &lt;- c(cc_vec, cc)
+  
+  set.seed(1)
+  log1p_alpha &lt;- passPCA:::fit_factor_model_log1p_exact_add_const(
+    Y = Y,
+    K = 4,
+    maxiter = 10000,
+    cc = cc
+  )
+  
+  H_alpha &lt;- exp(log1p_alpha$U %*% t(log1p_alpha$V)) - cc
+  
+  ll &lt;- sum(
+    dpois(
+      x = as.vector(Y_dense),
+      lambda = as.vector(H_alpha),
+      log = TRUE
+    )
+  )
+  
+  ll_vec &lt;- c(ll_vec, ll)
+  
+  set.seed(1)
+  log1p &lt;- passPCA::fit_factor_model_log1p_exact(
+    Y = Y,
+    K = 4,
+    maxiter = 100000,
+    s = rep(cc, n)
+  )
+  
+  H &lt;- exp(log1p$U %*% t(log1p$V)) - 1
+  
+  ll2 &lt;- sum(
+    dpois(
+      x = as.vector(Y_dense),
+      lambda = cc * as.vector(H),
+      log = TRUE
+    )
+  )
+  
+  ll2_vec &lt;- c(ll2_vec, ll2)
+  
+}
+
+res_df &lt;- data.frame(
+  cc = cc_vec,
+  ll_add_const = ll_vec,
+  ll_no_const = ll2_vec
+)
+
+library(fastglmpca)
+set.seed(1)
+glmpca_init &lt;- init_glmpca_pois(
+  col_size_factor = FALSE,
+  row_intercept = FALSE,
+  Y = Y,
+  K = 4
+)
+
+glmpca_fit &lt;- fit_glmpca_pois(
+  Y = Y,
+  fit0 = glmpca_init
+)
+
+add_const_res &lt;- list(
+  df = res_df,
+  glmpca_ll = glmpca_fit$loglik
+)</code></pre>
+<pre class="r"><code>add_const_res &lt;- readr::read_rds(&quot;~/Documents/data/passPCA/experiment_results/add_const_res.rds&quot;)
+
+df_plot &lt;- data.frame(
+  ll = c(
+    add_const_res$df$ll_no_const, add_const_res$df$ll_add_const
+    ),
+  model = c(
+    rep(&quot;log1p model with log(1/c) constant&quot;, nrow(add_const_res$df)), 
+    rep(&quot;standard log1p model&quot;, nrow(add_const_res$df))
+    ),
+  cc = rep(add_const_res$df$cc, 2)
+)
+
+ggplot(data = df_plot) +
+  geom_point(aes(x = cc, y = ll, color = model), size = 1.5) +
+  geom_line(aes(x = cc, y = ll, color = model)) +
+  scale_x_log10() +
+  ylab(&quot;log-likelihood&quot;) +
+  geom_hline(yintercept = add_const_res$glmpca_ll, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  cowplot::theme_cowplot() +
+  xlab(&quot;c&quot;)</code></pre>
+<p><img src="figure/model_connections.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
