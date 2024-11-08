@@ -500,23 +500,24 @@ res_df <- data.frame(
   ll_no_const = ll2_vec
 )
 
-library(fastglmpca)
-set.seed(1)
-glmpca_init <- init_glmpca_pois(
-  col_size_factor = FALSE,
-  row_intercept = FALSE,
+set.seed(10)
+fit_glmpca <- passPCA:::fit_nn_glmpca(
   Y = Y,
-  K = 4
+  K = 4, 
+  maxiter = 1000
 )
 
-glmpca_fit <- fit_glmpca_pois(
-  Y = Y,
-  fit0 = glmpca_init
+ll_nn_glmpca <- sum(
+  dpois(
+    x = as.vector(Y_dense),
+    lambda = as.vector(exp(fit_glmpca$U %*% t(fit_glmpca$V))),
+    log = TRUE
+  )
 )
 
 add_const_res <- list(
   df = res_df,
-  glmpca_ll = glmpca_fit$loglik
+  glmpca_ll = ll_nn_glmpca
 )
 ```
 
