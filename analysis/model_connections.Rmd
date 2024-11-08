@@ -392,7 +392,7 @@ y_{ij} &\sim \textrm{Poisson}(\lambda_{ij}) \\
 \boldsymbol{B} &= \boldsymbol{L}\boldsymbol{F}^{T}.
 \end{align}
 
-I simulated data under the same GLM-PCA model as above and compared the results of fitting the log1p models with various values of c without adding a constant and with adding a constant. The results are shown below.
+I simulated data under the same GLM-PCA model as above and compared the results of fitting the log1p models with various values of c without adding a constant and with adding a constant. I also fit GLMPCA, but this time with non-negative constraints. The results are shown below.
 
 ```{r, eval=FALSE}
 set.seed(10)
@@ -525,7 +525,7 @@ add_const_res <- readr::read_rds("~/Documents/data/passPCA/experiment_results/ad
 
 df_plot <- data.frame(
   ll = c(
-    add_const_res$df$ll_no_const, add_const_res$df$ll_add_const
+    add_const_res$df$ll_add_const, add_const_res$df$ll_no_const
     ),
   model = c(
     rep("log1p model with log(1/c) constant", nrow(add_const_res$df)), 
@@ -543,4 +543,4 @@ ggplot(data = df_plot) +
   cowplot::theme_cowplot() +
   xlab("c")
 ```
-The results are surprising, but I think possibly what is going on is that as you make the value of $c$ smaller, you are forcing the minimum value of lambda approach $1$. Now, you might think this would be fine because the true minimum value of lambda is $1$. However, looking at the GLM-PCA model, the minimum fitted value of lambda is about $0.25$. So, I think what might be going on here is that GLM-PCA has an advantage because it is optimizing over an un-constrained parameter space where the log1p model with a constant is not. Perhaps if I refit the log1p model but instead of thresholding $\boldsymbol{L}$ and $\boldsymbol{F}$ at $0$, I threshold them at $\log(c)$, then the results of this model will approach the same log-likelihood of the GLM-PCA model. On the other hand, this will no longer be a non-negative matrix factorization... 
+Here, you can see that with the added constant the `log1p` model converges to the non-negative `GLM-PCA` model.

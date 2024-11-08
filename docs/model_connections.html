@@ -401,7 +401,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-10-31
+<strong>Last updated:</strong> 2024-11-07
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -535,15 +535,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed209b46f6d23d2095d323f7d650a58d4e7fb0df8targetblankd209b46a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb8b679f20d6732f53364df313cd5e7ec30e3c834targetblankb8b679fa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/d209b46f6d23d2095d323f7d650a58d4e7fb0df8" target="_blank">d209b46</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/b8b679f20d6732f53364df313cd5e7ec30e3c834" target="_blank">b8b679f</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed209b46f6d23d2095d323f7d650a58d4e7fb0df8targetblankd209b46a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb8b679f20d6732f53364df313cd5e7ec30e3c834targetblankb8b679fa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -553,7 +553,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/d209b46f6d23d2095d323f7d650a58d4e7fb0df8" target="_blank">d209b46</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/b8b679f20d6732f53364df313cd5e7ec30e3c834" target="_blank">b8b679f</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -617,6 +617,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/b8b679f20d6732f53364df313cd5e7ec30e3c834/analysis/model_connections.Rmd" target="_blank">b8b679f</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-10-31
+</td>
+<td>
+added commentary
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/b8b679f20d6732f53364df313cd5e7ec30e3c834/docs/model_connections.html" target="_blank">b8b679f</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-10-31
+</td>
+<td>
+added commentary
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1253,7 +1287,8 @@ y_{ij} &amp;\sim \textrm{Poisson}(\lambda_{ij}) \\
 \end{align}\]</span></p>
 <p>I simulated data under the same GLM-PCA model as above and compared
 the results of fitting the log1p models with various values of c without
-adding a constant and with adding a constant. The results are shown
+adding a constant and with adding a constant. I also fit GLMPCA, but
+this time with non-negative constraints. The results are shown
 below.</p>
 <pre class="r"><code>set.seed(10)
 n &lt;- 500
@@ -1382,7 +1417,7 @@ add_const_res &lt;- list(
 
 df_plot &lt;- data.frame(
   ll = c(
-    add_const_res$df$ll_no_const, add_const_res$df$ll_add_const
+    add_const_res$df$ll_add_const, add_const_res$df$ll_no_const
     ),
   model = c(
     rep(&quot;log1p model with log(1/c) constant&quot;, nrow(add_const_res$df)), 
@@ -1437,23 +1472,6 @@ Eric Weine
 </table>
 </div>
 </div>
-<p>The results are surprising, but I think possibly what is going on is
-that as you make the value of <span class="math inline">\(c\)</span>
-smaller, you are forcing the minimum value of lambda approach <span
-class="math inline">\(1\)</span>. Now, you might think this would be
-fine because the true minimum value of lambda is <span
-class="math inline">\(1\)</span>. However, looking at the GLM-PCA model,
-the minimum fitted value of lambda is about <span
-class="math inline">\(0.25\)</span>. So, I think what might be going on
-here is that GLM-PCA has an advantage because it is optimizing over an
-un-constrained parameter space where the log1p model with a constant is
-not. Perhaps if I refit the log1p model but instead of thresholding
-<span class="math inline">\(\boldsymbol{L}\)</span> and <span
-class="math inline">\(\boldsymbol{F}\)</span> at <span
-class="math inline">\(0\)</span>, I threshold them at <span
-class="math inline">\(\log(c)\)</span>, then the results of this model
-will approach the same log-likelihood of the GLM-PCA model. On the other
-hand, this will no longer be a non-negative matrix factorization…</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
