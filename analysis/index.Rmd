@@ -44,4 +44,4 @@ Welcome to my research website.
 
 [Log-likelihood Approximation and Computational Considerations](computational_complexity_analysis.html)
 
-
+[Analysis of BBC Articles](bbc.html)
