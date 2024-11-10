@@ -1,0 +1,2348 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2024-11-08" />
+
+<title>Statistical Abstracts</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Statistical Abstracts</h1>
+<h4 class="date">2024-11-08</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-11-08
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2d4798ba2ebbb6e8a887715c27aec8b9786433c1targetblank2d4798ba">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/2d4798ba2ebbb6e8a887715c27aec8b9786433c1" target="_blank">2d4798b</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2d4798ba2ebbb6e8a887715c27aec8b9786433c1targetblank2d4798ba"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/2d4798ba2ebbb6e8a887715c27aec8b9786433c1" target="_blank">2d4798b</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+
+Untracked files:
+    Untracked:  analysis/statistical abstracts.Rmd
+    Untracked:  analysis/statistical-abstracts.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(Matrix)
+library(readr)
+library(tm)</code></pre>
+<pre><code>Loading required package: NLP</code></pre>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>
+Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    filter, lag</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>sla &lt;- read_csv(&quot;~/Downloads/paperList.txt&quot;)</code></pre>
+<pre><code>Rows: 3248 Columns: 5</code></pre>
+<pre><code>── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (3): DOI, title, abstract
+dbl (2): year, citCounts
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>sla &lt;- sla[!is.na(sla$abstract),]
+sla$docnum = 1:nrow(sla)
+
+datax = readRDS(&#39;~/Downloads/sla_full.rds&#39;)
+dim(datax$data)</code></pre>
+<pre><code>[1]  3207 10104</code></pre>
+<pre class="r"><code>sum(datax$data==0)/prod(dim(datax$data))</code></pre>
+<pre><code>[1] 0.9948157</code></pre>
+<pre class="r"><code>datax$data = Matrix(datax$data,sparse = TRUE)
+
+
+doc_to_use = order(rowSums(datax$data),decreasing = T)[1:round(nrow(datax$data)*0.6)]
+mat = datax$data[doc_to_use,]
+sla = sla[doc_to_use,]
+samples = datax$samples
+samples = lapply(samples, function(z){z[doc_to_use]})
+
+
+word_to_use = which(colSums(mat&gt;0)&gt;4)
+mat = mat[,word_to_use]
+mat = Matrix(mat,sparse=TRUE)
+
+s &lt;- Matrix::rowSums(mat)
+s &lt;- s / mean(s)</code></pre>
+<pre class="r"><code>library(passPCA)
+
+cc_vec &lt;- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+fit_list &lt;- list()
+n &lt;- nrow(mat)
+p &lt;- ncol(mat)
+
+K &lt;- 50
+
+for (cc in cc_vec) {
+  
+  print(cc)
+  
+  set.seed(1)
+  log1p_k1 &lt;- fit_factor_model_log1p_exact(
+    Y = mat,
+    K = 1,
+    maxiter = 10,
+    s = cc * s,
+    init_method = &quot;frob_nmf&quot;
+  )
+
+  init_LL &lt;- log1p_k1$U %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  init_FF &lt;- log1p_k1$V %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+
+  set.seed(1)
+  fit &lt;- fit_factor_model_log1p_exact(
+    Y = mat,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s
+  )
+
+  fit_list[[as.character(cc)]] &lt;- fit
+  
+}</code></pre>
+<pre class="r"><code>cc_vec &lt;- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+fit_list &lt;- readr::read_rds(&quot;~/Documents/data/passPCA/sa_fits.rds&quot;)
+
+ll_vec &lt;- c()
+
+for (cc in cc_vec) {
+  
+  fit &lt;- fit_list[[as.character(cc)]] 
+  B &lt;- fit$U %*% t(fit$V)
+  Lambda &lt;- cc * (exp(B) - 1)
+  Lambda &lt;- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+  
+  ll &lt;- sum(
+    dpois(
+      x = as.vector(as.matrix(mat)),
+      lambda = as.vector(Lambda),
+      log = TRUE
+    )
+  )
+  
+  ll_vec &lt;- c(ll_vec, ll)
+  
+}
+
+plot(cc_vec, ll_vec)</code></pre>
+<img src="figure/statistical%20abstracts.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code># it&#39;s interesting that the model that acts more like the log
+# has a much higher log-likelihood
+
+
+# it may just be interesting to look at the top n words here
+
+get_keywords &lt;- function(V) {
+  
+  kw_list &lt;- list()
+  
+  for (k in 1:ncol(V)) {
+    
+    kw_list[[k]] &lt;- names(head(sort(V[,k], decreasing = T), 10))
+    
+  }
+  
+  return(kw_list)
+  
+}
+
+kw_lists &lt;- list()
+
+for (cc in cc_vec) {
+  
+  fit &lt;- fit_list[[as.character(cc)]]
+  rownames(fit$V) &lt;- colnames(mat)
+  
+  kw_lists[[as.character(cc)]] &lt;- get_keywords(fit$V)
+
+}
+
+
+for (cc in cc_vec) {
+  
+  print(&quot;printing keywords for cc = &quot;)
+  print(cc)
+  print(kw_lists[[as.character(cc)]])
+
+}</code></pre>
+<pre><code>[1] &quot;printing keywords for cc = &quot;
+[1] 0.001
+[[1]]
+ [1] &quot;estim&quot;   &quot;propos&quot;  &quot;method&quot;  &quot;model&quot;   &quot;real&quot;    &quot;simul&quot;   &quot;consist&quot;
+ [8] &quot;perform&quot; &quot;studi&quot;   &quot;compar&quot; 
+
+[[2]]
+ [1] &quot;chain&quot;     &quot;mont&quot;      &quot;carlo&quot;     &quot;markov&quot;    &quot;posterior&quot; &quot;mcmc&quot;     
+ [7] &quot;updat&quot;     &quot;gibb&quot;      &quot;spatial&quot;   &quot;bayesian&quot; 
+
+[[3]]
+ [1] &quot;stop&quot;     &quot;prognost&quot; &quot;tree&quot;     &quot;time&quot;     &quot;split&quot;    &quot;forest&quot;  
+ [7] &quot;truncat&quot;  &quot;surviv&quot;   &quot;spacetim&quot; &quot;endpoint&quot;
+
+[[4]]
+ [1] &quot;calibr&quot;    &quot;cook&quot;      &quot;curv&quot;      &quot;wind&quot;      &quot;fundament&quot; &quot;student&quot;  
+ [7] &quot;northwest&quot; &quot;measur&quot;    &quot;concentr&quot;  &quot;perturb&quot;  
+
+[[5]]
+ [1] &quot;sampl&quot;         &quot;weight&quot;        &quot;responseadapt&quot; &quot;stop&quot;         
+ [5] &quot;scheme&quot;        &quot;survey&quot;        &quot;sequenti&quot;      &quot;coin&quot;         
+ [9] &quot;adjust&quot;        &quot;alloc&quot;        
+
+[[6]]
+ [1] &quot;copula&quot;        &quot;tail&quot;          &quot;latent&quot;        &quot;innov&quot;        
+ [5] &quot;constraint&quot;    &quot;fourth&quot;        &quot;manifest&quot;      &quot;heavytail&quot;    
+ [9] &quot;independ&quot;      &quot;goodnessoffit&quot;
+
+[[7]]
+ [1] &quot;cluster&quot;      &quot;group&quot;        &quot;mixtur&quot;       &quot;linkag&quot;       &quot;infecti&quot;     
+ [6] &quot;node&quot;         &quot;similar&quot;      &quot;heterogen&quot;    &quot;locat&quot;        &quot;neighborhood&quot;
+
+[[8]]
+ [1] &quot;forecast&quot;   &quot;weather&quot;    &quot;price&quot;      &quot;predict&quot;    &quot;area&quot;      
+ [6] &quot;period&quot;     &quot;daili&quot;      &quot;asset&quot;      &quot;temperatur&quot; &quot;error&quot;     
+
+[[9]]
+ [1] &quot;quantil&quot;     &quot;confound&quot;    &quot;extrem&quot;      &quot;regressor&quot;   &quot;intermedi&quot;  
+ [6] &quot;instrument&quot;  &quot;bias&quot;        &quot;bridg&quot;       &quot;exposur&quot;     &quot;homoscedast&quot;
+
+[[10]]
+ [1] &quot;miss&quot;            &quot;missingdata&quot;     &quot;imput&quot;           &quot;missing&quot;        
+ [5] &quot;doubli&quot;          &quot;incomplet&quot;       &quot;propens&quot;         &quot;misspecif&quot;      
+ [9] &quot;missingatrandom&quot; &quot;robin&quot;          
+
+[[11]]
+ [1] &quot;microarray&quot; &quot;imag&quot;       &quot;cdna&quot;       &quot;throughput&quot; &quot;gene&quot;      
+ [6] &quot;tumor&quot;      &quot;express&quot;    &quot;tstatist&quot;   &quot;thousand&quot;   &quot;null&quot;      
+
+[[12]]
+ [1] &quot;census&quot;    &quot;race&quot;      &quot;survey&quot;    &quot;interview&quot; &quot;american&quot;  &quot;imput&quot;    
+ [7] &quot;racial&quot;    &quot;popul&quot;     &quot;materi&quot;    &quot;synthes&quot;  
+
+[[13]]
+ [1] &quot;matric&quot;      &quot;eigenvalu&quot;   &quot;eigenvector&quot; &quot;matrix&quot;      &quot;dimens&quot;     
+ [6] &quot;euclidean&quot;   &quot;manifold&quot;    &quot;subspac&quot;     &quot;singular&quot;    &quot;embed&quot;      
+
+[[14]]
+ [1] &quot;chart&quot;     &quot;prior&quot;     &quot;posterior&quot; &quot;length&quot;    &quot;topolog&quot;   &quot;shift&quot;    
+ [7] &quot;monitor&quot;   &quot;infant&quot;    &quot;distribut&quot; &quot;act&quot;      
+
+[[15]]
+ [1] &quot;infect&quot;       &quot;vaccin&quot;       &quot;diseas&quot;       &quot;risk&quot;         &quot;virus&quot;       
+ [6] &quot;viral&quot;        &quot;immunodefici&quot; &quot;transmiss&quot;    &quot;stage&quot;        &quot;prevent&quot;     
+
+[[16]]
+ [1] &quot;protein&quot;    &quot;lasso&quot;      &quot;sequenc&quot;    &quot;gene&quot;       &quot;dna&quot;       
+ [6] &quot;regular&quot;    &quot;nonzero&quot;    &quot;oracl&quot;      &quot;bind&quot;       &quot;transcript&quot;
+
+[[17]]
+ [1] &quot;prior&quot;       &quot;dirichlet&quot;   &quot;bayesian&quot;    &quot;bay&quot;         &quot;count&quot;      
+ [6] &quot;posterior&quot;   &quot;poisson&quot;     &quot;paradox&quot;     &quot;frequentist&quot; &quot;elect&quot;      
+
+[[18]]
+ [1] &quot;toxic&quot;          &quot;dose&quot;           &quot;dosefind&quot;       &quot;phase&quot;         
+ [5] &quot;partit&quot;         &quot;satisfactorili&quot; &quot;alpha&quot;          &quot;coher&quot;         
+ [9] &quot;replac&quot;         &quot;discret&quot;       
+
+[[19]]
+ [1] &quot;test&quot;           &quot;null&quot;           &quot;hypothesi&quot;      &quot;power&quot;         
+ [5] &quot;chisquar&quot;       &quot;ratio&quot;          &quot;hypothes&quot;       &quot;supremum&quot;      
+ [9] &quot;altern&quot;         &quot;unionintersect&quot;
+
+[[20]]
+ [1] &quot;genet&quot;       &quot;loci&quot;        &quot;trait&quot;       &quot;allel&quot;       &quot;quantit&quot;    
+ [6] &quot;geneenviron&quot; &quot;map&quot;         &quot;phenotyp&quot;    &quot;genotyp&quot;     &quot;alcohol&quot;    
+
+[[21]]
+ [1] &quot;densiti&quot;     &quot;frequenc&quot;    &quot;margin&quot;      &quot;bivari&quot;      &quot;periodogram&quot;
+ [6] &quot;vertic&quot;      &quot;spectral&quot;    &quot;bar&quot;         &quot;linkag&quot;      &quot;domain&quot;     
+
+[[22]]
+ [1] &quot;residu&quot;    &quot;diagnost&quot;  &quot;generalis&quot; &quot;logist&quot;    &quot;paradigm&quot;  &quot;covari&quot;   
+ [7] &quot;multipl&quot;   &quot;mix&quot;       &quot;plot&quot;      &quot;model&quot;    
+
+[[23]]
+ [1] &quot;classif&quot;       &quot;discrimin&quot;     &quot;machin&quot;        &quot;classifi&quot;     
+ [5] &quot;boost&quot;         &quot;misclassif&quot;    &quot;soft&quot;          &quot;multicategori&quot;
+ [9] &quot;method&quot;        &quot;penalti&quot;      
+
+[[24]]
+ [1] &quot;score&quot;       &quot;sharp&quot;       &quot;answer&quot;      &quot;rule&quot;        &quot;respond&quot;    
+ [6] &quot;supervis&quot;    &quot;centr&quot;       &quot;surrog&quot;      &quot;propens&quot;     &quot;probabilist&quot;
+
+[[25]]
+ [1] &quot;covari&quot;    &quot;return&quot;    &quot;sensit&quot;    &quot;alloc&quot;     &quot;survivor&quot;  &quot;subset&quot;   
+ [7] &quot;diffus&quot;    &quot;volatil&quot;   &quot;water&quot;     &quot;nonrandom&quot;
+
+[[26]]
+ [1] &quot;shrinkag&quot; &quot;risk&quot;     &quot;minimax&quot;  &quot;loss&quot;     &quot;adapt&quot;    &quot;curv&quot;    
+ [7] &quot;oracl&quot;    &quot;sobolev&quot;  &quot;estim&quot;    &quot;pointwis&quot;
+
+[[27]]
+ [1] &quot;diffus&quot;        &quot;filter&quot;        &quot;transit&quot;       &quot;markov&quot;       
+ [5] &quot;volatil&quot;       &quot;continuoustim&quot; &quot;dynam&quot;         &quot;ergod&quot;        
+ [9] &quot;revers&quot;        &quot;state&quot;        
+
+[[28]]
+ [1] &quot;latent&quot;     &quot;project&quot;    &quot;backfit&quot;    &quot;fit&quot;        &quot;tibshirani&quot;
+ [6] &quot;path&quot;       &quot;dantzig&quot;    &quot;beta&quot;       &quot;algorithm&quot;  &quot;lasso&quot;     
+
+[[29]]
+ [1] &quot;cluster&quot;         &quot;coeffici&quot;        &quot;twostag&quot;         &quot;correl&quot;         
+ [5] &quot;covari&quot;          &quot;matrix&quot;          &quot;respons&quot;         &quot;variancecovari&quot; 
+ [9] &quot;serum&quot;           &quot;varyingcoeffici&quot;
+
+[[30]]
+ [1] &quot;confid&quot;    &quot;interv&quot;    &quot;coverag&quot;   &quot;bootstrap&quot; &quot;pivot&quot;     &quot;theta&quot;    
+ [7] &quot;invert&quot;    &quot;simpler&quot;   &quot;approxim&quot;  &quot;uncondit&quot; 
+
+[[31]]
+ [1] &quot;adher&quot;     &quot;complianc&quot; &quot;depress&quot;   &quot;noncompli&quot; &quot;placebo&quot;   &quot;random&quot;   
+ [7] &quot;children&quot;  &quot;causal&quot;    &quot;promot&quot;    &quot;receiv&quot;   
+
+[[32]]
+ [1] &quot;theorem&quot; &quot;amer&quot;    &quot;assoc&quot;   &quot;ser&quot;     &quot;soc&quot;     &quot;ann&quot;     &quot;depth&quot;  
+ [8] &quot;van&quot;     &quot;geometr&quot; &quot;stat&quot;   
+
+[[33]]
+ [1] &quot;theta&quot;   &quot;bar&quot;     &quot;beta&quot;    &quot;cap&quot;     &quot;ball&quot;    &quot;minimax&quot; &quot;vertic&quot; 
+ [8] &quot;lambda&quot;  &quot;signal&quot;  &quot;omega&quot;  
+
+[[34]]
+ [1] &quot;size&quot;               &quot;infin&quot;              &quot;bootstrap&quot;         
+ [4] &quot;screen&quot;             &quot;seri&quot;               &quot;fraction&quot;          
+ [7] &quot;periodogram&quot;        &quot;expans&quot;             &quot;ultrahighdimension&quot;
+[10] &quot;fdr&quot;               
+
+[[35]]
+ [1] &quot;correl&quot;    &quot;array&quot;     &quot;singular&quot;  &quot;unbalanc&quot;  &quot;design&quot;    &quot;age&quot;      
+ [7] &quot;factori&quot;   &quot;colon&quot;     &quot;gee&quot;       &quot;pulmonari&quot;
+
+[[36]]
+ [1] &quot;fals&quot;      &quot;control&quot;   &quot;fdr&quot;       &quot;familywis&quot; &quot;fwer&quot;      &quot;hochberg&quot; 
+ [7] &quot;kfwer&quot;     &quot;benjamini&quot; &quot;reject&quot;    &quot;stepdown&quot; 
+
+[[37]]
+ [1] &quot;designbas&quot;  &quot;auxiliari&quot;  &quot;survey&quot;     &quot;superpopul&quot; &quot;acycl&quot;     
+ [6] &quot;graph&quot;      &quot;popul&quot;      &quot;cell&quot;       &quot;dispers&quot;    &quot;causal&quot;    
+
+[[38]]
+ [1] &quot;censor&quot;      &quot;surviv&quot;      &quot;rightcensor&quot; &quot;hazard&quot;      &quot;quantil&quot;    
+ [6] &quot;failur&quot;      &quot;incid&quot;       &quot;bivari&quot;      &quot;acceler&quot;     &quot;lifetim&quot;    
+
+[[39]]
+ [1] &quot;compon&quot;      &quot;smooth&quot;      &quot;spline&quot;      &quot;anova&quot;       &quot;bspline&quot;    
+ [6] &quot;function&quot;    &quot;princip&quot;     &quot;kernel&quot;      &quot;penal&quot;       &quot;nonparametr&quot;
+
+[[40]]
+ [1] &quot;spatial&quot;   &quot;imag&quot;      &quot;brain&quot;     &quot;variogram&quot; &quot;sea&quot;       &quot;pixel&quot;    
+ [7] &quot;satellit&quot;  &quot;smooth&quot;    &quot;spacetim&quot;  &quot;lattic&quot;   
+
+[[41]]
+ [1] &quot;quantil&quot;       &quot;autoregress&quot;   &quot;seri&quot;          &quot;garch&quot;        
+ [5] &quot;criterion&quot;     &quot;polynomi&quot;      &quot;move&quot;          &quot;differenc&quot;    
+ [9] &quot;heteroscedast&quot; &quot;time&quot;         
+
+[[42]]
+ [1] &quot;process&quot;    &quot;trajectori&quot; &quot;curv&quot;       &quot;intens&quot;     &quot;align&quot;     
+ [6] &quot;earthquak&quot;  &quot;noisi&quot;      &quot;event&quot;      &quot;recurr&quot;     &quot;hybrid&quot;    
+
+[[43]]
+ [1] &quot;predictor&quot;   &quot;explanatori&quot; &quot;slice&quot;       &quot;sir&quot;         &quot;respons&quot;    
+ [6] &quot;dimens&quot;      &quot;variabl&quot;     &quot;curs&quot;        &quot;regress&quot;     &quot;nconsist&quot;   
+
+[[44]]
+ [1] &quot;model&quot;     &quot;aic&quot;       &quot;select&quot;    &quot;akaik&quot;     &quot;criterion&quot; &quot;criteria&quot; 
+ [7] &quot;bic&quot;       &quot;mutat&quot;     &quot;markov&quot;    &quot;paramet&quot;  
+
+[[45]]
+ [1] &quot;depth&quot;     &quot;project&quot;   &quot;breakdown&quot; &quot;radius&quot;    &quot;contour&quot;   &quot;equivari&quot; 
+ [7] &quot;ellipt&quot;    &quot;contamin&quot;  &quot;scatter&quot;   &quot;influenc&quot; 
+
+[[46]]
+ [1] &quot;servic&quot;    &quot;indirect&quot;  &quot;custom&quot;    &quot;delay&quot;     &quot;plugin&quot;    &quot;choos&quot;    
+ [7] &quot;accept&quot;    &quot;forward&quot;   &quot;bandwidth&quot; &quot;backward&quot; 
+
+[[47]]
+ [1] &quot;deconvolut&quot;   &quot;errorsinvari&quot; &quot;error&quot;        &quot;band&quot;         &quot;crossvalid&quot;  
+ [6] &quot;spline&quot;       &quot;densiti&quot;      &quot;classifi&quot;     &quot;polynomi&quot;     &quot;predict&quot;     
+
+[[48]]
+ [1] &quot;likelihood&quot; &quot;maximum&quot;    &quot;robust&quot;     &quot;onestep&quot;    &quot;trim&quot;      
+ [6] &quot;lambda&quot;     &quot;bartlett&quot;   &quot;percentil&quot;  &quot;psi&quot;        &quot;invari&quot;    
+
+[[49]]
+ [1] &quot;waveletbas&quot; &quot;resolut&quot;    &quot;network&quot;    &quot;partit&quot;     &quot;understand&quot;
+ [6] &quot;evolut&quot;     &quot;recurs&quot;     &quot;tree&quot;       &quot;map&quot;        &quot;dynam&quot;     
+
+[[50]]
+ [1] &quot;design&quot;    &quot;taylor&quot;    &quot;subspac&quot;   &quot;publish&quot;   &quot;cure&quot;      &quot;fraction&quot; 
+ [7] &quot;point&quot;     &quot;element&quot;   &quot;boundari&quot;  &quot;phenomena&quot;
+
+[1] &quot;printing keywords for cc = &quot;
+[1] 0.01
+[[1]]
+ [1] &quot;estim&quot;        &quot;consist&quot;      &quot;propos&quot;       &quot;procedur&quot;     &quot;method&quot;      
+ [6] &quot;paramet&quot;      &quot;simul&quot;        &quot;perform&quot;      &quot;normal&quot;       &quot;semiparametr&quot;
+
+[[2]]
+ [1] &quot;mont&quot;      &quot;carlo&quot;     &quot;chain&quot;     &quot;markov&quot;    &quot;mcmc&quot;      &quot;posterior&quot;
+ [7] &quot;sampler&quot;   &quot;algorithm&quot; &quot;gibb&quot;      &quot;mode&quot;     
+
+[[3]]
+ [1] &quot;event&quot;    &quot;censor&quot;   &quot;cancer&quot;   &quot;failur&quot;   &quot;surviv&quot;   &quot;time&quot;    
+ [7] &quot;recurr&quot;   &quot;incid&quot;    &quot;cohort&quot;   &quot;followup&quot;
+
+[[4]]
+ [1] &quot;statistician&quot; &quot;object&quot;       &quot;fundament&quot;    &quot;problem&quot;      &quot;decis&quot;       
+ [6] &quot;context&quot;      &quot;mathemat&quot;     &quot;review&quot;       &quot;statist&quot;      &quot;optim&quot;       
+
+[[5]]
+ [1] &quot;survey&quot;    &quot;weight&quot;    &quot;popul&quot;     &quot;sampl&quot;     &quot;unit&quot;      &quot;designbas&quot;
+ [7] &quot;domain&quot;    &quot;project&quot;   &quot;unbias&quot;    &quot;phase&quot;    
+
+[[6]]
+ [1] &quot;margin&quot;        &quot;independ&quot;      &quot;copula&quot;        &quot;graphic&quot;      
+ [5] &quot;univari&quot;       &quot;correl&quot;        &quot;bivari&quot;        &quot;latent&quot;       
+ [9] &quot;graph&quot;         &quot;goodnessoffit&quot;
+
+[[7]]
+ [1] &quot;group&quot;        &quot;cluster&quot;      &quot;neighborhood&quot; &quot;graph&quot;        &quot;node&quot;        
+ [6] &quot;vertic&quot;       &quot;jump&quot;         &quot;similar&quot;      &quot;uniform&quot;      &quot;inconsist&quot;   
+
+[[8]]
+ [1] &quot;forecast&quot;    &quot;predict&quot;     &quot;wind&quot;        &quot;price&quot;       &quot;probabilist&quot;
+ [6] &quot;error&quot;       &quot;electr&quot;      &quot;energi&quot;      &quot;speed&quot;       &quot;weather&quot;    
+
+[[9]]
+ [1] &quot;error&quot;      &quot;adjust&quot;     &quot;bias&quot;       &quot;instrument&quot; &quot;exposur&quot;   
+ [6] &quot;measur&quot;     &quot;match&quot;      &quot;control&quot;    &quot;simex&quot;      &quot;variabl&quot;   
+
+[[10]]
+ [1] &quot;parametr&quot;    &quot;nonparametr&quot; &quot;residu&quot;      &quot;machin&quot;      &quot;binari&quot;     
+ [6] &quot;class&quot;       &quot;adjust&quot;      &quot;risk&quot;        &quot;ordin&quot;       &quot;compet&quot;     
+
+[[11]]
+ [1] &quot;size&quot;       &quot;small&quot;      &quot;high&quot;       &quot;larg&quot;       &quot;microarray&quot;
+ [6] &quot;correl&quot;     &quot;dimension&quot;  &quot;threshold&quot;  &quot;express&quot;    &quot;sampl&quot;     
+
+[[12]]
+ [1] &quot;race&quot;   &quot;health&quot; &quot;peopl&quot;  &quot;item&quot;   &quot;survey&quot; &quot;racial&quot; &quot;census&quot; &quot;nation&quot;
+ [9] &quot;servic&quot; &quot;stop&quot;  
+
+[[13]]
+ [1] &quot;matric&quot;      &quot;eigenvalu&quot;   &quot;shape&quot;       &quot;matrix&quot;      &quot;invers&quot;     
+ [6] &quot;subspac&quot;     &quot;space&quot;       &quot;eigenvector&quot; &quot;definit&quot;     &quot;dimens&quot;     
+
+[[14]]
+ [1] &quot;shift&quot;       &quot;chart&quot;       &quot;cusum&quot;       &quot;detect&quot;      &quot;sum&quot;        
+ [6] &quot;match&quot;       &quot;changepoint&quot; &quot;label&quot;       &quot;monitor&quot;     &quot;famili&quot;     
+
+[[15]]
+ [1] &quot;vaccin&quot;    &quot;infect&quot;    &quot;transmiss&quot; &quot;infecti&quot;   &quot;diseas&quot;    &quot;outbreak&quot; 
+ [7] &quot;contamin&quot;  &quot;virus&quot;     &quot;upper&quot;     &quot;lower&quot;    
+
+[[16]]
+ [1] &quot;gene&quot;       &quot;microarray&quot; &quot;biolog&quot;     &quot;cell&quot;       &quot;express&quot;   
+ [6] &quot;dna&quot;        &quot;protein&quot;    &quot;sequenc&quot;    &quot;pathway&quot;    &quot;motif&quot;     
+
+[[17]]
+ [1] &quot;prior&quot;       &quot;posterior&quot;   &quot;bayesian&quot;    &quot;dirichlet&quot;   &quot;bay&quot;        
+ [6] &quot;frequentist&quot; &quot;mixtur&quot;      &quot;gibb&quot;        &quot;hierarch&quot;    &quot;process&quot;    
+
+[[18]]
+ [1] &quot;mixtur&quot;  &quot;extrem&quot;  &quot;tail&quot;    &quot;copula&quot;  &quot;shape&quot;   &quot;compon&quot;  &quot;posit&quot;  
+ [8] &quot;insur&quot;   &quot;mass&quot;    &quot;variabl&quot;
+
+[[19]]
+ [1] &quot;test&quot;          &quot;null&quot;          &quot;hypothesi&quot;     &quot;power&quot;        
+ [5] &quot;altern&quot;        &quot;hypothes&quot;      &quot;statist&quot;       &quot;goodnessoffit&quot;
+ [9] &quot;ratio&quot;         &quot;chi&quot;          
+
+[[20]]
+ [1] &quot;genet&quot;    &quot;genotyp&quot;  &quot;linkag&quot;   &quot;trait&quot;    &quot;diseas&quot;   &quot;associ&quot;  
+ [7] &quot;loci&quot;     &quot;marker&quot;   &quot;phenotyp&quot; &quot;interact&quot;
+
+[[21]]
+ [1] &quot;margin&quot;     &quot;densiti&quot;    &quot;bar&quot;        &quot;condit&quot;     &quot;vertic&quot;    
+ [6] &quot;robust&quot;     &quot;nonrespons&quot; &quot;imput&quot;      &quot;event&quot;      &quot;dropout&quot;   
+
+[[22]]
+ [1] &quot;imag&quot;      &quot;regress&quot;   &quot;tensor&quot;    &quot;euclidean&quot; &quot;voxel&quot;     &quot;magnet&quot;   
+ [7] &quot;propens&quot;   &quot;reson&quot;     &quot;brain&quot;     &quot;fmri&quot;     
+
+[[23]]
+ [1] &quot;classif&quot;   &quot;classifi&quot;  &quot;path&quot;      &quot;lasso&quot;     &quot;algorithm&quot; &quot;discrimin&quot;
+ [7] &quot;solut&quot;     &quot;boost&quot;     &quot;lar&quot;       &quot;select&quot;   
+
+[[24]]
+ [1] &quot;patient&quot;   &quot;trial&quot;     &quot;clinic&quot;    &quot;dose&quot;      &quot;treatment&quot; &quot;placebo&quot;  
+ [7] &quot;arm&quot;       &quot;toxic&quot;     &quot;drug&quot;      &quot;rule&quot;     
+
+[[25]]
+ [1] &quot;random&quot; &quot;effect&quot; &quot;covari&quot; &quot;factor&quot; &quot;closur&quot; &quot;assign&quot; &quot;unit&quot;   &quot;matric&quot;
+ [9] &quot;alloc&quot;  &quot;matrix&quot;
+
+[[26]]
+ [1] &quot;penalti&quot;  &quot;optim&quot;    &quot;oracl&quot;    &quot;minimax&quot;  &quot;penal&quot;    &quot;adapt&quot;   
+ [7] &quot;function&quot; &quot;loss&quot;     &quot;risk&quot;     &quot;regular&quot; 
+
+[[27]]
+ [1] &quot;diffus&quot;   &quot;process&quot;  &quot;filter&quot;   &quot;dynam&quot;    &quot;state&quot;    &quot;transit&quot; 
+ [7] &quot;sequenti&quot; &quot;jump&quot;     &quot;particl&quot;  &quot;hidden&quot;  
+
+[[28]]
+ [1] &quot;variabl&quot;   &quot;forest&quot;    &quot;select&quot;    &quot;predict&quot;   &quot;calibr&quot;    &quot;procedur&quot; 
+ [7] &quot;threshold&quot; &quot;auxiliari&quot; &quot;popul&quot;     &quot;tree&quot;     
+
+[[29]]
+ [1] &quot;cluster&quot;    &quot;longitudin&quot; &quot;correl&quot;     &quot;respons&quot;    &quot;predict&quot;   
+ [6] &quot;predictor&quot;  &quot;covari&quot;     &quot;repeat&quot;     &quot;coeffici&quot;   &quot;measur&quot;    
+
+[[30]]
+ [1] &quot;confid&quot;     &quot;likelihood&quot; &quot;interv&quot;     &quot;bootstrap&quot;  &quot;coverag&quot;   
+ [6] &quot;approxim&quot;   &quot;empir&quot;      &quot;ratio&quot;      &quot;accur&quot;      &quot;maximum&quot;   
+
+[[31]]
+ [1] &quot;vote&quot;         &quot;elect&quot;        &quot;rank&quot;         &quot;prefer&quot;       &quot;attribut&quot;    
+ [6] &quot;poll&quot;         &quot;candid&quot;       &quot;randomeffect&quot; &quot;model&quot;        &quot;cure&quot;        
+
+[[32]]
+ [1] &quot;ann&quot;     &quot;theorem&quot; &quot;assoc&quot;   &quot;amer&quot;    &quot;weak&quot;    &quot;converg&quot; &quot;array&quot;  
+ [8] &quot;statist&quot; &quot;aberr&quot;   &quot;theori&quot; 
+
+[[33]]
+ [1] &quot;theta&quot;    &quot;beta&quot;     &quot;cap&quot;      &quot;epsilon&quot;  &quot;vector&quot;   &quot;lambda&quot;  
+ [7] &quot;signal&quot;   &quot;ball&quot;     &quot;nois&quot;     &quot;sparsiti&quot;
+
+[[34]]
+ [1] &quot;seri&quot;          &quot;stationari&quot;    &quot;time&quot;          &quot;spectral&quot;     
+ [5] &quot;autoregress&quot;   &quot;process&quot;       &quot;innov&quot;         &quot;periodogram&quot;  
+ [9] &quot;nonstationari&quot; &quot;expans&quot;       
+
+[[35]]
+ [1] &quot;materi&quot;        &quot;miss&quot;          &quot;supplement&quot;    &quot;imput&quot;        
+ [5] &quot;onlin&quot;         &quot;supplementari&quot; &quot;method&quot;        &quot;shrinkag&quot;     
+ [9] &quot;design&quot;        &quot;exist&quot;        
+
+[[36]]
+ [1] &quot;fals&quot;      &quot;control&quot;   &quot;fdr&quot;       &quot;reject&quot;    &quot;discoveri&quot; &quot;hypothes&quot; 
+ [7] &quot;pvalu&quot;     &quot;stepdown&quot;  &quot;multipl&quot;   &quot;familywis&quot;
+
+[[37]]
+ [1] &quot;causal&quot;    &quot;surrog&quot;    &quot;outcom&quot;    &quot;direct&quot;    &quot;confound&quot;  &quot;intermedi&quot;
+ [7] &quot;missing&quot;   &quot;invers&quot;    &quot;estimand&quot;  &quot;dispers&quot;  
+
+[[38]]
+ [1] &quot;hazard&quot;     &quot;likelihood&quot; &quot;maximum&quot;    &quot;cox&quot;        &quot;surviv&quot;    
+ [6] &quot;effici&quot;     &quot;baselin&quot;    &quot;frailti&quot;    &quot;algorithm&quot;  &quot;proport&quot;   
+
+[[39]]
+ [1] &quot;compon&quot;       &quot;function&quot;     &quot;score&quot;        &quot;princip&quot;      &quot;profil&quot;      
+ [6] &quot;scalar&quot;       &quot;quadrat&quot;      &quot;semiparametr&quot; &quot;varianc&quot;      &quot;mix&quot;         
+
+[[40]]
+ [1] &quot;spatial&quot;      &quot;surfac&quot;       &quot;field&quot;        &quot;spatiotempor&quot; &quot;region&quot;      
+ [6] &quot;krige&quot;        &quot;locat&quot;        &quot;imag&quot;         &quot;brain&quot;        &quot;pixel&quot;       
+
+[[41]]
+ [1] &quot;quantil&quot;       &quot;regress&quot;       &quot;transform&quot;     &quot;wavelet&quot;      
+ [5] &quot;heteroscedast&quot; &quot;multipl&quot;       &quot;linear&quot;        &quot;multiscal&quot;    
+ [9] &quot;coupl&quot;         &quot;rang&quot;         
+
+[[42]]
+ [1] &quot;curv&quot;       &quot;point&quot;      &quot;process&quot;    &quot;trajectori&quot; &quot;diagnost&quot;  
+ [6] &quot;wavelet&quot;    &quot;growth&quot;     &quot;function&quot;   &quot;sensit&quot;     &quot;intens&quot;    
+
+[[43]]
+ [1] &quot;predictor&quot; &quot;lasso&quot;     &quot;factor&quot;    &quot;respons&quot;   &quot;regress&quot;   &quot;nonzero&quot;  
+ [7] &quot;distort&quot;   &quot;variabl&quot;   &quot;linear&quot;    &quot;coeffici&quot; 
+
+[[44]]
+ [1] &quot;model&quot;     &quot;criterion&quot; &quot;select&quot;    &quot;paramet&quot;   &quot;criteria&quot;  &quot;akaik&quot;    
+ [7] &quot;switch&quot;    &quot;fit&quot;       &quot;aic&quot;       &quot;hidden&quot;   
+
+[[45]]
+ [1] &quot;climat&quot;     &quot;ozon&quot;       &quot;pollut&quot;     &quot;tree&quot;       &quot;air&quot;       
+ [6] &quot;temperatur&quot; &quot;greenhous&quot;  &quot;abund&quot;      &quot;depth&quot;      &quot;mortal&quot;    
+
+[[46]]
+ [1] &quot;slice&quot;     &quot;predictor&quot; &quot;reduct&quot;    &quot;criterion&quot; &quot;time&quot;      &quot;seri&quot;     
+ [7] &quot;save&quot;      &quot;akaik&quot;     &quot;dimens&quot;    &quot;method&quot;   
+
+[[47]]
+ [1] &quot;bandwidth&quot;   &quot;kernel&quot;      &quot;smooth&quot;      &quot;rate&quot;        &quot;spline&quot;     
+ [6] &quot;converg&quot;     &quot;densiti&quot;     &quot;polynomi&quot;    &quot;crossvalid&quot;  &quot;nonparametr&quot;
+
+[[48]]
+ [1] &quot;robust&quot;    &quot;depth&quot;     &quot;equivari&quot;  &quot;trim&quot;      &quot;median&quot;    &quot;rank&quot;     
+ [7] &quot;breakdown&quot; &quot;outlier&quot;   &quot;locat&quot;     &quot;scatter&quot;  
+
+[[49]]
+ [1] &quot;spline&quot;     &quot;anova&quot;      &quot;fit&quot;        &quot;mix&quot;        &quot;decomposit&quot;
+ [6] &quot;network&quot;    &quot;smooth&quot;     &quot;penal&quot;      &quot;interact&quot;   &quot;effect&quot;    
+
+[[50]]
+ [1] &quot;design&quot;    &quot;sequenti&quot;  &quot;alpha&quot;     &quot;balanc&quot;    &quot;alloc&quot;     &quot;optim&quot;    
+ [7] &quot;order&quot;     &quot;euclidean&quot; &quot;bound&quot;     &quot;size&quot;     
+
+[1] &quot;printing keywords for cc = &quot;
+[1] 0.1
+[[1]]
+ [1] &quot;estim&quot;     &quot;consist&quot;   &quot;paramet&quot;   &quot;simul&quot;     &quot;establish&quot; &quot;bias&quot;     
+ [7] &quot;propos&quot;    &quot;asymptot&quot;  &quot;equat&quot;     &quot;perform&quot;  
+
+[[2]]
+ [1] &quot;predict&quot;   &quot;regress&quot;   &quot;predictor&quot; &quot;error&quot;     &quot;respons&quot;   &quot;model&quot;    
+ [7] &quot;squar&quot;     &quot;fit&quot;       &quot;linear&quot;    &quot;paramet&quot;  
+
+[[3]]
+ [1] &quot;method&quot;    &quot;condit&quot;    &quot;exist&quot;     &quot;regress&quot;   &quot;approach&quot;  &quot;propos&quot;   
+ [7] &quot;direct&quot;    &quot;predictor&quot; &quot;requir&quot;    &quot;quantil&quot;  
+
+[[4]]
+ [1] &quot;function&quot; &quot;score&quot;    &quot;loss&quot;     &quot;rule&quot;     &quot;surrog&quot;   &quot;proper&quot;  
+ [7] &quot;point&quot;    &quot;optim&quot;    &quot;true&quot;     &quot;expect&quot;  
+
+[[5]]
+ [1] &quot;surviv&quot;  &quot;censor&quot;  &quot;hazard&quot;  &quot;time&quot;    &quot;failur&quot;  &quot;event&quot;   &quot;proport&quot;
+ [8] &quot;recurr&quot;  &quot;cox&quot;     &quot;covari&quot; 
+
+[[6]]
+ [1] &quot;correl&quot;    &quot;margin&quot;    &quot;depend&quot;    &quot;joint&quot;     &quot;independ&quot;  &quot;structur&quot; 
+ [7] &quot;multivari&quot; &quot;copula&quot;    &quot;univari&quot;   &quot;measur&quot;   
+
+[[7]]
+ [1] &quot;genet&quot;       &quot;diseas&quot;      &quot;associ&quot;      &quot;trait&quot;       &quot;exposur&quot;    
+ [6] &quot;casecontrol&quot; &quot;marker&quot;      &quot;linkag&quot;      &quot;interact&quot;    &quot;adjust&quot;     
+
+[[8]]
+ [1] &quot;price&quot;   &quot;dynam&quot;   &quot;volatil&quot; &quot;process&quot; &quot;diffus&quot;  &quot;filter&quot;  &quot;state&quot;  
+ [8] &quot;observ&quot;  &quot;time&quot;    &quot;particl&quot;
+
+[[9]]
+ [1] &quot;treatment&quot;  &quot;match&quot;      &quot;bias&quot;       &quot;instrument&quot; &quot;random&quot;    
+ [6] &quot;sensit&quot;     &quot;observ&quot;     &quot;covari&quot;     &quot;variabl&quot;    &quot;assign&quot;    
+
+[[10]]
+ [1] &quot;miss&quot;         &quot;parametr&quot;     &quot;covari&quot;       &quot;robust&quot;       &quot;semiparametr&quot;
+ [6] &quot;nonparametr&quot;  &quot;correct&quot;      &quot;effici&quot;       &quot;mechan&quot;       &quot;misspecif&quot;   
+
+[[11]]
+ [1] &quot;cancer&quot; &quot;rate&quot;   &quot;report&quot; &quot;year&quot;   &quot;census&quot; &quot;health&quot; &quot;race&quot;   &quot;data&quot;  
+ [9] &quot;factor&quot; &quot;risk&quot;  
+
+[[12]]
+ [1] &quot;statist&quot;      &quot;statistician&quot; &quot;scienc&quot;       &quot;communiti&quot;    &quot;peopl&quot;       
+ [6] &quot;social&quot;       &quot;individu&quot;     &quot;record&quot;       &quot;data&quot;         &quot;polici&quot;      
+
+[[13]]
+ [1] &quot;shape&quot;     &quot;space&quot;     &quot;transform&quot; &quot;curv&quot;      &quot;defin&quot;     &quot;metric&quot;   
+ [7] &quot;symmetr&quot;   &quot;project&quot;   &quot;euclidean&quot; &quot;manifold&quot; 
+
+[[14]]
+ [1] &quot;data&quot;     &quot;real&quot;     &quot;infer&quot;    &quot;analysi&quot;  &quot;procedur&quot; &quot;approach&quot;
+ [7] &quot;simul&quot;    &quot;propos&quot;   &quot;model&quot;    &quot;set&quot;     
+
+[[15]]
+ [1] &quot;graph&quot;   &quot;region&quot;  &quot;graphic&quot; &quot;network&quot; &quot;wishart&quot; &quot;set&quot;     &quot;tabl&quot;   
+ [8] &quot;order&quot;   &quot;partit&quot;  &quot;confid&quot; 
+
+[[16]]
+ [1] &quot;seri&quot;        &quot;time&quot;        &quot;process&quot;     &quot;spectral&quot;    &quot;autoregress&quot;
+ [6] &quot;stationari&quot;  &quot;densiti&quot;     &quot;innov&quot;       &quot;frequenc&quot;    &quot;residu&quot;     
+
+[[17]]
+ [1] &quot;prior&quot;       &quot;bayesian&quot;    &quot;posterior&quot;   &quot;dirichlet&quot;   &quot;mixtur&quot;     
+ [6] &quot;bay&quot;         &quot;hierarch&quot;    &quot;frequentist&quot; &quot;process&quot;     &quot;distribut&quot;  
+
+[[18]]
+ [1] &quot;select&quot;     &quot;criterion&quot;  &quot;bandwidth&quot;  &quot;averag&quot;     &quot;kernel&quot;    
+ [6] &quot;weight&quot;     &quot;criteria&quot;   &quot;choos&quot;      &quot;crossvalid&quot; &quot;scheme&quot;    
+
+[[19]]
+ [1] &quot;test&quot;      &quot;null&quot;      &quot;hypothesi&quot; &quot;power&quot;     &quot;statist&quot;   &quot;altern&quot;   
+ [7] &quot;hypothes&quot;  &quot;distribut&quot; &quot;procedur&quot;  &quot;ratio&quot;    
+
+[[20]]
+ [1] &quot;forecast&quot;   &quot;wind&quot;       &quot;temperatur&quot; &quot;predict&quot;    &quot;climat&quot;    
+ [6] &quot;model&quot;      &quot;weather&quot;    &quot;speed&quot;      &quot;cost&quot;       &quot;daili&quot;     
+
+[[21]]
+ [1] &quot;theta&quot;     &quot;bar&quot;       &quot;cap&quot;       &quot;vertic&quot;    &quot;beta&quot;      &quot;random&quot;   
+ [7] &quot;lambda&quot;    &quot;distribut&quot; &quot;condit&quot;    &quot;tree&quot;     
+
+[[22]]
+ [1] &quot;sampl&quot;    &quot;size&quot;     &quot;larg&quot;     &quot;number&quot;   &quot;small&quot;    &quot;finit&quot;   
+ [7] &quot;increas&quot;  &quot;infin&quot;    &quot;asymptot&quot; &quot;moder&quot;   
+
+[[23]]
+ [1] &quot;select&quot;   &quot;lasso&quot;    &quot;variabl&quot;  &quot;penalti&quot;  &quot;penal&quot;    &quot;oracl&quot;   
+ [7] &quot;spars&quot;    &quot;coeffici&quot; &quot;regular&quot;  &quot;group&quot;   
+
+[[24]]
+ [1] &quot;trial&quot;     &quot;treatment&quot; &quot;clinic&quot;    &quot;patient&quot;   &quot;alloc&quot;     &quot;dose&quot;     
+ [7] &quot;toxic&quot;     &quot;stage&quot;     &quot;random&quot;    &quot;endpoint&quot; 
+
+[[25]]
+ [1] &quot;classif&quot;   &quot;classifi&quot;  &quot;discrimin&quot; &quot;machin&quot;    &quot;featur&quot;    &quot;rule&quot;     
+ [7] &quot;vector&quot;    &quot;support&quot;   &quot;label&quot;     &quot;boost&quot;    
+
+[[26]]
+ [1] &quot;rate&quot;        &quot;bound&quot;       &quot;converg&quot;     &quot;densiti&quot;     &quot;minimax&quot;    
+ [6] &quot;risk&quot;        &quot;estim&quot;       &quot;function&quot;    &quot;nonparametr&quot; &quot;class&quot;      
+
+[[27]]
+ [1] &quot;model&quot;     &quot;general&quot;   &quot;variabl&quot;   &quot;famili&quot;    &quot;mixtur&quot;    &quot;mix&quot;      
+ [7] &quot;latent&quot;    &quot;linear&quot;    &quot;distribut&quot; &quot;class&quot;    
+
+[[28]]
+ [1] &quot;compon&quot;    &quot;dimension&quot; &quot;princip&quot;   &quot;dimens&quot;    &quot;variabl&quot;   &quot;high&quot;     
+ [7] &quot;analysi&quot;   &quot;reduct&quot;    &quot;reduc&quot;     &quot;problem&quot;  
+
+[[29]]
+ [1] &quot;extrem&quot;    &quot;detect&quot;    &quot;count&quot;     &quot;shift&quot;     &quot;poisson&quot;   &quot;process&quot;  
+ [7] &quot;tail&quot;      &quot;event&quot;     &quot;threshold&quot; &quot;sum&quot;      
+
+[[30]]
+ [1] &quot;carlo&quot;     &quot;mont&quot;      &quot;markov&quot;    &quot;chain&quot;     &quot;mcmc&quot;      &quot;sampl&quot;    
+ [7] &quot;hidden&quot;    &quot;sampler&quot;   &quot;algorithm&quot; &quot;sequenti&quot; 
+
+[[31]]
+ [1] &quot;matrix&quot;      &quot;covari&quot;      &quot;matric&quot;      &quot;factor&quot;      &quot;eigenvalu&quot;  
+ [6] &quot;vector&quot;      &quot;eigenvector&quot; &quot;invers&quot;      &quot;subspac&quot;     &quot;rank&quot;       
+
+[[32]]
+ [1] &quot;survey&quot;     &quot;popul&quot;      &quot;weight&quot;     &quot;auxiliari&quot;  &quot;calibr&quot;    
+ [6] &quot;varianc&quot;    &quot;probabl&quot;    &quot;sampl&quot;      &quot;nonrespons&quot; &quot;imput&quot;     
+
+[[33]]
+ [1] &quot;wavelet&quot;    &quot;signal&quot;     &quot;threshold&quot;  &quot;nois&quot;       &quot;adapt&quot;     
+ [6] &quot;deconvolut&quot; &quot;rang&quot;       &quot;transform&quot;  &quot;wide&quot;       &quot;shrinkag&quot;  
+
+[[34]]
+ [1] &quot;bootstrap&quot; &quot;confid&quot;    &quot;interv&quot;    &quot;approxim&quot;  &quot;correct&quot;   &quot;distribut&quot;
+ [7] &quot;coverag&quot;   &quot;construct&quot; &quot;empir&quot;     &quot;method&quot;   
+
+[[35]]
+ [1] &quot;design&quot;   &quot;statist&quot;  &quot;factor&quot;   &quot;ann&quot;      &quot;block&quot;    &quot;project&quot; 
+ [7] &quot;minimum&quot;  &quot;orthogon&quot; &quot;assoc&quot;    &quot;run&quot;     
+
+[[36]]
+ [1] &quot;fals&quot;      &quot;control&quot;   &quot;procedur&quot;  &quot;fdr&quot;       &quot;discoveri&quot; &quot;reject&quot;   
+ [7] &quot;rate&quot;      &quot;multipl&quot;   &quot;pvalu&quot;     &quot;hypothes&quot; 
+
+[[37]]
+ [1] &quot;causal&quot;    &quot;treatment&quot; &quot;vaccin&quot;    &quot;outcom&quot;    &quot;infect&quot;    &quot;trial&quot;    
+ [7] &quot;effect&quot;    &quot;prevent&quot;   &quot;intervent&quot; &quot;diseas&quot;   
+
+[[38]]
+ [1] &quot;local&quot;    &quot;varianc&quot;  &quot;coeffici&quot; &quot;linear&quot;   &quot;partial&quot;  &quot;regress&quot; 
+ [7] &quot;asymptot&quot; &quot;quantil&quot;  &quot;measur&quot;   &quot;polynomi&quot;
+
+[[39]]
+ [1] &quot;likelihood&quot;   &quot;maximum&quot;      &quot;paramet&quot;      &quot;ratio&quot;        &quot;profil&quot;      
+ [6] &quot;nuisanc&quot;      &quot;semiparametr&quot; &quot;infer&quot;        &quot;empir&quot;        &quot;model&quot;       
+
+[[40]]
+ [1] &quot;spatial&quot;   &quot;locat&quot;     &quot;process&quot;   &quot;field&quot;     &quot;surfac&quot;    &quot;point&quot;    
+ [7] &quot;region&quot;    &quot;random&quot;    &quot;smooth&quot;    &quot;irregular&quot;
+
+[[41]]
+ [1] &quot;rank&quot;     &quot;elect&quot;    &quot;vote&quot;     &quot;school&quot;   &quot;candid&quot;   &quot;attribut&quot;
+ [7] &quot;evid&quot;     &quot;potenti&quot;  &quot;children&quot; &quot;poll&quot;    
+
+[[42]]
+ [1] &quot;cluster&quot;    &quot;longitudin&quot; &quot;curv&quot;       &quot;random&quot;     &quot;function&quot;  
+ [6] &quot;individu&quot;   &quot;trajectori&quot; &quot;time&quot;       &quot;effect&quot;     &quot;process&quot;   
+
+[[43]]
+ [1] &quot;risk&quot;     &quot;diagnost&quot; &quot;influenc&quot; &quot;perturb&quot;  &quot;combin&quot;   &quot;class&quot;   
+ [7] &quot;degre&quot;    &quot;assess&quot;   &quot;broad&quot;    &quot;sensit&quot;  
+
+[[44]]
+ [1] &quot;gene&quot;       &quot;express&quot;    &quot;microarray&quot; &quot;biolog&quot;     &quot;sequenc&quot;   
+ [6] &quot;differenti&quot; &quot;genom&quot;      &quot;cell&quot;       &quot;dna&quot;        &quot;segment&quot;   
+
+[[45]]
+ [1] &quot;health&quot;   &quot;mortal&quot;   &quot;ozon&quot;     &quot;pollut&quot;   &quot;air&quot;      &quot;trend&quot;   
+ [7] &quot;time&quot;     &quot;tree&quot;     &quot;contamin&quot; &quot;level&quot;   
+
+[[46]]
+ [1] &quot;algorithm&quot; &quot;comput&quot;    &quot;approxim&quot;  &quot;implement&quot; &quot;method&quot;    &quot;iter&quot;     
+ [7] &quot;effici&quot;    &quot;standard&quot;  &quot;calcul&quot;    &quot;requir&quot;   
+
+[[47]]
+ [1] &quot;smooth&quot;        &quot;spline&quot;        &quot;materi&quot;        &quot;onlin&quot;        
+ [5] &quot;basi&quot;          &quot;addit&quot;         &quot;effect&quot;        &quot;supplement&quot;   
+ [9] &quot;supplementari&quot; &quot;penal&quot;        
+
+[[48]]
+ [1] &quot;robust&quot;    &quot;depth&quot;     &quot;rank&quot;      &quot;project&quot;   &quot;locat&quot;     &quot;multivari&quot;
+ [7] &quot;scatter&quot;   &quot;ellipt&quot;    &quot;outlier&quot;   &quot;weight&quot;   
+
+[[49]]
+ [1] &quot;group&quot;    &quot;imag&quot;     &quot;variat&quot;   &quot;network&quot;  &quot;anova&quot;    &quot;brain&quot;   
+ [7] &quot;voxel&quot;    &quot;structur&quot; &quot;hierarch&quot; &quot;analys&quot;  
+
+[[50]]
+ [1] &quot;design&quot;  &quot;optim&quot;   &quot;problem&quot; &quot;experi&quot;  &quot;theori&quot;  &quot;case&quot;    &quot;solut&quot;  
+ [8] &quot;effici&quot;  &quot;context&quot; &quot;combin&quot; 
+
+[1] &quot;printing keywords for cc = &quot;
+[1] 1
+[[1]]
+ [1] &quot;estim&quot;     &quot;consist&quot;   &quot;paramet&quot;   &quot;establish&quot; &quot;simul&quot;     &quot;illustr&quot;  
+ [7] &quot;articl&quot;    &quot;asymptot&quot;  &quot;studi&quot;     &quot;construct&quot;
+
+[[2]]
+ [1] &quot;regress&quot;   &quot;linear&quot;    &quot;respons&quot;   &quot;predictor&quot; &quot;coeffici&quot;  &quot;general&quot;  
+ [7] &quot;model&quot;     &quot;nonlinear&quot; &quot;covari&quot;    &quot;logist&quot;   
+
+[[3]]
+ [1] &quot;method&quot;   &quot;propos&quot;   &quot;approach&quot; &quot;simul&quot;    &quot;perform&quot;  &quot;exist&quot;   
+ [7] &quot;compar&quot;   &quot;studi&quot;    &quot;appli&quot;    &quot;requir&quot;  
+
+[[4]]
+ [1] &quot;error&quot;    &quot;varianc&quot;  &quot;measur&quot;   &quot;bias&quot;     &quot;squar&quot;    &quot;area&quot;    
+ [7] &quot;standard&quot; &quot;correct&quot;  &quot;deriv&quot;    &quot;case&quot;    
+
+[[5]]
+ [1] &quot;cancer&quot; &quot;event&quot;  &quot;data&quot;   &quot;recurr&quot; &quot;time&quot;   &quot;risk&quot;   &quot;studi&quot;  &quot;cure&quot;  
+ [9] &quot;model&quot;  &quot;breast&quot;
+
+[[6]]
+ [1] &quot;process&quot;  &quot;predict&quot;  &quot;model&quot;    &quot;fit&quot;      &quot;residu&quot;   &quot;under&quot;   
+ [7] &quot;observ&quot;   &quot;stochast&quot; &quot;base&quot;     &quot;assum&quot;   
+
+[[7]]
+ [1] &quot;nest&quot;    &quot;invari&quot;  &quot;random&quot;  &quot;train&quot;   &quot;uniform&quot; &quot;run&quot;     &quot;distort&quot;
+ [8] &quot;split&quot;   &quot;perfect&quot; &quot;forest&quot; 
+
+[[8]]
+ [1] &quot;dynam&quot;   &quot;price&quot;   &quot;state&quot;   &quot;filter&quot;  &quot;time&quot;    &quot;diffus&quot;  &quot;volatil&quot;
+ [8] &quot;observ&quot;  &quot;process&quot; &quot;financi&quot;
+
+[[9]]
+ [1] &quot;treatment&quot; &quot;outcom&quot;    &quot;adjust&quot;    &quot;observ&quot;    &quot;sensit&quot;    &quot;score&quot;    
+ [7] &quot;effect&quot;    &quot;covari&quot;    &quot;random&quot;    &quot;studi&quot;    
+
+[[10]]
+ [1] &quot;parametr&quot;     &quot;nonparametr&quot;  &quot;semiparametr&quot; &quot;effici&quot;       &quot;model&quot;       
+ [6] &quot;class&quot;        &quot;asymptot&quot;     &quot;partial&quot;      &quot;propos&quot;       &quot;procedur&quot;    
+
+[[11]]
+ [1] &quot;test&quot;      &quot;statist&quot;   &quot;power&quot;     &quot;altern&quot;    &quot;hypothesi&quot; &quot;null&quot;     
+ [7] &quot;distribut&quot; &quot;procedur&quot;  &quot;propos&quot;    &quot;asymptot&quot; 
+
+[[12]]
+ [1] &quot;group&quot;    &quot;quantil&quot;  &quot;network&quot;  &quot;data&quot;     &quot;individu&quot; &quot;differ&quot;  
+ [7] &quot;statist&quot;  &quot;inform&quot;   &quot;level&quot;    &quot;social&quot;  
+
+[[13]]
+ [1] &quot;space&quot;     &quot;famili&quot;    &quot;shape&quot;     &quot;transform&quot; &quot;paramet&quot;   &quot;defin&quot;    
+ [7] &quot;statist&quot;   &quot;case&quot;      &quot;exponenti&quot; &quot;problem&quot;  
+
+[[14]]
+ [1] &quot;model&quot;    &quot;data&quot;     &quot;infer&quot;    &quot;approach&quot; &quot;set&quot;      &quot;real&quot;    
+ [7] &quot;paramet&quot;  &quot;analysi&quot;  &quot;assumpt&quot;  &quot;simul&quot;   
+
+[[15]]
+ [1] &quot;interv&quot;    &quot;confid&quot;    &quot;order&quot;     &quot;bound&quot;     &quot;region&quot;    &quot;construct&quot;
+ [7] &quot;coverag&quot;   &quot;set&quot;       &quot;approxim&quot;  &quot;probabl&quot;  
+
+[[16]]
+ [1] &quot;likelihood&quot; &quot;maximum&quot;    &quot;empir&quot;      &quot;ratio&quot;      &quot;paramet&quot;   
+ [6] &quot;normal&quot;     &quot;asymptot&quot;   &quot;distribut&quot;  &quot;studi&quot;      &quot;limit&quot;     
+
+[[17]]
+ [1] &quot;prior&quot;     &quot;bayesian&quot;  &quot;mixtur&quot;    &quot;posterior&quot; &quot;distribut&quot; &quot;bay&quot;      
+ [7] &quot;dirichlet&quot; &quot;probabl&quot;   &quot;model&quot;     &quot;paramet&quot;  
+
+[[18]]
+ [1] &quot;select&quot;    &quot;model&quot;     &quot;criterion&quot; &quot;choic&quot;     &quot;criteria&quot;  &quot;procedur&quot; 
+ [7] &quot;paramet&quot;   &quot;averag&quot;    &quot;copula&quot;    &quot;candid&quot;   
+
+[[19]]
+ [1] &quot;local&quot;       &quot;bootstrap&quot;   &quot;kernel&quot;      &quot;bandwidth&quot;   &quot;densiti&quot;    
+ [6] &quot;smooth&quot;      &quot;nonparametr&quot; &quot;polynomi&quot;    &quot;asymptot&quot;    &quot;global&quot;     
+
+[[20]]
+ [1] &quot;human&quot;        &quot;infect&quot;       &quot;model&quot;        &quot;evolutionari&quot; &quot;virus&quot;       
+ [6] &quot;time&quot;         &quot;sequenc&quot;      &quot;factor&quot;       &quot;gene&quot;         &quot;pathway&quot;     
+
+[[21]]
+ [1] &quot;theta&quot;     &quot;bar&quot;       &quot;cap&quot;       &quot;beta&quot;      &quot;vertic&quot;    &quot;statist&quot;  
+ [7] &quot;independ&quot;  &quot;distribut&quot; &quot;observ&quot;    &quot;condit&quot;   
+
+[[22]]
+ [1] &quot;function&quot;    &quot;curv&quot;        &quot;nonparametr&quot; &quot;score&quot;       &quot;observ&quot;     
+ [6] &quot;deriv&quot;       &quot;analysi&quot;     &quot;data&quot;        &quot;smooth&quot;      &quot;approach&quot;   
+
+[[23]]
+ [1] &quot;select&quot;    &quot;variabl&quot;   &quot;lasso&quot;     &quot;penalti&quot;   &quot;penal&quot;     &quot;regular&quot;  
+ [7] &quot;algorithm&quot; &quot;spars&quot;     &quot;oracl&quot;     &quot;properti&quot; 
+
+[[24]]
+ [1] &quot;treatment&quot; &quot;random&quot;    &quot;effect&quot;    &quot;causal&quot;    &quot;patient&quot;   &quot;trial&quot;    
+ [7] &quot;outcom&quot;    &quot;vaccin&quot;    &quot;care&quot;      &quot;profil&quot;   
+
+[[25]]
+ [1] &quot;classif&quot;   &quot;classifi&quot;  &quot;featur&quot;    &quot;rule&quot;      &quot;discrimin&quot; &quot;loss&quot;     
+ [7] &quot;vector&quot;    &quot;probabl&quot;   &quot;machin&quot;    &quot;perform&quot;  
+
+[[26]]
+ [1] &quot;rate&quot;     &quot;optim&quot;    &quot;converg&quot;  &quot;theoret&quot;  &quot;adapt&quot;    &quot;studi&quot;   
+ [7] &quot;procedur&quot; &quot;numer&quot;    &quot;paper&quot;    &quot;practic&quot; 
+
+[[27]]
+ [1] &quot;variabl&quot;   &quot;condit&quot;    &quot;distribut&quot; &quot;model&quot;     &quot;general&quot;   &quot;depend&quot;   
+ [7] &quot;latent&quot;    &quot;random&quot;    &quot;joint&quot;     &quot;continu&quot;  
+
+[[28]]
+ [1] &quot;compon&quot;    &quot;dimens&quot;    &quot;princip&quot;   &quot;dimension&quot; &quot;analysi&quot;   &quot;data&quot;     
+ [7] &quot;reduct&quot;    &quot;direct&quot;    &quot;invers&quot;    &quot;problem&quot;  
+
+[[29]]
+ [1] &quot;extrem&quot;    &quot;detect&quot;    &quot;tail&quot;      &quot;distribut&quot; &quot;threshold&quot; &quot;sum&quot;      
+ [7] &quot;shift&quot;     &quot;chang&quot;     &quot;depend&quot;    &quot;control&quot;  
+
+[[30]]
+ [1] &quot;algorithm&quot; &quot;carlo&quot;     &quot;mont&quot;      &quot;markov&quot;    &quot;chain&quot;     &quot;comput&quot;   
+ [7] &quot;effici&quot;    &quot;approxim&quot;  &quot;simul&quot;     &quot;mcmc&quot;     
+
+[[31]]
+ [1] &quot;sampl&quot;    &quot;size&quot;     &quot;number&quot;   &quot;larg&quot;     &quot;small&quot;    &quot;finit&quot;   
+ [7] &quot;asymptot&quot; &quot;case&quot;     &quot;increas&quot;  &quot;properti&quot;
+
+[[32]]
+ [1] &quot;miss&quot;       &quot;weight&quot;     &quot;popul&quot;      &quot;survey&quot;     &quot;data&quot;      
+ [6] &quot;imput&quot;      &quot;probabl&quot;    &quot;auxiliari&quot;  &quot;nonrespons&quot; &quot;mechan&quot;    
+
+[[33]]
+ [1] &quot;densiti&quot;   &quot;minimax&quot;   &quot;risk&quot;      &quot;nois&quot;      &quot;wavelet&quot;   &quot;adapt&quot;    
+ [7] &quot;bound&quot;     &quot;class&quot;     &quot;threshold&quot; &quot;problem&quot;  
+
+[[34]]
+ [1] &quot;time&quot;        &quot;seri&quot;        &quot;spectral&quot;    &quot;autoregress&quot; &quot;stationari&quot; 
+ [6] &quot;depend&quot;      &quot;process&quot;     &quot;expans&quot;      &quot;innov&quot;       &quot;asymptot&quot;   
+
+[[35]]
+ [1] &quot;design&quot;    &quot;factor&quot;    &quot;graph&quot;     &quot;screen&quot;    &quot;graphic&quot;   &quot;class&quot;    
+ [7] &quot;minimum&quot;   &quot;construct&quot; &quot;independ&quot;  &quot;structur&quot; 
+
+[[36]]
+ [1] &quot;procedur&quot;  &quot;control&quot;   &quot;fals&quot;      &quot;multipl&quot;   &quot;discoveri&quot; &quot;rate&quot;     
+ [7] &quot;reject&quot;    &quot;pvalu&quot;     &quot;fdr&quot;       &quot;test&quot;     
+
+[[37]]
+ [1] &quot;time&quot;    &quot;surviv&quot;  &quot;hazard&quot;  &quot;censor&quot;  &quot;failur&quot;  &quot;covari&quot;  &quot;proport&quot;
+ [8] &quot;studi&quot;   &quot;bivari&quot;  &quot;propos&quot; 
+
+[[38]]
+ [1] &quot;diseas&quot;      &quot;genet&quot;       &quot;associ&quot;      &quot;studi&quot;       &quot;trait&quot;      
+ [6] &quot;interact&quot;    &quot;exposur&quot;     &quot;risk&quot;        &quot;casecontrol&quot; &quot;marker&quot;     
+
+[[39]]
+ [1] &quot;forecast&quot;    &quot;predict&quot;     &quot;wind&quot;        &quot;model&quot;       &quot;futur&quot;      
+ [6] &quot;cost&quot;        &quot;score&quot;       &quot;probabilist&quot; &quot;speed&quot;       &quot;center&quot;     
+
+[[40]]
+ [1] &quot;spatial&quot;  &quot;field&quot;    &quot;imag&quot;     &quot;point&quot;    &quot;process&quot;  &quot;poisson&quot; 
+ [7] &quot;intens&quot;   &quot;random&quot;   &quot;surfac&quot;   &quot;gaussian&quot;
+
+[[41]]
+ [1] &quot;approxim&quot;   &quot;problem&quot;    &quot;equat&quot;      &quot;rank&quot;       &quot;solut&quot;     
+ [6] &quot;comput&quot;     &quot;general&quot;    &quot;numer&quot;      &quot;differenti&quot; &quot;solv&quot;      
+
+[[42]]
+ [1] &quot;cluster&quot;    &quot;correl&quot;     &quot;structur&quot;   &quot;data&quot;       &quot;longitudin&quot;
+ [6] &quot;margin&quot;     &quot;propos&quot;     &quot;independ&quot;   &quot;random&quot;     &quot;measur&quot;    
+
+[[43]]
+ [1] &quot;covari&quot;        &quot;matrix&quot;        &quot;vector&quot;        &quot;matric&quot;       
+ [5] &quot;eigenvalu&quot;     &quot;highdimension&quot; &quot;eigenvector&quot;   &quot;spars&quot;        
+ [9] &quot;multivari&quot;     &quot;factor&quot;       
+
+[[44]]
+ [1] &quot;gene&quot;       &quot;express&quot;    &quot;microarray&quot; &quot;biolog&quot;     &quot;sequenc&quot;   
+ [6] &quot;data&quot;       &quot;cell&quot;       &quot;experi&quot;     &quot;genom&quot;      &quot;identifi&quot;  
+
+[[45]]
+ [1] &quot;health&quot; &quot;level&quot;  &quot;factor&quot; &quot;studi&quot;  &quot;mortal&quot; &quot;model&quot;  &quot;ozon&quot;   &quot;year&quot;  
+ [9] &quot;risk&quot;   &quot;data&quot;  
+
+[[46]]
+ [1] &quot;design&quot;    &quot;treatment&quot; &quot;trial&quot;     &quot;optim&quot;     &quot;stage&quot;     &quot;sequenti&quot; 
+ [7] &quot;clinic&quot;    &quot;alloc&quot;     &quot;decis&quot;     &quot;patient&quot;  
+
+[[47]]
+ [1] &quot;smooth&quot;  &quot;mix&quot;     &quot;effect&quot;  &quot;model&quot;   &quot;spline&quot;  &quot;onlin&quot;   &quot;materi&quot; 
+ [8] &quot;addit&quot;   &quot;general&quot; &quot;compon&quot; 
+
+[[48]]
+ [1] &quot;robust&quot;    &quot;locat&quot;     &quot;depth&quot;     &quot;distribut&quot; &quot;normal&quot;    &quot;project&quot;  
+ [7] &quot;outlier&quot;   &quot;effici&quot;    &quot;multivari&quot; &quot;asymptot&quot; 
+
+[[49]]
+ [1] &quot;model&quot;       &quot;time&quot;        &quot;temperatur&quot;  &quot;climat&quot;      &quot;dynam&quot;      
+ [6] &quot;network&quot;     &quot;uncertainti&quot; &quot;period&quot;      &quot;data&quot;        &quot;trend&quot;      
+
+[[50]]
+ [1] &quot;statist&quot;    &quot;develop&quot;    &quot;methodolog&quot; &quot;address&quot;    &quot;techniqu&quot;  
+ [6] &quot;applic&quot;     &quot;assess&quot;     &quot;issu&quot;       &quot;measur&quot;     &quot;general&quot;   
+
+[1] &quot;printing keywords for cc = &quot;
+[1] 10
+[[1]]
+ [1] &quot;estim&quot;     &quot;consist&quot;   &quot;asymptot&quot;  &quot;simul&quot;     &quot;paramet&quot;   &quot;studi&quot;    
+ [7] &quot;propos&quot;    &quot;normal&quot;    &quot;procedur&quot;  &quot;establish&quot;
+
+[[2]]
+ [1] &quot;variabl&quot;     &quot;factor&quot;      &quot;latent&quot;      &quot;level&quot;       &quot;interact&quot;   
+ [6] &quot;continu&quot;     &quot;search&quot;      &quot;explanatori&quot; &quot;repres&quot;      &quot;categor&quot;    
+
+[[3]]
+ [1] &quot;featur&quot;    &quot;classif&quot;   &quot;classifi&quot;  &quot;rule&quot;      &quot;discrimin&quot; &quot;perform&quot;  
+ [7] &quot;wind&quot;      &quot;problem&quot;   &quot;probabl&quot;   &quot;vector&quot;   
+
+[[4]]
+ [1] &quot;data&quot;       &quot;methodolog&quot; &quot;statist&quot;    &quot;analysi&quot;    &quot;infer&quot;     
+ [6] &quot;measur&quot;     &quot;develop&quot;    &quot;problem&quot;    &quot;comput&quot;     &quot;valu&quot;      
+
+[[5]]
+ [1] &quot;trial&quot;     &quot;event&quot;     &quot;treatment&quot; &quot;clinic&quot;    &quot;patient&quot;   &quot;stage&quot;    
+ [7] &quot;recurr&quot;    &quot;twostag&quot;   &quot;medic&quot;     &quot;probabl&quot;  
+
+[[6]]
+ [1] &quot;function&quot; &quot;loss&quot;     &quot;residu&quot;   &quot;minim&quot;    &quot;quadrat&quot;  &quot;diagnost&quot;
+ [7] &quot;beta&quot;     &quot;risk&quot;     &quot;rule&quot;     &quot;expect&quot;  
+
+[[7]]
+ [1] &quot;type&quot;       &quot;choic&quot;      &quot;set&quot;        &quot;major&quot;      &quot;theoret&quot;   
+ [6] &quot;instrument&quot; &quot;attract&quot;    &quot;paramet&quot;    &quot;improv&quot;     &quot;natur&quot;     
+
+[[8]]
+ [1] &quot;dynam&quot;    &quot;forecast&quot; &quot;price&quot;    &quot;volatil&quot;  &quot;state&quot;    &quot;predict&quot; 
+ [7] &quot;econom&quot;   &quot;financi&quot;  &quot;time&quot;     &quot;market&quot;  
+
+[[9]]
+ [1] &quot;error&quot;    &quot;varianc&quot;  &quot;measur&quot;   &quot;partial&quot;  &quot;squar&quot;    &quot;bias&quot;    
+ [7] &quot;standard&quot; &quot;sum&quot;      &quot;area&quot;     &quot;correct&quot; 
+
+[[10]]
+ [1] &quot;spatial&quot;  &quot;field&quot;    &quot;process&quot;  &quot;imag&quot;     &quot;data&quot;     &quot;surfac&quot;  
+ [7] &quot;comput&quot;   &quot;dataset&quot;  &quot;gaussian&quot; &quot;brain&quot;   
+
+[[11]]
+ [1] &quot;detect&quot;  &quot;cancer&quot;  &quot;data&quot;    &quot;rate&quot;    &quot;shift&quot;   &quot;outlier&quot; &quot;breast&quot; 
+ [8] &quot;control&quot; &quot;differ&quot;  &quot;number&quot; 
+
+[[12]]
+ [1] &quot;group&quot;        &quot;network&quot;      &quot;count&quot;        &quot;data&quot;         &quot;characterist&quot;
+ [6] &quot;center&quot;       &quot;statist&quot;      &quot;heterogen&quot;    &quot;individu&quot;     &quot;articl&quot;      
+
+[[13]]
+ [1] &quot;space&quot;      &quot;transform&quot;  &quot;shape&quot;      &quot;wavelet&quot;    &quot;defin&quot;     
+ [6] &quot;metric&quot;     &quot;set&quot;        &quot;analysi&quot;    &quot;decomposit&quot; &quot;statist&quot;   
+
+[[14]]
+ [1] &quot;current&quot; &quot;data&quot;    &quot;tree&quot;    &quot;trend&quot;   &quot;time&quot;    &quot;risk&quot;    &quot;climat&quot; 
+ [8] &quot;chang&quot;   &quot;qualiti&quot; &quot;period&quot; 
+
+[[15]]
+ [1] &quot;time&quot;    &quot;surviv&quot;  &quot;data&quot;    &quot;censor&quot;  &quot;hazard&quot;  &quot;studi&quot;   &quot;covari&quot; 
+ [8] &quot;failur&quot;  &quot;proport&quot; &quot;propos&quot; 
+
+[[16]]
+ [1] &quot;covari&quot;        &quot;matrix&quot;        &quot;vector&quot;        &quot;matric&quot;       
+ [5] &quot;graph&quot;         &quot;set&quot;           &quot;highdimension&quot; &quot;graphic&quot;      
+ [9] &quot;spars&quot;         &quot;eigenvalu&quot;    
+
+[[17]]
+ [1] &quot;prior&quot;     &quot;bayesian&quot;  &quot;posterior&quot; &quot;mixtur&quot;    &quot;distribut&quot; &quot;process&quot;  
+ [7] &quot;bay&quot;       &quot;dirichlet&quot; &quot;hierarch&quot;  &quot;paramet&quot;  
+
+[[18]]
+ [1] &quot;model&quot;    &quot;paramet&quot;  &quot;fit&quot;      &quot;general&quot;  &quot;approach&quot; &quot;includ&quot;  
+ [7] &quot;infer&quot;    &quot;class&quot;    &quot;addit&quot;    &quot;simul&quot;   
+
+[[19]]
+ [1] &quot;test&quot;      &quot;statist&quot;   &quot;power&quot;     &quot;hypothesi&quot; &quot;null&quot;      &quot;altern&quot;   
+ [7] &quot;propos&quot;    &quot;asymptot&quot;  &quot;procedur&quot;  &quot;hypothes&quot; 
+
+[[20]]
+ [1] &quot;distribut&quot; &quot;condit&quot;    &quot;assumpt&quot;   &quot;independ&quot;  &quot;requir&quot;    &quot;set&quot;      
+ [7] &quot;valu&quot;      &quot;deriv&quot;     &quot;identifi&quot;  &quot;mild&quot;     
+
+[[21]]
+ [1] &quot;densiti&quot;   &quot;depend&quot;    &quot;joint&quot;     &quot;extrem&quot;    &quot;spectral&quot;  &quot;frequenc&quot; 
+ [7] &quot;tail&quot;      &quot;multivari&quot; &quot;copula&quot;    &quot;univari&quot;  
+
+[[22]]
+ [1] &quot;theori&quot;    &quot;limit&quot;     &quot;asymptot&quot;  &quot;statist&quot;   &quot;general&quot;   &quot;develop&quot;  
+ [7] &quot;normal&quot;    &quot;equival&quot;   &quot;paper&quot;     &quot;establish&quot;
+
+[[23]]
+ [1] &quot;select&quot;    &quot;lasso&quot;     &quot;criterion&quot; &quot;penalti&quot;   &quot;penal&quot;     &quot;variabl&quot;  
+ [7] &quot;procedur&quot;  &quot;algorithm&quot; &quot;properti&quot;  &quot;problem&quot;  
+
+[[24]]
+ [1] &quot;method&quot;   &quot;propos&quot;   &quot;approach&quot; &quot;simul&quot;    &quot;studi&quot;    &quot;perform&quot; 
+ [7] &quot;exist&quot;    &quot;compar&quot;   &quot;data&quot;     &quot;appli&quot;   
+
+[[25]]
+ [1] &quot;sampl&quot;    &quot;size&quot;     &quot;larg&quot;     &quot;number&quot;   &quot;small&quot;    &quot;finit&quot;   
+ [7] &quot;case&quot;     &quot;asymptot&quot; &quot;properti&quot; &quot;increas&quot; 
+
+[[26]]
+ [1] &quot;rate&quot;      &quot;converg&quot;   &quot;bound&quot;     &quot;adapt&quot;     &quot;threshold&quot; &quot;optim&quot;    
+ [7] &quot;risk&quot;      &quot;minimax&quot;   &quot;achiev&quot;    &quot;class&quot;    
+
+[[27]]
+ [1] &quot;order&quot;      &quot;famili&quot;     &quot;case&quot;       &quot;exponenti&quot;  &quot;equal&quot;     
+ [6] &quot;constraint&quot; &quot;observ&quot;     &quot;general&quot;    &quot;problem&quot;    &quot;probabl&quot;   
+
+[[28]]
+ [1] &quot;compon&quot;    &quot;dimens&quot;    &quot;dimension&quot; &quot;princip&quot;   &quot;reduct&quot;    &quot;analysi&quot;  
+ [7] &quot;data&quot;      &quot;high&quot;      &quot;problem&quot;   &quot;slice&quot;    
+
+[[29]]
+ [1] &quot;structur&quot;   &quot;correl&quot;     &quot;data&quot;       &quot;margin&quot;     &quot;longitudin&quot;
+ [6] &quot;independ&quot;   &quot;propos&quot;     &quot;depend&quot;     &quot;multivari&quot;  &quot;analysi&quot;   
+
+[[30]]
+ [1] &quot;approxim&quot;  &quot;bootstrap&quot; &quot;interv&quot;    &quot;confid&quot;    &quot;construct&quot; &quot;region&quot;   
+ [7] &quot;accur&quot;     &quot;base&quot;      &quot;coverag&quot;   &quot;valid&quot;    
+
+[[31]]
+ [1] &quot;random&quot;   &quot;effect&quot;   &quot;mix&quot;      &quot;rank&quot;     &quot;simpl&quot;    &quot;fix&quot;     
+ [7] &quot;play&quot;     &quot;procedur&quot; &quot;role&quot;     &quot;involv&quot;  
+
+[[32]]
+ [1] &quot;bias&quot;    &quot;sensit&quot;  &quot;evid&quot;    &quot;health&quot;  &quot;studi&quot;   &quot;data&quot;    &quot;analysi&quot;
+ [8] &quot;report&quot;  &quot;observ&quot;  &quot;analys&quot; 
+
+[[33]]
+ [1] &quot;problem&quot;  &quot;unknown&quot;  &quot;nois&quot;     &quot;densiti&quot;  &quot;signal&quot;   &quot;observ&quot;  
+ [7] &quot;gaussian&quot; &quot;theta&quot;    &quot;element&quot;  &quot;rang&quot;    
+
+[[34]]
+ [1] &quot;time&quot;        &quot;process&quot;     &quot;seri&quot;        &quot;autoregress&quot; &quot;depend&quot;     
+ [6] &quot;stationari&quot;  &quot;block&quot;       &quot;observ&quot;      &quot;innov&quot;       &quot;applic&quot;     
+
+[[35]]
+ [1] &quot;design&quot;    &quot;optim&quot;     &quot;construct&quot; &quot;effici&quot;    &quot;experi&quot;    &quot;balanc&quot;   
+ [7] &quot;minimum&quot;   &quot;sequenti&quot;  &quot;set&quot;       &quot;orthogon&quot; 
+
+[[36]]
+ [1] &quot;procedur&quot;  &quot;control&quot;   &quot;fals&quot;      &quot;multipl&quot;   &quot;rate&quot;      &quot;discoveri&quot;
+ [7] &quot;pvalu&quot;     &quot;reject&quot;    &quot;fdr&quot;       &quot;hypothes&quot; 
+
+[[37]]
+ [1] &quot;score&quot;     &quot;outcom&quot;    &quot;causal&quot;    &quot;treatment&quot; &quot;adjust&quot;    &quot;exposur&quot;  
+ [7] &quot;confound&quot;  &quot;observ&quot;    &quot;covari&quot;    &quot;vaccin&quot;   
+
+[[38]]
+ [1] &quot;diseas&quot;      &quot;associ&quot;      &quot;studi&quot;       &quot;genet&quot;       &quot;trait&quot;      
+ [6] &quot;risk&quot;        &quot;screen&quot;      &quot;marker&quot;      &quot;casecontrol&quot; &quot;data&quot;       
+
+[[39]]
+ [1] &quot;likelihood&quot;   &quot;paramet&quot;      &quot;maximum&quot;      &quot;ratio&quot;        &quot;empir&quot;       
+ [6] &quot;asymptot&quot;     &quot;infer&quot;        &quot;semiparametr&quot; &quot;nuisanc&quot;      &quot;normal&quot;      
+
+[[40]]
+ [1] &quot;function&quot; &quot;point&quot;    &quot;curv&quot;     &quot;data&quot;     &quot;process&quot;  &quot;observ&quot;  
+ [7] &quot;discret&quot;  &quot;poisson&quot;  &quot;continu&quot;  &quot;analysi&quot; 
+
+[[41]]
+ [1] &quot;nonparametr&quot;  &quot;local&quot;        &quot;parametr&quot;     &quot;semiparametr&quot; &quot;quantil&quot;     
+ [6] &quot;propos&quot;       &quot;asymptot&quot;     &quot;bandwidth&quot;    &quot;effici&quot;       &quot;polynomi&quot;    
+
+[[42]]
+ [1] &quot;cluster&quot; &quot;weight&quot;  &quot;probabl&quot; &quot;toxic&quot;   &quot;problem&quot; &quot;dose&quot;    &quot;base&quot;   
+ [8] &quot;motif&quot;   &quot;set&quot;     &quot;data&quot;   
+
+[[43]]
+ [1] &quot;predict&quot;   &quot;robust&quot;    &quot;data&quot;      &quot;miss&quot;      &quot;covari&quot;    &quot;observ&quot;   
+ [7] &quot;correct&quot;   &quot;effici&quot;    &quot;misspecif&quot; &quot;problem&quot;  
+
+[[44]]
+ [1] &quot;express&quot;    &quot;gene&quot;       &quot;sequenc&quot;    &quot;data&quot;       &quot;microarray&quot;
+ [6] &quot;biolog&quot;     &quot;differenti&quot; &quot;cell&quot;       &quot;studi&quot;      &quot;experi&quot;    
+
+[[45]]
+ [1] &quot;multivari&quot; &quot;robust&quot;    &quot;locat&quot;     &quot;depth&quot;     &quot;point&quot;     &quot;project&quot;  
+ [7] &quot;normal&quot;    &quot;sign&quot;      &quot;base&quot;      &quot;effici&quot;   
+
+[[46]]
+ [1] &quot;regress&quot;   &quot;linear&quot;    &quot;coeffici&quot;  &quot;predictor&quot; &quot;respons&quot;   &quot;general&quot;  
+ [7] &quot;nonlinear&quot; &quot;covari&quot;    &quot;case&quot;      &quot;propos&quot;   
+
+[[47]]
+ [1] &quot;smooth&quot;        &quot;materi&quot;        &quot;onlin&quot;         &quot;spline&quot;       
+ [5] &quot;basi&quot;          &quot;kernel&quot;        &quot;addit&quot;         &quot;comput&quot;       
+ [9] &quot;supplementari&quot; &quot;supplement&quot;   
+
+[[48]]
+ [1] &quot;popul&quot;      &quot;survey&quot;     &quot;calibr&quot;     &quot;probabl&quot;    &quot;imput&quot;     
+ [6] &quot;data&quot;       &quot;sampl&quot;      &quot;auxiliari&quot;  &quot;nonrespons&quot; &quot;census&quot;    
+
+[[49]]
+ [1] &quot;algorithm&quot; &quot;carlo&quot;     &quot;mont&quot;      &quot;markov&quot;    &quot;chain&quot;     &quot;comput&quot;   
+ [7] &quot;effici&quot;    &quot;approxim&quot;  &quot;simul&quot;     &quot;converg&quot;  
+
+[[50]]
+ [1] &quot;treatment&quot; &quot;subject&quot;   &quot;match&quot;     &quot;random&quot;    &quot;studi&quot;     &quot;assign&quot;   
+ [7] &quot;treat&quot;     &quot;effect&quot;    &quot;control&quot;   &quot;receiv&quot;   
+
+[1] &quot;printing keywords for cc = &quot;
+[1] 100
+[[1]]
+ [1] &quot;estim&quot;    &quot;propos&quot;   &quot;asymptot&quot; &quot;consist&quot;  &quot;studi&quot;    &quot;simul&quot;   
+ [7] &quot;paramet&quot;  &quot;normal&quot;   &quot;procedur&quot; &quot;perform&quot; 
+
+[[2]]
+ [1] &quot;popul&quot;     &quot;survey&quot;    &quot;area&quot;      &quot;sampl&quot;     &quot;probabl&quot;   &quot;variabl&quot;  
+ [7] &quot;calibr&quot;    &quot;tree&quot;      &quot;auxiliari&quot; &quot;approach&quot; 
+
+[[3]]
+ [1] &quot;forecast&quot;   &quot;model&quot;      &quot;predict&quot;    &quot;trend&quot;      &quot;wind&quot;      
+ [6] &quot;chang&quot;      &quot;temperatur&quot; &quot;climat&quot;     &quot;futur&quot;      &quot;daili&quot;     
+
+[[4]]
+ [1] &quot;sampl&quot;    &quot;size&quot;     &quot;number&quot;   &quot;larg&quot;     &quot;small&quot;    &quot;finit&quot;   
+ [7] &quot;asymptot&quot; &quot;case&quot;     &quot;increas&quot;  &quot;studi&quot;   
+
+[[5]]
+ [1] &quot;time&quot;    &quot;surviv&quot;  &quot;data&quot;    &quot;event&quot;   &quot;censor&quot;  &quot;hazard&quot;  &quot;failur&quot; 
+ [8] &quot;studi&quot;   &quot;proport&quot; &quot;propos&quot; 
+
+[[6]]
+ [1] &quot;measur&quot;   &quot;scale&quot;    &quot;residu&quot;   &quot;assess&quot;   &quot;diagnost&quot; &quot;statist&quot; 
+ [7] &quot;infer&quot;    &quot;equival&quot;  &quot;develop&quot;  &quot;class&quot;   
+
+[[7]]
+ [1] &quot;order&quot;      &quot;constraint&quot; &quot;subset&quot;     &quot;equal&quot;      &quot;constant&quot;  
+ [6] &quot;alpha&quot;      &quot;ident&quot;      &quot;independ&quot;   &quot;general&quot;    &quot;defin&quot;     
+
+[[8]]
+ [1] &quot;dynam&quot;   &quot;state&quot;   &quot;price&quot;   &quot;process&quot; &quot;filter&quot;  &quot;volatil&quot; &quot;diffus&quot; 
+ [8] &quot;observ&quot;  &quot;financi&quot; &quot;time&quot;   
+
+[[9]]
+ [1] &quot;varianc&quot;  &quot;data&quot;     &quot;imput&quot;    &quot;standard&quot; &quot;replic&quot;   &quot;measur&quot;  
+ [7] &quot;sum&quot;      &quot;valu&quot;     &quot;census&quot;   &quot;multipl&quot; 
+
+[[10]]
+ [1] &quot;carlo&quot;     &quot;mont&quot;      &quot;markov&quot;    &quot;chain&quot;     &quot;algorithm&quot; &quot;simul&quot;    
+ [7] &quot;hidden&quot;    &quot;infer&quot;     &quot;propos&quot;    &quot;mcmc&quot;     
+
+[[11]]
+ [1] &quot;detect&quot; &quot;differ&quot; &quot;cancer&quot; &quot;locat&quot;  &quot;rate&quot;   &quot;critic&quot; &quot;signal&quot; &quot;data&quot;  
+ [9] &quot;higher&quot; &quot;case&quot;  
+
+[[12]]
+ [1] &quot;statist&quot;  &quot;field&quot;    &quot;data&quot;     &quot;network&quot;  &quot;imag&quot;     &quot;question&quot;
+ [7] &quot;activ&quot;    &quot;studi&quot;    &quot;attent&quot;   &quot;scienc&quot;  
+
+[[13]]
+ [1] &quot;space&quot;     &quot;transform&quot; &quot;shape&quot;     &quot;statist&quot;   &quot;set&quot;       &quot;analysi&quot;  
+ [7] &quot;scale&quot;     &quot;defin&quot;     &quot;paramet&quot;   &quot;metric&quot;   
+
+[[14]]
+ [1] &quot;health&quot;  &quot;data&quot;    &quot;period&quot;  &quot;shift&quot;   &quot;record&quot;  &quot;control&quot; &quot;risk&quot;   
+ [8] &quot;qualiti&quot; &quot;monitor&quot; &quot;perform&quot;
+
+[[15]]
+ [1] &quot;treatment&quot; &quot;trial&quot;     &quot;patient&quot;   &quot;clinic&quot;    &quot;vaccin&quot;    &quot;subject&quot;  
+ [7] &quot;infect&quot;    &quot;studi&quot;     &quot;drug&quot;      &quot;prevent&quot;  
+
+[[16]]
+ [1] &quot;matrix&quot;        &quot;covari&quot;        &quot;vector&quot;        &quot;factor&quot;       
+ [5] &quot;matric&quot;        &quot;highdimension&quot; &quot;set&quot;           &quot;graphic&quot;      
+ [9] &quot;gaussian&quot;      &quot;paramet&quot;      
+
+[[17]]
+ [1] &quot;prior&quot;     &quot;bayesian&quot;  &quot;posterior&quot; &quot;distribut&quot; &quot;process&quot;   &quot;bay&quot;      
+ [7] &quot;mixtur&quot;    &quot;dirichlet&quot; &quot;hierarch&quot;  &quot;paramet&quot;  
+
+[[18]]
+ [1] &quot;model&quot;    &quot;general&quot;  &quot;paramet&quot;  &quot;fit&quot;      &quot;includ&quot;   &quot;approach&quot;
+ [7] &quot;addit&quot;    &quot;class&quot;    &quot;simul&quot;    &quot;extend&quot;  
+
+[[19]]
+ [1] &quot;test&quot;      &quot;statist&quot;   &quot;power&quot;     &quot;hypothesi&quot; &quot;null&quot;      &quot;asymptot&quot; 
+ [7] &quot;propos&quot;    &quot;distribut&quot; &quot;altern&quot;    &quot;base&quot;     
+
+[[20]]
+ [1] &quot;structur&quot;  &quot;data&quot;      &quot;combin&quot;    &quot;framework&quot; &quot;variat&quot;    &quot;approach&quot; 
+ [7] &quot;sourc&quot;     &quot;hierarch&quot;  &quot;common&quot;    &quot;analysi&quot;  
+
+[[21]]
+ [1] &quot;distribut&quot; &quot;condit&quot;    &quot;depend&quot;    &quot;extrem&quot;    &quot;famili&quot;    &quot;margin&quot;   
+ [7] &quot;independ&quot;  &quot;joint&quot;     &quot;bar&quot;       &quot;tail&quot;     
+
+[[22]]
+ [1] &quot;covari&quot;       &quot;nonparametr&quot;  &quot;parametr&quot;     &quot;data&quot;         &quot;semiparametr&quot;
+ [6] &quot;regress&quot;      &quot;miss&quot;         &quot;effici&quot;       &quot;method&quot;       &quot;propos&quot;      
+
+[[23]]
+ [1] &quot;featur&quot;    &quot;classif&quot;   &quot;classifi&quot;  &quot;discrimin&quot; &quot;perform&quot;   &quot;support&quot;  
+ [7] &quot;learn&quot;     &quot;vector&quot;    &quot;machin&quot;    &quot;propos&quot;   
+
+[[24]]
+ [1] &quot;densiti&quot; &quot;bound&quot;   &quot;mixtur&quot;  &quot;kernel&quot;  &quot;integr&quot;  &quot;lower&quot;   &quot;upper&quot;  
+ [8] &quot;case&quot;    &quot;finit&quot;   &quot;general&quot;
+
+[[25]]
+ [1] &quot;score&quot;   &quot;scheme&quot;  &quot;match&quot;   &quot;rule&quot;    &quot;pair&quot;    &quot;train&quot;   &quot;evalu&quot;  
+ [8] &quot;split&quot;   &quot;propens&quot; &quot;improv&quot; 
+
+[[26]]
+ [1] &quot;adapt&quot;     &quot;risk&quot;      &quot;threshold&quot; &quot;loss&quot;      &quot;nois&quot;      &quot;wavelet&quot;  
+ [7] &quot;minimax&quot;   &quot;procedur&quot;  &quot;shrinkag&quot;  &quot;class&quot;    
+
+[[27]]
+ [1] &quot;point&quot;   &quot;curv&quot;    &quot;continu&quot; &quot;discret&quot; &quot;observ&quot;  &quot;chang&quot;   &quot;base&quot;   
+ [8] &quot;case&quot;    &quot;categor&quot; &quot;transit&quot;
+
+[[28]]
+ [1] &quot;variabl&quot;   &quot;compon&quot;    &quot;dimens&quot;    &quot;latent&quot;    &quot;reduct&quot;    &quot;princip&quot;  
+ [7] &quot;analysi&quot;   &quot;multivari&quot; &quot;number&quot;    &quot;data&quot;     
+
+[[29]]
+ [1] &quot;correl&quot;     &quot;coeffici&quot;   &quot;propos&quot;     &quot;equat&quot;      &quot;data&quot;      
+ [6] &quot;longitudin&quot; &quot;independ&quot;   &quot;screen&quot;     &quot;approach&quot;   &quot;margin&quot;    
+
+[[30]]
+ [1] &quot;bootstrap&quot; &quot;interv&quot;    &quot;confid&quot;    &quot;region&quot;    &quot;construct&quot; &quot;approxim&quot; 
+ [7] &quot;empir&quot;     &quot;block&quot;     &quot;coverag&quot;   &quot;limit&quot;    
+
+[[31]]
+ [1] &quot;random&quot;   &quot;effect&quot;   &quot;mix&quot;      &quot;rank&quot;     &quot;infer&quot;    &quot;fix&quot;     
+ [7] &quot;interact&quot; &quot;analysi&quot;  &quot;data&quot;     &quot;anova&quot;   
+
+[[32]]
+ [1] &quot;rate&quot;      &quot;converg&quot;   &quot;statist&quot;   &quot;consist&quot;   &quot;condit&quot;    &quot;limit&quot;    
+ [7] &quot;establish&quot; &quot;asymptot&quot;  &quot;uniform&quot;   &quot;paper&quot;    
+
+[[33]]
+ [1] &quot;problem&quot;    &quot;observ&quot;     &quot;set&quot;        &quot;approach&quot;   &quot;solut&quot;     
+ [6] &quot;context&quot;    &quot;case&quot;       &quot;methodolog&quot; &quot;data&quot;       &quot;involv&quot;    
+
+[[34]]
+ [1] &quot;time&quot;        &quot;seri&quot;        &quot;process&quot;     &quot;spectral&quot;    &quot;autoregress&quot;
+ [6] &quot;frequenc&quot;    &quot;depend&quot;      &quot;stationari&quot;  &quot;innov&quot;       &quot;observ&quot;     
+
+[[35]]
+ [1] &quot;design&quot;     &quot;orthogon&quot;   &quot;minimum&quot;    &quot;construct&quot;  &quot;nest&quot;      
+ [6] &quot;graph&quot;      &quot;factor&quot;     &quot;experiment&quot; &quot;properti&quot;   &quot;class&quot;     
+
+[[36]]
+ [1] &quot;procedur&quot;  &quot;control&quot;   &quot;fals&quot;      &quot;multipl&quot;   &quot;rate&quot;      &quot;discoveri&quot;
+ [7] &quot;pvalu&quot;     &quot;reject&quot;    &quot;test&quot;      &quot;fdr&quot;      
+
+[[37]]
+ [1] &quot;outcom&quot;    &quot;treatment&quot; &quot;adjust&quot;    &quot;sensit&quot;    &quot;studi&quot;     &quot;observ&quot;   
+ [7] &quot;bias&quot;      &quot;assumpt&quot;   &quot;causal&quot;    &quot;exposur&quot;  
+
+[[38]]
+ [1] &quot;diseas&quot;      &quot;studi&quot;       &quot;associ&quot;      &quot;genet&quot;       &quot;data&quot;       
+ [6] &quot;trait&quot;       &quot;analysi&quot;     &quot;casecontrol&quot; &quot;propos&quot;      &quot;interact&quot;   
+
+[[39]]
+ [1] &quot;likelihood&quot; &quot;paramet&quot;    &quot;maximum&quot;    &quot;ratio&quot;      &quot;infer&quot;     
+ [6] &quot;empir&quot;      &quot;nuisanc&quot;    &quot;normal&quot;     &quot;asymptot&quot;   &quot;maxim&quot;     
+
+[[40]]
+ [1] &quot;smooth&quot;  &quot;spatial&quot; &quot;process&quot; &quot;data&quot;    &quot;spline&quot;  &quot;count&quot;   &quot;poisson&quot;
+ [8] &quot;intens&quot;  &quot;surfac&quot;  &quot;comput&quot; 
+
+[[41]]
+ [1] &quot;error&quot;     &quot;linear&quot;    &quot;regress&quot;   &quot;measur&quot;    &quot;quantil&quot;   &quot;squar&quot;    
+ [7] &quot;local&quot;     &quot;nonlinear&quot; &quot;partial&quot;   &quot;polynomi&quot; 
+
+[[42]]
+ [1] &quot;cluster&quot;  &quot;weight&quot;   &quot;data&quot;     &quot;probabl&quot;  &quot;dose&quot;     &quot;toxic&quot;   
+ [7] &quot;method&quot;   &quot;individu&quot; &quot;set&quot;      &quot;base&quot;    
+
+[[43]]
+ [1] &quot;respons&quot;   &quot;predict&quot;   &quot;predictor&quot; &quot;regress&quot;   &quot;dimension&quot; &quot;propos&quot;   
+ [7] &quot;high&quot;      &quot;observ&quot;    &quot;meansquar&quot; &quot;distort&quot;  
+
+[[44]]
+ [1] &quot;express&quot;    &quot;gene&quot;       &quot;data&quot;       &quot;microarray&quot; &quot;sequenc&quot;   
+ [6] &quot;biolog&quot;     &quot;differenti&quot; &quot;genom&quot;      &quot;studi&quot;      &quot;segment&quot;   
+
+[[45]]
+ [1] &quot;function&quot;    &quot;data&quot;        &quot;analysi&quot;     &quot;measur&quot;      &quot;deriv&quot;      
+ [6] &quot;nonparametr&quot; &quot;approach&quot;    &quot;trajectori&quot;  &quot;compon&quot;      &quot;illustr&quot;    
+
+[[46]]
+ [1] &quot;select&quot;    &quot;penal&quot;     &quot;lasso&quot;     &quot;criterion&quot; &quot;penalti&quot;   &quot;regress&quot;  
+ [7] &quot;variabl&quot;   &quot;coeffici&quot;  &quot;propos&quot;    &quot;bandwidth&quot;
+
+[[47]]
+ [1] &quot;group&quot;         &quot;onlin&quot;         &quot;materi&quot;        &quot;data&quot;         
+ [5] &quot;approach&quot;      &quot;articl&quot;        &quot;supplementari&quot; &quot;supplement&quot;   
+ [9] &quot;individu&quot;      &quot;differ&quot;       
+
+[[48]]
+ [1] &quot;robust&quot;    &quot;project&quot;   &quot;outlier&quot;   &quot;depth&quot;     &quot;effici&quot;    &quot;multivari&quot;
+ [7] &quot;base&quot;      &quot;properti&quot;  &quot;distribut&quot; &quot;asymptot&quot; 
+
+[[49]]
+ [1] &quot;method&quot;    &quot;comput&quot;    &quot;algorithm&quot; &quot;propos&quot;    &quot;simul&quot;     &quot;approxim&quot; 
+ [7] &quot;requir&quot;    &quot;exist&quot;     &quot;perform&quot;   &quot;compar&quot;   
+
+[[50]]
+ [1] &quot;optim&quot;    &quot;sequenti&quot; &quot;expect&quot;   &quot;stage&quot;    &quot;decis&quot;    &quot;alloc&quot;   
+ [7] &quot;twostag&quot;  &quot;procedur&quot; &quot;maxim&quot;    &quot;criteria&quot;
+
+[1] &quot;printing keywords for cc = &quot;
+[1] 1000
+[[1]]
+ [1] &quot;method&quot;   &quot;propos&quot;   &quot;simul&quot;    &quot;approach&quot; &quot;data&quot;     &quot;studi&quot;   
+ [7] &quot;perform&quot;  &quot;compar&quot;   &quot;exist&quot;    &quot;develop&quot; 
+
+[[2]]
+ [1] &quot;predict&quot;  &quot;forecast&quot; &quot;area&quot;     &quot;error&quot;    &quot;futur&quot;    &quot;cost&quot;    
+ [7] &quot;center&quot;   &quot;base&quot;     &quot;propos&quot;   &quot;accur&quot;   
+
+[[3]]
+ [1] &quot;time&quot;       &quot;period&quot;     &quot;tree&quot;       &quot;tempor&quot;     &quot;trend&quot;     
+ [6] &quot;wind&quot;       &quot;climat&quot;     &quot;data&quot;       &quot;temperatur&quot; &quot;daili&quot;     
+
+[[4]]
+ [1] &quot;measur&quot;  &quot;score&quot;   &quot;data&quot;    &quot;comput&quot;  &quot;valu&quot;    &quot;combin&quot;  &quot;assess&quot; 
+ [8] &quot;statist&quot; &quot;base&quot;    &quot;issu&quot;   
+
+[[5]]
+ [1] &quot;time&quot;    &quot;surviv&quot;  &quot;event&quot;   &quot;data&quot;    &quot;censor&quot;  &quot;hazard&quot;  &quot;failur&quot; 
+ [8] &quot;studi&quot;   &quot;proport&quot; &quot;analysi&quot;
+
+[[6]]
+ [1] &quot;residu&quot;   &quot;distanc&quot;  &quot;degre&quot;    &quot;diagnost&quot; &quot;beta&quot;     &quot;tool&quot;    
+ [7] &quot;tabl&quot;     &quot;scale&quot;    &quot;base&quot;     &quot;form&quot;    
+
+[[7]]
+ [1] &quot;region&quot;  &quot;locat&quot;   &quot;posit&quot;   &quot;invari&quot;  &quot;data&quot;    &quot;brain&quot;   &quot;activ&quot;  
+ [8] &quot;statist&quot; &quot;stop&quot;    &quot;gamma&quot;  
+
+[[8]]
+ [1] &quot;dynam&quot;   &quot;state&quot;   &quot;price&quot;   &quot;filter&quot;  &quot;volatil&quot; &quot;diffus&quot;  &quot;time&quot;   
+ [8] &quot;statist&quot; &quot;financi&quot; &quot;particl&quot;
+
+[[9]]
+ [1] &quot;treatment&quot; &quot;adjust&quot;    &quot;sensit&quot;    &quot;studi&quot;     &quot;bias&quot;      &quot;assumpt&quot;  
+ [7] &quot;match&quot;     &quot;observ&quot;    &quot;assign&quot;    &quot;infer&quot;    
+
+[[10]]
+ [1] &quot;covari&quot;       &quot;weight&quot;       &quot;data&quot;         &quot;miss&quot;         &quot;regress&quot;     
+ [6] &quot;effici&quot;       &quot;observ&quot;       &quot;studi&quot;        &quot;semiparametr&quot; &quot;correct&quot;     
+
+[[11]]
+ [1] &quot;featur&quot;    &quot;classif&quot;   &quot;classifi&quot;  &quot;discrimin&quot; &quot;perform&quot;   &quot;higher&quot;   
+ [7] &quot;vector&quot;    &quot;machin&quot;    &quot;base&quot;      &quot;support&quot;  
+
+[[12]]
+ [1] &quot;level&quot;     &quot;quantil&quot;   &quot;threshold&quot; &quot;extrem&quot;    &quot;signal&quot;    &quot;wavelet&quot;  
+ [7] &quot;tail&quot;      &quot;high&quot;      &quot;nois&quot;      &quot;data&quot;     
+
+[[13]]
+ [1] &quot;space&quot;     &quot;transform&quot; &quot;shape&quot;     &quot;statist&quot;   &quot;set&quot;       &quot;defin&quot;    
+ [7] &quot;paramet&quot;   &quot;analysi&quot;   &quot;metric&quot;    &quot;euclidean&quot;
+
+[[14]]
+ [1] &quot;network&quot; &quot;data&quot;    &quot;detect&quot;  &quot;count&quot;   &quot;shift&quot;   &quot;cancer&quot;  &quot;rate&quot;   
+ [8] &quot;articl&quot;  &quot;level&quot;   &quot;monitor&quot;
+
+[[15]]
+ [1] &quot;random&quot;  &quot;effect&quot;  &quot;mix&quot;     &quot;fix&quot;     &quot;simpl&quot;   &quot;infer&quot;   &quot;analysi&quot;
+ [8] &quot;appli&quot;   &quot;separ&quot;   &quot;studi&quot;  
+
+[[16]]
+ [1] &quot;matrix&quot;        &quot;vector&quot;        &quot;covari&quot;        &quot;matric&quot;       
+ [5] &quot;graph&quot;         &quot;highdimension&quot; &quot;eigenvalu&quot;     &quot;set&quot;          
+ [9] &quot;factor&quot;        &quot;gaussian&quot;     
+
+[[17]]
+ [1] &quot;bayesian&quot;  &quot;prior&quot;     &quot;mixtur&quot;    &quot;posterior&quot; &quot;bay&quot;       &quot;dirichlet&quot;
+ [7] &quot;distribut&quot; &quot;hierarch&quot;  &quot;paramet&quot;   &quot;probabl&quot;  
+
+[[18]]
+ [1] &quot;model&quot;    &quot;paramet&quot;  &quot;fit&quot;      &quot;general&quot;  &quot;approach&quot; &quot;infer&quot;   
+ [7] &quot;includ&quot;   &quot;addit&quot;    &quot;simul&quot;    &quot;lead&quot;    
+
+[[19]]
+ [1] &quot;test&quot;      &quot;statist&quot;   &quot;power&quot;     &quot;hypothesi&quot; &quot;null&quot;      &quot;asymptot&quot; 
+ [7] &quot;altern&quot;    &quot;propos&quot;    &quot;hypothes&quot;  &quot;base&quot;     
+
+[[20]]
+ [1] &quot;densiti&quot;    &quot;order&quot;      &quot;case&quot;       &quot;constraint&quot; &quot;independ&quot;  
+ [6] &quot;equal&quot;      &quot;monoton&quot;    &quot;observ&quot;     &quot;alpha&quot;      &quot;moment&quot;    
+
+[[21]]
+ [1] &quot;distribut&quot;   &quot;condit&quot;      &quot;nonparametr&quot; &quot;parametr&quot;    &quot;depend&quot;     
+ [6] &quot;assumpt&quot;     &quot;joint&quot;       &quot;bar&quot;         &quot;independ&quot;    &quot;vertic&quot;     
+
+[[22]]
+ [1] &quot;robust&quot;    &quot;classic&quot;   &quot;field&quot;     &quot;scale&quot;     &quot;infer&quot;     &quot;approach&quot; 
+ [7] &quot;imag&quot;      &quot;statist&quot;   &quot;misspecif&quot; &quot;regular&quot;  
+
+[[23]]
+ [1] &quot;select&quot;   &quot;regress&quot;  &quot;variabl&quot;  &quot;lasso&quot;    &quot;penalti&quot;  &quot;penal&quot;   
+ [7] &quot;spars&quot;    &quot;coeffici&quot; &quot;properti&quot; &quot;regular&quot; 
+
+[[24]]
+ [1] &quot;treatment&quot; &quot;trial&quot;     &quot;patient&quot;   &quot;clinic&quot;    &quot;care&quot;      &quot;medic&quot;    
+ [7] &quot;outcom&quot;    &quot;subject&quot;   &quot;studi&quot;     &quot;arm&quot;      
+
+[[25]]
+ [1] &quot;optim&quot;   &quot;expect&quot;  &quot;rule&quot;    &quot;minim&quot;   &quot;theta&quot;   &quot;averag&quot;  &quot;cap&quot;    
+ [8] &quot;maxim&quot;   &quot;alloc&quot;   &quot;paramet&quot;
+
+[[26]]
+ [1] &quot;rate&quot;    &quot;converg&quot; &quot;bound&quot;   &quot;adapt&quot;   &quot;minimax&quot; &quot;risk&quot;    &quot;class&quot;  
+ [8] &quot;loss&quot;    &quot;uniform&quot; &quot;achiev&quot; 
+
+[[27]]
+ [1] &quot;point&quot;    &quot;curv&quot;     &quot;continu&quot;  &quot;discret&quot;  &quot;observ&quot;   &quot;transit&quot; 
+ [7] &quot;case&quot;     &quot;probabl&quot;  &quot;chang&quot;    &quot;sequenti&quot;
+
+[[28]]
+ [1] &quot;variabl&quot;   &quot;respons&quot;   &quot;predictor&quot; &quot;regress&quot;   &quot;latent&quot;    &quot;dimens&quot;   
+ [7] &quot;reduct&quot;    &quot;direct&quot;    &quot;factor&quot;    &quot;slice&quot;    
+
+[[29]]
+ [1] &quot;structur&quot;   &quot;correl&quot;     &quot;data&quot;       &quot;margin&quot;     &quot;multivari&quot; 
+ [6] &quot;depend&quot;     &quot;independ&quot;   &quot;propos&quot;     &quot;longitudin&quot; &quot;binari&quot;    
+
+[[30]]
+ [1] &quot;likelihood&quot; &quot;maximum&quot;    &quot;paramet&quot;    &quot;approxim&quot;   &quot;statist&quot;   
+ [6] &quot;ratio&quot;      &quot;normal&quot;     &quot;deriv&quot;      &quot;simpl&quot;      &quot;general&quot;   
+
+[[31]]
+ [1] &quot;sampl&quot;     &quot;popul&quot;     &quot;bootstrap&quot; &quot;varianc&quot;   &quot;data&quot;      &quot;finit&quot;    
+ [7] &quot;survey&quot;    &quot;calibr&quot;    &quot;unit&quot;      &quot;auxiliari&quot;
+
+[[32]]
+ [1] &quot;data&quot;       &quot;sum&quot;        &quot;limit&quot;      &quot;survey&quot;     &quot;imput&quot;     
+ [6] &quot;question&quot;   &quot;nonrespons&quot; &quot;record&quot;     &quot;year&quot;       &quot;valu&quot;      
+
+[[33]]
+ [1] &quot;problem&quot;    &quot;set&quot;        &quot;solut&quot;      &quot;approach&quot;   &quot;methodolog&quot;
+ [6] &quot;practic&quot;    &quot;context&quot;    &quot;case&quot;       &quot;observ&quot;     &quot;paper&quot;     
+
+[[34]]
+ [1] &quot;time&quot;        &quot;seri&quot;        &quot;process&quot;     &quot;spectral&quot;    &quot;frequenc&quot;   
+ [6] &quot;autoregress&quot; &quot;block&quot;       &quot;depend&quot;      &quot;stationari&quot;  &quot;expans&quot;     
+
+[[35]]
+ [1] &quot;design&quot;     &quot;orthogon&quot;   &quot;balanc&quot;     &quot;minimum&quot;    &quot;experiment&quot;
+ [6] &quot;construct&quot;  &quot;nest&quot;       &quot;experi&quot;     &quot;factor&quot;     &quot;properti&quot;  
+
+[[36]]
+ [1] &quot;procedur&quot;  &quot;control&quot;   &quot;fals&quot;      &quot;rate&quot;      &quot;multipl&quot;   &quot;discoveri&quot;
+ [7] &quot;pvalu&quot;     &quot;reject&quot;    &quot;fdr&quot;       &quot;hypothes&quot; 
+
+[[37]]
+ [1] &quot;risk&quot;     &quot;factor&quot;   &quot;outcom&quot;   &quot;exposur&quot;  &quot;screen&quot;   &quot;studi&quot;   
+ [7] &quot;causal&quot;   &quot;confound&quot; &quot;individu&quot; &quot;health&quot;  
+
+[[38]]
+ [1] &quot;associ&quot;   &quot;genet&quot;    &quot;studi&quot;    &quot;diseas&quot;   &quot;interact&quot; &quot;data&quot;    
+ [7] &quot;trait&quot;    &quot;analysi&quot;  &quot;variant&quot;  &quot;marker&quot;  
+
+[[39]]
+ [1] &quot;estim&quot;    &quot;asymptot&quot; &quot;consist&quot;  &quot;propos&quot;   &quot;paramet&quot;  &quot;simul&quot;   
+ [7] &quot;studi&quot;    &quot;normal&quot;   &quot;procedur&quot; &quot;effici&quot;  
+
+[[40]]
+ [1] &quot;process&quot;  &quot;spatial&quot;  &quot;data&quot;     &quot;poisson&quot;  &quot;comput&quot;   &quot;intens&quot;  
+ [7] &quot;set&quot;      &quot;observ&quot;   &quot;surfac&quot;   &quot;gaussian&quot;
+
+[[41]]
+ [1] &quot;regress&quot;   &quot;linear&quot;    &quot;error&quot;     &quot;varianc&quot;   &quot;coeffici&quot;  &quot;partial&quot;  
+ [7] &quot;general&quot;   &quot;squar&quot;     &quot;nonlinear&quot; &quot;case&quot;     
+
+[[42]]
+ [1] &quot;cluster&quot; &quot;stage&quot;   &quot;twostag&quot; &quot;dose&quot;    &quot;toxic&quot;   &quot;probabl&quot; &quot;motif&quot;  
+ [8] &quot;base&quot;    &quot;set&quot;     &quot;target&quot; 
+
+[[43]]
+ [1] &quot;function&quot;    &quot;compon&quot;      &quot;data&quot;        &quot;analysi&quot;     &quot;princip&quot;    
+ [6] &quot;nonparametr&quot; &quot;deriv&quot;       &quot;approach&quot;    &quot;longitudin&quot;  &quot;basi&quot;       
+
+[[44]]
+ [1] &quot;express&quot;    &quot;gene&quot;       &quot;data&quot;       &quot;microarray&quot; &quot;biolog&quot;    
+ [6] &quot;sequenc&quot;    &quot;cell&quot;       &quot;studi&quot;      &quot;differenti&quot; &quot;experi&quot;    
+
+[[45]]
+ [1] &quot;rank&quot;      &quot;project&quot;   &quot;depth&quot;     &quot;multivari&quot; &quot;effici&quot;    &quot;base&quot;     
+ [7] &quot;sign&quot;      &quot;robust&quot;    &quot;asymptot&quot;  &quot;surrog&quot;   
+
+[[46]]
+ [1] &quot;smooth&quot;      &quot;local&quot;       &quot;criterion&quot;   &quot;kernel&quot;      &quot;spline&quot;     
+ [6] &quot;bandwidth&quot;   &quot;nonparametr&quot; &quot;asymptot&quot;    &quot;polynomi&quot;    &quot;addit&quot;      
+
+[[47]]
+ [1] &quot;group&quot;         &quot;onlin&quot;         &quot;materi&quot;        &quot;articl&quot;       
+ [5] &quot;supplementari&quot; &quot;supplement&quot;    &quot;data&quot;          &quot;detail&quot;       
+ [9] &quot;under&quot;         &quot;probabl&quot;      
+
+[[48]]
+ [1] &quot;empir&quot;     &quot;interv&quot;    &quot;confid&quot;    &quot;construct&quot; &quot;paramet&quot;   &quot;nuisanc&quot;  
+ [7] &quot;infer&quot;     &quot;profil&quot;    &quot;asymptot&quot;  &quot;general&quot;  
+
+[[49]]
+ [1] &quot;algorithm&quot; &quot;carlo&quot;     &quot;mont&quot;      &quot;markov&quot;    &quot;chain&quot;     &quot;comput&quot;   
+ [7] &quot;approxim&quot;  &quot;simul&quot;     &quot;effici&quot;    &quot;converg&quot;  
+
+[[50]]
+ [1] &quot;number&quot;    &quot;size&quot;      &quot;sampl&quot;     &quot;larg&quot;      &quot;small&quot;     &quot;asymptot&quot; 
+ [7] &quot;high&quot;      &quot;increas&quot;   &quot;dimension&quot; &quot;consist&quot;  </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/New_York
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] dplyr_1.1.4  tm_0.7-14    NLP_0.3-0    readr_2.1.5  Matrix_1.7-0
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.9        utf8_1.2.4        generics_0.1.3    xml2_1.3.6       
+ [5] slam_0.1-54       stringi_1.8.4     lattice_0.22-6    hms_1.1.3        
+ [9] digest_0.6.36     magrittr_2.0.3    evaluate_0.24.0   grid_4.4.0       
+[13] fastmap_1.2.0     rprojroot_2.0.4   workflowr_1.7.1   jsonlite_1.8.8   
+[17] promises_1.3.0    fansi_1.0.6       jquerylib_0.1.4   cli_3.6.3        
+[21] rlang_1.1.4       crayon_1.5.3      bit64_4.0.5       cachem_1.1.0     
+[25] yaml_2.3.8        tools_4.4.0       parallel_4.4.0    tzdb_0.4.0       
+[29] httpuv_1.6.15     vctrs_0.6.5       R6_2.5.1          lifecycle_1.0.4  
+[33] git2r_0.33.0      stringr_1.5.1     fs_1.6.4          bit_4.0.5        
+[37] vroom_1.6.5       pkgconfig_2.0.3   pillar_1.9.0      bslib_0.7.0      
+[41] later_1.3.2       glue_1.7.0        Rcpp_1.0.13       xfun_0.45        
+[45] tibble_3.2.1      tidyselect_1.2.1  highr_0.11        rstudioapi_0.16.0
+[49] knitr_1.47        htmltools_0.5.8.1 rmarkdown_2.27    compiler_4.4.0   </code></pre>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

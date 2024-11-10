@@ -1,0 +1,177 @@
+---
+title: "Statistical Abstracts"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-11-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(Matrix)
+library(readr)
+library(tm)
+library(dplyr)
+
+sla <- read_csv("~/Downloads/paperList.txt")
+
+sla <- sla[!is.na(sla$abstract),]
+sla$docnum = 1:nrow(sla)
+
+datax = readRDS('~/Downloads/sla_full.rds')
+dim(datax$data)
+
+sum(datax$data==0)/prod(dim(datax$data))
+
+datax$data = Matrix(datax$data,sparse = TRUE)
+
+
+doc_to_use = order(rowSums(datax$data),decreasing = T)[1:round(nrow(datax$data)*0.6)]
+mat = datax$data[doc_to_use,]
+sla = sla[doc_to_use,]
+samples = datax$samples
+samples = lapply(samples, function(z){z[doc_to_use]})
+
+
+word_to_use = which(colSums(mat>0)>4)
+mat = mat[,word_to_use]
+mat = Matrix(mat,sparse=TRUE)
+
+s <- Matrix::rowSums(mat)
+s <- s / mean(s)
+```
+
+
+```{r, eval=FALSE}
+
+library(passPCA)
+
+cc_vec <- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+fit_list <- list()
+n <- nrow(mat)
+p <- ncol(mat)
+
+K <- 50
+
+for (cc in cc_vec) {
+  
+  print(cc)
+  
+  set.seed(1)
+  log1p_k1 <- fit_factor_model_log1p_exact(
+    Y = mat,
+    K = 1,
+    maxiter = 10,
+    s = cc * s,
+    init_method = "frob_nmf"
+  )
+
+  init_LL <- log1p_k1$U %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  init_FF <- log1p_k1$V %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+
+  set.seed(1)
+  fit <- fit_factor_model_log1p_exact(
+    Y = mat,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s
+  )
+
+  fit_list[[as.character(cc)]] <- fit
+  
+}
+```
+
+```{r}
+cc_vec <- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+fit_list <- readr::read_rds("~/Documents/data/passPCA/sa_fits.rds")
+
+ll_vec <- c()
+
+for (cc in cc_vec) {
+  
+  fit <- fit_list[[as.character(cc)]] 
+  B <- fit$U %*% t(fit$V)
+  Lambda <- cc * (exp(B) - 1)
+  Lambda <- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+  
+  ll <- sum(
+    dpois(
+      x = as.vector(as.matrix(mat)),
+      lambda = as.vector(Lambda),
+      log = TRUE
+    )
+  )
+  
+  ll_vec <- c(ll_vec, ll)
+  
+}
+
+plot(cc_vec, ll_vec)
+
+# it's interesting that the model that acts more like the log
+# has a much higher log-likelihood
+
+
+# it may just be interesting to look at the top n words here
+
+get_keywords <- function(V) {
+  
+  kw_list <- list()
+  
+  for (k in 1:ncol(V)) {
+    
+    kw_list[[k]] <- names(head(sort(V[,k], decreasing = T), 10))
+    
+  }
+  
+  return(kw_list)
+  
+}
+
+kw_lists <- list()
+
+for (cc in cc_vec) {
+  
+  fit <- fit_list[[as.character(cc)]]
+  rownames(fit$V) <- colnames(mat)
+  
+  kw_lists[[as.character(cc)]] <- get_keywords(fit$V)
+
+}
+
+
+for (cc in cc_vec) {
+  
+  print("printing keywords for cc = ")
+  print(cc)
+  print(kw_lists[[as.character(cc)]])
+
+}
+```
+

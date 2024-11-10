@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2024-11-09" />
+
+<title>BBC Article Analysis</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">BBC Article Analysis</h1>
+<h4 class="date">2024-11-09</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-11-10
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2d4798ba2ebbb6e8a887715c27aec8b9786433c1targetblank2d4798ba">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/2d4798ba2ebbb6e8a887715c27aec8b9786433c1" target="_blank">2d4798b</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2d4798ba2ebbb6e8a887715c27aec8b9786433c1targetblank2d4798ba"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/2d4798ba2ebbb6e8a887715c27aec8b9786433c1" target="_blank">2d4798b</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+
+Untracked files:
+    Untracked:  analysis/bbc.Rmd
+    Untracked:  analysis/statistical abstracts.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Here, I will apply the <code>log1p</code> matrix factorization model
+to a dataset of approximately <span class="math inline">\(2K\)</span>
+BBC news articles. To pre-process the data, I perform stemming and
+remove stop words using the package <code>tm</code>. I fit the model
+without using any approximation for various values of <span
+class="math inline">\(c\)</span>. I also used a size factor on the order
+of <span class="math inline">\(1\)</span> that is proportional to the
+total number of words in each article. Finally, to initialize each fit,
+I first fit a <span class="math inline">\(K = 1\)</span> model to
+convergence and then initialize the <span class="math inline">\(K =
+50\)</span> fit with small positive numbers in factors <span
+class="math inline">\(2-49\)</span> and the rank 1 fit for the first
+factor.</p>
+<pre class="r"><code>dat &lt;- readr::read_csv(&quot;~/Downloads/bbc_news_text_complexity_summarization.csv&quot;)
+
+library(tm)
+library(SnowballC)
+
+my_corpus &lt;- VCorpus(VectorSource(dat$text))
+
+addspace &lt;- content_transformer(function(x, pattern) {
+  return(gsub(pattern, &quot; &quot;, x))
+})
+
+my_corpus &lt;- tm_map(my_corpus, addspace, &quot;-&quot;)
+
+my_corpus &lt;- tm_map(my_corpus, removePunctuation)
+my_corpus &lt;- tm_map(my_corpus, removeNumbers)
+my_corpus &lt;- tm_map(my_corpus, removeWords, stopwords(&quot;english&quot;))
+
+# Transform to lower case (need to wrap in content_transformer)
+my_corpus &lt;- tm_map(my_corpus,content_transformer(tolower))
+my_corpus &lt;- tm_map(my_corpus, stripWhitespace)
+
+my_corpus &lt;- tm_map(my_corpus, stemDocument)
+
+dtm &lt;- DocumentTermMatrix(my_corpus)
+dtm2 &lt;- Matrix::sparseMatrix(
+  i = dtm$i,
+  j = dtm$j,
+  x = dtm$v
+)
+
+
+colnames(dtm2) &lt;- dtm$dimnames$Terms
+words_to_use &lt;- which(Matrix::colSums(dtm2&gt;0)&gt;4)
+
+dtm2 &lt;- dtm2[,words_to_use]
+
+s &lt;- Matrix::rowSums(dtm2)
+s &lt;- s / mean(s)
+
+library(passPCA)
+library(Matrix)
+library(dplyr)
+cc_vec &lt;- c(0.0001, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)</code></pre>
+<pre class="r"><code>fit_list &lt;- list()
+n &lt;- nrow(dtm2)
+p &lt;- ncol(dtm2)
+
+K &lt;- 50
+
+for (cc in cc_vec) {
+
+  print(cc)
+
+  set.seed(1)
+  log1p_k1 &lt;- fit_factor_model_log1p_exact(
+    Y = dtm2,
+    K = 1,
+    maxiter = 10,
+    s = cc * s,
+    init_method = &quot;frob_nmf&quot;
+  )
+
+  init_LL &lt;- log1p_k1$U %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  init_FF &lt;- log1p_k1$V %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+
+  set.seed(1)
+  fit &lt;- fit_factor_model_log1p_exact(
+    Y = dtm2,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s
+  )
+
+  fit_list[[as.character(cc)]] &lt;- fit
+
+}
+
+library(fastTopics)
+nmf &lt;- fit_poisson_nmf(X = dtm2, k = 50, control = list(nc = 4))
+
+fit_list[[&quot;nmf&quot;]] &lt;- nmf</code></pre>
+<pre class="r"><code>fit_list &lt;- readr::read_rds(
+  &quot;~/Documents/data/passPCA/bbc_articles.rds&quot;
+  )</code></pre>
+</div>
+<div id="analysis-of-fits" class="section level1">
+<h1>Analysis of fits</h1>
+<div id="log-likelihood" class="section level2">
+<h2>Log-likelihood</h2>
+<p>Below is a plot of the log-likelihoods of the data under a Poisson
+model using different values of <span class="math inline">\(c\)</span>.
+The dashed red line is the log-likelihood of the topic model as fit via
+<code>fastTopics</code>. Surprisingly, very small values of <span
+class="math inline">\(c\)</span> actually lead to the highest likelihood
+by far.</p>
+<pre class="r"><code>ll_vec &lt;- c()
+
+fit_list[[as.character(1e-4)]] &lt;- fit_list$`0.0001`
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list[[as.character(cc)]] 
+  B &lt;- fit$U %*% t(fit$V)
+  Lambda &lt;- cc * (exp(B) - 1)
+  Lambda &lt;- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+  
+  ll &lt;- sum(
+    dpois(
+      x = as.vector(as.matrix(dtm2)),
+      lambda = as.vector(Lambda),
+      log = TRUE
+    )
+  )
+  
+  ll_vec &lt;- c(ll_vec, ll)
+  
+}
+
+ll_nmf &lt;- sum(
+  dpois(
+    x = as.vector(as.matrix(dtm2)),
+    lambda = as.vector(fit_list$nmf$L %*% t(fit_list$nmf$F)),
+    log = TRUE
+  )
+)</code></pre>
+<pre class="r"><code>df &lt;- data.frame(
+  cc = cc_vec,
+  ll_diff = max(ll_vec) - ll_vec + 1
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = ll_diff)) +
+  geom_line(aes(x = cc, y = ll_diff)) +
+  xlab(&quot;c&quot;) +
+  ylab(&quot;Distance from best log-likelihood&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = max(ll_vec) - ll_nmf + 1, color = &quot;red&quot;, linetype = &quot;dashed&quot;)</code></pre>
+<p><img src="figure/bbc.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="loadings" class="section level2">
+<h2>Loadings</h2>
+<p>Each article in the original dataset comes with a section label (one
+of business, entertainment, politics, sports, or tech). I’m interested
+in understanding how the loadings for different articles compare across
+article category. To make the analysis easier to view, I am only going
+to focus on the three smallest values of <span
+class="math inline">\(c\)</span> that I ran above as well as the topic
+model fit.</p>
+<pre class="r"><code>normalize_bars &lt;- function(LL) {
+
+  max_col &lt;- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = &quot;/&quot;)
+
+}</code></pre>
+<pre class="r"><code>library(tidyr)
+library(stringi)
+library(stringr)
+cell.type &lt;- as.factor(dat$labels)
+
+LL_c0001 &lt;- normalize_bars(fit_list$`0.0001`$U)
+
+# Downsample the number of cells and sort them using tSNE.
+set.seed(8675309)
+cell.idx &lt;- numeric(0)
+cell.types &lt;- levels(cell.type)
+for (i in 1:length(cell.types)) {
+  which.idx &lt;- which(cell.type == cell.types[i])
+  # Downsample common cell types.
+  if (length(which.idx) &gt; 1000) {
+    which.idx &lt;- sample(which.idx, 1000)
+  }
+  # Don&#39;t include rare cell types.
+  if (length(which.idx) &gt; 10) {
+    # Sort using tsne.
+    tsne.res &lt;- Rtsne::Rtsne(
+      LL_c0001[which.idx, ],
+      dims = 1,
+      pca = FALSE,
+      normalize = FALSE,
+      perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+      theta = 0.1,
+      max_iter = 1000,
+      eta = 200,
+      check_duplicates = FALSE
+    )$Y[, 1]
+    which.idx &lt;- which.idx[order(tsne.res)]
+    cell.idx &lt;- c(cell.idx, which.idx)
+  }
+}
+
+cell.type &lt;- cell.type[cell.idx]
+cell.type &lt;- droplevels(cell.type)
+
+LL_c0001 &lt;- LL_c0001[cell.idx, ]
+LL_c001 &lt;- normalize_bars(fit_list$`0.001`$U)
+LL_c001 &lt;- LL_c001[cell.idx, ]
+LL_c01 &lt;- normalize_bars(fit_list$`0.01`$U)
+LL_c01 &lt;- LL_c01[cell.idx, ]
+LL_cp1 &lt;- normalize_bars(fit_list$`0.1`$U)
+LL_cp1 &lt;- LL_cp1[cell.idx, ]
+LL_cinf &lt;- fit_list$nmf$L
+LL_cinf &lt;- LL_cinf[cell.idx, ]
+
+make.heatmap.tib &lt;- function(FF) {
+  tib &lt;- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %&gt;%
+    mutate(Cell.type = cell.type) %&gt;%
+    arrange(Cell.type) %&gt;%
+    mutate(Cell.idx = row_number())
+  
+  tib &lt;- tib %&gt;%
+    pivot_longer(
+      -c(Cell.idx, Cell.type),
+      names_to = &quot;Factor&quot;,
+      values_to = &quot;Loading&quot;,
+      values_drop_na = TRUE
+    ) %&gt;%
+    mutate(Factor = as.numeric(str_extract(Factor, &quot;[0-9]+&quot;)))
+  
+  return(tib)
+}
+
+LL_c0001_tib &lt;- make.heatmap.tib(LL_c0001)
+LL_c001_tib &lt;- make.heatmap.tib(LL_c001)
+LL_c01_tib &lt;- make.heatmap.tib(LL_c01)
+LL_cp1_tib &lt;- make.heatmap.tib(LL_cp1)
+LL_cinf_tib &lt;- make.heatmap.tib(LL_cinf)
+
+
+heatmap.tib &lt;- LL_c0001_tib %&gt;% mutate(Method = &quot;c = 0.0001&quot;) %&gt;%
+  bind_rows(LL_c001_tib %&gt;% mutate(Method = &quot;c = 0.001&quot;)) %&gt;%
+  bind_rows(LL_c01_tib %&gt;% mutate(Method = &quot;c = 0.01&quot;)) %&gt;%
+  bind_rows(LL_cp1_tib %&gt;% mutate(Method = &quot;c = 0.1&quot;)) %&gt;%
+  bind_rows(LL_cinf_tib %&gt;% mutate(Method = &quot;Topic Model&quot;)) %&gt;% 
+  mutate(Method = factor(Method, levels = c(&quot;c = 0.0001&quot;, &quot;c = 0.001&quot;, &quot;c = 0.01&quot;, &quot;c = 0.1&quot;, &quot;Topic Model&quot;)))
+
+tib &lt;- heatmap.tib %&gt;%
+  group_by(Cell.type, Cell.idx) %&gt;%
+  summarize()
+
+cell_type_breaks &lt;- c(1, which(tib$Cell.type[-1] != tib$Cell.type[-nrow(tib)]))
+label_pos &lt;- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib)) / 2
+
+library(ggplot2)
+
+plt &lt;- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = &quot;white&quot;, high = &quot;firebrick&quot;) +
+  labs(y = &quot;&quot;) +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = &quot;all&quot;) +
+  theme(legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 16)) 
+
+plt</code></pre>
+<p><img src="figure/bbc.Rmd/unnamed-chunk-7-1.png" width="1152" style="display: block; margin: auto;" /></p>
+</div>
+<div id="factors" class="section level2">
+<h2>Factors</h2>
+<p>Below, I print out the top <span class="math inline">\(10\)</span>
+words for each factor from each model.</p>
+<pre class="r"><code>get_keywords &lt;- function(V) {
+  
+  kw_list &lt;- list()
+  
+  for (k in 1:ncol(V)) {
+    
+    kw_list[[k]] &lt;- names(head(sort(V[,k], decreasing = T), 10))
+    
+  }
+  
+  return(kw_list)
+  
+}</code></pre>
+<pre class="r"><code>kw_lists &lt;- list()
+
+for (cc in c(cc_vec)) {
+  
+  fit &lt;- fit_list[[as.character(cc)]]
+  rownames(fit$V) &lt;- colnames(dtm2)
+  
+  kw_lists[[as.character(cc)]] &lt;- get_keywords(fit$V)
+
+}
+
+kw_lists[[&quot;nmf&quot;]] &lt;- get_keywords(fit_list$nmf$F)</code></pre>
+<div id="c-1e-4" class="section level3">
+<h3>c = 1e-4</h3>
+<pre class="r"><code>print(kw_lists[[as.character(1e-4)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;will&quot;  &quot;said&quot;  &quot;the&quot;   &quot;see&quot;   &quot;way&quot;   &quot;peopl&quot; &quot;first&quot; &quot;time&quot;  &quot;need&quot; 
+[10] &quot;make&quot; 
+
+[[2]]
+ [1] &quot;franchis&quot;    &quot;finest&quot;      &quot;sequel&quot;      &quot;graphic&quot;     &quot;supercomput&quot;
+ [6] &quot;merchandis&quot;  &quot;francisco&quot;   &quot;silicon&quot;     &quot;refin&quot;       &quot;amplifi&quot;    
+
+[[3]]
+ [1] &quot;pension&quot;     &quot;quango&quot;      &quot;frontlin&quot;    &quot;tuc&quot;         &quot;whitehal&quot;   
+ [6] &quot;servant&quot;     &quot;bureaucraci&quot; &quot;student&quot;     &quot;serwotka&quot;    &quot;taxpay&quot;     
+
+[[4]]
+ [1] &quot;web&quot;       &quot;googl&quot;     &quot;user&quot;      &quot;internet&quot;  &quot;net&quot;       &quot;upload&quot;   
+ [7] &quot;tool&quot;      &quot;softwar&quot;   &quot;surfer&quot;    &quot;broadband&quot;
+
+[[5]]
+ [1] &quot;odriscol&quot;   &quot;capt&quot;       &quot;hodgson&quot;    &quot;scrum&quot;      &quot;twickenham&quot;
+ [6] &quot;oconnel&quot;    &quot;darci&quot;      &quot;kicker&quot;     &quot;ireland&quot;    &quot;olli&quot;      
+
+[[6]]
+ [1] &quot;spotless&quot; &quot;sunshin&quot;  &quot;winslet&quot;  &quot;etern&quot;    &quot;actor&quot;    &quot;foxx&quot;    
+ [7] &quot;globe&quot;    &quot;dicaprio&quot; &quot;actress&quot;  &quot;nomin&quot;   
+
+[[7]]
+ [1] &quot;indoor&quot;     &quot;bekel&quot;      &quot;kluft&quot;      &quot;heptathlon&quot; &quot;kenenisa&quot;  
+ [6] &quot;sotherton&quot;  &quot;hurdl&quot;      &quot;sec&quot;        &quot;bronz&quot;      &quot;aaa&quot;       
+
+[[8]]
+ [1] &quot;manageri&quot;  &quot;rugbi&quot;     &quot;murray&quot;    &quot;scottish&quot;  &quot;glenn&quot;     &quot;appoint&quot;  
+ [7] &quot;captain&quot;   &quot;neath&quot;     &quot;captainci&quot; &quot;hodg&quot;     
+
+[[9]]
+ [1] &quot;myskina&quot;   &quot;qatar&quot;     &quot;russian&quot;   &quot;russia&quot;    &quot;vinci&quot;     &quot;menatep&quot;  
+ [7] &quot;martinez&quot;  &quot;spain&quot;     &quot;anastasia&quot; &quot;putin&quot;    
+
+[[10]]
+ [1] &quot;film&quot;       &quot;hank&quot;       &quot;bowl&quot;       &quot;remak&quot;      &quot;oscar&quot;     
+ [6] &quot;dan&quot;        &quot;screenwrit&quot; &quot;movi&quot;       &quot;actor&quot;      &quot;jackson&quot;   
+
+[[11]]
+ [1] &quot;muslim&quot;        &quot;legisl&quot;        &quot;tag&quot;           &quot;disproportion&quot;
+ [5] &quot;clark&quot;         &quot;lord&quot;          &quot;murder&quot;        &quot;miscarriag&quot;   
+ [9] &quot;suspect&quot;       &quot;law&quot;          
+
+[[12]]
+ [1] &quot;roddick&quot;  &quot;melzer&quot;   &quot;haa&quot;      &quot;moya&quot;     &quot;jurgen&quot;   &quot;cyril&quot;   
+ [7] &quot;agassi&quot;   &quot;argentin&quot; &quot;saulnier&quot; &quot;backhand&quot;
+
+[[13]]
+ [1] &quot;children&quot;  &quot;parent&quot;    &quot;dancer&quot;    &quot;youngster&quot; &quot;pupil&quot;     &quot;wilkinson&quot;
+ [7] &quot;petrol&quot;    &quot;women&quot;     &quot;wilson&quot;    &quot;factori&quot;  
+
+[[14]]
+ [1] &quot;survey&quot;     &quot;retail&quot;     &quot;consum&quot;     &quot;growth&quot;     &quot;shopper&quot;   
+ [6] &quot;manufactur&quot; &quot;economi&quot;    &quot;tobacco&quot;    &quot;rate&quot;       &quot;rose&quot;      
+
+[[15]]
+ [1] &quot;mitsubishi&quot; &quot;china&quot;      &quot;japan&quot;      &quot;hong&quot;       &quot;lse&quot;       
+ [6] &quot;furs&quot;       &quot;chines&quot;     &quot;stumbl&quot;     &quot;korea&quot;      &quot;regulatori&quot;
+
+[[16]]
+ [1] &quot;attorney&quot;    &quot;goldsmith&quot;   &quot;isra&quot;        &quot;palestinian&quot; &quot;conspiraci&quot; 
+ [6] &quot;wit&quot;         &quot;cook&quot;        &quot;alleg&quot;       &quot;aston&quot;       &quot;baghdad&quot;    
+
+[[17]]
+ [1] &quot;whatsoev&quot;  &quot;yahoo&quot;     &quot;venus&quot;     &quot;wasnt&quot;     &quot;nicola&quot;    &quot;slam&quot;     
+ [7] &quot;mirza&quot;     &quot;jeev&quot;      &quot;amazoncom&quot; &quot;round&quot;    
+
+[[18]]
+ [1] &quot;lawsuit&quot;    &quot;subsidiari&quot; &quot;bankruptci&quot; &quot;wrongdo&quot;    &quot;compli&quot;    
+ [6] &quot;violat&quot;     &quot;chapter&quot;    &quot;insur&quot;      &quot;parmalat&quot;   &quot;sec&quot;       
+
+[[19]]
+ [1] &quot;women&quot;     &quot;rooney&quot;    &quot;richest&quot;   &quot;spam&quot;      &quot;conscienc&quot; &quot;revalu&quot;   
+ [7] &quot;clay&quot;      &quot;vaccin&quot;    &quot;poorest&quot;   &quot;phillip&quot;  
+
+[[20]]
+ [1] &quot;album&quot;     &quot;band&quot;      &quot;music&quot;     &quot;franz&quot;     &quot;song&quot;      &quot;artist&quot;   
+ [7] &quot;eminem&quot;    &quot;joss&quot;      &quot;gig&quot;       &quot;ferdinand&quot;
+
+[[21]]
+ [1] &quot;stake&quot;   &quot;foster&quot;  &quot;wine&quot;    &quot;glazer&quot;  &quot;takeov&quot;  &quot;stade&quot;   &quot;fiat&quot;   
+ [8] &quot;buy&quot;     &quot;francai&quot; &quot;brand&quot;  
+
+[[22]]
+ [1] &quot;milburn&quot;  &quot;poster&quot;   &quot;pig&quot;      &quot;semit&quot;    &quot;distract&quot; &quot;fagin&quot;   
+ [7] &quot;jewish&quot;   &quot;peston&quot;   &quot;blair&quot;    &quot;supremo&quot; 
+
+[[23]]
+ [1] &quot;straw&quot;       &quot;nuclear&quot;     &quot;agricultur&quot;  &quot;multilater&quot;  &quot;venezuela&quot;  
+ [6] &quot;rectifi&quot;     &quot;subsidi&quot;     &quot;environment&quot; &quot;ethiopia&quot;    &quot;afghanistan&quot;
+
+[[24]]
+ [1] &quot;ukip&quot;    &quot;kilroy&quot;  &quot;silk&quot;    &quot;verita&quot;  &quot;ballot&quot;  &quot;mep&quot;     &quot;hockney&quot;
+ [8] &quot;muslim&quot;  &quot;bnp&quot;     &quot;midland&quot;
+
+[[25]]
+ [1] &quot;copyright&quot; &quot;gray&quot;      &quot;court&quot;     &quot;bittorr&quot;   &quot;legal&quot;     &quot;infring&quot;  
+ [7] &quot;pirat&quot;     &quot;piraci&quot;    &quot;wembley&quot;   &quot;illeg&quot;    
+
+[[26]]
+ [1] &quot;ranger&quot;      &quot;leed&quot;        &quot;saracen&quot;     &quot;northampton&quot; &quot;ibrox&quot;      
+ [6] &quot;blackburn&quot;   &quot;preston&quot;     &quot;glasgow&quot;     &quot;burnley&quot;     &quot;christma&quot;   
+
+[[27]]
+ [1] &quot;robot&quot;   &quot;aston&quot;   &quot;gigg&quot;    &quot;villa&quot;   &quot;river&quot;   &quot;ruddock&quot; &quot;vehicl&quot; 
+ [8] &quot;car&quot;     &quot;dragon&quot;  &quot;carmak&quot; 
+
+[[28]]
+ [1] &quot;mcfadden&quot;   &quot;sharon&quot;     &quot;bellami&quot;    &quot;blunkett&quot;   &quot;gym&quot;       
+ [6] &quot;shepherd&quot;   &quot;cue&quot;        &quot;isinbayeva&quot; &quot;ear&quot;        &quot;mauric&quot;    
+
+[[29]]
+ [1] &quot;yard&quot;   &quot;volley&quot; &quot;sub&quot;    &quot;unmark&quot; &quot;save&quot;   &quot;dive&quot;   &quot;drive&quot;  &quot;tap&quot;   
+ [9] &quot;blaze&quot;  &quot;corner&quot;
+
+[[30]]
+ [1] &quot;patent&quot;    &quot;quota&quot;     &quot;wto&quot;       &quot;schroeder&quot; &quot;eus&quot;       &quot;softwar&quot;  
+ [7] &quot;workplac&quot;  &quot;textil&quot;    &quot;seeker&quot;    &quot;comput&quot;   
+
+[[31]]
+ [1] &quot;vote&quot;    &quot;elect&quot;   &quot;tori&quot;    &quot;dem&quot;     &quot;voter&quot;   &quot;lib&quot;     &quot;poll&quot;   
+ [8] &quot;debat&quot;   &quot;mpc&quot;     &quot;elector&quot;
+
+[[32]]
+ [1] &quot;trader&quot;     &quot;stock&quot;      &quot;halifax&quot;    &quot;billionair&quot; &quot;mcilroy&quot;   
+ [6] &quot;saudi&quot;      &quot;index&quot;      &quot;northern&quot;   &quot;irish&quot;      &quot;potent&quot;    
+
+[[33]]
+ [1] &quot;etc&quot;     &quot;wenger&quot;  &quot;paula&quot;   &quot;rubbish&quot; &quot;whi&quot;     &quot;isnt&quot;    &quot;fault&quot;  
+ [8] &quot;doesnt&quot;  &quot;liter&quot;   &quot;niggl&quot;  
+
+[[34]]
+ [1] &quot;deficit&quot;       &quot;airlin&quot;        &quot;dollar&quot;        &quot;sideway&quot;      
+ [5] &quot;homeland&quot;      &quot;quarter&quot;       &quot;san&quot;           &quot;marsh&quot;        
+ [9] &quot;daimlerchrysl&quot; &quot;aviat&quot;        
+
+[[35]]
+ [1] &quot;broadcast&quot; &quot;channel&quot;   &quot;kaplan&quot;    &quot;viewer&quot;    &quot;itv&quot;       &quot;eastend&quot;  
+ [7] &quot;sky&quot;       &quot;lewsey&quot;    &quot;freeview&quot;  &quot;chavez&quot;   
+
+[[36]]
+ [1] &quot;turkey&quot;     &quot;makelel&quot;    &quot;ferreira&quot;   &quot;gudjohnsen&quot; &quot;galla&quot;     
+ [6] &quot;lehmann&quot;    &quot;turkish&quot;    &quot;duff&quot;       &quot;regardless&quot; &quot;sky&quot;       
+
+[[37]]
+ [1] &quot;osullivan&quot; &quot;blog&quot;      &quot;munster&quot;   &quot;guardian&quot;  &quot;easterbi&quot;  &quot;prize&quot;    
+ [7] &quot;shrek&quot;     &quot;ogara&quot;     &quot;ministri&quot;  &quot;award&quot;    
+
+[[38]]
+ [1] &quot;handset&quot;  &quot;mobil&quot;    &quot;phone&quot;    &quot;batteri&quot;  &quot;nokia&quot;    &quot;ericsson&quot;
+ [7] &quot;motorola&quot; &quot;samsung&quot;  &quot;gsm&quot;      &quot;notebook&quot;
+
+[[39]]
+ [1] &quot;virus&quot;    &quot;phish&quot;    &quot;symantec&quot; &quot;spywar&quot;   &quot;infect&quot;   &quot;sopho&quot;   
+ [7] &quot;worm&quot;     &quot;login&quot;    &quot;malici&quot;   &quot;variant&quot; 
+
+[[40]]
+ [1] &quot;consol&quot;    &quot;soni&quot;      &quot;xbox&quot;      &quot;playstat&quot;  &quot;dvd&quot;       &quot;format&quot;   
+ [7] &quot;psp&quot;       &quot;microsoft&quot; &quot;video&quot;     &quot;game&quot;     
+
+[[41]]
+ [1] &quot;gas&quot;     &quot;india&quot;   &quot;oil&quot;     &quot;indian&quot;  &quot;yuko&quot;    &quot;gazprom&quot; &quot;coal&quot;   
+ [8] &quot;putin&quot;   &quot;relianc&quot; &quot;copper&quot; 
+
+[[42]]
+ [1] &quot;airlin&quot;    &quot;airbus&quot;    &quot;bnp&quot;       &quot;flight&quot;    &quot;airway&quot;    &quot;ryanair&quot;  
+ [7] &quot;bollywood&quot; &quot;griffin&quot;   &quot;aircraft&quot;  &quot;plane&quot;    
+
+[[43]]
+ [1] &quot;creditor&quot; &quot;imf&quot;      &quot;debt&quot;     &quot;lanka&quot;    &quot;borrow&quot;   &quot;bank&quot;    
+ [7] &quot;indebt&quot;   &quot;currenc&quot;  &quot;rupe&quot;     &quot;freez&quot;   
+
+[[44]]
+ [1] &quot;henin&quot;     &quot;hardenn&quot;   &quot;clijster&quot;  &quot;chepkemei&quot; &quot;gate&quot;      &quot;wrist&quot;    
+ [7] &quot;melbourn&quot;  &quot;radcliff&quot;  &quot;absent&quot;    &quot;microsoft&quot;
+
+[[45]]
+ [1] &quot;drug&quot;         &quot;dope&quot;         &quot;verdict&quot;      &quot;notifi&quot;       &quot;prosecutor&quot;  
+ [6] &quot;disciplinari&quot; &quot;cocain&quot;       &quot;greek&quot;        &quot;suspens&quot;      &quot;iaaf&quot;        
+
+[[46]]
+ [1] &quot;earthquak&quot;  &quot;disast&quot;     &quot;donat&quot;      &quot;disord&quot;     &quot;troncon&quot;   
+ [6] &quot;angola&quot;     &quot;bergamasco&quot; &quot;ladbrok&quot;    &quot;mcconnel&quot;   &quot;den&quot;       
+
+[[47]]
+ [1] &quot;charlton&quot;  &quot;gatland&quot;   &quot;bush&quot;      &quot;fed&quot;       &quot;dow&quot;       &quot;flush&quot;    
+ [7] &quot;rat&quot;       &quot;steven&quot;    &quot;greenspan&quot; &quot;kerri&quot;    
+
+[[48]]
+ [1] &quot;deport&quot;   &quot;belmarsh&quot; &quot;visa&quot;     &quot;detaine&quot;  &quot;nuclear&quot;  &quot;detent&quot;  
+ [7] &quot;bruno&quot;    &quot;bath&quot;     &quot;tortur&quot;   &quot;opt&quot;     
+
+[[49]]
+ [1] &quot;chelsea&quot;    &quot;uefa&quot;       &quot;manchest&quot;   &quot;mourinho&quot;   &quot;arsenal&quot;   
+ [6] &quot;everton&quot;    &quot;wenger&quot;     &quot;ruud&quot;       &quot;barcelona&quot;  &quot;nistelrooy&quot;
+
+[[50]]
+ [1] &quot;orchestra&quot; &quot;gerrard&quot;   &quot;benitez&quot;   &quot;liverpool&quot; &quot;anfield&quot;   &quot;appl&quot;     
+ [7] &quot;rafa&quot;      &quot;casino&quot;    &quot;gameboy&quot;   &quot;ipod&quot;     </code></pre>
+</div>
+<div id="c-1e-3" class="section level3">
+<h3>c = 1e-3</h3>
+<pre class="r"><code>print(kw_lists[[as.character(1e-3)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;will&quot;  &quot;said&quot;  &quot;the&quot;   &quot;see&quot;   &quot;first&quot; &quot;time&quot;  &quot;new&quot;   &quot;get&quot;   &quot;peopl&quot;
+[10] &quot;much&quot; 
+
+[[2]]
+ [1] &quot;franchis&quot; &quot;wal&quot;      &quot;mart&quot;     &quot;sequel&quot;   &quot;laser&quot;    &quot;machin&quot;  
+ [7] &quot;gameplay&quot; &quot;chao&quot;     &quot;bolton&quot;   &quot;san&quot;     
+
+[[3]]
+ [1] &quot;pension&quot;   &quot;servant&quot;   &quot;quango&quot;    &quot;sector&quot;    &quot;lectur&quot;    &quot;educ&quot;     
+ [7] &quot;taxpay&quot;    &quot;tomlinson&quot; &quot;tuc&quot;       &quot;staff&quot;    
+
+[[4]]
+ [1] &quot;blog&quot;      &quot;web&quot;       &quot;technolog&quot; &quot;student&quot;   &quot;tool&quot;      &quot;softwar&quot;  
+ [7] &quot;yahoo&quot;     &quot;research&quot;  &quot;search&quot;    &quot;msn&quot;      
+
+[[5]]
+ [1] &quot;hodgson&quot;  &quot;ogara&quot;    &quot;easterbi&quot; &quot;murphi&quot;   &quot;hicki&quot;    &quot;lewsey&quot;  
+ [7] &quot;horgan&quot;   &quot;barkley&quot;  &quot;magg&quot;     &quot;foley&quot;   
+
+[[6]]
+ [1] &quot;sunshin&quot;   &quot;dicaprio&quot;  &quot;spotless&quot;  &quot;etern&quot;     &quot;globe&quot;     &quot;staunton&quot; 
+ [7] &quot;neverland&quot; &quot;blanchett&quot; &quot;winslet&quot;   &quot;actress&quot;  
+
+[[7]]
+ [1] &quot;indoor&quot;       &quot;garden&quot;       &quot;olymp&quot;        &quot;hurdl&quot;        &quot;championship&quot;
+ [6] &quot;medal&quot;        &quot;athlet&quot;       &quot;holm&quot;         &quot;claxton&quot;      &quot;heptathlon&quot;  
+
+[[8]]
+ [1] &quot;rugbi&quot;    &quot;coach&quot;    &quot;ruddock&quot;  &quot;wale&quot;     &quot;captain&quot;  &quot;lion&quot;    
+ [7] &quot;woodward&quot; &quot;scotland&quot; &quot;yapp&quot;     &quot;england&quot; 
+
+[[9]]
+ [1] &quot;russian&quot;    &quot;elena&quot;      &quot;martinez&quot;   &quot;kuznetsova&quot; &quot;dementieva&quot;
+ [6] &quot;alicia&quot;     &quot;vinci&quot;      &quot;myskina&quot;    &quot;sharapova&quot;  &quot;wta&quot;       
+
+[[10]]
+ [1] &quot;film&quot;      &quot;hank&quot;      &quot;hollywood&quot; &quot;movi&quot;      &quot;actor&quot;     &quot;novel&quot;    
+ [7] &quot;remak&quot;     &quot;marri&quot;     &quot;sequel&quot;    &quot;father&quot;   
+
+[[11]]
+ [1] &quot;lord&quot;    &quot;legisl&quot;  &quot;law&quot;     &quot;oppos&quot;   &quot;muslim&quot;  &quot;bill&quot;    &quot;debat&quot;  
+ [8] &quot;concess&quot; &quot;propos&quot;  &quot;mps&quot;    
+
+[[12]]
+ [1] &quot;roddick&quot;  &quot;agassi&quot;   &quot;seed&quot;     &quot;women&quot;    &quot;saulnier&quot; &quot;melzer&quot;  
+ [7] &quot;haa&quot;      &quot;argentin&quot; &quot;backhand&quot; &quot;dent&quot;    
+
+[[13]]
+ [1] &quot;bmw&quot;       &quot;children&quot;  &quot;souness&quot;   &quot;recycl&quot;    &quot;pupil&quot;     &quot;parent&quot;   
+ [7] &quot;venezuela&quot; &quot;child&quot;     &quot;chavez&quot;    &quot;school&quot;   
+
+[[14]]
+ [1] &quot;growth&quot;    &quot;rate&quot;      &quot;economi&quot;   &quot;economist&quot; &quot;consum&quot;    &quot;bank&quot;     
+ [7] &quot;rise&quot;      &quot;rose&quot;      &quot;figur&quot;     &quot;econom&quot;   
+
+[[15]]
+ [1] &quot;japan&quot;      &quot;sundanc&quot;    &quot;japanes&quot;    &quot;boe&quot;        &quot;turkey&quot;    
+ [6] &quot;mitsubishi&quot; &quot;worldcom&quot;   &quot;straw&quot;      &quot;der&quot;        &quot;yen&quot;       
+
+[[16]]
+ [1] &quot;israel&quot;      &quot;callaghan&quot;   &quot;isra&quot;        &quot;kinnock&quot;     &quot;palestinian&quot;
+ [6] &quot;elect&quot;       &quot;down&quot;        &quot;lord&quot;        &quot;lieuten&quot;     &quot;prime&quot;      
+
+[[17]]
+ [1] &quot;search&quot;   &quot;boro&quot;     &quot;jeev&quot;     &quot;yahoo&quot;    &quot;sullivan&quot; &quot;queri&quot;   
+ [7] &quot;googl&quot;    &quot;wasnt&quot;    &quot;benitez&quot;  &quot;magpi&quot;   
+
+[[18]]
+ [1] &quot;sec&quot;        &quot;bankruptci&quot; &quot;citigroup&quot;  &quot;wrongdo&quot;    &quot;investor&quot;  
+ [6] &quot;enron&quot;      &quot;fraud&quot;      &quot;parmalat&quot;   &quot;bankrupt&quot;   &quot;disclos&quot;   
+
+[[19]]
+ [1] &quot;rooney&quot;  &quot;black&quot;   &quot;junk&quot;    &quot;phillip&quot; &quot;nevill&quot;  &quot;ethnic&quot;  &quot;wayn&quot;   
+ [8] &quot;spider&quot;  &quot;comic&quot;   &quot;spammer&quot;
+
+[[20]]
+ [1] &quot;album&quot;  &quot;band&quot;   &quot;music&quot;  &quot;song&quot;   &quot;hop&quot;    &quot;artist&quot; &quot;pop&quot;    &quot;franz&quot; 
+ [9] &quot;grammi&quot; &quot;hip&quot;   
+
+[[21]]
+ [1] &quot;takeov&quot;    &quot;stake&quot;     &quot;glazer&quot;    &quot;foster&quot;    &quot;fiat&quot;      &quot;merger&quot;   
+ [7] &quot;sharehold&quot; &quot;buy&quot;       &quot;acquisit&quot;  &quot;tycoon&quot;   
+
+[[22]]
+ [1] &quot;peston&quot;    &quot;milburn&quot;   &quot;blair&quot;     &quot;poster&quot;    &quot;rift&quot;      &quot;animos&quot;   
+ [7] &quot;dinner&quot;    &quot;interven&quot;  &quot;schoolboy&quot; &quot;unifi&quot;    
+
+[[23]]
+ [1] &quot;princ&quot;       &quot;environment&quot; &quot;aid&quot;         &quot;bush&quot;        &quot;menzi&quot;      
+ [6] &quot;sand&quot;        &quot;militari&quot;    &quot;ship&quot;        &quot;leak&quot;        &quot;paper&quot;      
+
+[[24]]
+ [1] &quot;kilroy&quot;  &quot;silk&quot;    &quot;ukip&quot;    &quot;verita&quot;  &quot;hockney&quot; &quot;mep&quot;     &quot;print&quot;  
+ [8] &quot;candid&quot;  &quot;bnp&quot;     &quot;ballot&quot; 
+
+[[25]]
+ [1] &quot;court&quot;     &quot;copyright&quot; &quot;legal&quot;     &quot;sharer&quot;    &quot;illeg&quot;     &quot;piraci&quot;   
+ [7] &quot;lawsuit&quot;   &quot;peer&quot;      &quot;sue&quot;       &quot;infring&quot;  
+
+[[26]]
+ [1] &quot;leed&quot;        &quot;saracen&quot;     &quot;northampton&quot; &quot;ranger&quot;      &quot;glasgow&quot;    
+ [6] &quot;sunderland&quot;  &quot;christma&quot;    &quot;burnley&quot;     &quot;rail&quot;        &quot;preston&quot;    
+
+[[27]]
+ [1] &quot;robot&quot;   &quot;holm&quot;    &quot;aston&quot;   &quot;villa&quot;   &quot;galleri&quot; &quot;fiat&quot;    &quot;swansea&quot;
+ [8] &quot;car&quot;     &quot;shopper&quot; &quot;auction&quot;
+
+[[28]]
+ [1] &quot;hewitt&quot;   &quot;elvi&quot;     &quot;jailhous&quot; &quot;gamer&quot;    &quot;presley&quot;  &quot;bookmak&quot; 
+ [7] &quot;oneil&quot;    &quot;ladbrok&quot;  &quot;bet&quot;      &quot;evict&quot;   
+
+[[29]]
+ [1] &quot;yard&quot;    &quot;minut&quot;   &quot;penalti&quot; &quot;corner&quot;  &quot;volley&quot;  &quot;save&quot;    &quot;drive&quot;  
+ [8] &quot;marigni&quot; &quot;pass&quot;    &quot;visitor&quot;
+
+[[30]]
+ [1] &quot;eus&quot;       &quot;franc&quot;     &quot;european&quot;  &quot;schroeder&quot; &quot;wto&quot;       &quot;patent&quot;   
+ [7] &quot;germani&quot;   &quot;itali&quot;     &quot;cyprus&quot;    &quot;seeker&quot;   
+
+[[31]]
+ [1] &quot;tax&quot;     &quot;elect&quot;   &quot;kennedi&quot; &quot;lib&quot;     &quot;dem&quot;     &quot;tori&quot;    &quot;labour&quot; 
+ [8] &quot;parti&quot;   &quot;voter&quot;   &quot;howard&quot; 
+
+[[32]]
+ [1] &quot;stock&quot;    &quot;northern&quot; &quot;halifax&quot;  &quot;tourist&quot;  &quot;cairn&quot;    &quot;winter&quot;  
+ [7] &quot;mcilroy&quot;  &quot;irish&quot;    &quot;insur&quot;    &quot;price&quot;   
+
+[[33]]
+ [1] &quot;isnt&quot;    &quot;etc&quot;     &quot;doesnt&quot;  &quot;whi&quot;     &quot;wasnt&quot;   &quot;realli&quot;  &quot;rubbish&quot;
+ [8] &quot;bit&quot;     &quot;didnt&quot;   &quot;anyth&quot;  
+
+[[34]]
+ [1] &quot;deficit&quot; &quot;virgin&quot;  &quot;motor&quot;   &quot;focker&quot;  &quot;loss&quot;    &quot;passeng&quot; &quot;blue&quot;   
+ [8] &quot;profit&quot;  &quot;nissan&quot;  &quot;yen&quot;    
+
+[[35]]
+ [1] &quot;channel&quot;   &quot;broadcast&quot; &quot;viewer&quot;    &quot;episod&quot;    &quot;eastend&quot;   &quot;itv&quot;      
+ [7] &quot;kaplan&quot;    &quot;janet&quot;     &quot;sitcom&quot;    &quot;televis&quot;  
+
+[[36]]
+ [1] &quot;galla&quot;    &quot;sky&quot;      &quot;knee&quot;     &quot;injuri&quot;   &quot;keeper&quot;   &quot;duff&quot;    
+ [7] &quot;delta&quot;    &quot;tabloid&quot;  &quot;morrison&quot; &quot;lehmann&quot; 
+
+[[37]]
+ [1] &quot;prize&quot;    &quot;award&quot;    &quot;categori&quot; &quot;winner&quot;   &quot;guardian&quot; &quot;nomine&quot;  
+ [7] &quot;ceremoni&quot; &quot;accolad&quot;  &quot;sideway&quot;  &quot;china&quot;   
+
+[[38]]
+ [1] &quot;mobil&quot;      &quot;phone&quot;      &quot;handset&quot;    &quot;nokia&quot;      &quot;motorola&quot;  
+ [6] &quot;ericsson&quot;   &quot;camera&quot;     &quot;multimedia&quot; &quot;batteri&quot;    &quot;vodafon&quot;   
+
+[[39]]
+ [1] &quot;virus&quot;  &quot;malici&quot; &quot;spywar&quot; &quot;hacker&quot; &quot;worm&quot;   &quot;phish&quot;  &quot;spam&quot;   &quot;secur&quot; 
+ [9] &quot;infect&quot; &quot;mail&quot;  
+
+[[40]]
+ [1] &quot;consol&quot;   &quot;dvd&quot;      &quot;soni&quot;     &quot;game&quot;     &quot;playstat&quot; &quot;gamer&quot;   
+ [7] &quot;dvds&quot;     &quot;devic&quot;    &quot;format&quot;   &quot;digit&quot;   
+
+[[41]]
+ [1] &quot;india&quot;     &quot;indian&quot;    &quot;gas&quot;       &quot;russia&quot;    &quot;oil&quot;       &quot;petroleum&quot;
+ [7] &quot;yuko&quot;      &quot;relianc&quot;   &quot;rupe&quot;      &quot;delhi&quot;    
+
+[[42]]
+ [1] &quot;airlin&quot;    &quot;boe&quot;       &quot;redknapp&quot;  &quot;blunkett&quot;  &quot;bnp&quot;       &quot;airport&quot;  
+ [7] &quot;airbus&quot;    &quot;ryanair&quot;   &quot;flight&quot;    &quot;bollywood&quot;
+
+[[43]]
+ [1] &quot;tsunami&quot;  &quot;sri&quot;      &quot;lanka&quot;    &quot;relief&quot;   &quot;creditor&quot; &quot;poverti&quot; 
+ [7] &quot;brazil&quot;   &quot;debt&quot;     &quot;imf&quot;      &quot;aid&quot;     
+
+[[44]]
+ [1] &quot;microsoft&quot;  &quot;chepkemei&quot;  &quot;concert&quot;    &quot;festiv&quot;     &quot;radcliff&quot;  
+ [6] &quot;marathon&quot;   &quot;australian&quot; &quot;clijster&quot;   &quot;pull&quot;       &quot;brighton&quot;  
+
+[[45]]
+ [1] &quot;drug&quot;         &quot;dope&quot;         &quot;substanc&quot;     &quot;disciplinari&quot; &quot;athlet&quot;      
+ [6] &quot;ban&quot;          &quot;test&quot;         &quot;suspend&quot;      &quot;iaaf&quot;         &quot;tribun&quot;      
+
+[[46]]
+ [1] &quot;broadband&quot; &quot;donat&quot;     &quot;ntl&quot;       &quot;net&quot;       &quot;adsl&quot;      &quot;unbundl&quot;  
+ [7] &quot;brows&quot;     &quot;drink&quot;     &quot;ofcom&quot;     &quot;virgin&quot;   
+
+[[47]]
+ [1] &quot;bush&quot;      &quot;steven&quot;    &quot;morient&quot;   &quot;madrid&quot;    &quot;liverpool&quot; &quot;parri&quot;    
+ [7] &quot;fernando&quot;  &quot;anfield&quot;   &quot;charlton&quot;  &quot;gerrard&quot;  
+
+[[48]]
+ [1] &quot;detent&quot;     &quot;deport&quot;     &quot;tortur&quot;     &quot;belmarsh&quot;   &quot;guantanamo&quot;
+ [6] &quot;nuclear&quot;    &quot;terror&quot;     &quot;detaine&quot;    &quot;tate&quot;       &quot;straw&quot;     
+
+[[49]]
+ [1] &quot;chelsea&quot;     &quot;arsenal&quot;     &quot;uefa&quot;        &quot;mourinho&quot;    &quot;barcelona&quot;  
+ [6] &quot;manchest&quot;    &quot;wenger&quot;      &quot;jose&quot;        &quot;premiership&quot; &quot;southampton&quot;
+
+[[50]]
+ [1] &quot;mac&quot;       &quot;mourinho&quot;  &quot;gerrard&quot;   &quot;orchestra&quot; &quot;super&quot;     &quot;armi&quot;     
+ [7] &quot;gameboy&quot;   &quot;appl&quot;      &quot;mini&quot;      &quot;turkey&quot;   </code></pre>
+</div>
+<div id="c-1e-2" class="section level3">
+<h3>c = 1e-2</h3>
+<pre class="r"><code>print(kw_lists[[as.character(1e-2)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;will&quot;  &quot;said&quot;  &quot;see&quot;   &quot;get&quot;   &quot;new&quot;   &quot;chang&quot; &quot;way&quot;   &quot;peopl&quot; &quot;need&quot; 
+[10] &quot;next&quot; 
+
+[[2]]
+ [1] &quot;comput&quot;    &quot;chip&quot;      &quot;processor&quot; &quot;ibm&quot;       &quot;intel&quot;     &quot;data&quot;     
+ [7] &quot;technolog&quot; &quot;cell&quot;      &quot;softwar&quot;   &quot;mac&quot;      
+
+[[3]]
+ [1] &quot;pension&quot; &quot;women&quot;   &quot;worker&quot;  &quot;employ&quot;  &quot;age&quot;     &quot;scheme&quot;  &quot;depart&quot; 
+ [8] &quot;salari&quot;  &quot;servant&quot; &quot;union&quot;  
+
+[[4]]
+ [1] &quot;blog&quot;     &quot;web&quot;      &quot;onlin&quot;    &quot;googl&quot;    &quot;search&quot;   &quot;net&quot;     
+ [7] &quot;site&quot;     &quot;blogger&quot;  &quot;internet&quot; &quot;research&quot;
+
+[[5]]
+ [1] &quot;minut&quot;   &quot;yard&quot;    &quot;penalti&quot; &quot;save&quot;    &quot;ball&quot;    &quot;lead&quot;    &quot;sub&quot;    
+ [8] &quot;shot&quot;    &quot;tri&quot;     &quot;cross&quot;  
+
+[[6]]
+ [1] &quot;theatr&quot;    &quot;india&quot;     &quot;indian&quot;    &quot;school&quot;    &quot;student&quot;   &quot;poppin&quot;   
+ [7] &quot;unit&quot;      &quot;mirza&quot;     &quot;dame&quot;      &quot;orchestra&quot;
+
+[[7]]
+ [1] &quot;indoor&quot;       &quot;european&quot;     &quot;olymp&quot;        &quot;championship&quot; &quot;champion&quot;    
+ [6] &quot;race&quot;         &quot;holm&quot;         &quot;garden&quot;       &quot;jump&quot;         &quot;record&quot;      
+
+[[8]]
+ [1] &quot;ireland&quot;  &quot;england&quot;  &quot;franc&quot;    &quot;coach&quot;    &quot;robinson&quot; &quot;nation&quot;  
+ [7] &quot;scotland&quot; &quot;rugbi&quot;    &quot;wale&quot;     &quot;odriscol&quot;
+
+[[9]]
+ [1] &quot;seed&quot;       &quot;open&quot;       &quot;australian&quot; &quot;beat&quot;       &quot;match&quot;     
+ [6] &quot;play&quot;       &quot;hewitt&quot;     &quot;win&quot;        &quot;final&quot;      &quot;round&quot;     
+
+[[10]]
+ [1] &quot;film&quot;   &quot;movi&quot;   &quot;book&quot;   &quot;sequel&quot; &quot;cinema&quot; &quot;star&quot;   &quot;box&quot;    &quot;hank&quot;  
+ [9] &quot;novel&quot;  &quot;offic&quot; 
+
+[[11]]
+ [1] &quot;drink&quot;    &quot;mcconnel&quot; &quot;bing&quot;     &quot;drunk&quot;    &quot;bill&quot;     &quot;scottish&quot;
+ [7] &quot;pupil&quot;    &quot;school&quot;   &quot;children&quot; &quot;scotland&quot;
+
+[[12]]
+ [1] &quot;japan&quot;      &quot;japanes&quot;    &quot;mitsubishi&quot; &quot;wilkinson&quot;  &quot;father&quot;    
+ [6] &quot;lift&quot;       &quot;parent&quot;     &quot;podcast&quot;    &quot;recoveri&quot;   &quot;broken&quot;    
+
+[[13]]
+ [1] &quot;profit&quot; &quot;car&quot;    &quot;merced&quot; &quot;motor&quot;  &quot;sale&quot;   &quot;loss&quot;   &quot;carmak&quot; &quot;bmw&quot;   
+ [9] &quot;vehicl&quot; &quot;euro&quot;  
+
+[[14]]
+ [1] &quot;rate&quot;      &quot;growth&quot;    &quot;economi&quot;   &quot;rise&quot;      &quot;bank&quot;      &quot;economist&quot;
+ [7] &quot;figur&quot;     &quot;slowdown&quot;  &quot;consum&quot;    &quot;quarter&quot;  
+
+[[15]]
+ [1] &quot;kenteri&quot; &quot;iaaf&quot;    &quot;greek&quot;   &quot;test&quot;    &quot;thanou&quot;  &quot;drug&quot;    &quot;athlet&quot; 
+ [8] &quot;olymp&quot;   &quot;dope&quot;    &quot;athen&quot;  
+
+[[16]]
+ [1] &quot;lord&quot;       &quot;falcon&quot;     &quot;parliament&quot; &quot;peer&quot;       &quot;chancellor&quot;
+ [6] &quot;butler&quot;     &quot;bill&quot;       &quot;appoint&quot;    &quot;speaker&quot;    &quot;judg&quot;      
+
+[[17]]
+ [1] &quot;ebber&quot;    &quot;worldcom&quot; &quot;mci&quot;      &quot;sullivan&quot; &quot;search&quot;   &quot;brother&quot; 
+ [7] &quot;job&quot;      &quot;verizon&quot;  &quot;bellami&quot;  &quot;scottish&quot;
+
+[[18]]
+ [1] &quot;fraud&quot;      &quot;sec&quot;        &quot;parmalat&quot;   &quot;bank&quot;       &quot;prosecutor&quot;
+ [6] &quot;marsh&quot;      &quot;account&quot;    &quot;settlement&quot; &quot;fine&quot;       &quot;lawsuit&quot;   
+
+[[19]]
+ [1] &quot;rugbi&quot;     &quot;zealand&quot;   &quot;tobacco&quot;   &quot;davi&quot;      &quot;black&quot;     &quot;steel&quot;    
+ [7] &quot;cup&quot;       &quot;south&quot;     &quot;copper&quot;    &quot;australia&quot;
+
+[[20]]
+ [1] &quot;album&quot;  &quot;band&quot;   &quot;chart&quot;  &quot;music&quot;  &quot;artist&quot; &quot;song&quot;   &quot;pop&quot;    &quot;hop&quot;   
+ [9] &quot;rock&quot;   &quot;franz&quot; 
+
+[[21]]
+ [1] &quot;dvd&quot;     &quot;dvds&quot;    &quot;ray&quot;     &quot;format&quot;  &quot;mart&quot;    &quot;wal&quot;     &quot;hdtv&quot;   
+ [8] &quot;definit&quot; &quot;disc&quot;    &quot;stade&quot;  
+
+[[22]]
+ [1] &quot;blair&quot;      &quot;labour&quot;     &quot;brown&quot;      &quot;prime&quot;      &quot;minist&quot;    
+ [6] &quot;elect&quot;      &quot;chancellor&quot; &quot;milburn&quot;    &quot;cabinet&quot;    &quot;prescott&quot;  
+
+[[23]]
+ [1] &quot;referendum&quot; &quot;mayor&quot;      &quot;paper&quot;      &quot;livingston&quot; &quot;iraq&quot;      
+ [6] &quot;journalist&quot; &quot;date&quot;       &quot;leak&quot;       &quot;confidenti&quot; &quot;apologis&quot;  
+
+[[24]]
+ [1] &quot;kilroy&quot;  &quot;silk&quot;    &quot;ukip&quot;    &quot;parti&quot;   &quot;elect&quot;   &quot;verita&quot;  &quot;mep&quot;    
+ [8] &quot;seat&quot;    &quot;polit&quot;   &quot;hockney&quot;
+
+[[25]]
+ [1] &quot;copyright&quot; &quot;peer&quot;      &quot;file&quot;      &quot;music&quot;     &quot;piraci&quot;    &quot;legal&quot;    
+ [7] &quot;movi&quot;      &quot;illeg&quot;     &quot;court&quot;     &quot;bittorr&quot;  
+
+[[26]]
+ [1] &quot;leed&quot;        &quot;book&quot;        &quot;israel&quot;      &quot;southampton&quot; &quot;student&quot;    
+ [6] &quot;bath&quot;        &quot;palestinian&quot; &quot;simpson&quot;     &quot;tottenham&quot;   &quot;novel&quot;      
+
+[[27]]
+ [1] &quot;robot&quot;   &quot;wale&quot;    &quot;welsh&quot;   &quot;assembl&quot; &quot;jone&quot;    &quot;swansea&quot; &quot;cardiff&quot;
+ [8] &quot;william&quot; &quot;cairn&quot;   &quot;henson&quot; 
+
+[[28]]
+ [1] &quot;auction&quot; &quot;donat&quot;   &quot;item&quot;    &quot;shopper&quot; &quot;shop&quot;    &quot;princ&quot;   &quot;ebay&quot;   
+ [8] &quot;onlin&quot;   &quot;charl&quot;   &quot;foster&quot; 
+
+[[29]]
+ [1] &quot;hunt&quot;      &quot;polic&quot;     &quot;ranger&quot;    &quot;glasgow&quot;   &quot;edinburgh&quot; &quot;site&quot;     
+ [7] &quot;china&quot;     &quot;dog&quot;       &quot;properti&quot;  &quot;ban&quot;      
+
+[[30]]
+ [1] &quot;turkey&quot;     &quot;european&quot;   &quot;franc&quot;      &quot;french&quot;     &quot;china&quot;     
+ [6] &quot;euro&quot;       &quot;agricultur&quot; &quot;cyprus&quot;     &quot;brussel&quot;    &quot;reform&quot;    
+
+[[31]]
+ [1] &quot;tax&quot;     &quot;lib&quot;     &quot;dem&quot;     &quot;budget&quot;  &quot;kennedi&quot; &quot;tori&quot;    &quot;elect&quot;  
+ [8] &quot;labour&quot;  &quot;spend&quot;   &quot;parti&quot;  
+
+[[32]]
+ [1] &quot;boers&quot;     &quot;deutsch&quot;   &quot;lse&quot;       &quot;stock&quot;     &quot;sharehold&quot; &quot;takeov&quot;   
+ [7] &quot;share&quot;     &quot;exchang&quot;   &quot;bid&quot;       &quot;euronext&quot; 
+
+[[33]]
+ [1] &quot;realli&quot; &quot;even&quot;   &quot;think&quot;  &quot;thing&quot;  &quot;just&quot;   &quot;bit&quot;    &quot;good&quot;   &quot;seem&quot;  
+ [9] &quot;dont&quot;   &quot;that&quot;  
+
+[[34]]
+ [1] &quot;dollar&quot;    &quot;deficit&quot;   &quot;bush&quot;      &quot;currenc&quot;   &quot;greenspan&quot; &quot;euro&quot;     
+ [7] &quot;feder&quot;     &quot;yen&quot;       &quot;crude&quot;     &quot;trade&quot;    
+
+[[35]]
+ [1] &quot;broadcast&quot; &quot;viewer&quot;    &quot;channel&quot;   &quot;fox&quot;       &quot;programm&quot;  &quot;itv&quot;      
+ [7] &quot;televis&quot;   &quot;episod&quot;    &quot;show&quot;      &quot;station&quot;  
+
+[[36]]
+ [1] &quot;vote&quot;      &quot;fiat&quot;      &quot;handset&quot;   &quot;johnson&quot;   &quot;chelsea&quot;   &quot;bridg&quot;    
+ [7] &quot;voter&quot;     &quot;age&quot;       &quot;galla&quot;     &quot;bluetooth&quot;
+
+[[37]]
+ [1] &quot;award&quot;   &quot;best&quot;    &quot;nomin&quot;   &quot;film&quot;    &quot;oscar&quot;   &quot;actress&quot; &quot;bafta&quot;  
+ [8] &quot;drake&quot;   &quot;vera&quot;    &quot;prize&quot;  
+
+[[38]]
+ [1] &quot;mobil&quot;      &quot;phone&quot;      &quot;handset&quot;    &quot;camera&quot;     &quot;multimedia&quot;
+ [6] &quot;gartner&quot;    &quot;messag&quot;     &quot;ericsson&quot;   &quot;gadget&quot;     &quot;megapixel&quot; 
+
+[[39]]
+ [1] &quot;virus&quot;   &quot;mail&quot;    &quot;infect&quot;  &quot;malici&quot;  &quot;user&quot;    &quot;secur&quot;   &quot;attack&quot; 
+ [8] &quot;program&quot; &quot;spam&quot;    &quot;machin&quot; 
+
+[[40]]
+ [1] &quot;game&quot;     &quot;consol&quot;   &quot;xbox&quot;     &quot;gamer&quot;    &quot;titl&quot;     &quot;halo&quot;    
+ [7] &quot;playstat&quot; &quot;nintendo&quot; &quot;soni&quot;     &quot;graphic&quot; 
+
+[[41]]
+ [1] &quot;oil&quot;     &quot;yuko&quot;    &quot;russian&quot; &quot;gas&quot;     &quot;gazprom&quot; &quot;russia&quot;  &quot;energi&quot; 
+ [8] &quot;rosneft&quot; &quot;india&quot;   &quot;yugansk&quot;
+
+[[42]]
+ [1] &quot;airlin&quot;  &quot;flight&quot;  &quot;passeng&quot; &quot;airway&quot;  &quot;air&quot;     &quot;imag&quot;    &quot;jewish&quot; 
+ [8] &quot;poster&quot;  &quot;delta&quot;   &quot;cancel&quot; 
+
+[[43]]
+ [1] &quot;tsunami&quot;   &quot;aid&quot;       &quot;sri&quot;       &quot;disast&quot;    &quot;relief&quot;    &quot;indonesia&quot;
+ [7] &quot;lanka&quot;     &quot;africa&quot;    &quot;poverti&quot;   &quot;thailand&quot; 
+
+[[44]]
+ [1] &quot;festiv&quot;    &quot;microsoft&quot; &quot;boe&quot;       &quot;deal&quot;      &quot;will&quot;      &quot;browser&quot;  
+ [7] &quot;chepkemei&quot; &quot;contract&quot;  &quot;explor&quot;    &quot;featur&quot;   
+
+[[45]]
+ [1] &quot;murder&quot;    &quot;drug&quot;      &quot;blunkett&quot;  &quot;patient&quot;   &quot;sentenc&quot;   &quot;safeti&quot;   
+ [7] &quot;assault&quot;   &quot;treatment&quot; &quot;gun&quot;       &quot;visa&quot;     
+
+[[46]]
+ [1] &quot;broadband&quot; &quot;servic&quot;    &quot;telecom&quot;   &quot;mbps&quot;      &quot;telephon&quot;  &quot;speed&quot;    
+ [7] &quot;ofcom&quot;     &quot;connect&quot;   &quot;bts&quot;       &quot;fast&quot;     
+
+[[47]]
+ [1] &quot;liverpool&quot; &quot;parri&quot;     &quot;gerrard&quot;   &quot;club&quot;      &quot;steven&quot;    &quot;deal&quot;     
+ [7] &quot;anfield&quot;   &quot;money&quot;     &quot;bid&quot;       &quot;offer&quot;    
+
+[[48]]
+ [1] &quot;terror&quot;    &quot;suspect&quot;   &quot;detain&quot;    &quot;detent&quot;    &quot;clark&quot;     &quot;trial&quot;    
+ [7] &quot;human&quot;     &quot;terrorist&quot; &quot;home&quot;      &quot;detaine&quot;  
+
+[[49]]
+ [1] &quot;arsenal&quot;   &quot;wenger&quot;    &quot;ferguson&quot;  &quot;footbal&quot;   &quot;unit&quot;      &quot;mourinho&quot; 
+ [7] &quot;chelsea&quot;   &quot;barcelona&quot; &quot;leagu&quot;     &quot;uefa&quot;     
+
+[[50]]
+ [1] &quot;gadget&quot;  &quot;list&quot;    &quot;appl&quot;    &quot;magazin&quot; &quot;ipod&quot;    &quot;mini&quot;    &quot;mac&quot;    
+ [8] &quot;soni&quot;    &quot;laptop&quot;  &quot;top&quot;    </code></pre>
+</div>
+<div id="c-1e-1" class="section level3">
+<h3>c = 1e-1</h3>
+<pre class="r"><code>print(kw_lists[[as.character(1e-1)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;said&quot;  &quot;will&quot;  &quot;want&quot;  &quot;get&quot;   &quot;told&quot;  &quot;next&quot;  &quot;bbc&quot;   &quot;think&quot; &quot;peopl&quot;
+[10] &quot;new&quot;  
+
+[[2]]
+ [1] &quot;game&quot;   &quot;play&quot;   &quot;the&quot;    &quot;titl&quot;   &quot;time&quot;   &quot;onlin&quot;  &quot;life&quot;   &quot;player&quot;
+ [9] &quot;can&quot;    &quot;hour&quot;  
+
+[[3]]
+ [1] &quot;union&quot;    &quot;pension&quot;  &quot;govern&quot;   &quot;public&quot;   &quot;health&quot;   &quot;work&quot;    
+ [7] &quot;blunkett&quot; &quot;said&quot;     &quot;servic&quot;   &quot;civil&quot;   
+
+[[4]]
+ [1] &quot;site&quot;    &quot;mail&quot;    &quot;spam&quot;    &quot;net&quot;     &quot;attack&quot;  &quot;virus&quot;   &quot;messag&quot; 
+ [8] &quot;use&quot;     &quot;websit&quot;  &quot;traffic&quot;
+
+[[5]]
+ [1] &quot;ebber&quot;    &quot;worldcom&quot; &quot;fraud&quot;    &quot;compani&quot;  &quot;former&quot;   &quot;account&quot; 
+ [7] &quot;firm&quot;     &quot;charg&quot;    &quot;sullivan&quot; &quot;the&quot;     
+
+[[6]]
+ [1] &quot;polic&quot;    &quot;drink&quot;    &quot;murder&quot;   &quot;sentenc&quot;  &quot;prison&quot;   &quot;arrest&quot;  
+ [7] &quot;jackson&quot;  &quot;mcconnel&quot; &quot;jail&quot;     &quot;fine&quot;    
+
+[[7]]
+ [1] &quot;music&quot;  &quot;mac&quot;    &quot;appl&quot;   &quot;player&quot; &quot;mini&quot;   &quot;ipod&quot;   &quot;digit&quot;  &quot;mobil&quot; 
+ [9] &quot;comput&quot; &quot;devic&quot; 
+
+[[8]]
+ [1] &quot;wage&quot;      &quot;minimum&quot;   &quot;worker&quot;    &quot;employ&quot;    &quot;edinburgh&quot; &quot;increas&quot;  
+ [7] &quot;busi&quot;      &quot;border&quot;    &quot;glasgow&quot;   &quot;job&quot;      
+
+[[9]]
+ [1] &quot;race&quot;         &quot;olymp&quot;        &quot;world&quot;        &quot;indoor&quot;       &quot;european&quot;    
+ [6] &quot;second&quot;       &quot;year&quot;         &quot;championship&quot; &quot;champion&quot;     &quot;record&quot;      
+
+[[10]]
+ [1] &quot;film&quot;   &quot;star&quot;   &quot;the&quot;    &quot;actor&quot;  &quot;role&quot;   &quot;book&quot;   &quot;movi&quot;   &quot;produc&quot;
+ [9] &quot;direct&quot; &quot;play&quot;  
+
+[[11]]
+ [1] &quot;award&quot;  &quot;show&quot;   &quot;best&quot;   &quot;winner&quot; &quot;vote&quot;   &quot;radio&quot;  &quot;prize&quot;  &quot;won&quot;   
+ [9] &quot;host&quot;   &quot;the&quot;   
+
+[[12]]
+ [1] &quot;rugbi&quot;   &quot;zealand&quot; &quot;england&quot; &quot;lion&quot;    &quot;cup&quot;     &quot;player&quot;  &quot;tour&quot;   
+ [8] &quot;world&quot;   &quot;wale&quot;    &quot;new&quot;    
+
+[[13]]
+ [1] &quot;world&quot;   &quot;countri&quot; &quot;turkey&quot;  &quot;aid&quot;     &quot;blair&quot;   &quot;africa&quot;  &quot;develop&quot;
+ [8] &quot;nation&quot;  &quot;intern&quot;  &quot;brown&quot;  
+
+[[14]]
+ [1] &quot;file&quot;     &quot;music&quot;    &quot;peer&quot;     &quot;share&quot;    &quot;download&quot; &quot;network&quot; 
+ [7] &quot;content&quot;  &quot;piraci&quot;   &quot;industri&quot; &quot;legal&quot;   
+
+[[15]]
+ [1] &quot;test&quot;    &quot;drug&quot;    &quot;athlet&quot;  &quot;olymp&quot;   &quot;the&quot;     &quot;kenteri&quot; &quot;ban&quot;    
+ [8] &quot;iaaf&quot;    &quot;greek&quot;   &quot;dope&quot;   
+
+[[16]]
+ [1] &quot;blair&quot;      &quot;brown&quot;      &quot;elect&quot;      &quot;labour&quot;     &quot;prime&quot;     
+ [6] &quot;minist&quot;     &quot;lord&quot;       &quot;chancellor&quot; &quot;campaign&quot;   &quot;toni&quot;      
+
+[[17]]
+ [1] &quot;search&quot; &quot;blog&quot;   &quot;googl&quot;  &quot;web&quot;    &quot;onlin&quot;  &quot;site&quot;   &quot;yahoo&quot;  &quot;user&quot;  
+ [9] &quot;inform&quot; &quot;engin&quot; 
+
+[[18]]
+ [1] &quot;china&quot;   &quot;india&quot;   &quot;chines&quot;  &quot;foreign&quot; &quot;countri&quot; &quot;project&quot; &quot;indian&quot; 
+ [8] &quot;invest&quot;  &quot;state&quot;   &quot;oil&quot;    
+
+[[19]]
+ [1] &quot;open&quot;    &quot;final&quot;   &quot;seed&quot;    &quot;set&quot;     &quot;match&quot;   &quot;win&quot;     &quot;play&quot;   
+ [8] &quot;roddick&quot; &quot;first&quot;   &quot;year&quot;   
+
+[[20]]
+ [1] &quot;think&quot;  &quot;just&quot;   &quot;thing&quot;  &quot;realli&quot; &quot;dont&quot;   &quot;good&quot;   &quot;even&quot;   &quot;and&quot;   
+ [9] &quot;that&quot;   &quot;like&quot;  
+
+[[21]]
+ [1] &quot;wale&quot;    &quot;franc&quot;   &quot;william&quot; &quot;half&quot;    &quot;jone&quot;    &quot;thoma&quot;   &quot;game&quot;   
+ [8] &quot;henson&quot;  &quot;itali&quot;   &quot;win&quot;    
+
+[[22]]
+ [1] &quot;deficit&quot; &quot;dollar&quot;  &quot;budget&quot;  &quot;euro&quot;    &quot;japan&quot;   &quot;bush&quot;    &quot;export&quot; 
+ [8] &quot;the&quot;     &quot;economi&quot; &quot;trade&quot;  
+
+[[23]]
+ [1] &quot;council&quot;    &quot;govern&quot;     &quot;referendum&quot; &quot;constitut&quot;  &quot;local&quot;     
+ [6] &quot;vote&quot;       &quot;scottish&quot;   &quot;the&quot;        &quot;said&quot;       &quot;ballot&quot;    
+
+[[24]]
+ [1] &quot;parti&quot;  &quot;ukip&quot;   &quot;kilroy&quot; &quot;silk&quot;   &quot;elect&quot;  &quot;seat&quot;   &quot;vote&quot;   &quot;labour&quot;
+ [9] &quot;verita&quot; &quot;candid&quot;
+
+[[25]]
+ [1] &quot;minut&quot;  &quot;goal&quot;   &quot;ball&quot;   &quot;shot&quot;   &quot;half&quot;   &quot;the&quot;    &quot;second&quot; &quot;chanc&quot; 
+ [9] &quot;time&quot;   &quot;yard&quot;  
+
+[[26]]
+ [1] &quot;england&quot;  &quot;robinson&quot; &quot;ireland&quot;  &quot;six&quot;      &quot;half&quot;     &quot;game&quot;    
+ [7] &quot;injuri&quot;   &quot;nation&quot;   &quot;leicest&quot;  &quot;bath&quot;    
+
+[[27]]
+ [1] &quot;mobil&quot;     &quot;phone&quot;     &quot;broadband&quot; &quot;servic&quot;    &quot;speed&quot;     &quot;network&quot;  
+ [7] &quot;handset&quot;   &quot;net&quot;       &quot;use&quot;       &quot;access&quot;   
+
+[[28]]
+ [1] &quot;number&quot;   &quot;box&quot;      &quot;offic&quot;    &quot;chart&quot;    &quot;top&quot;      &quot;week&quot;    
+ [7] &quot;weekend&quot;  &quot;christma&quot; &quot;the&quot;      &quot;releas&quot;  
+
+[[29]]
+ [1] &quot;poster&quot;     &quot;howard&quot;     &quot;labour&quot;     &quot;jewish&quot;     &quot;said&quot;      
+ [6] &quot;tori&quot;       &quot;apologis&quot;   &quot;campaign&quot;   &quot;campbel&quot;    &quot;livingston&quot;
+
+[[30]]
+ [1] &quot;comput&quot;    &quot;use&quot;       &quot;technolog&quot; &quot;robot&quot;     &quot;the&quot;       &quot;chip&quot;     
+ [7] &quot;light&quot;     &quot;data&quot;      &quot;power&quot;     &quot;will&quot;     
+
+[[31]]
+ [1] &quot;tax&quot;    &quot;tori&quot;   &quot;labour&quot; &quot;elect&quot;  &quot;parti&quot;  &quot;howard&quot; &quot;brown&quot;  &quot;lib&quot;   
+ [9] &quot;dem&quot;    &quot;cut&quot;   
+
+[[32]]
+ [1] &quot;school&quot;   &quot;children&quot; &quot;educ&quot;     &quot;age&quot;      &quot;women&quot;    &quot;student&quot; 
+ [7] &quot;parent&quot;   &quot;univers&quot;  &quot;research&quot; &quot;game&quot;    
+
+[[33]]
+ [1] &quot;rate&quot;    &quot;growth&quot;  &quot;price&quot;   &quot;bank&quot;    &quot;hous&quot;    &quot;rise&quot;    &quot;figur&quot;  
+ [8] &quot;year&quot;    &quot;economi&quot; &quot;the&quot;    
+
+[[34]]
+ [1] &quot;patent&quot;     &quot;law&quot;        &quot;bill&quot;       &quot;european&quot;   &quot;airlin&quot;    
+ [6] &quot;govern&quot;     &quot;softwar&quot;    &quot;the&quot;        &quot;parliament&quot; &quot;direct&quot;    
+
+[[35]]
+ [1] &quot;game&quot;      &quot;consol&quot;    &quot;dvd&quot;       &quot;soni&quot;      &quot;high&quot;      &quot;video&quot;    
+ [7] &quot;definit&quot;   &quot;will&quot;      &quot;technolog&quot; &quot;develop&quot;  
+
+[[36]]
+ [1] &quot;secur&quot;     &quot;virus&quot;     &quot;program&quot;   &quot;microsoft&quot; &quot;softwar&quot;   &quot;card&quot;     
+ [7] &quot;window&quot;    &quot;spywar&quot;    &quot;comput&quot;    &quot;user&quot;     
+
+[[37]]
+ [1] &quot;best&quot;    &quot;film&quot;    &quot;award&quot;   &quot;nomin&quot;   &quot;oscar&quot;   &quot;the&quot;     &quot;actor&quot;  
+ [8] &quot;actress&quot; &quot;aviat&quot;   &quot;won&quot;    
+
+[[38]]
+ [1] &quot;band&quot;   &quot;album&quot;  &quot;music&quot;  &quot;song&quot;   &quot;rock&quot;   &quot;artist&quot; &quot;record&quot; &quot;singl&quot; 
+ [9] &quot;the&quot;    &quot;pop&quot;   
+
+[[39]]
+ [1] &quot;yuko&quot;    &quot;russian&quot; &quot;court&quot;   &quot;gazprom&quot; &quot;compani&quot; &quot;tax&quot;     &quot;russia&quot; 
+ [8] &quot;oil&quot;     &quot;rosneft&quot; &quot;yugansk&quot;
+
+[[40]]
+ [1] &quot;die&quot;     &quot;age&quot;     &quot;becam&quot;   &quot;auction&quot; &quot;charl&quot;   &quot;famili&quot;  &quot;includ&quot; 
+ [8] &quot;his&quot;     &quot;hous&quot;    &quot;year&quot;   
+
+[[41]]
+ [1] &quot;profit&quot;  &quot;price&quot;   &quot;oil&quot;     &quot;share&quot;   &quot;sale&quot;    &quot;compani&quot; &quot;product&quot;
+ [8] &quot;crude&quot;   &quot;firm&quot;    &quot;barrel&quot; 
+
+[[42]]
+ [1] &quot;car&quot;    &quot;airlin&quot; &quot;fiat&quot;   &quot;sale&quot;   &quot;year&quot;   &quot;profit&quot; &quot;euro&quot;   &quot;vehicl&quot;
+ [9] &quot;cost&quot;   &quot;motor&quot; 
+
+[[43]]
+ [1] &quot;film&quot;   &quot;festiv&quot; &quot;cinema&quot; &quot;camera&quot; &quot;print&quot;  &quot;ink&quot;    &quot;the&quot;    &quot;berlin&quot;
+ [9] &quot;imag&quot;   &quot;screen&quot;
+
+[[44]]
+ [1] &quot;tsunami&quot;   &quot;disast&quot;    &quot;sri&quot;       &quot;aid&quot;       &quot;lanka&quot;     &quot;indonesia&quot;
+ [7] &quot;countri&quot;   &quot;affect&quot;    &quot;damag&quot;     &quot;creditor&quot; 
+
+[[45]]
+ [1] &quot;sale&quot;     &quot;store&quot;    &quot;wal&quot;      &quot;mart&quot;     &quot;women&quot;    &quot;retail&quot;  
+ [7] &quot;book&quot;     &quot;shop&quot;     &quot;christma&quot; &quot;shopper&quot; 
+
+[[46]]
+ [1] &quot;hunt&quot;    &quot;polic&quot;   &quot;law&quot;     &quot;ban&quot;     &quot;parti&quot;   &quot;the&quot;     &quot;vote&quot;   
+ [8] &quot;said&quot;    &quot;labour&quot;  &quot;support&quot;
+
+[[47]]
+ [1] &quot;club&quot;      &quot;chelsea&quot;   &quot;leagu&quot;     &quot;liverpool&quot; &quot;arsenal&quot;   &quot;player&quot;   
+ [7] &quot;season&quot;    &quot;manag&quot;     &quot;footbal&quot;   &quot;cup&quot;      
+
+[[48]]
+ [1] &quot;lord&quot;    &quot;terror&quot;  &quot;said&quot;    &quot;right&quot;   &quot;law&quot;     &quot;home&quot;    &quot;the&quot;    
+ [8] &quot;human&quot;   &quot;clark&quot;   &quot;suspect&quot;
+
+[[49]]
+ [1] &quot;bid&quot;       &quot;offer&quot;     &quot;deutsch&quot;   &quot;glazer&quot;    &quot;lse&quot;       &quot;share&quot;    
+ [7] &quot;boers&quot;     &quot;club&quot;      &quot;takeov&quot;    &quot;sharehold&quot;
+
+[[50]]
+ [1] &quot;gadget&quot;    &quot;the&quot;       &quot;list&quot;      &quot;mobil&quot;     &quot;phone&quot;     &quot;top&quot;      
+ [7] &quot;parri&quot;     &quot;use&quot;       &quot;nintendo&quot;  &quot;liverpool&quot;</code></pre>
+</div>
+<div id="nmf" class="section level3">
+<h3>nmf</h3>
+<pre class="r"><code>print(kw_lists[[&quot;nmf&quot;]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;club&quot;     &quot;unit&quot;     &quot;the&quot;      &quot;board&quot;    &quot;said&quot;     &quot;will&quot;    
+ [7] &quot;propos&quot;   &quot;glazer&quot;   &quot;bid&quot;      &quot;manchest&quot;
+
+[[2]]
+ [1] &quot;said&quot;    &quot;aid&quot;     &quot;tsunami&quot; &quot;disast&quot;  &quot;the&quot;     &quot;countri&quot; &quot;peopl&quot;  
+ [8] &quot;affect&quot;  &quot;will&quot;    &quot;sri&quot;    
+
+[[3]]
+ [1] &quot;race&quot;     &quot;year&quot;     &quot;world&quot;    &quot;olymp&quot;    &quot;the&quot;      &quot;will&quot;    
+ [7] &quot;indoor&quot;   &quot;win&quot;      &quot;second&quot;   &quot;european&quot;
+
+[[4]]
+ [1] &quot;said&quot;    &quot;right&quot;   &quot;the&quot;     &quot;law&quot;     &quot;human&quot;   &quot;terror&quot;  &quot;rule&quot;   
+ [8] &quot;govern&quot;  &quot;suspect&quot; &quot;trial&quot;  
+
+[[5]]
+ [1] &quot;drug&quot;    &quot;test&quot;    &quot;the&quot;     &quot;said&quot;    &quot;ban&quot;     &quot;athlet&quot;  &quot;will&quot;   
+ [8] &quot;olymp&quot;   &quot;charg&quot;   &quot;kenteri&quot;
+
+[[6]]
+ [1] &quot;china&quot;   &quot;bank&quot;    &quot;the&quot;     &quot;govern&quot;  &quot;said&quot;    &quot;countri&quot; &quot;foreign&quot;
+ [8] &quot;will&quot;    &quot;chines&quot;  &quot;state&quot;  
+
+[[7]]
+ [1] &quot;open&quot;  &quot;win&quot;   &quot;final&quot; &quot;set&quot;   &quot;play&quot;  &quot;first&quot; &quot;said&quot;  &quot;match&quot; &quot;year&quot; 
+[10] &quot;the&quot;  
+
+[[8]]
+ [1] &quot;said&quot;   &quot;polic&quot;  &quot;hunt&quot;   &quot;the&quot;    &quot;law&quot;    &quot;murder&quot; &quot;arrest&quot; &quot;peopl&quot; 
+ [9] &quot;court&quot;  &quot;ban&quot;   
+
+[[9]]
+ [1] &quot;music&quot;  &quot;song&quot;   &quot;best&quot;   &quot;the&quot;    &quot;year&quot;   &quot;award&quot;  &quot;album&quot;  &quot;artist&quot;
+ [9] &quot;band&quot;   &quot;record&quot;
+
+[[10]]
+ [1] &quot;the&quot;      &quot;compani&quot;  &quot;said&quot;     &quot;firm&quot;     &quot;fraud&quot;    &quot;account&quot; 
+ [7] &quot;former&quot;   &quot;charg&quot;    &quot;investig&quot; &quot;financi&quot; 
+
+[[11]]
+ [1] &quot;manag&quot;  &quot;game&quot;   &quot;said&quot;   &quot;club&quot;   &quot;the&quot;    &quot;will&quot;   &quot;player&quot; &quot;boss&quot;  
+ [9] &quot;ranger&quot; &quot;cup&quot;   
+
+[[12]]
+ [1] &quot;will&quot;      &quot;said&quot;      &quot;chelsea&quot;   &quot;club&quot;      &quot;liverpool&quot; &quot;leagu&quot;    
+ [7] &quot;player&quot;    &quot;play&quot;      &quot;game&quot;      &quot;footbal&quot;  
+
+[[13]]
+ [1] &quot;yuko&quot;    &quot;oil&quot;     &quot;said&quot;    &quot;russian&quot; &quot;compani&quot; &quot;the&quot;     &quot;russia&quot; 
+ [8] &quot;firm&quot;    &quot;court&quot;   &quot;tax&quot;    
+
+[[14]]
+ [1] &quot;search&quot; &quot;said&quot;   &quot;googl&quot;  &quot;peopl&quot;  &quot;the&quot;    &quot;user&quot;   &quot;web&quot;    &quot;use&quot;   
+ [9] &quot;inform&quot; &quot;onlin&quot; 
+
+[[15]]
+ [1] &quot;use&quot;     &quot;the&quot;     &quot;said&quot;    &quot;work&quot;    &quot;softwar&quot; &quot;comput&quot;  &quot;light&quot;  
+ [8] &quot;can&quot;     &quot;site&quot;    &quot;call&quot;   
+
+[[16]]
+ [1] &quot;the&quot;     &quot;dollar&quot;  &quot;japan&quot;   &quot;price&quot;   &quot;trade&quot;   &quot;said&quot;    &quot;oil&quot;    
+ [8] &quot;deficit&quot; &quot;market&quot;  &quot;year&quot;   
+
+[[17]]
+ [1] &quot;ireland&quot;  &quot;william&quot;  &quot;wale&quot;     &quot;itali&quot;    &quot;half&quot;     &quot;tri&quot;     
+ [7] &quot;game&quot;     &quot;scotland&quot; &quot;penalti&quot;  &quot;minut&quot;   
+
+[[18]]
+ [1] &quot;the&quot;       &quot;will&quot;      &quot;technolog&quot; &quot;use&quot;       &quot;can&quot;       &quot;robot&quot;    
+ [7] &quot;peopl&quot;     &quot;research&quot;  &quot;comput&quot;    &quot;develop&quot;  
+
+[[19]]
+ [1] &quot;european&quot; &quot;the&quot;      &quot;franc&quot;    &quot;germani&quot;  &quot;will&quot;     &quot;french&quot;  
+ [7] &quot;europ&quot;    &quot;countri&quot;  &quot;said&quot;     &quot;german&quot;  
+
+[[20]]
+ [1] &quot;film&quot;     &quot;the&quot;      &quot;best&quot;     &quot;award&quot;    &quot;oscar&quot;    &quot;nomin&quot;   
+ [7] &quot;actor&quot;    &quot;director&quot; &quot;star&quot;     &quot;year&quot;    
+
+[[21]]
+ [1] &quot;said&quot;     &quot;the&quot;      &quot;govern&quot;   &quot;will&quot;     &quot;scottish&quot; &quot;council&quot; 
+ [7] &quot;peopl&quot;    &quot;committe&quot; &quot;new&quot;      &quot;scotland&quot;
+
+[[22]]
+ [1] &quot;secur&quot;   &quot;said&quot;    &quot;virus&quot;   &quot;the&quot;     &quot;mail&quot;    &quot;use&quot;     &quot;user&quot;   
+ [8] &quot;net&quot;     &quot;program&quot; &quot;attack&quot; 
+
+[[23]]
+ [1] &quot;the&quot;    &quot;number&quot; &quot;top&quot;    &quot;chart&quot;  &quot;band&quot;   &quot;singl&quot;  &quot;one&quot;    &quot;releas&quot;
+ [9] &quot;record&quot; &quot;year&quot;  
+
+[[24]]
+ [1] &quot;england&quot;  &quot;franc&quot;    &quot;game&quot;     &quot;robinson&quot; &quot;six&quot;      &quot;nation&quot;  
+ [7] &quot;the&quot;      &quot;wale&quot;     &quot;rugbi&quot;    &quot;ireland&quot; 
+
+[[25]]
+ [1] &quot;school&quot;   &quot;said&quot;     &quot;the&quot;      &quot;women&quot;    &quot;children&quot; &quot;educ&quot;    
+ [7] &quot;student&quot;  &quot;univers&quot;  &quot;age&quot;      &quot;peopl&quot;   
+
+[[26]]
+ [1] &quot;gadget&quot;  &quot;the&quot;     &quot;player&quot;  &quot;list&quot;    &quot;magazin&quot; &quot;said&quot;    &quot;digit&quot;  
+ [8] &quot;use&quot;     &quot;top&quot;     &quot;ipod&quot;   
+
+[[27]]
+ [1] &quot;sale&quot;    &quot;profit&quot;  &quot;year&quot;    &quot;said&quot;    &quot;the&quot;     &quot;car&quot;     &quot;euro&quot;   
+ [8] &quot;market&quot;  &quot;compani&quot; &quot;will&quot;   
+
+[[28]]
+ [1] &quot;the&quot;    &quot;iraq&quot;   &quot;will&quot;   &quot;said&quot;   &quot;bush&quot;   &quot;war&quot;    &quot;blair&quot;  &quot;presid&quot;
+ [9] &quot;govern&quot; &quot;polit&quot; 
+
+[[29]]
+ [1] &quot;minut&quot;  &quot;goal&quot;   &quot;ball&quot;   &quot;half&quot;   &quot;score&quot;  &quot;the&quot;    &quot;second&quot; &quot;chanc&quot; 
+ [9] &quot;time&quot;   &quot;shot&quot;  
+
+[[30]]
+ [1] &quot;will&quot;      &quot;technolog&quot; &quot;the&quot;       &quot;video&quot;     &quot;high&quot;      &quot;dvd&quot;      
+ [7] &quot;digit&quot;     &quot;said&quot;      &quot;devic&quot;     &quot;definit&quot;  
+
+[[31]]
+ [1] &quot;radio&quot;   &quot;show&quot;    &quot;the&quot;     &quot;said&quot;    &quot;blog&quot;    &quot;say&quot;     &quot;peopl&quot;  
+ [8] &quot;station&quot; &quot;blogger&quot; &quot;one&quot;    
+
+[[32]]
+ [1] &quot;lord&quot;       &quot;said&quot;       &quot;bill&quot;       &quot;the&quot;        &quot;minist&quot;    
+ [6] &quot;govern&quot;     &quot;mps&quot;        &quot;say&quot;        &quot;common&quot;     &quot;parliament&quot;
+
+[[33]]
+ [1] &quot;said&quot;    &quot;india&quot;   &quot;airlin&quot;  &quot;the&quot;     &quot;countri&quot; &quot;will&quot;    &quot;world&quot;  
+ [8] &quot;year&quot;    &quot;develop&quot; &quot;indian&quot; 
+
+[[34]]
+ [1] &quot;mobil&quot;     &quot;phone&quot;     &quot;use&quot;       &quot;said&quot;      &quot;peopl&quot;     &quot;handset&quot;  
+ [7] &quot;messag&quot;    &quot;the&quot;       &quot;camera&quot;    &quot;technolog&quot;
+
+[[35]]
+ [1] &quot;said&quot;     &quot;file&quot;     &quot;music&quot;    &quot;the&quot;      &quot;download&quot; &quot;industri&quot;
+ [7] &quot;network&quot;  &quot;peer&quot;     &quot;legal&quot;    &quot;copi&quot;    
+
+[[36]]
+ [1] &quot;said&quot;      &quot;the&quot;       &quot;blunkett&quot;  &quot;say&quot;       &quot;minist&quot;    &quot;comment&quot;  
+ [7] &quot;secretari&quot; &quot;poster&quot;    &quot;work&quot;      &quot;apologis&quot; 
+
+[[37]]
+ [1] &quot;get&quot;   &quot;just&quot;  &quot;think&quot; &quot;like&quot;  &quot;one&quot;   &quot;but&quot;   &quot;can&quot;   &quot;peopl&quot; &quot;say&quot;  
+[10] &quot;good&quot; 
+
+[[38]]
+ [1] &quot;will&quot;   &quot;play&quot;   &quot;year&quot;   &quot;said&quot;   &quot;player&quot; &quot;the&quot;    &quot;injuri&quot; &quot;cup&quot;   
+ [9] &quot;rugbi&quot;  &quot;world&quot; 
+
+[[39]]
+ [1] &quot;the&quot;    &quot;award&quot;  &quot;best&quot;   &quot;prize&quot;  &quot;winner&quot; &quot;won&quot;    &quot;show&quot;   &quot;year&quot;  
+ [9] &quot;will&quot;   &quot;includ&quot;
+
+[[40]]
+ [1] &quot;the&quot;    &quot;said&quot;   &quot;year&quot;   &quot;die&quot;    &quot;also&quot;   &quot;age&quot;    &quot;work&quot;   &quot;includ&quot;
+ [9] &quot;she&quot;    &quot;famili&quot;
+
+[[41]]
+ [1] &quot;comput&quot;    &quot;the&quot;       &quot;will&quot;      &quot;use&quot;       &quot;said&quot;      &quot;mini&quot;     
+ [7] &quot;mac&quot;       &quot;chip&quot;      &quot;power&quot;     &quot;technolog&quot;
+
+[[42]]
+ [1] &quot;share&quot;   &quot;said&quot;    &quot;compani&quot; &quot;firm&quot;    &quot;deal&quot;    &quot;stock&quot;   &quot;market&quot; 
+ [8] &quot;the&quot;     &quot;london&quot;  &quot;offer&quot;  
+
+[[43]]
+ [1] &quot;rate&quot;    &quot;the&quot;     &quot;said&quot;    &quot;year&quot;    &quot;growth&quot;  &quot;economi&quot; &quot;figur&quot;  
+ [8] &quot;month&quot;   &quot;rise&quot;    &quot;price&quot;  
+
+[[44]]
+ [1] &quot;game&quot;     &quot;the&quot;      &quot;play&quot;     &quot;titl&quot;     &quot;will&quot;     &quot;consol&quot;  
+ [7] &quot;can&quot;      &quot;nintendo&quot; &quot;gamer&quot;    &quot;time&quot;    
+
+[[45]]
+ [1] &quot;servic&quot;    &quot;broadband&quot; &quot;will&quot;      &quot;the&quot;       &quot;net&quot;       &quot;said&quot;     
+ [7] &quot;peopl&quot;     &quot;network&quot;   &quot;speed&quot;     &quot;access&quot;   
+
+[[46]]
+ [1] &quot;tax&quot;     &quot;will&quot;    &quot;said&quot;    &quot;the&quot;     &quot;govern&quot;  &quot;cut&quot;     &quot;spend&quot;  
+ [8] &quot;increas&quot; &quot;budget&quot;  &quot;pension&quot;
+
+[[47]]
+ [1] &quot;parti&quot;  &quot;vote&quot;   &quot;elect&quot;  &quot;said&quot;   &quot;ukip&quot;   &quot;kilroy&quot; &quot;the&quot;    &quot;silk&quot;  
+ [9] &quot;polit&quot;  &quot;will&quot;  
+
+[[48]]
+ [1] &quot;said&quot;   &quot;the&quot;    &quot;plan&quot;   &quot;immigr&quot; &quot;asylum&quot; &quot;will&quot;   &quot;tori&quot;   &quot;peopl&quot; 
+ [9] &quot;card&quot;   &quot;govern&quot;
+
+[[49]]
+ [1] &quot;film&quot; &quot;the&quot;  &quot;star&quot; &quot;show&quot; &quot;said&quot; &quot;will&quot; &quot;movi&quot; &quot;year&quot; &quot;new&quot;  &quot;seri&quot;
+
+[[50]]
+ [1] &quot;labour&quot;   &quot;elect&quot;    &quot;blair&quot;    &quot;parti&quot;    &quot;said&quot;     &quot;brown&quot;   
+ [7] &quot;tori&quot;     &quot;howard&quot;   &quot;prime&quot;    &quot;campaign&quot;</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/New_York
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] stringr_1.5.1   stringi_1.8.4   tidyr_1.3.1     ggplot2_3.5.1  
+ [5] dplyr_1.1.4     Matrix_1.7-0    passPCA_0.1.0   SnowballC_0.7.1
+ [9] tm_0.7-14       NLP_0.3-0      
+
+loaded via a namespace (and not attached):
+ [1] generics_0.1.3    sass_0.4.9        utf8_1.2.4        xml2_1.3.6       
+ [5] slam_0.1-54       lattice_0.22-6    hms_1.1.3         digest_0.6.36    
+ [9] magrittr_2.0.3    evaluate_0.24.0   grid_4.4.0        fastmap_1.2.0    
+[13] rprojroot_2.0.4   workflowr_1.7.1   jsonlite_1.8.8    promises_1.3.0   
+[17] purrr_1.0.2       fansi_1.0.6       scales_1.3.0      jquerylib_0.1.4  
+[21] cli_3.6.3         rlang_1.1.4       crayon_1.5.3      munsell_0.5.1    
+[25] bit64_4.0.5       withr_3.0.0       cachem_1.1.0      yaml_2.3.8       
+[29] Rtsne_0.17        tools_4.4.0       parallel_4.4.0    tzdb_0.4.0       
+[33] colorspace_2.1-0  httpuv_1.6.15     vctrs_0.6.5       R6_2.5.1         
+[37] lifecycle_1.0.4   git2r_0.33.0      fs_1.6.4          bit_4.0.5        
+[41] vroom_1.6.5       pkgconfig_2.0.3   gtable_0.3.5      pillar_1.9.0     
+[45] bslib_0.7.0       later_1.3.2       glue_1.7.0        Rcpp_1.0.13      
+[49] highr_0.11        xfun_0.45         tibble_3.2.1      tidyselect_1.2.1 
+[53] rstudioapi_0.16.0 knitr_1.47        farver_2.1.2      htmltools_0.5.8.1
+[57] labeling_0.4.3    rmarkdown_2.27    readr_2.1.5       compiler_4.4.0   </code></pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
