@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 # Introduction
 
-Here, I will apply the `log1p` matrix factorization model to a dataset of approximately $2K$ BBC news articles. To pre-process the data, I perform stemming and remove stop words using the package `tm`. I fit the model without using any approximation for various values of $c$. I also used a size factor on the order of $1$ that is proportional to the total number of words in each article. Finally, to initialize each fit, I first fit a $K = 1$ model to convergence and then initialize the $K = 50$ fit with small positive numbers in factors $2-49$ and the rank 1 fit for the first factor.
+Here, I will apply the `log1p` matrix factorization model to a dataset of approximately $2K$ BBC news articles. To pre-process the data, I perform stemming and remove stop words using the package `tm`. I fit the model without using any approximation for various values of $c$. I also used a size factor on the order of $1$ that is proportional to the total number of words in each article. Finally, to initialize each fit, I first fit a $K = 1$ model to convergence and then initialize the $K = 30$ fit with small positive numbers in factors $2-29$ and the rank 1 fit for the first factor.
 
 
 ```{r}
@@ -29,12 +29,12 @@ addspace <- content_transformer(function(x, pattern) {
 
 my_corpus <- tm_map(my_corpus, addspace, "-")
 
-my_corpus <- tm_map(my_corpus, removePunctuation)
 my_corpus <- tm_map(my_corpus, removeNumbers)
-my_corpus <- tm_map(my_corpus, removeWords, stopwords("english"))
 
 # Transform to lower case (need to wrap in content_transformer)
 my_corpus <- tm_map(my_corpus,content_transformer(tolower))
+my_corpus <- tm_map(my_corpus, removeWords, stopwords("SMART"))
+my_corpus <- tm_map(my_corpus, removePunctuation)
 my_corpus <- tm_map(my_corpus, stripWhitespace)
 
 my_corpus <- tm_map(my_corpus, stemDocument)
@@ -58,7 +58,7 @@ s <- s / mean(s)
 library(passPCA)
 library(Matrix)
 library(dplyr)
-cc_vec <- c(0.0001, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+cc_vec <- c(0.0001, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3, 1e4)
 ```
 
 ```{r, eval=FALSE}
@@ -66,12 +66,12 @@ fit_list <- list()
 n <- nrow(dtm2)
 p <- ncol(dtm2)
 
-K <- 50
+K <- 30
 
 for (cc in cc_vec) {
-
+  
   print(cc)
-
+  
   set.seed(1)
   log1p_k1 <- fit_factor_model_log1p_exact(
     Y = dtm2,
@@ -80,7 +80,7 @@ for (cc in cc_vec) {
     s = cc * s,
     init_method = "frob_nmf"
   )
-
+  
   init_LL <- log1p_k1$U %>%
     cbind(
       matrix(
@@ -91,7 +91,7 @@ for (cc in cc_vec) {
         ncol = K - 1
       )
     )
-
+  
   init_FF <- log1p_k1$V %>%
     cbind(
       matrix(
@@ -102,8 +102,8 @@ for (cc in cc_vec) {
         ncol = K - 1
       )
     )
-
-
+  
+  
   set.seed(1)
   fit <- fit_factor_model_log1p_exact(
     Y = dtm2,
@@ -113,13 +113,13 @@ for (cc in cc_vec) {
     maxiter = 100,
     s = cc * s
   )
-
+  
   fit_list[[as.character(cc)]] <- fit
-
+  
 }
 
 library(fastTopics)
-nmf <- fit_poisson_nmf(X = dtm2, k = 50, control = list(nc = 4))
+nmf <- fit_poisson_nmf(X = dtm2, k = K, control = list(nc = 6))
 
 fit_list[["nmf"]] <- nmf
 ```
@@ -137,8 +137,6 @@ Below is a plot of the log-likelihoods of the data under a Poisson model using d
 
 ```{r}
 ll_vec <- c()
-
-fit_list[[as.character(1e-4)]] <- fit_list$`0.0001`
 
 for (cc in cc_vec) {
 
@@ -187,7 +185,7 @@ ggplot(data = df) +
 
 ## Loadings
 
-Each article in the original dataset comes with a section label (one of business, entertainment, politics, sports, or tech). I'm interested in understanding how the loadings for different articles compare across article category. To make the analysis easier to view, I am only going to focus on the three smallest values of $c$ that I ran above as well as the topic model fit. 
+Each article in the original dataset comes with a section label (one of business, entertainment, politics, sports, or tech). I'm interested in understanding how the loadings for different articles compare across article category. 
 
 ```{r}
 normalize_bars <- function(LL) {
@@ -199,13 +197,13 @@ normalize_bars <- function(LL) {
 ```
 
 
-```{r, fig.width=12, fig.height=20}
+```{r, fig.width=12, fig.height=33}
 library(tidyr)
 library(stringi)
 library(stringr)
 cell.type <- as.factor(dat$labels)
 
-LL_c0001 <- normalize_bars(fit_list$`0.0001`$U)
+LL_c0001 <- normalize_bars(fit_list$`1e-04`$U)
 
 # Downsample the number of cells and sort them using tSNE.
 set.seed(8675309)
@@ -246,6 +244,14 @@ LL_c01 <- normalize_bars(fit_list$`0.01`$U)
 LL_c01 <- LL_c01[cell.idx, ]
 LL_cp1 <- normalize_bars(fit_list$`0.1`$U)
 LL_cp1 <- LL_cp1[cell.idx, ]
+LL_c1 <- normalize_bars(fit_list$`1`$U)
+LL_c1 <- LL_c1[cell.idx, ]
+LL_c10 <- normalize_bars(fit_list$`10`$U)
+LL_c10 <- LL_c10[cell.idx, ]
+LL_c100 <- normalize_bars(fit_list$`100`$U)
+LL_c100 <- LL_c100[cell.idx, ]
+LL_c1000 <- normalize_bars(fit_list$`1000`$U)
+LL_c1000 <- LL_c1000[cell.idx, ]
 LL_cinf <- fit_list$nmf$L
 LL_cinf <- LL_cinf[cell.idx, ]
 
@@ -271,15 +277,22 @@ LL_c0001_tib <- make.heatmap.tib(LL_c0001)
 LL_c001_tib <- make.heatmap.tib(LL_c001)
 LL_c01_tib <- make.heatmap.tib(LL_c01)
 LL_cp1_tib <- make.heatmap.tib(LL_cp1)
+LL_c1_tib <- make.heatmap.tib(LL_c1)
+LL_c10_tib <- make.heatmap.tib(LL_c10)
+LL_c100_tib <- make.heatmap.tib(LL_c100)
+LL_c1000_tib <- make.heatmap.tib(LL_c1000)
 LL_cinf_tib <- make.heatmap.tib(LL_cinf)
-
 
 heatmap.tib <- LL_c0001_tib %>% mutate(Method = "c = 0.0001") %>%
   bind_rows(LL_c001_tib %>% mutate(Method = "c = 0.001")) %>%
   bind_rows(LL_c01_tib %>% mutate(Method = "c = 0.01")) %>%
   bind_rows(LL_cp1_tib %>% mutate(Method = "c = 0.1")) %>%
+  bind_rows(LL_c1_tib %>% mutate(Method = "c = 1")) %>%
+  bind_rows(LL_c10_tib %>% mutate(Method = "c = 10")) %>%
+  bind_rows(LL_c100_tib %>% mutate(Method = "c = 100")) %>%
+  bind_rows(LL_c1000_tib %>% mutate(Method = "c = 1000")) %>%
   bind_rows(LL_cinf_tib %>% mutate(Method = "Topic Model")) %>% 
-  mutate(Method = factor(Method, levels = c("c = 0.0001", "c = 0.001", "c = 0.01", "c = 0.1", "Topic Model")))
+  mutate(Method = factor(Method, levels = c("c = 0.0001", "c = 0.001", "c = 0.01", "c = 0.1", "c = 1", "c = 10", "c = 100", "c = 1000", "Topic Model")))
 
 tib <- heatmap.tib %>%
   group_by(Cell.type, Cell.idx) %>%
@@ -364,6 +377,30 @@ print(kw_lists[[as.character(1e-2)]])
 
 ```{r}
 print(kw_lists[[as.character(1e-1)]])
+```
+
+### c = 1
+
+```{r}
+print(kw_lists[[as.character(1)]])
+```
+
+### c = 10
+
+```{r}
+print(kw_lists[[as.character(10)]])
+```
+
+### c = 100
+
+```{r}
+print(kw_lists[[as.character(100)]])
+```
+
+### c = 1000
+
+```{r}
+print(kw_lists[[as.character(1000)]])
 ```
 
 ### nmf
