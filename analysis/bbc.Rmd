@@ -185,8 +185,6 @@ ggplot(data = df) +
 
 ## Loadings
 
-Each article in the original dataset comes with a section label (one of business, entertainment, politics, sports, or tech). I'm interested in understanding how the loadings for different articles compare across article category. 
-
 ```{r}
 normalize_bars <- function(LL) {
 
@@ -196,6 +194,40 @@ normalize_bars <- function(LL) {
 }
 ```
 
+First, I plot the sparsity of the loadings as a function of `c`, where the dashed red line is the sparsity of the loadings in the topic model.
+
+```{r}
+L_sparsity_vec <- c()
+
+for (cc in cc_vec) {
+
+  fit <- fit_list[[as.character(cc)]] 
+  LL <- normalize_bars(fit$U)
+  L_sparsity <- mean(LL < 1e-5)
+  L_sparsity_vec <- c(L_sparsity_vec, L_sparsity)
+
+  
+}
+
+nmf_sparsity <- mean(normalize_bars(fit_list$nmf$L) < 1e-5)
+df <- data.frame(
+  cc = cc_vec,
+  l_sparsity = L_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = l_sparsity)) +
+  geom_line(aes(x = cc, y = l_sparsity)) +
+  xlab("c") +
+  ylab("Sparsity of Loadings") +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = "red", linetype = "dashed") +
+  cowplot::theme_cowplot()
+```
+
+Now, each article in the original dataset comes with a section label (one of business, entertainment, politics, sports, or tech). I'm interested in understanding how the loadings for different articles compare across article category. 
 
 ```{r, fig.width=12, fig.height=33}
 library(tidyr)
@@ -321,6 +353,39 @@ plt
 ```
 
 ## Factors
+
+First, I plot the sparsity of the factors as a function of `c`, where the dashed red line is the sparsity of the factors in the topic model.
+
+```{r}
+F_sparsity_vec <- c()
+
+for (cc in cc_vec) {
+
+  fit <- fit_list[[as.character(cc)]] 
+  FF <- normalize_bars(fit$V)
+  F_sparsity <- mean(FF < 1e-5)
+  F_sparsity_vec <- c(F_sparsity_vec, F_sparsity)
+
+  
+}
+
+nmf_sparsity <- mean(normalize_bars(fit_list$nmf$F) < 1e-5)
+df <- data.frame(
+  cc = cc_vec,
+  f_sparsity = F_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = f_sparsity)) +
+  geom_line(aes(x = cc, y = f_sparsity)) +
+  xlab("c") +
+  ylab("Sparsity of Factors") +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = "red", linetype = "dashed") +
+  cowplot::theme_cowplot()
+```
 
 Below, I print out the top $10$ words for each factor from each model.
 

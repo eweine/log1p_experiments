@@ -400,7 +400,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-11-11
+<strong>Last updated:</strong> 2024-11-14
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree9fe544c67b0c8e3863eb4f72ba8ecd8c00ef672ftargetblank9fe544ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree30d590cff3c0c6c72772a0407f3b01d88b9601b9targetblank30d590ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/9fe544c67b0c8e3863eb4f72ba8ecd8c00ef672f" target="_blank">9fe544c</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/30d590cff3c0c6c72772a0407f3b01d88b9601b9" target="_blank">30d590c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree9fe544c67b0c8e3863eb4f72ba8ecd8c00ef672ftargetblank9fe544ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree30d590cff3c0c6c72772a0407f3b01d88b9601b9targetblank30d590ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/9fe544c67b0c8e3863eb4f72ba8ecd8c00ef672f" target="_blank">9fe544c</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/30d590cff3c0c6c72772a0407f3b01d88b9601b9" target="_blank">30d590c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -615,6 +615,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/30d590cff3c0c6c72772a0407f3b01d88b9601b9/analysis/bbc.Rmd" target="_blank">30d590c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-11
+</td>
+<td>
+updated BBC analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/30d590cff3c0c6c72772a0407f3b01d88b9601b9/docs/bbc.html" target="_blank">30d590c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-11
+</td>
+<td>
+updated BBC analysis
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -855,6 +889,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/30d590cff3c0c6c72772a0407f3b01d88b9601b9/docs/figure/bbc.Rmd/unnamed-chunk-5-1.png" target="_blank">30d590c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-11
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/9fe544c67b0c8e3863eb4f72ba8ecd8c00ef672f/docs/figure/bbc.Rmd/unnamed-chunk-5-1.png" target="_blank">9fe544c</a>
 </td>
 <td>
@@ -871,16 +916,96 @@ Eric Weine
 </div>
 <div id="loadings" class="section level2">
 <h2>Loadings</h2>
-<p>Each article in the original dataset comes with a section label (one
-of business, entertainment, politics, sports, or tech). I’m interested
-in understanding how the loadings for different articles compare across
-article category.</p>
 <pre class="r"><code>normalize_bars &lt;- function(LL) {
 
   max_col &lt;- apply(LL, 2, max)
   sweep(LL, 2, max_col, FUN = &quot;/&quot;)
 
 }</code></pre>
+<p>First, I plot the sparsity of the loadings as a function of
+<code>c</code>, where the dashed red line is the sparsity of the
+loadings in the topic model.</p>
+<pre class="r"><code>L_sparsity_vec &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list[[as.character(cc)]] 
+  LL &lt;- normalize_bars(fit$U)
+  L_sparsity &lt;- mean(LL &lt; 1e-5)
+  L_sparsity_vec &lt;- c(L_sparsity_vec, L_sparsity)
+
+  
+}
+
+nmf_sparsity &lt;- mean(normalize_bars(fit_list$nmf$L) &lt; 1e-5)
+df &lt;- data.frame(
+  cc = cc_vec,
+  l_sparsity = L_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = l_sparsity)) +
+  geom_line(aes(x = cc, y = l_sparsity)) +
+  xlab(&quot;c&quot;) +
+  ylab(&quot;Sparsity of Loadings&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/bbc.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/30d590cff3c0c6c72772a0407f3b01d88b9601b9/docs/figure/bbc.Rmd/unnamed-chunk-7-1.png" target="_blank">30d590c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-11
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/9fe544c67b0c8e3863eb4f72ba8ecd8c00ef672f/docs/figure/bbc.Rmd/unnamed-chunk-7-1.png" target="_blank">9fe544c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Now, each article in the original dataset comes with a section label
+(one of business, entertainment, politics, sports, or tech). I’m
+interested in understanding how the loadings for different articles
+compare across article category.</p>
 <pre class="r"><code>library(tidyr)
 library(stringi)
 library(stringr)
@@ -1001,47 +1126,42 @@ plt &lt;- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
         strip.text = element_text(size = 16)) 
 
 plt</code></pre>
-<p><img src="figure/bbc.Rmd/unnamed-chunk-7-1.png" width="1152" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
-Past versions of unnamed-chunk-7-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-7-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/9fe544c67b0c8e3863eb4f72ba8ecd8c00ef672f/docs/figure/bbc.Rmd/unnamed-chunk-7-1.png" target="_blank">9fe544c</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-11-10
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/bbc.Rmd/unnamed-chunk-8-1.png" width="1152" style="display: block; margin: auto;" /></p>
 </div>
 <div id="factors" class="section level2">
 <h2>Factors</h2>
+<p>First, I plot the sparsity of the factors as a function of
+<code>c</code>, where the dashed red line is the sparsity of the factors
+in the topic model.</p>
+<pre class="r"><code>F_sparsity_vec &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list[[as.character(cc)]] 
+  FF &lt;- normalize_bars(fit$V)
+  F_sparsity &lt;- mean(FF &lt; 1e-5)
+  F_sparsity_vec &lt;- c(F_sparsity_vec, F_sparsity)
+
+  
+}
+
+nmf_sparsity &lt;- mean(normalize_bars(fit_list$nmf$F) &lt; 1e-5)
+df &lt;- data.frame(
+  cc = cc_vec,
+  f_sparsity = F_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = f_sparsity)) +
+  geom_line(aes(x = cc, y = f_sparsity)) +
+  xlab(&quot;c&quot;) +
+  ylab(&quot;Sparsity of Factors&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/bbc.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Below, I print out the top <span class="math inline">\(10\)</span>
 words for each factor from each model.</p>
 <pre class="r"><code>get_keywords &lt;- function(V) {
@@ -2215,16 +2335,16 @@ loaded via a namespace (and not attached):
 [13] rprojroot_2.0.4   workflowr_1.7.1   jsonlite_1.8.8    whisker_0.4.1    
 [17] promises_1.3.0    purrr_1.0.2       fansi_1.0.6       scales_1.3.0     
 [21] jquerylib_0.1.4   cli_3.6.3         rlang_1.1.4       crayon_1.5.3     
-[25] munsell_0.5.1     bit64_4.0.5       withr_3.0.0       cachem_1.1.0     
-[29] yaml_2.3.8        Rtsne_0.17        tools_4.4.0       parallel_4.4.0   
-[33] tzdb_0.4.0        colorspace_2.1-0  httpuv_1.6.15     vctrs_0.6.5      
-[37] R6_2.5.1          lifecycle_1.0.4   git2r_0.33.0      fs_1.6.4         
-[41] bit_4.0.5         vroom_1.6.5       pkgconfig_2.0.3   gtable_0.3.5     
-[45] pillar_1.9.0      bslib_0.7.0       later_1.3.2       glue_1.7.0       
-[49] Rcpp_1.0.13       highr_0.11        xfun_0.45         tibble_3.2.1     
-[53] tidyselect_1.2.1  rstudioapi_0.16.0 knitr_1.47        farver_2.1.2     
-[57] htmltools_0.5.8.1 labeling_0.4.3    rmarkdown_2.27    readr_2.1.5      
-[61] compiler_4.4.0   </code></pre>
+[25] cowplot_1.1.3     munsell_0.5.1     bit64_4.0.5       withr_3.0.0      
+[29] cachem_1.1.0      yaml_2.3.8        Rtsne_0.17        tools_4.4.0      
+[33] parallel_4.4.0    tzdb_0.4.0        colorspace_2.1-0  httpuv_1.6.15    
+[37] vctrs_0.6.5       R6_2.5.1          lifecycle_1.0.4   git2r_0.33.0     
+[41] fs_1.6.4          bit_4.0.5         vroom_1.6.5       pkgconfig_2.0.3  
+[45] gtable_0.3.5      pillar_1.9.0      bslib_0.7.0       later_1.3.2      
+[49] glue_1.7.0        Rcpp_1.0.13       highr_0.11        xfun_0.45        
+[53] tibble_3.2.1      tidyselect_1.2.1  rstudioapi_0.16.0 knitr_1.47       
+[57] farver_2.1.2      htmltools_0.5.8.1 labeling_0.4.3    rmarkdown_2.27   
+[61] readr_2.1.5       compiler_4.4.0   </code></pre>
 </div>
 </div>
 </div>
