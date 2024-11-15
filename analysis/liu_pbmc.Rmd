@@ -217,41 +217,7 @@ normalize_bars <- function(LL) {
 }
 ```
 
-First, I plot the sparsity of the loadings as a function of `c`, where the dashed red line is the sparsity of the loadings in the topic model.
-
-```{r}
-L_sparsity_vec <- c()
-
-for (cc in cc_vec) {
-
-  fit <- fit_list[[as.character(cc)]]
-  LL <- normalize_bars(fit$U)
-  L_sparsity <- mean(LL < 1e-5)
-  L_sparsity_vec <- c(L_sparsity_vec, L_sparsity)
-
-
-}
-
-nmf_sparsity <- mean(normalize_bars(fit_list$nmf$L) < 1e-5)
-df <- data.frame(
-  cc = cc_vec,
-  l_sparsity = L_sparsity_vec
-)
-
-library(ggplot2)
-ggplot(data = df) +
-  geom_point(aes(x = cc, y = l_sparsity)) +
-  geom_line(aes(x = cc, y = l_sparsity)) +
-  xlab("c") +
-  ylab("Sparsity of Loadings") +
-  scale_x_log10() +
-  scale_y_log10() +
-  geom_hline(yintercept = nmf_sparsity, color = "red", linetype = "dashed") +
-  cowplot::theme_cowplot()
-```
-Here, we actually see that the relationship between the sparsity of the loadings and $c$ is non-monotonic. I looks like the most sparse fit is for $c = 10$, with $c = 1$ a close second. 
-
-Now, each cell in the original dataset has a FACS label (one of 10 different cell types). Below, I plot the loadings stratified by each label.
+Each cell in the original dataset has a FACS label (one of 10 different cell types). Below, I plot the loadings stratified by each label.
 
 ```{r, fig.width=12, fig.height=33}
 library(tidyr)
@@ -268,8 +234,8 @@ cell.types <- levels(cell.type)
 for (i in 1:length(cell.types)) {
   which.idx <- which(cell.type == cell.types[i])
   # Downsample common cell types.
-  if (length(which.idx) > 1000) {
-    which.idx <- sample(which.idx, 1000)
+  if (length(which.idx) > 2000) {
+    which.idx <- sample(which.idx, 2000)
   }
   # Don't include rare cell types.
   if (length(which.idx) > 10) {
@@ -308,7 +274,7 @@ LL_c100 <- normalize_bars(fit_list$`100`$U)
 LL_c100 <- LL_c100[cell.idx, ]
 LL_c1000 <- normalize_bars(fit_list$`1000`$U)
 LL_c1000 <- LL_c1000[cell.idx, ]
-LL_cinf <- fit_list$nmf$L
+LL_cinf <- normalize_bars(fit_list$nmf$L)
 LL_cinf <- LL_cinf[cell.idx, ]
 
 make.heatmap.tib <- function(FF) {
@@ -376,6 +342,85 @@ plt <- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
 plt
 ```
 
+Now, I plot the sparsity of the loadings as a function of `c`, where the dashed red line is the sparsity of the loadings in the topic model.
+
+```{r}
+L_sparsity_vec <- c()
+
+for (cc in cc_vec) {
+
+  fit <- fit_list[[as.character(cc)]]
+  LL <- normalize_bars(fit$U)
+  L_sparsity <- mean(LL < 1e-5)
+  L_sparsity_vec <- c(L_sparsity_vec, L_sparsity)
+
+
+}
+
+nmf_sparsity <- mean(normalize_bars(fit_list$nmf$L) < 1e-5)
+df <- data.frame(
+  cc = cc_vec,
+  l_sparsity = L_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = l_sparsity)) +
+  geom_line(aes(x = cc, y = l_sparsity)) +
+  xlab("c") +
+  ylab("Sparsity of Loadings") +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = "red", linetype = "dashed") +
+  cowplot::theme_cowplot()
+```
+Here, we actually see that the relationship between the sparsity of the loadings and $c$ is non-monotonic. I looks like the most sparse fit is for $c = 10$, with $c = 1$ a close second. 
+
+
+```{r}
+cc_out_vec <- c(
+  rep("1e-4", nrow(counts) * 25),
+  rep("1e-3", nrow(counts) * 25),
+  rep("1e-2", nrow(counts) * 25),
+  rep("1e-1", nrow(counts) * 25),
+  rep("1", nrow(counts) * 25),
+  rep("1e1", nrow(counts) * 25),
+  rep("1e2", nrow(counts) * 25),
+  rep("1e3", nrow(counts) * 25),
+  rep("nmf", nrow(counts) * 25)
+)
+
+cc_out_vector <- factor(
+  x = cc_out_vec,
+  levels = c("1e-4", "1e-3", "1e-2", "1e-1", "1", "1e1", "1e2", "1e3", "nmf")
+)
+
+l_df <- data.frame(
+  l = c(
+    as.vector(LL_c0001),
+    as.vector(LL_c001),
+    as.vector(LL_c01),
+    as.vector(LL_cp1),
+    as.vector(LL_c1),
+    as.vector(LL_c10),
+    as.vector(LL_c100),
+    as.vector(LL_c1000),
+    as.vector(LL_cinf)
+  ),
+  cc = cc_out_vector
+)
+```
+
+```{r}
+ggplot(l_df, aes(x = l)) +
+  geom_histogram(bins = 40, fill = "blue", color = "black", alpha = 0.7) +
+  facet_wrap(~ cc) +
+  labs(title = "Histograms of loadings by c",
+       x = "l",
+       y = "Count") +
+  theme_minimal()
+```
+
 ## Factors
 
 First, I plot the sparsity of the factors as a function of `c`, where the dashed red line is the sparsity of the factors in the topic model.
@@ -412,6 +457,52 @@ ggplot(data = df) +
 ```
 
 Again, we see a non-monotonic relationship, with the sparsest loadings occuring when $c = 0.1$.
+
+I also plot the histogram of normalized factor values.
+
+```{r}
+cc_out_vec <- c(
+  rep("1e-4", ncol(counts) * 25),
+  rep("1e-3", ncol(counts) * 25),
+  rep("1e-2", ncol(counts) * 25),
+  rep("1e-1", ncol(counts) * 25),
+  rep("1", ncol(counts) * 25),
+  rep("1e1", ncol(counts) * 25),
+  rep("1e2", ncol(counts) * 25),
+  rep("1e3", ncol(counts) * 25),
+  rep("nmf", ncol(counts) * 25)
+)
+
+cc_out_vector <- factor(
+  x = cc_out_vec,
+  levels = c("1e-4", "1e-3", "1e-2", "1e-1", "1", "1e1", "1e2", "1e3", "nmf")
+)
+
+f_df <- data.frame(
+  f = c(
+    as.vector(normalize_bars(fit_list$`1e-04`$V)),
+    as.vector(normalize_bars(fit_list$`0.001`$V)),
+    as.vector(normalize_bars(fit_list$`0.01`$V)),
+    as.vector(normalize_bars(fit_list$`0.1`$V)),
+    as.vector(normalize_bars(fit_list$`1`$V)),
+    as.vector(normalize_bars(fit_list$`10`$V)),
+    as.vector(normalize_bars(fit_list$`100`$V)),
+    as.vector(normalize_bars(fit_list$`1000`$V)),
+    as.vector(normalize_bars(fit_list$nmf$F))
+  ),
+  cc = cc_out_vector
+)
+```
+
+```{r}
+ggplot(f_df, aes(x = f)) +
+  geom_histogram(bins = 40, fill = "blue", color = "black", alpha = 0.7) +
+  facet_wrap(~ cc) +
+  labs(title = "Histograms of factors by c",
+       x = "f",
+       y = "Count") +
+  theme_minimal()
+```
 
 Now, I show the GO terms for the top 20 genes for each factor.
 

@@ -438,10 +438,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R
-Markdown file created these results, you’ll want to first commit it to
-the Git repo. If you’re still working on the analysis, you can ignore
-this warning. When you’re finished, you can run
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree5d74653d94fd46afb4ec22f9c2e0e06e849f7021targetblank5d74653a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree42dc800dff59b5e6ff230ff782bd6c11c54669d7targetblank42dc800a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/5d74653d94fd46afb4ec22f9c2e0e06e849f7021" target="_blank">5d74653</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/42dc800dff59b5e6ff230ff782bd6c11c54669d7" target="_blank">42dc800</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree5d74653d94fd46afb4ec22f9c2e0e06e849f7021targetblank5d74653a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree42dc800dff59b5e6ff230ff782bd6c11c54669d7targetblank42dc800a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/5d74653d94fd46afb4ec22f9c2e0e06e849f7021" target="_blank">5d74653</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/42dc800dff59b5e6ff230ff782bd6c11c54669d7" target="_blank">42dc800</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -569,8 +569,8 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
 
-Untracked files:
-    Untracked:  analysis/liu_pbmc.Rmd
+Unstaged changes:
+    Modified:   analysis/liu_pbmc.Rmd
 
 </code></pre>
 <p>
@@ -585,10 +585,74 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/liu_pbmc.Rmd</code>) and HTML
+(<code>docs/liu_pbmc.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/42dc800dff59b5e6ff230ff782bd6c11c54669d7/analysis/liu_pbmc.Rmd" target="_blank">42dc800</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-15
+</td>
+<td>
+added results from Liu PBMC dataset
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/42dc800dff59b5e6ff230ff782bd6c11c54669d7/docs/liu_pbmc.html" target="_blank">42dc800</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-15
+</td>
+<td>
+added results from Liu PBMC dataset
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -781,6 +845,43 @@ ggplot(data = ll_list$df) +
   geom_hline(yintercept = max(ll_list$ll_vec) - ll_list$nmf_ll + 1, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
   cowplot::theme_cowplot()</code></pre>
 <p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/42dc800dff59b5e6ff230ff782bd6c11c54669d7/docs/figure/liu_pbmc.Rmd/unnamed-chunk-6-1.png" target="_blank">42dc800</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="loadings" class="section level2">
 <h2>Loadings</h2>
@@ -790,44 +891,7 @@ ggplot(data = ll_list$df) +
   sweep(LL, 2, max_col, FUN = &quot;/&quot;)
 
 }</code></pre>
-<p>First, I plot the sparsity of the loadings as a function of
-<code>c</code>, where the dashed red line is the sparsity of the
-loadings in the topic model.</p>
-<pre class="r"><code>L_sparsity_vec &lt;- c()
-
-for (cc in cc_vec) {
-
-  fit &lt;- fit_list[[as.character(cc)]]
-  LL &lt;- normalize_bars(fit$U)
-  L_sparsity &lt;- mean(LL &lt; 1e-5)
-  L_sparsity_vec &lt;- c(L_sparsity_vec, L_sparsity)
-
-
-}
-
-nmf_sparsity &lt;- mean(normalize_bars(fit_list$nmf$L) &lt; 1e-5)
-df &lt;- data.frame(
-  cc = cc_vec,
-  l_sparsity = L_sparsity_vec
-)
-
-library(ggplot2)
-ggplot(data = df) +
-  geom_point(aes(x = cc, y = l_sparsity)) +
-  geom_line(aes(x = cc, y = l_sparsity)) +
-  xlab(&quot;c&quot;) +
-  ylab(&quot;Sparsity of Loadings&quot;) +
-  scale_x_log10() +
-  scale_y_log10() +
-  geom_hline(yintercept = nmf_sparsity, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
-  cowplot::theme_cowplot()</code></pre>
-<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" />
-Here, we actually see that the relationship between the sparsity of the
-loadings and <span class="math inline">\(c\)</span> is non-monotonic. I
-looks like the most sparse fit is for <span class="math inline">\(c =
-10\)</span>, with <span class="math inline">\(c = 1\)</span> a close
-second.</p>
-<p>Now, each cell in the original dataset has a FACS label (one of 10
+<p>Each cell in the original dataset has a FACS label (one of 10
 different cell types). Below, I plot the loadings stratified by each
 label.</p>
 <pre class="r"><code>library(tidyr)
@@ -844,8 +908,8 @@ cell.types &lt;- levels(cell.type)
 for (i in 1:length(cell.types)) {
   which.idx &lt;- which(cell.type == cell.types[i])
   # Downsample common cell types.
-  if (length(which.idx) &gt; 1000) {
-    which.idx &lt;- sample(which.idx, 1000)
+  if (length(which.idx) &gt; 2000) {
+    which.idx &lt;- sample(which.idx, 2000)
   }
   # Don&#39;t include rare cell types.
   if (length(which.idx) &gt; 10) {
@@ -884,7 +948,7 @@ LL_c100 &lt;- normalize_bars(fit_list$`100`$U)
 LL_c100 &lt;- LL_c100[cell.idx, ]
 LL_c1000 &lt;- normalize_bars(fit_list$`1000`$U)
 LL_c1000 &lt;- LL_c1000[cell.idx, ]
-LL_cinf &lt;- fit_list$nmf$L
+LL_cinf &lt;- normalize_bars(fit_list$nmf$L)
 LL_cinf &lt;- LL_cinf[cell.idx, ]
 
 make.heatmap.tib &lt;- function(FF) {
@@ -950,7 +1014,157 @@ plt &lt;- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
         strip.text = element_text(size = 16)) 
 
 plt</code></pre>
-<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-9-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-8-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/42dc800dff59b5e6ff230ff782bd6c11c54669d7/docs/figure/liu_pbmc.Rmd/unnamed-chunk-8-1.png" target="_blank">42dc800</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Now, I plot the sparsity of the loadings as a function of
+<code>c</code>, where the dashed red line is the sparsity of the
+loadings in the topic model.</p>
+<pre class="r"><code>L_sparsity_vec &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list[[as.character(cc)]]
+  LL &lt;- normalize_bars(fit$U)
+  L_sparsity &lt;- mean(LL &lt; 1e-5)
+  L_sparsity_vec &lt;- c(L_sparsity_vec, L_sparsity)
+
+
+}
+
+nmf_sparsity &lt;- mean(normalize_bars(fit_list$nmf$L) &lt; 1e-5)
+df &lt;- data.frame(
+  cc = cc_vec,
+  l_sparsity = L_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = l_sparsity)) +
+  geom_line(aes(x = cc, y = l_sparsity)) +
+  xlab(&quot;c&quot;) +
+  ylab(&quot;Sparsity of Loadings&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/42dc800dff59b5e6ff230ff782bd6c11c54669d7/docs/figure/liu_pbmc.Rmd/unnamed-chunk-9-1.png" target="_blank">42dc800</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Here, we actually see that the relationship between the sparsity of
+the loadings and <span class="math inline">\(c\)</span> is
+non-monotonic. I looks like the most sparse fit is for <span
+class="math inline">\(c = 10\)</span>, with <span
+class="math inline">\(c = 1\)</span> a close second.</p>
+<pre class="r"><code>cc_out_vec &lt;- c(
+  rep(&quot;1e-4&quot;, nrow(counts) * 25),
+  rep(&quot;1e-3&quot;, nrow(counts) * 25),
+  rep(&quot;1e-2&quot;, nrow(counts) * 25),
+  rep(&quot;1e-1&quot;, nrow(counts) * 25),
+  rep(&quot;1&quot;, nrow(counts) * 25),
+  rep(&quot;1e1&quot;, nrow(counts) * 25),
+  rep(&quot;1e2&quot;, nrow(counts) * 25),
+  rep(&quot;1e3&quot;, nrow(counts) * 25),
+  rep(&quot;nmf&quot;, nrow(counts) * 25)
+)
+
+cc_out_vector &lt;- factor(
+  x = cc_out_vec,
+  levels = c(&quot;1e-4&quot;, &quot;1e-3&quot;, &quot;1e-2&quot;, &quot;1e-1&quot;, &quot;1&quot;, &quot;1e1&quot;, &quot;1e2&quot;, &quot;1e3&quot;, &quot;nmf&quot;)
+)
+
+l_df &lt;- data.frame(
+  l = c(
+    as.vector(LL_c0001),
+    as.vector(LL_c001),
+    as.vector(LL_c01),
+    as.vector(LL_cp1),
+    as.vector(LL_c1),
+    as.vector(LL_c10),
+    as.vector(LL_c100),
+    as.vector(LL_c1000),
+    as.vector(LL_cinf)
+  ),
+  cc = cc_out_vector
+)</code></pre>
+<pre class="r"><code>ggplot(l_df, aes(x = l)) +
+  geom_histogram(bins = 40, fill = &quot;blue&quot;, color = &quot;black&quot;, alpha = 0.7) +
+  facet_wrap(~ cc) +
+  labs(title = &quot;Histograms of loadings by c&quot;,
+       x = &quot;l&quot;,
+       y = &quot;Count&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="factors" class="section level2">
 <h2>Factors</h2>
@@ -985,9 +1199,49 @@ ggplot(data = df) +
   scale_y_log10() +
   geom_hline(yintercept = nmf_sparsity, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
   cowplot::theme_cowplot()</code></pre>
-<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Again, we see a non-monotonic relationship, with the sparsest
 loadings occuring when <span class="math inline">\(c = 0.1\)</span>.</p>
+<p>I also plot the histogram of normalized factor values.</p>
+<pre class="r"><code>cc_out_vec &lt;- c(
+  rep(&quot;1e-4&quot;, ncol(counts) * 25),
+  rep(&quot;1e-3&quot;, ncol(counts) * 25),
+  rep(&quot;1e-2&quot;, ncol(counts) * 25),
+  rep(&quot;1e-1&quot;, ncol(counts) * 25),
+  rep(&quot;1&quot;, ncol(counts) * 25),
+  rep(&quot;1e1&quot;, ncol(counts) * 25),
+  rep(&quot;1e2&quot;, ncol(counts) * 25),
+  rep(&quot;1e3&quot;, ncol(counts) * 25),
+  rep(&quot;nmf&quot;, ncol(counts) * 25)
+)
+
+cc_out_vector &lt;- factor(
+  x = cc_out_vec,
+  levels = c(&quot;1e-4&quot;, &quot;1e-3&quot;, &quot;1e-2&quot;, &quot;1e-1&quot;, &quot;1&quot;, &quot;1e1&quot;, &quot;1e2&quot;, &quot;1e3&quot;, &quot;nmf&quot;)
+)
+
+f_df &lt;- data.frame(
+  f = c(
+    as.vector(normalize_bars(fit_list$`1e-04`$V)),
+    as.vector(normalize_bars(fit_list$`0.001`$V)),
+    as.vector(normalize_bars(fit_list$`0.01`$V)),
+    as.vector(normalize_bars(fit_list$`0.1`$V)),
+    as.vector(normalize_bars(fit_list$`1`$V)),
+    as.vector(normalize_bars(fit_list$`10`$V)),
+    as.vector(normalize_bars(fit_list$`100`$V)),
+    as.vector(normalize_bars(fit_list$`1000`$V)),
+    as.vector(normalize_bars(fit_list$nmf$F))
+  ),
+  cc = cc_out_vector
+)</code></pre>
+<pre class="r"><code>ggplot(f_df, aes(x = f)) +
+  geom_histogram(bins = 40, fill = &quot;blue&quot;, color = &quot;black&quot;, alpha = 0.7) +
+  facet_wrap(~ cc) +
+  labs(title = &quot;Histograms of factors by c&quot;,
+       x = &quot;f&quot;,
+       y = &quot;Count&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Now, I show the GO terms for the top 20 genes for each factor.</p>
 <pre class="r"><code>K &lt;- 25
 
@@ -3579,21 +3833,21 @@ loaded via a namespace (and not attached):
  [61] treeio_1.28.0           withr_3.0.0             KEGGREST_1.44.1        
  [64] evaluate_0.24.0         Rtsne_0.17              gridGraphics_0.5-1     
  [67] scatterpie_0.2.3        polyclip_1.10-6         Biostrings_2.72.1      
- [70] ggtree_3.12.0           pillar_1.9.0            ggfun_0.1.5            
- [73] generics_0.1.3          rprojroot_2.0.4         hms_1.1.3              
- [76] tidytree_0.4.6          munsell_0.5.1           scales_1.3.0           
- [79] glue_1.7.0              lazyeval_0.2.2          tools_4.4.0            
- [82] data.table_1.15.4       graphlayouts_1.1.1      fs_1.6.4               
- [85] fastmatch_1.1-4         tidygraph_1.3.1         cowplot_1.1.3          
- [88] grid_4.4.0              ape_5.8                 colorspace_2.1-0       
- [91] nlme_3.1-165            patchwork_1.2.0         GenomeInfoDbData_1.2.12
- [94] ggforce_0.4.2           cli_3.6.3               workflowr_1.7.1        
- [97] fansi_1.0.6             viridisLite_0.4.2       gtable_0.3.5           
-[100] yulab.utils_0.1.4       sass_0.4.9              digest_0.6.36          
-[103] ggplotify_0.1.2         ggrepel_0.9.5           farver_2.1.2           
-[106] memoise_2.0.1           htmltools_0.5.8.1       lifecycle_1.0.4        
-[109] httr_1.4.7              GO.db_3.19.1            bit64_4.0.5            
-[112] MASS_7.3-61            </code></pre>
+ [70] ggtree_3.12.0           pillar_1.9.0            whisker_0.4.1          
+ [73] ggfun_0.1.5             generics_0.1.3          rprojroot_2.0.4        
+ [76] hms_1.1.3               tidytree_0.4.6          munsell_0.5.1          
+ [79] scales_1.3.0            glue_1.7.0              lazyeval_0.2.2         
+ [82] tools_4.4.0             data.table_1.15.4       graphlayouts_1.1.1     
+ [85] fs_1.6.4                fastmatch_1.1-4         tidygraph_1.3.1        
+ [88] cowplot_1.1.3           grid_4.4.0              ape_5.8                
+ [91] colorspace_2.1-0        nlme_3.1-165            patchwork_1.2.0        
+ [94] GenomeInfoDbData_1.2.12 ggforce_0.4.2           cli_3.6.3              
+ [97] workflowr_1.7.1         fansi_1.0.6             viridisLite_0.4.2      
+[100] gtable_0.3.5            yulab.utils_0.1.4       sass_0.4.9             
+[103] digest_0.6.36           ggplotify_0.1.2         ggrepel_0.9.5          
+[106] farver_2.1.2            memoise_2.0.1           htmltools_0.5.8.1      
+[109] lifecycle_1.0.4         httr_1.4.7              GO.db_3.19.1           
+[112] bit64_4.0.5             MASS_7.3-61            </code></pre>
 </div>
 </div>
 </div>
