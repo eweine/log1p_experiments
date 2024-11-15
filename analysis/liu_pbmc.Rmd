@@ -1,0 +1,530 @@
+---
+title: "Single Cell PBMC Analysis"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-11-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Introduction
+
+Here, I will apply the `log1p` matrix factorization model to a dataset of approximately $10K$ single cells labeled with FACS sorting from a single donor.
+
+
+```{r}
+load("~/Documents/data/passPCA/liu_data.Rdata")
+```
+
+I filtered out genes that are not expressed in at least $5$ cells. This leaves $17642$ remaining genes.
+
+```{r}
+library(Matrix)
+library(dplyr)
+counts <- counts[,Matrix::colSums(counts) > 0]
+# require that all used genes appear in at least 5 cells
+s <- Matrix::rowSums(counts)
+s <- s / mean(s)
+genes_to_use <- which(Matrix::colSums(counts>0)>4)
+counts <- counts[,genes_to_use]
+
+cc_vec <- c(0.0001, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+```
+
+Now, we fit the `log1p` model for a variety of values of $c$. I initialize each model with a rank 1 fit and then I fit a model with $K = 25$ (where I do *not* fix the first factor).
+
+```{r, eval=FALSE}
+nmf_k1 <- fastTopics:::fit_pnmf_rank1(counts)
+
+K <- 25
+
+nmf_LL <- nmf_k1$L %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+rownames(nmf_LL) <- rownames(counts)
+
+nmf_FF <- nmf_k1$F %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+rownames(nmf_FF) <- colnames(counts)
+
+set.seed(1)
+nmf_fit0 <- fastTopics::init_poisson_nmf(
+  X = counts,
+  L = nmf_LL,
+  F = nmf_FF
+)
+
+nmf_fit <- fastTopics::fit_poisson_nmf(
+  X = counts,
+  fit0 = nmf_fit0
+)
+
+readr::write_rds(
+  nmf_fit, "~/Documents/data/passPCA/liu_results/nmf_k25.rds"
+)
+
+library(passPCA)
+library(Matrix)
+cc_vec <- c(0.0001, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+for (cc in cc_vec) {
+
+  print(cc)
+
+  set.seed(1)
+  log1p_k1 <- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = 1,
+    maxiter = 10,
+    s = cc * s,
+    init_method = "frob_nmf"
+  )
+
+  init_LL <- log1p_k1$U %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  init_FF <- log1p_k1$V %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+
+  set.seed(1)
+  fit <- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s
+  )
+
+  rownames(fit$U) <- rownames(counts)
+  rownames(fit$V) <- colnames(counts)
+
+  readr::write_rds(
+    fit, glue::glue("~/Documents/data/passPCA/liu_results/log1p_c{cc}_k25.rds")
+  )
+
+}
+```
+
+```{r}
+fit_list <- readr::read_rds(
+  "~/Documents/data/passPCA/liu_results/fit_list.rds"
+  )
+```
+
+# Analysis of fits
+## Log-likelihood
+
+Below is a plot of the log-likelihoods of the data under a Poisson model using different values of $c$. The dashed red line is the log-likelihood of the topic model as fit via `fastTopics`. Again, very small values of $c$ actually lead to the highest likelihood by far. 
+
+```{r, eval=FALSE}
+Y <- as.matrix(counts)
+
+ll_vec <- c()
+
+for (cc in cc_vec) {
+
+  fit <- fit_list[[as.character(cc)]]
+  B <- fit$U %*% t(fit$V)
+  Lambda <- cc * (exp(B) - 1)
+  Lambda <- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+
+  ll <- sum(
+    dpois(
+      x = as.vector(Y),
+      lambda = as.vector(Lambda),
+      log = TRUE
+    )
+  )
+
+  ll_vec <- c(ll_vec, ll)
+
+}
+
+ll_nmf <- sum(
+  dpois(
+    x = as.vector(Y),
+    lambda = as.vector(fit_list$nmf$L %*% t(fit_list$nmf$F)),
+    log = TRUE
+  )
+)
+
+df <- data.frame(
+  cc = cc_vec,
+  ll_diff = max(ll_vec) - ll_vec + 1
+)
+```
+
+```{r}
+ll_list <- readr::read_rds("~/Documents/data/passPCA/liu_results/loglik.rds")
+
+library(ggplot2)
+ggplot(data = ll_list$df) +
+  geom_point(aes(x = cc, y = ll_diff)) +
+  geom_line(aes(x = cc, y = ll_diff)) +
+  xlab("c") +
+  ylab("Distance from best log-likelihood") +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = max(ll_list$ll_vec) - ll_list$nmf_ll + 1, color = "red", linetype = "dashed") +
+  cowplot::theme_cowplot()
+```
+
+## Loadings
+
+```{r}
+normalize_bars <- function(LL) {
+
+  max_col <- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = "/")
+
+}
+```
+
+First, I plot the sparsity of the loadings as a function of `c`, where the dashed red line is the sparsity of the loadings in the topic model.
+
+```{r}
+L_sparsity_vec <- c()
+
+for (cc in cc_vec) {
+
+  fit <- fit_list[[as.character(cc)]]
+  LL <- normalize_bars(fit$U)
+  L_sparsity <- mean(LL < 1e-5)
+  L_sparsity_vec <- c(L_sparsity_vec, L_sparsity)
+
+
+}
+
+nmf_sparsity <- mean(normalize_bars(fit_list$nmf$L) < 1e-5)
+df <- data.frame(
+  cc = cc_vec,
+  l_sparsity = L_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = l_sparsity)) +
+  geom_line(aes(x = cc, y = l_sparsity)) +
+  xlab("c") +
+  ylab("Sparsity of Loadings") +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = "red", linetype = "dashed") +
+  cowplot::theme_cowplot()
+```
+Here, we actually see that the relationship between the sparsity of the loadings and $c$ is non-monotonic. I looks like the most sparse fit is for $c = 10$, with $c = 1$ a close second. 
+
+Now, each cell in the original dataset has a FACS label (one of 10 different cell types). Below, I plot the loadings stratified by each label.
+
+```{r, fig.width=12, fig.height=33}
+library(tidyr)
+library(stringi)
+library(stringr)
+cell.type <- as.factor(ct$celltype)
+
+LL_c0001 <- normalize_bars(fit_list$`1e-04`$U)
+
+# Downsample the number of cells and sort them using tSNE.
+set.seed(8675309)
+cell.idx <- numeric(0)
+cell.types <- levels(cell.type)
+for (i in 1:length(cell.types)) {
+  which.idx <- which(cell.type == cell.types[i])
+  # Downsample common cell types.
+  if (length(which.idx) > 1000) {
+    which.idx <- sample(which.idx, 1000)
+  }
+  # Don't include rare cell types.
+  if (length(which.idx) > 10) {
+    # Sort using tsne.
+    tsne.res <- Rtsne::Rtsne(
+      LL_c0001[which.idx, ],
+      dims = 1,
+      pca = FALSE,
+      normalize = FALSE,
+      perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+      theta = 0.1,
+      max_iter = 1000,
+      eta = 200,
+      check_duplicates = FALSE
+    )$Y[, 1]
+    which.idx <- which.idx[order(tsne.res)]
+    cell.idx <- c(cell.idx, which.idx)
+  }
+}
+
+cell.type <- cell.type[cell.idx]
+cell.type <- droplevels(cell.type)
+
+LL_c0001 <- LL_c0001[cell.idx, ]
+LL_c001 <- normalize_bars(fit_list$`0.001`$U)
+LL_c001 <- LL_c001[cell.idx, ]
+LL_c01 <- normalize_bars(fit_list$`0.01`$U)
+LL_c01 <- LL_c01[cell.idx, ]
+LL_cp1 <- normalize_bars(fit_list$`0.1`$U)
+LL_cp1 <- LL_cp1[cell.idx, ]
+LL_c1 <- normalize_bars(fit_list$`1`$U)
+LL_c1 <- LL_c1[cell.idx, ]
+LL_c10 <- normalize_bars(fit_list$`10`$U)
+LL_c10 <- LL_c10[cell.idx, ]
+LL_c100 <- normalize_bars(fit_list$`100`$U)
+LL_c100 <- LL_c100[cell.idx, ]
+LL_c1000 <- normalize_bars(fit_list$`1000`$U)
+LL_c1000 <- LL_c1000[cell.idx, ]
+LL_cinf <- fit_list$nmf$L
+LL_cinf <- LL_cinf[cell.idx, ]
+
+make.heatmap.tib <- function(FF) {
+  tib <- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %>%
+    mutate(Cell.type = cell.type) %>%
+    arrange(Cell.type) %>%
+    mutate(Cell.idx = row_number())
+  
+  tib <- tib %>%
+    pivot_longer(
+      -c(Cell.idx, Cell.type),
+      names_to = "Factor",
+      values_to = "Loading",
+      values_drop_na = TRUE
+    ) %>%
+    mutate(Factor = as.numeric(str_extract(Factor, "[0-9]+")))
+  
+  return(tib)
+}
+
+LL_c0001_tib <- make.heatmap.tib(LL_c0001)
+LL_c001_tib <- make.heatmap.tib(LL_c001)
+LL_c01_tib <- make.heatmap.tib(LL_c01)
+LL_cp1_tib <- make.heatmap.tib(LL_cp1)
+LL_c1_tib <- make.heatmap.tib(LL_c1)
+LL_c10_tib <- make.heatmap.tib(LL_c10)
+LL_c100_tib <- make.heatmap.tib(LL_c100)
+LL_c1000_tib <- make.heatmap.tib(LL_c1000)
+LL_cinf_tib <- make.heatmap.tib(LL_cinf)
+
+heatmap.tib <- LL_c0001_tib %>% mutate(Method = "c = 0.0001") %>%
+  bind_rows(LL_c001_tib %>% mutate(Method = "c = 0.001")) %>%
+  bind_rows(LL_c01_tib %>% mutate(Method = "c = 0.01")) %>%
+  bind_rows(LL_cp1_tib %>% mutate(Method = "c = 0.1")) %>%
+  bind_rows(LL_c1_tib %>% mutate(Method = "c = 1")) %>%
+  bind_rows(LL_c10_tib %>% mutate(Method = "c = 10")) %>%
+  bind_rows(LL_c100_tib %>% mutate(Method = "c = 100")) %>%
+  bind_rows(LL_c1000_tib %>% mutate(Method = "c = 1000")) %>%
+  bind_rows(LL_cinf_tib %>% mutate(Method = "Topic Model")) %>% 
+  mutate(Method = factor(Method, levels = c("c = 0.0001", "c = 0.001", "c = 0.01", "c = 0.1", "c = 1", "c = 10", "c = 100", "c = 1000", "Topic Model")))
+
+tib <- heatmap.tib %>%
+  group_by(Cell.type, Cell.idx) %>%
+  summarize()
+
+cell_type_breaks <- c(1, which(tib$Cell.type[-1] != tib$Cell.type[-nrow(tib)]))
+label_pos <- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib)) / 2
+
+library(ggplot2)
+
+plt <- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "firebrick") +
+  labs(y = "") +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = "all") +
+  theme(legend.position = "none", 
+        strip.text = element_text(size = 16)) 
+
+plt
+```
+
+## Factors
+
+First, I plot the sparsity of the factors as a function of `c`, where the dashed red line is the sparsity of the factors in the topic model.
+
+```{r}
+F_sparsity_vec <- c()
+
+for (cc in cc_vec) {
+
+  fit <- fit_list[[as.character(cc)]]
+  FF <- normalize_bars(fit$V)
+  F_sparsity <- mean(FF < 1e-5)
+  F_sparsity_vec <- c(F_sparsity_vec, F_sparsity)
+
+
+}
+
+nmf_sparsity <- mean(normalize_bars(fit_list$nmf$F) < 1e-5)
+df <- data.frame(
+  cc = cc_vec,
+  f_sparsity = F_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = f_sparsity)) +
+  geom_line(aes(x = cc, y = f_sparsity)) +
+  xlab("c") +
+  ylab("Sparsity of Factors") +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = "red", linetype = "dashed") +
+  cowplot::theme_cowplot()
+```
+
+Again, we see a non-monotonic relationship, with the sparsest loadings occuring when $c = 0.1$.
+
+Now, I show the GO terms for the top 20 genes for each factor.
+
+```{r}
+K <- 25
+
+library(clusterProfiler)
+library(fgsea)
+library(AnnotationDbi)
+library(org.Hs.eg.db)
+
+get_go_terms <- function(V) {
+  
+  K <- ncol(V)
+  
+  genes_vec <- c()
+  go_terms_vec <- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes <- names(sort(V[,k], decreasing = TRUE))[1:20]
+    
+    go_result <- enrichGO(gene = driving_genes,
+                          OrgDb = org.Hs.eg.db,
+                          keyType = "SYMBOL",
+                          ont = "BP", 
+                          pAdjustMethod = "bonferroni",
+                          pvalueCutoff = 0.01,
+                          qvalueCutoff = 0.1)@result
+    
+    go_result <- go_result %>%
+      dplyr::filter(p.adjust < .01)
+    
+    go_terms <- go_result$Description
+    
+    genes_vec <- c(genes_vec, paste(driving_genes, collapse = ", "))
+    go_terms_vec <- c(go_terms_vec, paste(go_terms, collapse = ", "))
+    
+  }
+  
+  go_df <- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}
+
+c0001_gdf <- get_go_terms(fit_list$`1e-04`$V)
+c001_gdf <- get_go_terms(fit_list$`0.001`$V)
+c01_gdf <- get_go_terms(fit_list$`0.01`$V)
+cp1_gdf <- get_go_terms(fit_list$`0.1`$V)
+c1_gdf <- get_go_terms(fit_list$`1`$V)
+c10_gdf <- get_go_terms(fit_list$`10`$V)
+c100_gdf <- get_go_terms(fit_list$`100`$V)
+c1000_gdf <- get_go_terms(fit_list$`1000`$V)
+cnmf_gdf <- get_go_terms(fit_list$nmf$F)
+```
+
+### c = 1e-4
+
+```{r}
+knitr::kable(c0001_gdf)
+```
+
+### c = 1e-3
+
+```{r}
+knitr::kable(c001_gdf)
+```
+
+### c = 1e-2
+
+```{r}
+knitr::kable(c01_gdf)
+```
+
+### c = 1e-1
+
+```{r}
+knitr::kable(cp1_gdf)
+```
+
+### c = 1
+
+```{r}
+knitr::kable(c1_gdf)
+```
+
+### c = 10
+
+```{r}
+knitr::kable(c10_gdf)
+```
+
+### c = 100
+
+```{r}
+knitr::kable(c100_gdf)
+```
+
+### c = 1000
+
+```{r}
+knitr::kable(c1000_gdf)
+```
+
+### nmf
+
+```{r}
+knitr::kable(cnmf_gdf)
+```
+
+I think the takeaway here is the same as for the documents. That is, in the topic model you see many of the same genes appearing as the top genes in each factor. Smaller values of $c$, however, seem to lead to each factor encoding different information. 

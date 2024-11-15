@@ -1,0 +1,3698 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2024-11-15" />
+
+<title>Single Cell PBMC Analysis</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Single Cell PBMC Analysis</h1>
+<h4 class="date">2024-11-15</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-11-15
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree5d74653d94fd46afb4ec22f9c2e0e06e849f7021targetblank5d74653a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/5d74653d94fd46afb4ec22f9c2e0e06e849f7021" target="_blank">5d74653</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree5d74653d94fd46afb4ec22f9c2e0e06e849f7021targetblank5d74653a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/5d74653d94fd46afb4ec22f9c2e0e06e849f7021" target="_blank">5d74653</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+
+Untracked files:
+    Untracked:  analysis/liu_pbmc.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Here, I will apply the <code>log1p</code> matrix factorization model
+to a dataset of approximately <span class="math inline">\(10K\)</span>
+single cells labeled with FACS sorting from a single donor.</p>
+<pre class="r"><code>load(&quot;~/Documents/data/passPCA/liu_data.Rdata&quot;)</code></pre>
+<p>I filtered out genes that are not expressed in at least <span
+class="math inline">\(5\)</span> cells. This leaves <span
+class="math inline">\(17642\)</span> remaining genes.</p>
+<pre class="r"><code>library(Matrix)
+library(dplyr)
+counts &lt;- counts[,Matrix::colSums(counts) &gt; 0]
+# require that all used genes appear in at least 5 cells
+s &lt;- Matrix::rowSums(counts)
+s &lt;- s / mean(s)
+genes_to_use &lt;- which(Matrix::colSums(counts&gt;0)&gt;4)
+counts &lt;- counts[,genes_to_use]
+
+cc_vec &lt;- c(0.0001, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)</code></pre>
+<p>Now, we fit the <code>log1p</code> model for a variety of values of
+<span class="math inline">\(c\)</span>. I initialize each model with a
+rank 1 fit and then I fit a model with <span class="math inline">\(K =
+25\)</span> (where I do <em>not</em> fix the first factor).</p>
+<pre class="r"><code>nmf_k1 &lt;- fastTopics:::fit_pnmf_rank1(counts)
+
+K &lt;- 25
+
+nmf_LL &lt;- nmf_k1$L %&gt;%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+rownames(nmf_LL) &lt;- rownames(counts)
+
+nmf_FF &lt;- nmf_k1$F %&gt;%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+rownames(nmf_FF) &lt;- colnames(counts)
+
+set.seed(1)
+nmf_fit0 &lt;- fastTopics::init_poisson_nmf(
+  X = counts,
+  L = nmf_LL,
+  F = nmf_FF
+)
+
+nmf_fit &lt;- fastTopics::fit_poisson_nmf(
+  X = counts,
+  fit0 = nmf_fit0
+)
+
+readr::write_rds(
+  nmf_fit, &quot;~/Documents/data/passPCA/liu_results/nmf_k25.rds&quot;
+)
+
+library(passPCA)
+library(Matrix)
+cc_vec &lt;- c(0.0001, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+for (cc in cc_vec) {
+
+  print(cc)
+
+  set.seed(1)
+  log1p_k1 &lt;- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = 1,
+    maxiter = 10,
+    s = cc * s,
+    init_method = &quot;frob_nmf&quot;
+  )
+
+  init_LL &lt;- log1p_k1$U %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  init_FF &lt;- log1p_k1$V %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+
+  set.seed(1)
+  fit &lt;- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s
+  )
+
+  rownames(fit$U) &lt;- rownames(counts)
+  rownames(fit$V) &lt;- colnames(counts)
+
+  readr::write_rds(
+    fit, glue::glue(&quot;~/Documents/data/passPCA/liu_results/log1p_c{cc}_k25.rds&quot;)
+  )
+
+}</code></pre>
+<pre class="r"><code>fit_list &lt;- readr::read_rds(
+  &quot;~/Documents/data/passPCA/liu_results/fit_list.rds&quot;
+  )</code></pre>
+</div>
+<div id="analysis-of-fits" class="section level1">
+<h1>Analysis of fits</h1>
+<div id="log-likelihood" class="section level2">
+<h2>Log-likelihood</h2>
+<p>Below is a plot of the log-likelihoods of the data under a Poisson
+model using different values of <span class="math inline">\(c\)</span>.
+The dashed red line is the log-likelihood of the topic model as fit via
+<code>fastTopics</code>. Again, very small values of <span
+class="math inline">\(c\)</span> actually lead to the highest likelihood
+by far.</p>
+<pre class="r"><code>Y &lt;- as.matrix(counts)
+
+ll_vec &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list[[as.character(cc)]]
+  B &lt;- fit$U %*% t(fit$V)
+  Lambda &lt;- cc * (exp(B) - 1)
+  Lambda &lt;- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+
+  ll &lt;- sum(
+    dpois(
+      x = as.vector(Y),
+      lambda = as.vector(Lambda),
+      log = TRUE
+    )
+  )
+
+  ll_vec &lt;- c(ll_vec, ll)
+
+}
+
+ll_nmf &lt;- sum(
+  dpois(
+    x = as.vector(Y),
+    lambda = as.vector(fit_list$nmf$L %*% t(fit_list$nmf$F)),
+    log = TRUE
+  )
+)
+
+df &lt;- data.frame(
+  cc = cc_vec,
+  ll_diff = max(ll_vec) - ll_vec + 1
+)</code></pre>
+<pre class="r"><code>ll_list &lt;- readr::read_rds(&quot;~/Documents/data/passPCA/liu_results/loglik.rds&quot;)
+
+library(ggplot2)
+ggplot(data = ll_list$df) +
+  geom_point(aes(x = cc, y = ll_diff)) +
+  geom_line(aes(x = cc, y = ll_diff)) +
+  xlab(&quot;c&quot;) +
+  ylab(&quot;Distance from best log-likelihood&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = max(ll_list$ll_vec) - ll_list$nmf_ll + 1, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="loadings" class="section level2">
+<h2>Loadings</h2>
+<pre class="r"><code>normalize_bars &lt;- function(LL) {
+
+  max_col &lt;- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = &quot;/&quot;)
+
+}</code></pre>
+<p>First, I plot the sparsity of the loadings as a function of
+<code>c</code>, where the dashed red line is the sparsity of the
+loadings in the topic model.</p>
+<pre class="r"><code>L_sparsity_vec &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list[[as.character(cc)]]
+  LL &lt;- normalize_bars(fit$U)
+  L_sparsity &lt;- mean(LL &lt; 1e-5)
+  L_sparsity_vec &lt;- c(L_sparsity_vec, L_sparsity)
+
+
+}
+
+nmf_sparsity &lt;- mean(normalize_bars(fit_list$nmf$L) &lt; 1e-5)
+df &lt;- data.frame(
+  cc = cc_vec,
+  l_sparsity = L_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = l_sparsity)) +
+  geom_line(aes(x = cc, y = l_sparsity)) +
+  xlab(&quot;c&quot;) +
+  ylab(&quot;Sparsity of Loadings&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" />
+Here, we actually see that the relationship between the sparsity of the
+loadings and <span class="math inline">\(c\)</span> is non-monotonic. I
+looks like the most sparse fit is for <span class="math inline">\(c =
+10\)</span>, with <span class="math inline">\(c = 1\)</span> a close
+second.</p>
+<p>Now, each cell in the original dataset has a FACS label (one of 10
+different cell types). Below, I plot the loadings stratified by each
+label.</p>
+<pre class="r"><code>library(tidyr)
+library(stringi)
+library(stringr)
+cell.type &lt;- as.factor(ct$celltype)
+
+LL_c0001 &lt;- normalize_bars(fit_list$`1e-04`$U)
+
+# Downsample the number of cells and sort them using tSNE.
+set.seed(8675309)
+cell.idx &lt;- numeric(0)
+cell.types &lt;- levels(cell.type)
+for (i in 1:length(cell.types)) {
+  which.idx &lt;- which(cell.type == cell.types[i])
+  # Downsample common cell types.
+  if (length(which.idx) &gt; 1000) {
+    which.idx &lt;- sample(which.idx, 1000)
+  }
+  # Don&#39;t include rare cell types.
+  if (length(which.idx) &gt; 10) {
+    # Sort using tsne.
+    tsne.res &lt;- Rtsne::Rtsne(
+      LL_c0001[which.idx, ],
+      dims = 1,
+      pca = FALSE,
+      normalize = FALSE,
+      perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+      theta = 0.1,
+      max_iter = 1000,
+      eta = 200,
+      check_duplicates = FALSE
+    )$Y[, 1]
+    which.idx &lt;- which.idx[order(tsne.res)]
+    cell.idx &lt;- c(cell.idx, which.idx)
+  }
+}
+
+cell.type &lt;- cell.type[cell.idx]
+cell.type &lt;- droplevels(cell.type)
+
+LL_c0001 &lt;- LL_c0001[cell.idx, ]
+LL_c001 &lt;- normalize_bars(fit_list$`0.001`$U)
+LL_c001 &lt;- LL_c001[cell.idx, ]
+LL_c01 &lt;- normalize_bars(fit_list$`0.01`$U)
+LL_c01 &lt;- LL_c01[cell.idx, ]
+LL_cp1 &lt;- normalize_bars(fit_list$`0.1`$U)
+LL_cp1 &lt;- LL_cp1[cell.idx, ]
+LL_c1 &lt;- normalize_bars(fit_list$`1`$U)
+LL_c1 &lt;- LL_c1[cell.idx, ]
+LL_c10 &lt;- normalize_bars(fit_list$`10`$U)
+LL_c10 &lt;- LL_c10[cell.idx, ]
+LL_c100 &lt;- normalize_bars(fit_list$`100`$U)
+LL_c100 &lt;- LL_c100[cell.idx, ]
+LL_c1000 &lt;- normalize_bars(fit_list$`1000`$U)
+LL_c1000 &lt;- LL_c1000[cell.idx, ]
+LL_cinf &lt;- fit_list$nmf$L
+LL_cinf &lt;- LL_cinf[cell.idx, ]
+
+make.heatmap.tib &lt;- function(FF) {
+  tib &lt;- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %&gt;%
+    mutate(Cell.type = cell.type) %&gt;%
+    arrange(Cell.type) %&gt;%
+    mutate(Cell.idx = row_number())
+  
+  tib &lt;- tib %&gt;%
+    pivot_longer(
+      -c(Cell.idx, Cell.type),
+      names_to = &quot;Factor&quot;,
+      values_to = &quot;Loading&quot;,
+      values_drop_na = TRUE
+    ) %&gt;%
+    mutate(Factor = as.numeric(str_extract(Factor, &quot;[0-9]+&quot;)))
+  
+  return(tib)
+}
+
+LL_c0001_tib &lt;- make.heatmap.tib(LL_c0001)
+LL_c001_tib &lt;- make.heatmap.tib(LL_c001)
+LL_c01_tib &lt;- make.heatmap.tib(LL_c01)
+LL_cp1_tib &lt;- make.heatmap.tib(LL_cp1)
+LL_c1_tib &lt;- make.heatmap.tib(LL_c1)
+LL_c10_tib &lt;- make.heatmap.tib(LL_c10)
+LL_c100_tib &lt;- make.heatmap.tib(LL_c100)
+LL_c1000_tib &lt;- make.heatmap.tib(LL_c1000)
+LL_cinf_tib &lt;- make.heatmap.tib(LL_cinf)
+
+heatmap.tib &lt;- LL_c0001_tib %&gt;% mutate(Method = &quot;c = 0.0001&quot;) %&gt;%
+  bind_rows(LL_c001_tib %&gt;% mutate(Method = &quot;c = 0.001&quot;)) %&gt;%
+  bind_rows(LL_c01_tib %&gt;% mutate(Method = &quot;c = 0.01&quot;)) %&gt;%
+  bind_rows(LL_cp1_tib %&gt;% mutate(Method = &quot;c = 0.1&quot;)) %&gt;%
+  bind_rows(LL_c1_tib %&gt;% mutate(Method = &quot;c = 1&quot;)) %&gt;%
+  bind_rows(LL_c10_tib %&gt;% mutate(Method = &quot;c = 10&quot;)) %&gt;%
+  bind_rows(LL_c100_tib %&gt;% mutate(Method = &quot;c = 100&quot;)) %&gt;%
+  bind_rows(LL_c1000_tib %&gt;% mutate(Method = &quot;c = 1000&quot;)) %&gt;%
+  bind_rows(LL_cinf_tib %&gt;% mutate(Method = &quot;Topic Model&quot;)) %&gt;% 
+  mutate(Method = factor(Method, levels = c(&quot;c = 0.0001&quot;, &quot;c = 0.001&quot;, &quot;c = 0.01&quot;, &quot;c = 0.1&quot;, &quot;c = 1&quot;, &quot;c = 10&quot;, &quot;c = 100&quot;, &quot;c = 1000&quot;, &quot;Topic Model&quot;)))
+
+tib &lt;- heatmap.tib %&gt;%
+  group_by(Cell.type, Cell.idx) %&gt;%
+  summarize()
+
+cell_type_breaks &lt;- c(1, which(tib$Cell.type[-1] != tib$Cell.type[-nrow(tib)]))
+label_pos &lt;- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib)) / 2
+
+library(ggplot2)
+
+plt &lt;- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = &quot;white&quot;, high = &quot;firebrick&quot;) +
+  labs(y = &quot;&quot;) +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = &quot;all&quot;) +
+  theme(legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 16)) 
+
+plt</code></pre>
+<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-9-1.png" width="1152" style="display: block; margin: auto;" /></p>
+</div>
+<div id="factors" class="section level2">
+<h2>Factors</h2>
+<p>First, I plot the sparsity of the factors as a function of
+<code>c</code>, where the dashed red line is the sparsity of the factors
+in the topic model.</p>
+<pre class="r"><code>F_sparsity_vec &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list[[as.character(cc)]]
+  FF &lt;- normalize_bars(fit$V)
+  F_sparsity &lt;- mean(FF &lt; 1e-5)
+  F_sparsity_vec &lt;- c(F_sparsity_vec, F_sparsity)
+
+
+}
+
+nmf_sparsity &lt;- mean(normalize_bars(fit_list$nmf$F) &lt; 1e-5)
+df &lt;- data.frame(
+  cc = cc_vec,
+  f_sparsity = F_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = f_sparsity)) +
+  geom_line(aes(x = cc, y = f_sparsity)) +
+  xlab(&quot;c&quot;) +
+  ylab(&quot;Sparsity of Factors&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/liu_pbmc.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Again, we see a non-monotonic relationship, with the sparsest
+loadings occuring when <span class="math inline">\(c = 0.1\)</span>.</p>
+<p>Now, I show the GO terms for the top 20 genes for each factor.</p>
+<pre class="r"><code>K &lt;- 25
+
+library(clusterProfiler)
+library(fgsea)
+library(AnnotationDbi)
+library(org.Hs.eg.db)
+
+get_go_terms &lt;- function(V) {
+  
+  K &lt;- ncol(V)
+  
+  genes_vec &lt;- c()
+  go_terms_vec &lt;- c()
+  
+  for (k in 1:K) {
+    
+    driving_genes &lt;- names(sort(V[,k], decreasing = TRUE))[1:20]
+    
+    go_result &lt;- enrichGO(gene = driving_genes,
+                          OrgDb = org.Hs.eg.db,
+                          keyType = &quot;SYMBOL&quot;,
+                          ont = &quot;BP&quot;, 
+                          pAdjustMethod = &quot;bonferroni&quot;,
+                          pvalueCutoff = 0.01,
+                          qvalueCutoff = 0.1)@result
+    
+    go_result &lt;- go_result %&gt;%
+      dplyr::filter(p.adjust &lt; .01)
+    
+    go_terms &lt;- go_result$Description
+    
+    genes_vec &lt;- c(genes_vec, paste(driving_genes, collapse = &quot;, &quot;))
+    go_terms_vec &lt;- c(go_terms_vec, paste(go_terms, collapse = &quot;, &quot;))
+    
+  }
+  
+  go_df &lt;- data.frame(
+    driving_genes = genes_vec,
+    go_terms = go_terms_vec,
+    factor = 1:K
+  )
+  
+  return(go_df)
+  
+}
+
+c0001_gdf &lt;- get_go_terms(fit_list$`1e-04`$V)
+c001_gdf &lt;- get_go_terms(fit_list$`0.001`$V)
+c01_gdf &lt;- get_go_terms(fit_list$`0.01`$V)
+cp1_gdf &lt;- get_go_terms(fit_list$`0.1`$V)
+c1_gdf &lt;- get_go_terms(fit_list$`1`$V)
+c10_gdf &lt;- get_go_terms(fit_list$`10`$V)
+c100_gdf &lt;- get_go_terms(fit_list$`100`$V)
+c1000_gdf &lt;- get_go_terms(fit_list$`1000`$V)
+cnmf_gdf &lt;- get_go_terms(fit_list$nmf$F)</code></pre>
+<div id="c-1e-4" class="section level3">
+<h3>c = 1e-4</h3>
+<pre class="r"><code>knitr::kable(c0001_gdf)</code></pre>
+<table>
+<colgroup>
+<col width="38%" />
+<col width="60%" />
+<col width="1%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">MT-CO1, MT-CO2, MT-CO3, MT-ND4, MT-ND1, MT-ND2, MT-CYB,
+MT-RNR2, MT-ATP6, MT-ND3, RPL34, MT-ND5, TPT1, TMSB4X, MT-ND6, EEF1A1,
+RPL31, RPL21, RPS27, RPL23</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">PI3, CXCR2, CXCR1, SLPI, FCGR3B, P2RY13, CCR3, CXCL8,
+LINC02158, CHI3L1, HSPA6, TNFRSF10C, PHOSPHO1, AC012368.1, MNDA,
+SIGLEC10, THBD, HCAR2, ALPL, CMTM2</td>
+<td align="left">chemokine-mediated signaling pathway, response to
+chemokine, cellular response to chemokine, cellular defense response,
+positive regulation of angiogenesis, positive regulation of vasculature
+development</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">CXCR6, CCR5, GZMK, TRDV2, CD28, KLRC1, TRDC, TRGC1,
+NPDC1, PDGFB, GPR171, DUSP4, RTKN2, KLRG1, KLRB1, PACSIN1, IL12RB2,
+AC091390.1, SLC4A10, CD40LG</td>
+<td align="left">gamma-delta T cell activation</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">THBS1, THBD, HBEGF, PF4, F13A1, PPBP, EGR1, NRGN,
+GGTA1P, FAM20C, CYP27A1, ALDH1A1, OLIG1, NRG1, VSTM1, IGF2BP2, MYCL,
+CYBRD1, AC097504.2, CXCR2P1</td>
+<td align="left">wound healing</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">AL353795.2, AL442128.2, AC023051.1, MRTFA-AS1,
+TMEM132A, AL031595.3, ST8SIA6-AS1, RNU6-1294P, C11orf80, FGD6,
+AP005899.1, AL354798.1, LYG2, Z83843.1, AC013394.1, AC090616.6, CACNA1H,
+AC093525.6, CATIP-AS2, RPSAP16</td>
+<td align="left"></td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">SH2D1B, IGFBP7, ZMAT4, LGALS9B, RNF165, CHST2, DAB2,
+CD160, TMIGD2, LIM2, MYOM2, LRRC43, BNC2, AKR1C3, LINGO2, NCAM1,
+SERPINE2, CYBRD1, TKTL1, FGFBP2</td>
+<td align="left"></td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">CD8B, LRRN3, LEF1-AS1, LINC02446, NELL2, MAL,
+LINC00402, DSC1, CD248, CCR7, NOG, CA6, REG4, SLC16A10, SIRPG, TCEA3,
+PLAG1, TMIGD2, SH3RF3, SLC7A8</td>
+<td align="left"></td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">RPL3P6, AL158211.1, AL121929.2, HBB, HBA2, MRPL46,
+AP005329.1, AC005363.2, AC134407.1, KCNQ3, AL353135.1, AC022778.1,
+DNAH7, FMNL2, AF127577.6, AC015911.2, AC092139.2, PSMD6-AS2, AC097372.3,
+AC010203.1</td>
+<td align="left">carbon dioxide transport, oxygen transport, gas
+transport, one-carbon compound transport, hydrogen peroxide catabolic
+process</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">TEDDM1, IFIT1, SNRK-AS1, SLC26A8, IFIT2, MX1,
+AL035661.1, OAS3, PRDM5, AP003086.3, GTF2IP1, SPNS2, RSAD2, CMPK2,
+LILRA6, IFI44L, HERC5, FGF13, ANKRD22, RLIMP1</td>
+<td align="left">defense response to virus, response to virus, negative
+regulation of viral genome replication, regulation of viral genome
+replication, negative regulation of viral process, viral genome
+replication, regulation of viral life cycle, regulation of viral
+process, antiviral innate immune response</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">CLC, FCER1A, CPA3, MS4A2, GATA2, TCN1, HDC, PCP2,
+PTGER3, LINC01835, GCSAML, IGKC, SSTR3, NKAPL, AKAP12, ITGB8, ITGB5,
+BTBD7P1, AL390195.2, PSAT1</td>
+<td align="left"></td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">RNASE1, EMP1, NEGR1, ZNF366, RYR1, TNFRSF21, SERPINB10,
+GVQW2, ALOX15B, TNNT1, LRRC3, RPL5P12, AC010883.1, LRP5, KIAA0895L,
+PODNL1, ADORA3, AC007996.1, DOCK1, LRFN4</td>
+<td align="left"></td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">CXCL8, EXOC5P1, THBS1, IL1B, NIPAL1, AC093525.8, CXCL2,
+NR4A3, NUF2, THNSL2, AL162741.1, SIK1, AL132780.1, AC008608.2, CASTOR3,
+HEATR4, ZNF667, MIR3188, IGLC7, AC098591.2</td>
+<td align="left">granulocyte chemotaxis, granulocyte migration,
+leukocyte chemotaxis, myeloid leukocyte migration</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">IGHD, TCL1A, IGHM, CD22, FCER2, VPREB3, PAX5, PCDH9,
+SNX22, MACROD2, CD24, FCRL1, FAM129C, CD79A, BLNK, FCRLA, COL19A1, SPIB,
+DBNDD1, TSPAN13</td>
+<td align="left">B cell receptor signaling pathway, immune
+response-regulating cell surface receptor signaling pathway, antigen
+receptor-mediated signaling pathway, B cell activation, immune
+response-activating cell surface receptor signaling pathway</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">PI3, KLRC2, TRDV3, IKZF2, AKAP5, KLRA1P, TRDC, TFCP2L1,
+TRGC1, THBD, GNLY, SLPI, TRBV14, AL158071.2, KLHL4, GLB1L2, TRGV4,
+AC026904.1, FCGR3A, KIR2DS4</td>
+<td align="left">natural killer cell degranulation</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">C9orf153, ITGAD, AC021683.5, GEM, PSD2, PRDM16,
+AC110285.7, AC022167.3, AC130448.2, CEBPA-DT, ASB12, GNRH1, LINC00865,
+AC012313.2, VIPR2, MROH8, SCARNA13, ZNF415P1, AC034238.1, NAPSA</td>
+<td align="left"></td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">RSAD2, CCL2, IFIT1, IFIT3, IFIT2, IFI44L, CMPK2,
+SERPING1, HERC5, OAS3, AL022329.1, MX1, NEURL1, C1QA, AC023512.1, IKZF2,
+IL1B, DECR2, TFAP2E, CD1B</td>
+<td align="left">defense response to virus, response to virus, viral
+genome replication, antiviral innate immune response, negative
+regulation of viral genome replication, regulation of viral genome
+replication, negative regulation of viral process, regulation of viral
+life cycle, viral life cycle</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">PF4, PPBP, LINC00892, ZNF365, CFH, SPARC, ZNF683, CD4,
+TRAV13-1, ROR2, CD40LG, CLU, AGAP1, CAVIN2, NTN4, EDARADD, MAF,
+SPATA3-AS1, AP001189.1, SLAMF1</td>
+<td align="left"></td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">CD177, GALNT14, BEND7, NOV, HYPK, OTX1, MMP9, BMX,
+DRC1, ARG1, ARL4AP2, AC079944.2, TOX2, PGLYRP1, SYN2, LIMS2, IGBP1-AS2,
+RPS27AP8, AL807752.1, HRK</td>
+<td align="left"></td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">ADTRP, ST6GALNAC1, TSHZ2, IL17RB, AC211433.1, HIST2H3D,
+DACT1, FBLN7, RPS3AP3, ANKRD55, AC022893.1, COL7A1, CSNK1G2-AS1,
+L3MBTL1, AL391834.1, ANKRD36BP2, ABCC2, RPS14P4, ATG16L1, NEFL</td>
+<td align="left"></td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">CCL20, AC008026.3, EGR4, AC009133.1, AC016542.1,
+LINC00309, AC006483.2, RWDD4P1, AKR1C7P, HES1, G0S2, CARD17, LRRC17,
+PDZD2, AF131215.6, AC092140.2, IGLV1-51, AC010491.1, AL158212.5,
+AZIN1-AS1</td>
+<td align="left"></td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">EGR1, FOS, IL23R, AC007952.4, SPA17, SLC18A2, IFNG,
+H2AFVP1, AL031728.1, AC110769.2, FOSB, GLT8D2, RN7SL473P, AP001330.5,
+AC093484.2, JUN, RNVU1-6, SNORD3B-1, AL450326.2, AC009133.3</td>
+<td align="left">positive regulation of osteoclast differentiation,
+positive regulation of miRNA transcription, positive regulation of
+myeloid leukocyte differentiation, positive regulation of miRNA
+metabolic process, regulation of osteoclast differentiation, regulation
+of miRNA transcription, miRNA transcription, regulation of miRNA
+metabolic process</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">EGR1, EBI3, CRIP2, OSTN-AS1, TAS1R3, SOX5, SSPN, KLK1,
+BHLHE41, ARHGAP6, IGHG1, CD1C, CHAD, UTS2B, IGHA1, TNFRSF13B, EGR3,
+JCHAIN, CLECL1, EGR4</td>
+<td align="left"></td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">AC004585.1, CD8B, TPX2, CD8A, POC1A, CDC6, CEP55, RRM2,
+MELK, MTCO1P40, AC012073.1, MRPS30-DT, RMI2, NUSAP1, TIMD4, BIRC5,
+AC011447.3, FBN1, NCAPH, PCDH1</td>
+<td align="left">sister chromatid segregation, nuclear chromosome
+segregation, chromosome segregation, positive regulation of chromosome
+segregation, positive regulation of cell cycle process, regulation of
+chromosome segregation, positive regulation of cell cycle, mitotic
+sister chromatid segregation, cytokinesis, regulation of chromosome
+organization</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">GCSAML, CLC, CXCL8, PTGER3, CPA3, MS4A2, FCER1A, HDC,
+AKAP12, ORM1, SLC45A3, SERPINB10, GATA2, SERPINB2, SOCS2, PPARG, CAV2,
+CXCL2, CACNG6, JCHAIN</td>
+<td align="left"></td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">HBB, HBA1, HBA2, OCLM, GOLGA8N, AC106886.3, TYRO3, MOK,
+AL590705.3, TPPP3, PIWIL2, AC098859.1, SFRP5, LYPD5, FAAHP1, TRNP1,
+AP001429.1, AL358472.2, AC007285.1, AC005962.1</td>
+<td align="left">carbon dioxide transport, oxygen transport, gas
+transport, one-carbon compound transport, hydrogen peroxide catabolic
+process, hydrogen peroxide metabolic process, cellular oxidant
+detoxification, response to hydrogen peroxide, cellular detoxification,
+cellular response to toxic substance</td>
+<td align="right">25</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="c-1e-3" class="section level3">
+<h3>c = 1e-3</h3>
+<pre class="r"><code>knitr::kable(c001_gdf)</code></pre>
+<table>
+<colgroup>
+<col width="17%" />
+<col width="81%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">MT-CO1, MT-CO2, MT-ND4, MT-CO3, MT-ND1, MT-CYB, MT-ND2,
+MT-RNR2, MT-ATP6, MT-ND3, RPL34, MT-ND5, TPT1, TMSB4X, RPL31, MT-ND6,
+RPL21, EEF1A1, RPS27, MTCO1P12</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">CXCR2, PI3, CXCL8, P2RY13, CXCR1, FCGR3B, MNDA,
+AC012368.1, CHI3L1, SIGLEC10, CSF3R, CSF2RB, PTAFR, FPR1, C5AR1, ADGRE2,
+LINC02158, SLPI, PHOSPHO1, FPR2</td>
+<td align="left">chemotaxis, taxis, leukocyte migration, leukocyte
+chemotaxis, myeloid leukocyte migration, granulocyte chemotaxis,
+granulocyte migration, cell chemotaxis, phospholipase C-activating G
+protein-coupled receptor signaling pathway, neutrophil chemotaxis,
+neutrophil migration, positive regulation of leukocyte migration,
+complement receptor mediated signaling pathway, positive regulation of
+cytosolic calcium ion concentration, positive regulation of leukocyte
+chemotaxis, positive regulation of neutrophil chemotaxis, regulation of
+leukocyte migration, positive regulation of granulocyte chemotaxis,
+myeloid leukocyte activation, regulation of neutrophil chemotaxis,
+positive regulation of neutrophil migration, regulation of leukocyte
+chemotaxis, neutrophil activation, positive regulation of chemotaxis,
+regulation of neutrophil migration, granulocyte activation, regulation
+of granulocyte chemotaxis, cellular defense response, response to
+molecule of bacterial origin</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">TRGC1, GZMK, CD28, KLRB1, TRDC, CXCR6, RTKN2, CCR5,
+KLRC1, TRDV2, KLRG1, GPR171, IL7R, SLC4A10, AQP3, DPP4, IL12RB2, TRAT1,
+PDGFB, ZBTB16</td>
+<td align="left">gamma-delta T cell activation</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">HBEGF, MAFB, CPVL, C19orf38, LYZ, CD14, THBS1,
+TMEM176A, TMEM176B, NRGN, CCR1, THBD, CD86, CD4, CD300E, ALDH1A1, FCN1,
+SERPINA1, H1F0, EGR1</td>
+<td align="left">regulation of leukocyte differentiation, regulation of
+hemopoiesis, mononuclear cell differentiation, positive regulation of
+cytokine production</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">AC023051.1, AC016831.4, AC090616.6, KCNQ1OT1, FGD6,
+AC245060.5, AC011912.1, Z83843.1, PCSK7, C11orf80, RABGEF1, AC114760.2,
+CELF2-AS1, AC079331.1, AC122718.1, TTN-AS1, AP005899.1, AL049840.1,
+CFAP70, AC058791.1</td>
+<td align="left"></td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">SH2D1B, CHST2, IGFBP7, B3GNT7, FCGR3A, GZMB, FGFBP2,
+LGALS9B, GNLY, AREG, IL2RB, NCAM1, MYOM2, SPON2, KLRD1, S1PR5, TMIGD2,
+CD160, KLRB1, KLRF1</td>
+<td align="left">natural killer cell mediated immunity, leukocyte
+mediated immunity, natural killer cell mediated cytotoxicity, lymphocyte
+mediated immunity, cell killing, regulation of natural killer cell
+mediated immunity, leukocyte mediated cytotoxicity, positive regulation
+of natural killer cell mediated immunity, regulation of natural killer
+cell mediated cytotoxicity</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">CCR7, MAL, NELL2, LRRN3, LEF1, CD8B, TRAC, IL7R,
+LINC02446, LINC00402, CAMK4, RCAN3, TCF7, TRABD2A, LEF1-AS1, ITGA6,
+RETREG1, BEX3, SIRPG, SLC16A10</td>
+<td align="left">regulation of T cell activation, T cell
+differentiation, regulation of T cell differentiation</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">MT-RNR2, MTRNR2L12, ANKS3, RALGPS1, AC134407.1,
+AC139795.1, CARM1, RPL3P6, AC008969.1, AC018644.1, AC010969.2, TARS2,
+ITSN1, ZNF613, AL121929.2, SBF2, AC022150.4, AP005329.1, KCTD1,
+CHEK1</td>
+<td align="left"></td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">IFIT1, IGKC, MX1, IFIT2, HERC5, IFIT3, RSAD2, PRDM5,
+AL035661.1, OAS3, EIF2AK2, IFI6, IFI44L, CMPK2, SAMD9L, STAT1, EPSTI1,
+FCGR1A, HELZ2, HBA2</td>
+<td align="left">defense response to virus, response to virus, negative
+regulation of viral process, antiviral innate immune response, negative
+regulation of viral genome replication, regulation of viral process,
+regulation of viral genome replication, viral genome replication,
+regulation of viral life cycle, response to type I interferon, viral
+process, viral life cycle</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">IGKC, FCER1A, PSAT1, CLSPN, CLC, CCL4L2, NKAPL, CHEK1,
+SDF2L1, RRM2, DHCR24, SSTR3, CDT1, BTBD7P1, RPP25, MCM4, TK1, CRNDE,
+HSP90AB3P, TMEM97</td>
+<td align="left">nuclear DNA replication, cell cycle DNA
+replication</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">RNASE1, EMP1, TNNT1, OLFM1, F13A1, PAPSS2, SNAI1,
+RNASE2, MS4A4A, RYR1, ID2, SOX4, CPED1, ZNF366, CLEC12A-AS1, CLEC10A,
+PID1, ARHGAP10, MMP14, GATB</td>
+<td align="left"></td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">CXCL8, IL1B, NR4A3, CD8A, ZNF331, JCHAIN, THBS1,
+HMGCS1, AREG, LYPD3, ZNF184, SLC7A5, LMNA, SIK1, HSPE1P2, AC108449.2,
+ZNF667, CASTOR3, NR4A2, AC008608.2</td>
+<td align="left"></td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">IGHD, TCL1A, IGHM, CD79A, CD22, PAX5, FAM129C, MS4A1,
+IGKC, FCER2, TNFRSF13C, FCRL1, LINC00926, VPREB3, PCDH9, BANK1, RALGPS2,
+BCL11A, SNX22, CD24</td>
+<td align="left">B cell receptor signaling pathway, immune
+response-regulating cell surface receptor signaling pathway, antigen
+receptor-mediated signaling pathway, B cell activation, immune
+response-activating cell surface receptor signaling pathway, immune
+response-activating signaling pathway, B cell proliferation, lymphocyte
+proliferation, mononuclear cell proliferation, leukocyte
+proliferation</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">KLRC2, IKZF2, TRGC1, TRDC, KLRA1P, GNLY, AKAP5, TRDV3,
+TRGC2, TFCP2L1, PI3, FCGR3A, KLRD1, TRGV4, GZMB, GZMH, PTMS, KLRF1,
+TIGIT, NKG7</td>
+<td align="left">cell killing, natural killer cell mediated
+cytotoxicity, natural killer cell mediated immunity, natural killer cell
+degranulation, leukocyte mediated cytotoxicity, immune
+response-regulating cell surface receptor signaling pathway, killing of
+cells of another organism, disruption of cell in another organism,
+disruption of anatomical structure in another organism, natural killer
+cell activation, natural killer cell activation involved in immune
+response, regulation of natural killer cell activation, immune
+response-activating cell surface receptor signaling pathway, lymphocyte
+mediated immunity</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">AC007485.2, ZFP28, DGCR9, CASC19, LGR4, IGLC3, SGK494,
+IGHG1, ACVR2B, IGLC2, AC008115.3, AC021683.5, SEPT8, HSD17B8, TAF6L,
+CRIP2, AC005726.3, MEGF6, XRRA1, LINC00894</td>
+<td align="left"></td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">IFIT2, IFIT3, RSAD2, IFI44L, MX1, SERPING1, CCL2,
+HERC5, OAS3, IL1B, IFIT1, CMPK2, IFI6, ISG15, VSIG4, GBP4, MGLL, EPSTI1,
+MARCKS, SASH1</td>
+<td align="left">defense response to virus, response to virus, negative
+regulation of viral genome replication, viral genome replication,
+regulation of viral genome replication, negative regulation of viral
+process, antiviral innate immune response, regulation of viral life
+cycle, viral life cycle, regulation of viral process, regulation of
+complement activation, negative regulation of innate immune response,
+response to type I interferon, viral process, negative regulation of
+response to biotic stimulus, regulation of humoral immune response</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">CD4, MAF, FGFBP2, ZNF683, PRSS23, ZNF365, GZMH, TRAC,
+LINC00892, CFH, GNLY, AGAP1, CD40LG, NTN4, PRR5L, CD5, CD226, PROK2,
+SLAMF1, LINC002481</td>
+<td align="left">positive regulation of leukocyte activation, positive
+regulation of cell activation</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">MMP9, NOV, BEND7, CD177, PGLYRP1, PADI4, PROK2, OTX1,
+S100A12, ARG1, BMX, AC079174.2, GPR27, F5, TOX2, CA4, G0S2, CDA, CYP4F3,
+MARC1</td>
+<td align="left"></td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">THBS1, TSHZ2, ADTRP, L3MBTL1, ANKRD55, G0S2, PLCL1,
+FBLN7, CD40LG, TIAM1, ATG16L1, AC004987.2, PSMG3-AS1, AC011815.1, FHIT,
+ANKRD36BP2, HEMGN, DACT1, AC022893.1, NEFL</td>
+<td align="left"></td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">EGR1, G0S2, NFKBIZ, CCL20, HES1, NFKBIA, IL1B, CTDSPL,
+ZC3H12A, EGR4, AZIN1-AS1, CD83, DUSP2, CCL4, CD69, IER2, KLF10, ICAM1,
+PPBP, BTG2</td>
+<td align="left">cellular response to interleukin-1, response to
+interleukin-1, cellular response to lipopolysaccharide, leukocyte
+cell-cell adhesion, response to chemokine, cellular response to
+chemokine, cellular response to molecule of bacterial origin, cellular
+response to tumor necrosis factor, neutrophil chemotaxis,
+interleukin-1-mediated signaling pathway, response to tumor necrosis
+factor, cellular response to biotic stimulus, granulocyte chemotaxis,
+neutrophil migration</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">EGR1, FOS, FOSB, JUN, SPA17, AC007952.4, CD69,
+MZF1-AS1, IFNG, SNORD3B-1, RNVU1-6, DUSP1, RHOB, AL136531.3, RN7SL473P,
+ATF3, RNVU1-4, KLF6, LINC01135, AC009133.3</td>
+<td align="left">positive regulation of miRNA transcription</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">IGHA1, OSTN-AS1, CRIP2, TNFRSF13B, JCHAIN, SSPN, KLK1,
+IGKC, IGHG1, EBI3, CLECL1, CHAD, BANK1, CD80, BHLHE41, CPNE5, UTS2B,
+CD1C, LINC01781, SOX5</td>
+<td align="left">B cell receptor signaling pathway, adaptive immune
+response based on somatic recombination of immune receptors built from
+immunoglobulin superfamily domains, lymphocyte mediated immunity,
+antigen receptor-mediated signaling pathway, antibacterial humoral
+response</td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">AC004585.1, CD8A, CD8B, TPX2, MKI67, NCAPH, RMI2, TOX2,
+CENPF, PRR11, TIMD4, MELK, RGS2, CDC6, STMN1, CTLA4, FASLG, AL441992.1,
+CD38, TIGIT</td>
+<td align="left">regulation of chromosome segregation, chromosome
+segregation, sister chromatid segregation, nuclear chromosome
+segregation</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">CXCL8, CXCL2, SERPINB2, SERPINB10, SOX4, CLC, G0S2,
+EREG, GCSAML, CYP1B1, ORM1, IGKC, JUN, CXCL1, SOCS2, TNFAIP6, IL1B,
+PKP4, KLF5, HP</td>
+<td align="left">neutrophil chemotaxis, granulocyte chemotaxis,
+neutrophil migration, granulocyte migration, leukocyte migration,
+leukocyte chemotaxis, myeloid leukocyte migration</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">HBB, CLC, HBA2, FCER1A, HDC, GCSAML, MS4A2, CPA3, HBA1,
+GATA2, PTGER3, SOCS2, CAVIN2, ENPP3, AKAP12, SLC45A3, CACNG6, GNG11,
+CD200R1, TPPP3</td>
+<td align="left">carbon dioxide transport, oxygen transport, gas
+transport, one-carbon compound transport, hydrogen peroxide catabolic
+process</td>
+<td align="right">25</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="c-1e-2" class="section level3">
+<h3>c = 1e-2</h3>
+<pre class="r"><code>knitr::kable(c01_gdf)</code></pre>
+<table>
+<colgroup>
+<col width="7%" />
+<col width="92%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">MT-CO1, MT-ND4, MT-CO3, MT-CYB, MT-CO2, MT-ND1, MT-ND2,
+MT-ATP6, MT-RNR2, MT-ND3, RPL34, MT-ND5, TPT1, TMSB4X, EEF1A1, RPL31,
+RPL21, MT-ND6, RPS27, RPL23</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">CXCR2, MNDA, P2RY13, CXCL8, CSF3R, CXCR1, FAM129A,
+FCGR3B, C5AR1, FPR1, CPPED1, PTAFR, PECAM1, CEBPD, AC012368.1, CSF2RB,
+TMEM154, IFITM2, CHI3L1, ADGRE2</td>
+<td align="left">granulocyte migration, leukocyte migration, myeloid
+leukocyte migration, granulocyte chemotaxis, neutrophil migration,
+chemotaxis, taxis, neutrophil chemotaxis, leukocyte chemotaxis, cell
+chemotaxis, positive regulation of neutrophil chemotaxis, myeloid
+leukocyte activation, phospholipase C-activating G protein-coupled
+receptor signaling pathway, positive regulation of granulocyte
+chemotaxis, regulation of neutrophil chemotaxis, positive regulation of
+neutrophil migration, neutrophil activation, positive regulation of
+leukocyte migration, regulation of neutrophil migration, granulocyte
+activation, regulation of granulocyte chemotaxis, positive regulation of
+cytosolic calcium ion concentration, cellular defense response, positive
+regulation of angiogenesis, positive regulation of vasculature
+development, mononuclear cell migration</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">IL7R, KLRB1, KLRG1, CD28, GZMK, GZMA, CCL5, CD3E, TRAC,
+TRGC1, CST7, DUSP2, SYNE2, TNFAIP3, GPR171, IL32, CD69, PHACTR2, TENT5C,
+TRAT1</td>
+<td align="left">T cell receptor signaling pathway, immune
+response-activating cell surface receptor signaling pathway, immune
+response-regulating cell surface receptor signaling pathway, antigen
+receptor-mediated signaling pathway, immune response-activating
+signaling pathway</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">CYP1B1, VCAN, LYZ, S100A9, FCN1, MAFB, CD14, S100A8,
+CYBB, C5AR1, DUSP6, MPEG1, THBS1, TMEM176B, MS4A6A, S100A12, CEBPD,
+CCR1, CD36, RGS2</td>
+<td align="left">defense response to bacterium, leukocyte chemotaxis,
+myeloid leukocyte migration, granulocyte chemotaxis, granulocyte
+migration, positive regulation of cytokine production, cell chemotaxis,
+chronic inflammatory response, leukocyte migration, neutrophil
+chemotaxis, positive regulation of tumor necrosis factor production,
+regulation of toll-like receptor signaling pathway, positive regulation
+of tumor necrosis factor superfamily cytokine production, pattern
+recognition receptor signaling pathway, response to alcohol, chemotaxis,
+taxis, defense response to Gram-positive bacterium, response to ethanol,
+innate immune response-activating signaling pathway, neutrophil
+migration, immune response-activating signaling pathway</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, PCSK7, AC020916.1, AC114760.2, ANKRD10-IT1,
+AC016831.4, AC027290.2, AC021078.1, NKTR, AC058791.1, AC003681.1, NEAT1,
+SREK1, DDX17, RSRP1, U2AF1, ANKRD36, RF00019, PARP15, MIAT</td>
+<td align="left">regulation of miRNA catabolic process, miRNA metabolic
+process, miRNA catabolic process, RNA splicing</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">SH2D1B, IL2RB, SPON2, PRF1, GNLY, FGFBP2, GZMB, AREG,
+KLRB1, CHST2, FCGR3A, NKG7, FCER1G, KLRD1, CD7, KLRF1, B3GNT7, CST7,
+IRS2, S1PR5</td>
+<td align="left">leukocyte mediated immunity, lymphocyte mediated
+immunity, natural killer cell mediated immunity, cell killing, leukocyte
+mediated cytotoxicity, natural killer cell mediated cytotoxicity,
+killing of cells of another organism, disruption of cell in another
+organism, disruption of anatomical structure in another organism</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">CCR7, IL7R, TRAC, TCF7, CD3E, RCAN3, MAL, LEF1,
+TRABD2A, TRBC2, BCL11B, CD7, CD3D, CD8B, CD3G, RGS10, NELL2, ABLIM1,
+ETS1, PRKCQ-AS1</td>
+<td align="left">T cell receptor signaling pathway, T cell
+differentiation in thymus, alpha-beta T cell activation, T cell
+differentiation, antigen receptor-mediated signaling pathway, T cell
+selection, lymphocyte differentiation, thymic T cell selection,
+mononuclear cell differentiation, gamma-delta T cell activation, immune
+response-activating cell surface receptor signaling pathway, immune
+response-regulating cell surface receptor signaling pathway, positive T
+cell selection, immune response-activating signaling pathway, positive
+thymic T cell selection, regulation of leukocyte apoptotic process,
+leukocyte apoptotic process, positive regulation of leukocyte cell-cell
+adhesion, positive regulation of cell-cell adhesion</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">MT-RNR2, MT-RNR1, MTRNR2L12, SBF2, GAN, ITPR2, POC1B,
+AC046185.3, TARS2, MALAT1, ZNF182, CCDC14, RBAK, UVRAG, FAM204A, UBA6,
+ZNF747, USP33, HIST1H1D, IRGQ</td>
+<td align="left"></td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">IFIT2, IFIT3, IFIT1, MX1, IFI6, SAMD9L, IFI44L, OAS3,
+STAT1, EIF2AK2, PARP9, ISG15, GBP5, RSAD2, HERC5, GBP1, EPSTI1, CMPK2,
+GBP4, PARP14</td>
+<td align="left">defense response to virus, response to virus, negative
+regulation of viral process, negative regulation of viral genome
+replication, regulation of viral process, regulation of viral genome
+replication, antiviral innate immune response, cellular response to type
+II interferon, viral genome replication, viral process, response to type
+II interferon, regulation of viral life cycle, response to type I
+interferon, interferon-mediated signaling pathway, regulation of innate
+immune response, viral life cycle, cellular response to type I
+interferon, type II interferon-mediated signaling pathway, positive
+regulation of cytokine production, defense response to bacterium,
+cytoplasmic pattern recognition receptor signaling pathway, positive
+regulation of innate immune response</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">IGKC, IGHA1, SDF2L1, ACTB, CALR, STMN1, PDIA4, CCND2,
+BCL2, ACTR3, NME1, ACAA2, HSPA5, HSP90B1, CDK2AP2, SEC11C, CANX, PDIA3,
+SPCS2, SMC1A</td>
+<td align="left">protein folding in endoplasmic reticulum, response to
+endoplasmic reticulum stress, protein folding, ERAD pathway</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">ID2, F13A1, VCAN, RNASE1, SNAI1, ID1, RNASE2, MNDA,
+MT2A, PAPSS2, SOCS3, ANXA2, BHLHE40, SOX4, CPED1, S100A10, EMP1, S100A9,
+CEBPB, TOB1</td>
+<td align="left">positive regulation of protein maturation</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">CD8A, SLC7A5, NR4A3, ZNF331, CD8B, SKIL, YBX3, RGCC,
+IFRD1, RASGEF1B, NAMPT, LMNA, FOSB, NR4A2, GPR132, HMGCS1, JCHAIN, AREG,
+HSPA5, YPEL5</td>
+<td align="left"></td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">CD79A, IGHM, MS4A1, IGHD, IGKC, CD22, PAX5, FAM129C,
+TCL1A, TNFRSF13C, RALGPS2, CD74, FCRL1, MEF2C, LINC00926, FCER2, BANK1,
+HLA-DRA, BCL11A, FCMR</td>
+<td align="left">B cell receptor signaling pathway, antigen
+receptor-mediated signaling pathway, immune response-regulating cell
+surface receptor signaling pathway, B cell activation, immune
+response-activating cell surface receptor signaling pathway, immune
+response-activating signaling pathway, B cell proliferation, adaptive
+immune response based on somatic recombination of immune receptors built
+from immunoglobulin superfamily domains, immunoglobulin mediated immune
+response, lymphocyte mediated immunity, B cell mediated immunity,
+regulation of B cell activation, leukocyte mediated immunity, lymphocyte
+proliferation, mononuclear cell proliferation, regulation of B cell
+proliferation, leukocyte proliferation, humoral immune response,
+positive regulation of B cell proliferation</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">IKZF2, TRDC, TRGC1, KLRC2, GNLY, KLRD1, TRGC2, AKAP5,
+NKG7, FCGR3A, KLRA1P, CST7, CCL5, CMC1, TIGIT, CD7, KLRF1, ITGAX, IL2RB,
+CD160</td>
+<td align="left">natural killer cell mediated cytotoxicity, natural
+killer cell mediated immunity, immune response-regulating cell surface
+receptor signaling pathway, cell killing, natural killer cell
+degranulation, leukocyte mediated cytotoxicity, immune
+response-activating cell surface receptor signaling pathway, lymphocyte
+mediated immunity, natural killer cell activation, positive regulation
+of natural killer cell mediated cytotoxicity, leukocyte mediated
+immunity, natural killer cell activation involved in immune response,
+positive regulation of natural killer cell mediated immunity, immune
+response-activating signaling pathway, regulation of natural killer cell
+activation, T cell receptor signaling pathway, regulation of natural
+killer cell mediated cytotoxicity, regulation of natural killer cell
+mediated immunity</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CYB, MT-ND2, MT-ND4, MT-ND5, MT-ND3, MT-ATP6,
+MT-ND6, MT-ND4L, MT-ND1, MTATP6P1, MT-CO2, MT-ATP8, MT-CO3, MTND1P23,
+MTND2P28, MT-CO1, DDX20, ANKRD42, CAMK2N1, ZNF101</td>
+<td align="left"></td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">HLA-DRB1, HLA-DPA1, HLA-DRA, IL1B, HLA-DRB5, CPVL,
+HLA-DQA1, PEA15, SIGLEC10, CDKN1A, HES1, CD4, APOBEC3A, MAFB, DUSP6,
+HLA-DPB1, CD74, CD300E, MARCKS, SGK1</td>
+<td align="left">antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide or polysaccharide antigen via MHC class II, MHC class II protein
+complex assembly, peptide antigen assembly with MHC class II protein
+complex, positive regulation of lymphocyte activation, antigen
+processing and presentation of exogenous peptide antigen, positive
+regulation of leukocyte activation, positive regulation of T cell
+activation, positive regulation of cell activation, MHC protein complex
+assembly, peptide antigen assembly with MHC protein complex, antigen
+processing and presentation of exogenous antigen, positive regulation of
+leukocyte cell-cell adhesion, positive regulation of cell-cell adhesion,
+antigen processing and presentation of peptide antigen, regulation of T
+cell activation, regulation of leukocyte cell-cell adhesion, leukocyte
+cell-cell adhesion, positive regulation of cell adhesion, regulation of
+cell-cell adhesion, antigen processing and presentation, regulation of
+lymphocyte proliferation, regulation of mononuclear cell proliferation,
+positive regulation of lymphocyte proliferation, positive regulation of
+mononuclear cell proliferation, regulation of leukocyte proliferation,
+positive regulation of leukocyte proliferation, lymphocyte
+proliferation, mononuclear cell proliferation, leukocyte proliferation,
+positive regulation of monocyte differentiation, positive regulation of
+viral entry into host cell, positive regulation by symbiont of entry
+into host, dendritic cell antigen processing and presentation, T cell
+differentiation, regulation of T cell proliferation, regulation of
+monocyte differentiation, positive regulation of viral life cycle, T
+cell proliferation, positive regulation of T cell proliferation,
+lymphocyte differentiation, antigen processing and presentation of
+endogenous antigen, positive regulation of cell development, monocyte
+differentiation, type II interferon production, regulation of type II
+interferon production, mononuclear cell differentiation, positive
+regulation of adaptive immune response based on somatic recombination of
+immune receptors built from immunoglobulin superfamily domains</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">FGFBP2, GZMH, TRAC, PRSS23, GNLY, NKG7, TGFBR3, CST7,
+GZMB, CD8A, ZNF683, PRF1, CD3G, ADGRG1, MAF, CD2, GZMA, ITGB1, CD3E,
+CCL5</td>
+<td align="left">killing of cells of another organism, disruption of
+cell in another organism, disruption of anatomical structure in another
+organism, cell killing, cell-cell adhesion mediated by integrin,
+alpha-beta T cell activation, lymphocyte differentiation, mononuclear
+cell differentiation</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">S100A12, S100A8, PROK2, S100A9, PADI4, MMP9, G0S2, CDA,
+ALOX5AP, CYP4F3, S100P, MME, FCN1, JUN, GPR27, SLC2A3, ACSL1, PGLYRP1,
+MARC1, QPCT</td>
+<td align="left">regulation of inflammatory response, positive
+regulation of inflammatory response</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">THBS1, G0S2, CD40LG, TSHZ2, CD4, TIAM1, SESN3, PLCL1,
+TXNIP, MAF, MDFIC, LPAR6, IL6ST, TRAT1, FHIT, SBDSP1, MXI1, SMC4,
+SAMSN1, TAMM41</td>
+<td align="left"></td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">DUSP2, G0S2, NFKBIZ, GNLY, CD83, CCL4, ZC3H12A, NFKBIA,
+IL1B, ZFP36, CD69, SOCS3, IFI6, CCL3L1, ICAM1, TNFAIP3, DUSP5, GADD45B,
+IER2, AZIN1-AS1</td>
+<td align="left">cellular response to lipopolysaccharide, cellular
+response to interleukin-1, extrinsic apoptotic signaling pathway,
+cellular response to molecule of bacterial origin, cellular response to
+tumor necrosis factor, response to tumor necrosis factor, cellular
+response to biotic stimulus, response to interleukin-1, p38MAPK cascade,
+regulation of extrinsic apoptotic signaling pathway, interleukin-2
+production, regulation of interleukin-2 production, response to
+interleukin-17, cellular response to interleukin-17, response to
+lipopolysaccharide, response to molecule of bacterial origin, adaptive
+immune response based on somatic recombination of immune receptors built
+from immunoglobulin superfamily domains, CD4-positive, alpha-beta T cell
+differentiation, regulation of inflammatory response, negative
+regulation of extrinsic apoptotic signaling pathway, positive regulation
+of p38MAPK cascade, T-helper 17 cell differentiation, positive
+regulation of MAPK cascade, CD4-positive, alpha-beta T cell activation,
+T cell activation involved in immune response, alpha-beta T cell
+differentiation</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">EGR1, FOS, FOSB, JUN, CD69, DUSP1, RHOB, KLF6, BTG2,
+IER2, IFNG, ZFP36, PPP1R15A, RGS1, JUNB, DUSP2, KLF2, RGS2, MYADM,
+AC020916.1</td>
+<td align="left">integrated stress response signaling</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">MS4A1, IGKC, CD79A, JCHAIN, BANK1, POU2AF1, MARCKS,
+CPNE5, IGHA1, RALGPS2, CXXC5, CD82, TNFRSF13C, EGR1, CLECL1, DUSP2,
+TNFRSF13B, LINC01781, CRIP2, GPR183</td>
+<td align="left">B cell activation, B cell receptor signaling pathway, B
+cell proliferation, antigen receptor-mediated signaling pathway, humoral
+immune response, regulation of B cell activation, lymphocyte
+proliferation, mononuclear cell proliferation, immune
+response-activating cell surface receptor signaling pathway, B cell
+differentiation, leukocyte proliferation, immune response-regulating
+cell surface receptor signaling pathway, regulation of B cell
+proliferation, lymphocyte differentiation</td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">RGS2, RGS1, TIGIT, MAF, TOX, DUSP4, SMC4, TRBC2, GZMA,
+HLA-DQA1, EOMES, GZMH, TOX2, MKI67, HLA-DPA1, AC004585.1, ITM2A, CD8A,
+HLA-DRB5, CD38</td>
+<td align="left">MHC class II protein complex assembly, peptide antigen
+assembly with MHC class II protein complex, MHC protein complex
+assembly, peptide antigen assembly with MHC protein complex, antigen
+processing and presentation of exogenous peptide antigen via MHC class
+II, antigen processing and presentation, antigen processing and
+presentation of peptide antigen via MHC class II, antigen processing and
+presentation of peptide or polysaccharide antigen via MHC class II,
+antigen processing and presentation of exogenous peptide antigen,
+positive regulation of lymphocyte activation, antigen processing and
+presentation of exogenous antigen</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">CXCL8, IL1B, NFKBIZ, NFKBIA, JUN, CD69, ZC3H12A, CCL20,
+G0S2, SOX4, CCL4, BTG2, EGR1, CD83, TNFAIP3, IER5, TRGC1, IER2, CXCL2,
+EREG</td>
+<td align="left">cellular response to interleukin-1, response to
+interleukin-1, cellular response to lipopolysaccharide, cellular
+response to molecule of bacterial origin, cellular response to biotic
+stimulus, response to lipopolysaccharide, response to chemokine,
+cellular response to chemokine, response to molecule of bacterial
+origin, neutrophil chemotaxis, cellular response to tumor necrosis
+factor, granulocyte chemotaxis, neutrophil migration, response to tumor
+necrosis factor, granulocyte migration, T cell differentiation,
+chemokine-mediated signaling pathway, leukocyte chemotaxis, lymphocyte
+differentiation, myeloid leukocyte migration, interleukin-1-mediated
+signaling pathway, mononuclear cell differentiation</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">CLC, FCER1A, HDC, SOCS2, GCSAML, GNLY, CPA3, MS4A2,
+HBA2, HBB, GATA2, CD200R1, CAVIN2, LMNA, FOSB, AKAP12, PF4, KLF5, PPBP,
+PTGER3</td>
+<td align="left"></td>
+<td align="right">25</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="c-1e-1" class="section level3">
+<h3>c = 1e-1</h3>
+<pre class="r"><code>knitr::kable(cp1_gdf)</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="6%" />
+<col width="92%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">MT-CO1, MT-ND2, MT-ND4, MT-ND1, MT-CO3, MT-CO2, MT-CYB,
+MT-RNR2, MT-ATP6, MT-ND3, MT-ND5, RPL34, MT-ND6, TPT1, RPL31, EEF1A1,
+RPS18, RPL21, TMSB4X, RPS27</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">CXCR2, MNDA, CSF3R, IFITM2, CXCL8, RGS2, MALAT1,
+MT-RNR2, P2RY13, S100A9, C5AR1, FPR1, TNFAIP2, FAM129A, ITM2B, TXNIP,
+SRGN, SIGLEC10, FCGR3B, CPPED1</td>
+<td align="left">neutrophil chemotaxis, granulocyte chemotaxis,
+neutrophil migration, granulocyte migration, positive regulation of
+neutrophil chemotaxis, leukocyte chemotaxis, myeloid leukocyte
+migration, positive regulation of granulocyte chemotaxis, chemotaxis,
+taxis, regulation of neutrophil chemotaxis, positive regulation of
+neutrophil migration, cell chemotaxis, regulation of neutrophil
+migration, regulation of granulocyte chemotaxis, cellular defense
+response, leukocyte migration</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">TNFAIP3, IL7R, CD3E, KLRB1, NKG7, CST7, CD69, TRGC1,
+CCL5, SPOCK2, KLRG1, GZMA, ARL4C, SYNE2, ZFP36, DUSP2, JUN, CXCR4, TRAC,
+FOS</td>
+<td align="left"></td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, S100A8, MME, MNDA, IFITM2, S100A4, SRGN, NAMPT,
+PROK2, BASP1, CTSS, VNN2, FCGR3B, ALOX5AP, FTL, CYP4F3, CXCR2, MT-RNR2,
+FPR1, SELL</td>
+<td align="left">sequestering of metal ion, chemotaxis, taxis</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">CXCL8, IL1B, TNFAIP3, NFKBIA, NFKBIZ, JUN, GNLY,
+ZC3H12A, MYADM, CD83, G0S2, KLF6, IER5, PPP1R15A, CD69, FOSB, RGCC, VIM,
+JUND, MARCKS</td>
+<td align="left">cellular response to lipopolysaccharide, cellular
+response to molecule of bacterial origin, cellular response to biotic
+stimulus, response to lipopolysaccharide, response to molecule of
+bacterial origin, response to muramyl dipeptide, cellular response to
+interleukin-1, humoral immune response, regulation of cell-cell
+adhesion</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">NKG7, PRF1, GZMB, IL2RB, FGFBP2, CST7, SPON2, FCER1G,
+KLRD1, GNLY, ARL4C, FCGR3A, SH2D1B, CD7, GZMA, KLRB1, KLRF1, CCL4,
+RUNX3, S1PR5</td>
+<td align="left">leukocyte mediated immunity, cell killing, lymphocyte
+mediated immunity, natural killer cell mediated immunity, leukocyte
+mediated cytotoxicity, natural killer cell mediated cytotoxicity,
+killing of cells of another organism, disruption of cell in another
+organism, disruption of anatomical structure in another organism,
+regulation of natural killer cell mediated immunity</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">CD3E, CCR7, TCF7, TRAC, IL7R, LEF1, ETS1, SPOCK2, CD8B,
+TRBC2, RCAN3, FYB1, TNFAIP3, BCL11B, SATB1, KLF2, CD7, LEPROTL1, CD3G,
+TRABD2A</td>
+<td align="left">T cell receptor signaling pathway, immune
+response-activating cell surface receptor signaling pathway, antigen
+receptor-mediated signaling pathway, immune response-regulating cell
+surface receptor signaling pathway, gamma-delta T cell activation, T
+cell differentiation, immune response-activating signaling pathway,
+alpha-beta T cell activation, T cell differentiation in thymus,
+lymphocyte differentiation, T cell selection, mononuclear cell
+differentiation, immune system development, thymic T cell selection,
+regulation of leukocyte apoptotic process, leukocyte apoptotic process,
+positive regulation of cell adhesion, positive regulation of leukocyte
+cell-cell adhesion, positive T cell selection</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">MT-RNR2, MT-RNR1, MALAT1, MT-CO1, FAM204A, NIN, DDX6,
+APC, ITGA4, PTPRC, GPBP1, UVRAG, USP33, HNRNPU, SLTM, MT-ND5, CAP1,
+RBL2, PRDM2, PTBP3</td>
+<td align="left"></td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">KLF6, IFI6, MYADM, RGCC, FOSB, STAT1, IFIT2, FOS, JUND,
+C16orf54, MX1, DUSP6, TSC22D3, PARP9, TUBA1A, ANXA1, TAGLN2, MCL1,
+EIF2AK2, GBP4</td>
+<td align="left">defense response to virus, cellular response to calcium
+ion, response to virus, response to calcium ion</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">CLC, RGS1, MAF, FCER1A, GPR183, CD69, ITM2A, KLF6,
+TRAC, TNFAIP3, KLF2, TRBC2, FOS, SLAMF1, SOCS2, CD4, GZMA, TSC22D3,
+ALOX5AP, GATA3</td>
+<td align="left">mononuclear cell differentiation, regulation of
+adaptive immune response based on somatic recombination of immune
+receptors built from immunoglobulin superfamily domains, regulation of
+adaptive immune response, adaptive immune response based on somatic
+recombination of immune receptors built from immunoglobulin superfamily
+domains, lymphocyte differentiation, myeloid cell differentiation, T
+cell cytokine production, regulation of T cell cytokine production</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">NKG7, FGFBP2, GZMH, TRAC, CD3E, CST7, CD8A, GNLY, CD3G,
+TGFBR3, PRF1, GZMA, MAF, CD52, SPOCK2, CCL5, RUNX3, CD2, GZMB,
+ARL4C</td>
+<td align="left">killing of cells of another organism, disruption of
+cell in another organism, disruption of anatomical structure in another
+organism, cell killing, alpha-beta T cell activation, leukocyte mediated
+cytotoxicity, T cell differentiation, T cell receptor signaling
+pathway</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">IGKC, ZNF331, CD8A, NR4A2, IGHA1, SLC7A5, HSPA5, RGCC,
+YPEL5, CREM, AREG, NR4A3, PIK3R1, MAFF, LDHA, CCNH, RGS2, FOSL2, IFRD1,
+RGS1</td>
+<td align="left">immune response-activating cell surface receptor
+signaling pathway, immune response-regulating cell surface receptor
+signaling pathway, immune response-activating signaling pathway</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, CD79A, IGKC, MS4A1, IGHM, CD22, FAM129C, IGHD,
+RALGPS2, PAX5, TNFRSF13C, FCMR, CXCR4, BIRC3, MEF2C, PLPP5, HLA-DRB1,
+TCL1A, HLA-DQB1, HLA-DPB1</td>
+<td align="left">antigen receptor-mediated signaling pathway, immune
+response-activating cell surface receptor signaling pathway, B cell
+receptor signaling pathway, immune response-activating signaling
+pathway, immune response-regulating cell surface receptor signaling
+pathway, lymphocyte proliferation, mononuclear cell proliferation, B
+cell proliferation, leukocyte proliferation, B cell activation, antigen
+processing and presentation of exogenous peptide antigen via MHC class
+II, antigen processing and presentation of peptide antigen via MHC class
+II, antigen processing and presentation of peptide or polysaccharide
+antigen via MHC class II, adaptive immune response based on somatic
+recombination of immune receptors built from immunoglobulin superfamily
+domains, antigen processing and presentation of exogenous peptide
+antigen, regulation of lymphocyte proliferation, regulation of
+mononuclear cell proliferation, humoral immune response, antigen
+processing and presentation of exogenous antigen, regulation of
+leukocyte proliferation, regulation of B cell proliferation, MHC class
+II protein complex assembly, peptide antigen assembly with MHC class II
+protein complex, positive regulation of lymphocyte activation, antigen
+processing and presentation of peptide antigen, positive regulation of
+leukocyte activation, MHC protein complex assembly, peptide antigen
+assembly with MHC protein complex, lymphocyte mediated immunity,
+positive regulation of cell activation, immunoglobulin mediated immune
+response, B cell mediated immunity, positive regulation of T cell
+activation, leukocyte mediated immunity, antigen processing and
+presentation, positive regulation of leukocyte cell-cell adhesion,
+regulation of B cell activation, positive regulation of B cell
+proliferation, positive regulation of lymphocyte proliferation</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">GNLY, IKZF2, NKG7, KLRD1, TRGC1, TRGC2, FCGR3A, TRDC,
+CST7, TYROBP, GZMB, PRF1, GZMH, CCL5, KLRF1, CD3E, IL2RB, CTSW, CD7,
+ARL4C</td>
+<td align="left">cell killing, leukocyte mediated cytotoxicity, killing
+of cells of another organism, disruption of cell in another organism,
+disruption of anatomical structure in another organism, immune
+response-regulating cell surface receptor signaling pathway, leukocyte
+mediated immunity, immune response-activating cell surface receptor
+signaling pathway, natural killer cell mediated cytotoxicity, natural
+killer cell mediated immunity, lymphocyte mediated immunity, gamma-delta
+T cell activation, natural killer cell activation, immune
+response-activating signaling pathway, regulation of natural killer cell
+activation, T cell receptor signaling pathway</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">FOS, KLF6, MYADM, RGS2, FOSB, TSC22D3, DUSP1, MT-CO1,
+KLF2, JUND, C16orf54, VIM, MTCO1P12, MCL1, ZFP36, PPP1R15A, TUBA1A,
+AC020916.1, TAGLN2, ANXA1</td>
+<td align="left">cellular response to calcium ion, response to
+glucocorticoid, homeostasis of number of cells, response to calcium ion,
+response to corticosteroid</td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">G0S2, DUSP2, IL1B, HLA-DRB1, CD74, ZFP36L1, MT-CO1,
+SAT1, IFI6, HLA-DRB5, HLA-DRA, NAMPT, STAT1, HLA-DPA1, HLA-DPB1, PPIF,
+THBS1, TMSB4X, RGS2, MTCO1P12</td>
+<td align="left">antigen processing and presentation of peptide or
+polysaccharide antigen via MHC class II, antigen processing and
+presentation of exogenous peptide antigen via MHC class II, antigen
+processing and presentation of peptide antigen via MHC class II, antigen
+processing and presentation of exogenous peptide antigen, MHC class II
+protein complex assembly, peptide antigen assembly with MHC class II
+protein complex, antigen processing and presentation of exogenous
+antigen, MHC protein complex assembly, peptide antigen assembly with MHC
+protein complex, antigen processing and presentation, antigen processing
+and presentation of peptide antigen, positive regulation of leukocyte
+activation, positive regulation of cell activation, dendritic cell
+antigen processing and presentation, positive regulation of T cell
+activation, positive regulation of leukocyte cell-cell adhesion,
+positive regulation of cell-cell adhesion, positive regulation of
+lymphocyte activation, regulation of T cell activation, regulation of
+leukocyte cell-cell adhesion, leukocyte cell-cell adhesion, positive
+regulation of monocyte differentiation, positive regulation of cell
+adhesion, regulation of cell-cell adhesion, regulation of monocyte
+differentiation, regulation of apoptotic signaling pathway, regulation
+of lymphocyte proliferation, regulation of mononuclear cell
+proliferation, negative regulation of apoptotic signaling pathway,
+positive regulation of myeloid cell differentiation, antigen processing
+and presentation of endogenous antigen, regulation of leukocyte
+proliferation, type II interferon production, regulation of type II
+interferon production, monocyte differentiation, positive regulation of
+cytokine production, regulation of canonical NF-kappaB signal
+transduction</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-ND2, MT-CYB, MT-ND5, MT-ND4, MT-ND6, MT-ND4L,
+MT-ATP6, MT-ND1, MT-ND3, MTATP6P1, MT-CO2, TXNIP, MT-ATP8, MT-CO3, FOS,
+IL7R, KLF6, AHNAK, MT-CO1, MAGT1</td>
+<td align="left"></td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, S100A8, FCN1, VCAN, LYZ, CYBB, CTSS, C5AR1,
+CD14, APLP2, DUSP6, FCER1G, TYROBP, CYP1B1, MNDA, S100A12, MAFB, PSAP,
+GRN, MS4A6A</td>
+<td align="left">immune response-activating signaling pathway, positive
+regulation of response to biotic stimulus, regulation of innate immune
+response, activation of innate immune response, defense response to
+bacterium, positive regulation of innate immune response, neutrophil
+chemotaxis, astrocyte development, granulocyte chemotaxis, neutrophil
+migration, innate immune response-activating signaling pathway,
+granulocyte migration, positive regulation of cytokine production,
+immune response-activating cell surface receptor signaling pathway,
+immune response-regulating cell surface receptor signaling pathway,
+astrocyte differentiation, leukocyte chemotaxis, myeloid leukocyte
+migration, myeloid leukocyte activation, pattern recognition receptor
+signaling pathway, glial cell differentiation, positive regulation of
+hydrolase activity, glial cell development, respiratory burst,
+neutrophil activation</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">TXNIP, CD4, IL7R, ETS1, MXI1, FYB1, IL6ST, MDFIC,
+SESN3, ZFP36L2, CD40LG, SMCHD1, BTG2, SOCS3, MARCH7, CYLD, MALAT1,
+BCL11B, JAK1, ADD3</td>
+<td align="left">T cell selection, lymphocyte differentiation,
+mononuclear cell differentiation, T cell differentiation, positive
+regulation of cell-cell adhesion, positive T cell selection, positive
+regulation of leukocyte cell-cell adhesion, positive regulation of cell
+adhesion, regulation of cell-cell adhesion, regulation of leukocyte
+cell-cell adhesion, leukocyte cell-cell adhesion, CD4-positive or
+CD8-positive, alpha-beta T cell lineage commitment, positive regulation
+of T cell activation, T cell lineage commitment</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">G0S2, IFIT2, IFIT3, ZFP36, S100A8, MT-RNR2, IFI6,
+S100A9, NFKBIA, JUNB, SAT1, IFITM2, IFIT1, DUSP1, SLC25A37, CSF3R, IRF1,
+MT-RNR1, FFAR2, SOCS3</td>
+<td align="left">defense response to virus, leukocyte migration involved
+in inflammatory response, response to virus, regulation of inflammatory
+response, leukocyte chemotaxis, pattern recognition receptor signaling
+pathway, regulation of toll-like receptor signaling pathway, innate
+immune response-activating signaling pathway, activation of innate
+immune response, cell chemotaxis, positive regulation of inflammatory
+response, antiviral innate immune response</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">EGR1, FOS, JUN, CD69, BTG2, FOSB, IER2, DUSP1, DUSP2,
+ZFP36, JUNB, PPP1R15A, KLF6, NFKBIA, NFKBIZ, JUND, PMAIP1, KLF2, RHOB,
+IER5</td>
+<td align="left">integrated stress response signaling, cellular response
+to metal ion, cellular response to calcium ion, cellular response to
+inorganic substance</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">IGKC, MS4A1, CD79A, CD74, BANK1, JCHAIN, RALGPS2,
+TNFRSF13C, HLA-DPB1, GPR183, HLA-DQA1, HLA-DRB5, CXXC5, MARCKS,
+HLA-DRB1, CD52, POU2AF1, SYK, HLA-DPA1, TCF4</td>
+<td align="left">antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide or polysaccharide antigen via MHC class II, antigen processing
+and presentation of exogenous peptide antigen, MHC class II protein
+complex assembly, peptide antigen assembly with MHC class II protein
+complex, antigen processing and presentation of exogenous antigen,
+lymphocyte proliferation, mononuclear cell proliferation, MHC protein
+complex assembly, peptide antigen assembly with MHC protein complex,
+positive regulation of lymphocyte activation, leukocyte proliferation,
+positive regulation of leukocyte activation, positive regulation of cell
+activation, antigen processing and presentation of peptide antigen,
+positive regulation of T cell activation, positive regulation of
+leukocyte cell-cell adhesion, B cell activation, positive regulation of
+cell-cell adhesion, antigen receptor-mediated signaling pathway, antigen
+processing and presentation, regulation of T cell activation, regulation
+of leukocyte cell-cell adhesion, regulation of lymphocyte proliferation,
+regulation of mononuclear cell proliferation, leukocyte cell-cell
+adhesion, positive regulation of lymphocyte proliferation, positive
+regulation of mononuclear cell proliferation, regulation of leukocyte
+proliferation, positive regulation of leukocyte proliferation, B cell
+receptor signaling pathway, positive regulation of cell adhesion,
+regulation of cell-cell adhesion, immune response-activating cell
+surface receptor signaling pathway, immune response-regulating cell
+surface receptor signaling pathway, B cell proliferation, lymphocyte
+differentiation, regulation of B cell activation, mononuclear cell
+differentiation, B cell differentiation, immune response-activating
+signaling pathway, regulation of T cell proliferation, positive
+regulation of B cell activation, T cell proliferation, positive
+regulation of T cell proliferation, humoral immune response, leukocyte
+activation involved in immune response, positive regulation of B cell
+proliferation, cell activation involved in immune response</td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">ACTB, ACTG1, ACTR3, PFN1, S100A8, LCP1, ARPC2, CFL1,
+ENO1, ACTR2, S100A9, HSPA5, MYH9, SLC9A3R1, CAPZA1, WDR1, PDIA3,
+HNRNPA2B1, PKM, RAC2</td>
+<td align="left">actin filament organization, positive regulation of
+lamellipodium assembly, positive regulation of lamellipodium
+organization, positive regulation of plasma membrane bounded cell
+projection assembly, regulation of lamellipodium assembly, regulation of
+lamellipodium organization, leukocyte aggregation, spindle localization,
+lamellipodium assembly, platelet aggregation, positive regulation of
+cell projection organization, actin polymerization or depolymerization,
+regulation of plasma membrane bounded cell projection assembly,
+regulation of actin filament-based process, regulation of cell
+projection assembly, lamellipodium organization, establishment or
+maintenance of cell polarity, homotypic cell-cell adhesion, regulation
+of actin filament organization, neutrophil migration, platelet
+activation</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">MALAT1, PCSK7, NEAT1, NKTR, DDX17, AC020916.1, OGA,
+RBM25, N4BP2L2, RSRP1, LUC7L3, PNISR, AKAP9, SREK1, PRRC2C, TRIM33, OGT,
+UTRN, ARGLU1, SRSF11</td>
+<td align="left">RNA splicing</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">ID2, CD74, FCN1, CTSS, S100A9, PSAP, FCER1G, TYROBP,
+CYBB, LYZ, VCAN, MS4A6A, HLA-DRB5, HLA-DRB1, CST3, LGALS3, CPVL, GPX1,
+MNDA, COTL1</td>
+<td align="left">antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide or polysaccharide antigen via MHC class II, antigen processing
+and presentation of exogenous peptide antigen, antigen processing and
+presentation of exogenous antigen, antigen processing and presentation
+of peptide antigen, negative regulation of lymphocyte activation, immune
+response-activating signaling pathway, negative regulation of leukocyte
+activation, negative regulation of cell activation, antigen processing
+and presentation, positive regulation of myeloid leukocyte
+differentiation, immune response-activating cell surface receptor
+signaling pathway, immune response-regulating cell surface receptor
+signaling pathway, regulation of immune effector process, positive
+regulation of response to biotic stimulus, regulation of lymphocyte
+proliferation, positive regulation of myeloid cell differentiation,
+regulation of mononuclear cell proliferation, neutrophil chemotaxis,
+negative regulation of B cell activation, regulation of leukocyte
+proliferation, T cell activation involved in immune response, regulation
+of myeloid leukocyte differentiation, granulocyte chemotaxis, neutrophil
+migration, regulation of B cell activation</td>
+<td align="right">25</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="c-1" class="section level3">
+<h3>c = 1</h3>
+<pre class="r"><code>knitr::kable(c1_gdf)</code></pre>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="87%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">MT-ND4, MT-CYB, MT-ND2, MT-CO3, MT-ND1, MT-CO2, MT-CO1,
+MT-ATP6, MT-ND3, MT-RNR2, MT-ND5, MT-ND6, MTCO1P12, RPL34, MT-ND4L,
+MTATP6P1, RPS18, RPL31, RPL21, TPT1</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">IL1B, CXCL8, G0S2, NFKBIA, NFKBIZ, TNFAIP3, ZFP36L1,
+MARCKS, NAMPT, PLEK, ZFP36, MT-RNR2, DUSP6, SAT1, CD74, PPIF, SRGN,
+CTSS, SOD2, THBS1</td>
+<td align="left">regulation of apoptotic signaling pathway, response to
+lipopolysaccharide, response to molecule of bacterial origin, cellular
+response to lipopolysaccharide, cellular response to molecule of
+bacterial origin, cellular response to tumor necrosis factor, negative
+regulation of apoptotic signaling pathway, response to tumor necrosis
+factor, cellular response to biotic stimulus, epithelial cell apoptotic
+process, chronic inflammatory response, extrinsic apoptotic signaling
+pathway, regulation of epithelial cell apoptotic process, cellular
+response to fibroblast growth factor stimulus, response to fibroblast
+growth factor, antigen processing and presentation of peptide or
+polysaccharide antigen via MHC class II</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">YPEL5, ZNF331, PIK3R1, CXCR4, NR4A2, JUND, RGS1, ARL4C,
+RGCC, ZFP36, SRGN, BTG1, DUSP2, STK17B, CD74, CD8A, JUNB, PTMA, RBM39,
+HSPA5</td>
+<td align="left"></td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">MT-RNR2, MT-RNR1, MALAT1, MT-CO1, MT-ND5, PPP1R15A,
+PABPC1, MTCO1P12, MT-CO3, TMSB4X, N4BP2L2, MT-ND1, DDX6, NEAT1, TPT1,
+UBE2D3, RPL34, SUB1, RPL23, SLTM</td>
+<td align="left">regulation of miRNA catabolic process</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, CD79A, CXCR4, TXNIP, IGKC, MS4A1, JUND, BTG1,
+CD37, IGHM, BIRC3, KLF6, TSC22D3, LAPTM5, KLF2, CD22, FAM129C, DUSP1,
+RALGPS2, FCMR</td>
+<td align="left">B cell receptor signaling pathway, antigen
+receptor-mediated signaling pathway, immune response-activating
+signaling pathway, immune response-activating cell surface receptor
+signaling pathway, immune response-regulating cell surface receptor
+signaling pathway, B cell activation, B cell proliferation</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">JUN, CD69, BTG2, FOS, EGR1, ZFP36, NFKBIA, JUNB, IER2,
+DUSP1, DUSP2, PPP1R15A, NFKBIZ, FOSB, JUND, IER5, CXCR4, KLF6, PMAIP1,
+TXNIP</td>
+<td align="left">response to mechanical stimulus, integrated stress
+response signaling, response to calcium ion, response to metal ion,
+cellular response to metal ion, cellular response to calcium ion,
+cellular response to inorganic substance, response to xenobiotic
+stimulus, response to progesterone</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">TXNIP, CD3E, TNFAIP3, KLF2, IL7R, RPL34, TCF7, FYB1,
+RPS27, RPS12, ETS1, RPL11, RPL31, TPT1, RPS13, RPL32, RPL21, RPS18,
+RPS14, EEF1A1</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, homeostasis of number of cells</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">NKG7, FGFBP2, ARL4C, PRF1, TXNIP, CST7, GNLY, RUNX3,
+GZMB, SPON2, FCGR3A, B2M, KLRD1, EFHD2, GZMA, IL2RB, LITAF, ITGB2,
+TMSB4X, MSN</td>
+<td align="left">cell killing, leukocyte mediated immunity, leukocyte
+mediated cytotoxicity, killing of cells of another organism, disruption
+of cell in another organism, disruption of anatomical structure in
+another organism, lymphocyte mediated immunity, natural killer cell
+mediated cytotoxicity, natural killer cell mediated immunity, response
+to tumor cell</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">G0S2, ZFP36, JUNB, RGS2, DUSP1, SAT1, S100A8, IFITM2,
+FOS, MT-ND1, S100A9, MT-ND2, MT-CYB, MT-ND4, MALAT1, NEAT1, MT-ND3,
+BTG2, CSF3R, MT-CO2</td>
+<td align="left">positive regulation of miRNA metabolic process</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, S100A8, PSAP, VCAN, CTSS, FCN1, VIM, SRGN,
+ACTB, FTL, LYZ, S100A4, C5AR1, APLP2, RGS2, CYBB, S100A6, CD74, FCER1G,
+MNDA</td>
+<td align="left">neutrophil chemotaxis, astrocyte development,
+sequestering of metal ion, granulocyte chemotaxis, neutrophil migration,
+granulocyte migration, immune response-activating signaling pathway,
+astrocyte differentiation, leukocyte chemotaxis, myeloid leukocyte
+migration, antigen processing and presentation of exogenous peptide
+antigen via MHC class II, glial cell differentiation, chemotaxis, taxis,
+antigen processing and presentation of peptide antigen via MHC class II,
+antigen processing and presentation of peptide or polysaccharide antigen
+via MHC class II, glial cell development, antigen processing and
+presentation of exogenous peptide antigen, activation of innate immune
+response</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">ACTB, ACTG1, PFN1, CFL1, TMSB4X, ARPC2, MT-CO1, RAC2,
+LCP1, ARHGDIB, MT-CO3, MT-CO2, ACTR2, CD74, TMSB4XP4, ATP5F1E, PPIA,
+CAPZB, HNRNPA2B1, CALM1</td>
+<td align="left">actin filament organization, regulation of
+lamellipodium assembly, regulation of lamellipodium organization,
+lamellipodium assembly, actin polymerization or depolymerization,
+regulation of plasma membrane bounded cell projection assembly,
+regulation of cell projection assembly, lamellipodium organization,
+positive regulation of lamellipodium assembly, positive regulation of
+plasma membrane bounded cell projection assembly, regulation of actin
+filament organization, positive regulation of lamellipodium
+organization, regulation of actin filament polymerization, response to
+type II interferon, regulation of actin polymerization or
+depolymerization, regulation of actin cytoskeleton organization,
+regulation of actin filament length, actin filament polymerization</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, MNDA, CTSS, FCGR3B, CXCR2, S100A8, ITM2B,
+BASP1, SRGN, VNN2, IFITM2, SELL, FPR1, C5AR1, NAMPT, B2M, EVI2B, LITAF,
+CXCL8, LCP1</td>
+<td align="left">neutrophil chemotaxis, granulocyte chemotaxis,
+neutrophil migration, granulocyte migration, response to molecule of
+bacterial origin, positive regulation of neutrophil chemotaxis,
+leukocyte migration, positive regulation of granulocyte chemotaxis,
+leukocyte chemotaxis, myeloid leukocyte migration, regulation of
+neutrophil chemotaxis, positive regulation of neutrophil migration,
+chemotaxis, taxis, immune response-activating signaling pathway,
+astrocyte development, regulation of neutrophil migration</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">IGKC, MT-RNR2, HSP90B1, MT-ND2, MT-ND1, TXNIP, NFKBIA,
+MT-ND4, HSP90AB1, MT-CYB, VIM, HSPA5, PTMA, MT-ND5, RPS6, MT-ATP6,
+MT-CO2, HNRNPA2B1, NCL, MT-ND6</td>
+<td align="left">cellular response to biotic stimulus, protein folding
+in endoplasmic reticulum</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">IFI6, IFIT2, STAT1, IFIT3, MT-RNR2, MX1, IFITM3, APOL6,
+GBP5, SAMD9L, EIF2AK2, PARP9, SP110, IRF1, TRIM22, SAT1, CLC, IFI16,
+PARP14, APOBEC3A</td>
+<td align="left">defense response to virus, response to virus,
+regulation of viral process, negative regulation of viral process,
+negative regulation of viral genome replication, viral process, response
+to type II interferon, regulation of viral life cycle, type II
+interferon-mediated signaling pathway, regulation of viral genome
+replication, response to interferon-beta, interferon-mediated signaling
+pathway, cellular response to type II interferon, viral genome
+replication, antiviral innate immune response, viral life cycle,
+cellular response to interferon-beta, regulation of innate immune
+response, positive regulation of defense response to virus by host,
+regulation of defense response to virus by host, positive regulation of
+innate immune response</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">FOS, KLF6, MYADM, JUND, RGCC, TSC22D3, FOSB, TNFAIP3,
+VIM, DUSP1, MCL1, PPP1R15A, TAGLN2, ANXA1, C16orf54, YPEL5, KLF2, JUN,
+MALAT1, AHNAK</td>
+<td align="left"></td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">CD74, IGKC, MS4A1, CD79A, KLF6, TXNIP, UCP2, BANK1,
+TAGLN2, AHNAK, JCHAIN, RIPOR2, RALGPS2, HLA-DPB1, HLA-DRB1, CD37,
+GPR183, MARCKS, HLA-DQA1, JUND</td>
+<td align="left">antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen receptor-mediated signaling
+pathway, antigen processing and presentation of peptide or
+polysaccharide antigen via MHC class II, antigen processing and
+presentation of exogenous peptide antigen, antigen processing and
+presentation of exogenous antigen, B cell activation, lymphocyte
+proliferation, mononuclear cell proliferation, MHC class II protein
+complex assembly, peptide antigen assembly with MHC class II protein
+complex, immune response-activating cell surface receptor signaling
+pathway, antigen processing and presentation of peptide antigen,
+leukocyte proliferation, B cell receptor signaling pathway, immune
+response-regulating cell surface receptor signaling pathway, MHC protein
+complex assembly, peptide antigen assembly with MHC protein complex,
+lymphocyte differentiation, B cell proliferation, antigen processing and
+presentation, mononuclear cell differentiation, immune
+response-activating signaling pathway, positive regulation of lymphocyte
+activation</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">NKG7, GNLY, FGFBP2, CD3E, GZMH, S100A4, ARL4C, B2M,
+TXNIP, TNFAIP3, TRAC, RUNX3, CST7, AHNAK, CD8A, KLF6, TMSB4X, CD3G,
+ANXA1, PRF1</td>
+<td align="left">alpha-beta T cell activation, lymphocyte
+differentiation, mononuclear cell differentiation, T cell
+differentiation, killing of cells of another organism, disruption of
+cell in another organism, disruption of anatomical structure in another
+organism, cell killing, CD4-positive, alpha-beta T cell activation,
+response to tumor cell</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">CXCR2, MNDA, MT-RNR2, CXCL8, ITM2B, FCGR3B, B2M, TXNIP,
+PTPRC, IFITM2, SMAP2, CTSS, TAGLN2, FPR1, FAM129A, CSF3R, LYN, MALAT1,
+CPPED1, LITAF</td>
+<td align="left"></td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">TNFAIP3, ZFP36, IL7R, CXCR4, ARL4C, CD3E, ZFP36L2, JUN,
+CD69, NFKBIA, SPOCK2, CD74, SYNE2, RUNX3, CST7, NKG7, GZMA, DUSP2,
+KLRB1, RPS27</td>
+<td align="left">T cell differentiation in thymus, regulation of
+hemopoiesis, B cell homeostasis</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">ZFP36, GNLY, ARL4C, CXCR4, IL2RB, NKG7, TNFAIP3, MAFF,
+RUNX3, NR4A2, AREG, DUSP2, CD69, JUND, FOSL2, SRGN, PIK3R1, FOS, NFKBIA,
+ZFP36L2</td>
+<td align="left">response to glucocorticoid, response to corticosteroid,
+regulation of hemopoiesis, cellular response to tumor necrosis factor,
+response to tumor necrosis factor</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">RPS18, RPS12, RPS6, RPS8, RPL34, RPL31, RPL23, EEF1A1,
+RPS14, RPL32, RPS13, RPS27, RPL3, TPT1, RPL9, RPS29, RPS20, RPL21,
+RPS27A, RPS28</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribonucleoprotein complex biogenesis,
+ribosomal small subunit assembly, rRNA processing, rRNA metabolic
+process, maturation of SSU-rRNA, ribosome assembly, ncRNA
+processing</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">MALAT1, NEAT1, DDX17, PNISR, PRRC2C, MT-CO1, NKTR,
+RBM25, MT-CO3, MT-CO2, OGA, AKAP9, DDX5, MT-ND4, SRSF11, ARGLU1, SFPQ,
+N4BP2L2, SMCHD1, CCNL1</td>
+<td align="left">alternative mRNA splicing, via spliceosome, RNA
+splicing, miRNA metabolic process, regulation of alternative mRNA
+splicing, via spliceosome, regulation of RNA splicing, regulation of
+miRNA catabolic process</td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">TXNIP, IL7R, CXCR4, ZFP36L2, TRAC, CD4, ETS1, ARL4C,
+FYB1, JUNB, CD3E, BTG1, KLF2, MAF, TNFAIP3, RGS1, TMSB4X, GPR183,
+PIK3R1, AHNAK</td>
+<td align="left">T cell differentiation, lymphocyte differentiation,
+myeloid cell differentiation, mononuclear cell differentiation,
+regulation of hemopoiesis, B cell activation</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">GNLY, NKG7, ARL4C, KLRD1, CD3E, TXNIP, CST7, TRGC1,
+RUNX3, TRGC2, IKZF2, PRF1, ZFP36, CXCR4, CCL5, TMSB4X, GZMH, B2M, TRDC,
+GZMA</td>
+<td align="left">cell killing, killing of cells of another organism,
+disruption of cell in another organism, disruption of anatomical
+structure in another organism, gamma-delta T cell activation</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, PSAP, CTSS, FTL, S100A9, ACTB, FCN1, VIM, S100A4,
+DUSP6, FCER1G, HLA-DRB1, ZFP36, TMSB4X, CYBB, TYROBP, SRGN, ID2,
+HLA-DRB5, LYZ</td>
+<td align="left">antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide or polysaccharide antigen via MHC class II, antigen processing
+and presentation of exogenous peptide antigen, antigen processing and
+presentation of exogenous antigen, antigen processing and presentation
+of peptide antigen, antigen processing and presentation, positive
+regulation of myeloid leukocyte differentiation, positive regulation of
+leukocyte differentiation, positive regulation of hemopoiesis,
+regulation of myeloid cell differentiation, regulation of hemopoiesis,
+positive regulation of myeloid cell differentiation, regulation of
+myeloid leukocyte differentiation, immune response-activating signaling
+pathway</td>
+<td align="right">25</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="c-10" class="section level3">
+<h3>c = 10</h3>
+<pre class="r"><code>knitr::kable(c10_gdf)</code></pre>
+<table>
+<colgroup>
+<col width="21%" />
+<col width="78%" />
+<col width="0%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">MT-CYB, MT-ND4, MT-ND2, MT-ND1, MT-CO2, MT-CO3,
+MT-ATP6, MT-CO1, MT-ND3, MT-ND5, MT-RNR2, MT-ND6, MTCO1P12, MT-ND4L,
+MTATP6P1, RPL34, TMSB4X, MT-RNR1, MT-ATP8, RPS20</td>
+<td align="left"></td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">RPL34, RPS18, MT-CO1, RPS12, TXNIP, EEF1A1, RPL31,
+RPS6, RPS27, RPL21, RPL32, TPT1, RPS13, RPS14, PABPC1, CD3E, RPS29,
+RPS8, RPL11, RPL23</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribonucleoprotein complex biogenesis,
+rRNA processing, rRNA metabolic process, ribosome assembly</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-RNR2, MALAT1, MT-RNR1, MT-CO1, MT-ND5, MT-ND1,
+MT-CO3, PABPC1, MT-ND4, MT-ND6, TPT1, MT-CO2, RPL34, TMSB4X, PTPRC,
+RPLP1, RPL23, MBNL1, UBE2D3, HNRNPU</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">RPS18, RPL34, RPS12, RPS6, RPL31, EEF1A1, RPS27, RPS8,
+TPT1, RPL21, RPS14, RPS29, RPL23, RPL32, RPS13, RPS27A, RPS20, RPS28,
+RPL9, RPL37</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribonucleoprotein complex biogenesis,
+ribosomal small subunit assembly, rRNA processing, positive regulation
+of signal transduction by p53 class mediator, rRNA metabolic process,
+maturation of SSU-rRNA, ribosome assembly, ncRNA processing</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, CXCR4, MT-CO1, RPL34, RPS27, MT-CO3, CD79A, JUND,
+RPS18, RPS8, RPL21, TXNIP, EEF1A1, MT-CO2, BTG1, RPS11, IGKC, MT-ND4,
+PTMA, RPL23</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">TNFAIP3, JUND, MT-ND2, RGCC, TSC22D3, MYADM, MT-ND1,
+KLF6, MT-ND4, MT-CYB, YPEL5, PTMA, MT-CO2, MT-ATP6, TAGLN2, MALAT1,
+MT-ND5, VIM, MT-RNR2, EIF1</td>
+<td align="left"></td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">TXNIP, RPL34, RPS27, TPT1, MT-CO1, TMSB4X, RPL31,
+RPS13, EEF1A1, RPL32, KLF2, RPL11, RPL21, RPS29, FYB1, RPS18, RPS12,
+RPS27A, RPS20, RPS6</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">JUN, NFKBIA, CD69, ZFP36, BTG2, TNFAIP3, DUSP2, IER2,
+CXCR4, PPP1R15A, EGR1, JUNB, JUND, MT-CO1, NFKBIZ, IER5, DUSP1, H3F3B,
+MT-CO3, TPT1</td>
+<td align="left">integrated stress response signaling</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-RNR2, MALAT1, IFITM2, G0S2, RGS2, CXCL8, CSF3R,
+SAT1, DUSP1, S100A9, ZFP36, JUNB, SRGN, CXCR2, MNDA, TXNIP, B2M, TMSB4X,
+TAGLN2, BTG2</td>
+<td align="left">cell chemotaxis, leukocyte chemotaxis, myeloid
+leukocyte migration, neutrophil chemotaxis, chemotaxis, taxis,
+granulocyte chemotaxis, neutrophil migration</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, S100A8, MT-CO1, PSAP, VIM, CTSS, ACTB, FTL,
+TMSB4X, VCAN, FCN1, SRGN, S100A4, MT-CO3, PABPC1, TPT1, MT-CO2, MT-RNR2,
+LYZ, MTCO1P12</td>
+<td align="left">sequestering of metal ion, maintenance of location in
+cell, maintenance of location, astrocyte development</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">ZFP36, CXCR4, MT-CO1, ARL4C, GNLY, NKG7, JUND, BTG1,
+TMSB4X, RUNX3, IL2RB, PTMA, MT-CO3, PABPC1, SRGN, H3F3B, DUSP2, PIK3R1,
+NR4A2, EEF1A1</td>
+<td align="left"></td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, S100A8, MT-RNR2, IFITM2, MALAT1, SRGN, RGS2,
+ACTB, G0S2, C5AR1, MNDA, TMSB4X, FTL, FOS, CSF3R, NAMPT, DUSP1, H3F3B,
+SELL, CTSS</td>
+<td align="left">sequestering of metal ion, cell chemotaxis, leukocyte
+migration, maintenance of location in cell, leukocyte chemotaxis,
+myeloid leukocyte migration, neutrophil chemotaxis, chemotaxis, taxis,
+granulocyte chemotaxis, neutrophil migration, positive regulation of
+apoptotic signaling pathway, astrocyte development, granulocyte
+migration, maintenance of location</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">IGKC, MT-RNR2, MT-CO1, CD74, MT-ND1, MT-CO2, MT-ND4,
+MT-CO3, MT-ND2, MT-ND3, MS4A1, MT-CYB, MT-ATP6, TMSB4X, MALAT1, JCHAIN,
+MT-ND5, RPS18, IGHA1, RPS8</td>
+<td align="left">B cell receptor signaling pathway</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">IFI6, MT-RNR2, SAT1, IFIT2, B2M, IFITM2, IFITM3, STAT1,
+SELL, IRF1, MALAT1, SRGN, ITM2B, SP110, H3F3B, TXNIP, CTSS, IFIT3,
+PARP9, FYB1</td>
+<td align="left">defense response to virus, response to virus, response
+to interferon-beta, interferon-mediated signaling pathway, response to
+type II interferon, type II interferon-mediated signaling pathway,
+cellular response to interferon-beta</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">FOS, DUSP1, KLF6, JUND, MALAT1, ZFP36, FOSB, JUNB,
+TSC22D3, MT-RNR2, MYADM, MCL1, PPP1R15A, KLF2, MT-ND2, MT-ND4, JUN,
+ZFP36L2, MT-ND1, ACTB</td>
+<td align="left">integrated stress response signaling, cellular response
+to metal ion, cellular response to calcium ion, cellular response to
+inorganic substance, response to glucocorticoid, cellular response to
+epidermal growth factor stimulus, response to calcium ion, response to
+epidermal growth factor, response to corticosteroid, response to metal
+ion</td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">ACTB, PFN1, CFL1, TMSB4X, MT-CO2, ACTG1, MT-CO3,
+MT-CO1, MT-ATP6, MT-CYB, MT-ND4, MT-RNR2, MT-ND2, MT-ND1, ARPC2, RAC2,
+LCP1, CALM1, ARHGDIB, PTMA</td>
+<td align="left">actin filament organization, actin polymerization or
+depolymerization, regulation of actin filament organization</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">TNFAIP3, CXCR4, IL7R, MT-CO1, RPS27, KLF6, B2M, TXNIP,
+EEF1A1, ARL4C, RPL34, TMSB4X, ZFP36L2, RPS18, RPS29, TPT1, CD3E, AHNAK,
+S100A4, TSC22D3</td>
+<td align="left">T cell differentiation in thymus</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">CD74, CTSS, PSAP, IL1B, MT-CO1, S100A9, TMSB4X, SRGN,
+MT-RNR2, DUSP6, ACTB, FTL, ZFP36, ZFP36L1, SAT1, PLEK, B2M, MT-ND1,
+S100A8, NAMPT</td>
+<td align="left">sequestering of metal ion, leukocyte aggregation,
+maintenance of location, T cell differentiation in thymus, leukocyte
+cell-cell adhesion, maintenance of location in cell, neutrophil
+chemotaxis, antigen processing and presentation of exogenous peptide
+antigen via MHC class II, antigen processing and presentation of peptide
+antigen via MHC class II, granulocyte chemotaxis, neutrophil migration,
+antigen processing and presentation of peptide or polysaccharide antigen
+via MHC class II, T cell differentiation, antigen processing and
+presentation of exogenous peptide antigen, cell chemotaxis, astrocyte
+development</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO1, NKG7, B2M, TMSB4X, GNLY, RPS27, CD3E, ARL4C,
+S100A4, RPL34, GZMH, EEF1A1, RUNX3, RPS14, MT-ND5, RPL21, TXNIP, RPS27A,
+FGFBP2, RPS19</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+assembly, killing of cells of another organism, disruption of cell in
+another organism, disruption of anatomical structure in another
+organism, cell killing</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, CXCR4, ZFP36, ARL4C, CD74, TMSB4X, RPS27,
+EEF1A1, B2M, CD3E, TNFAIP3, ZFP36L2, RPL34, NKG7, MT-CO3, RPS18, DUSP2,
+PIK3R1, RPL21, RPS29</td>
+<td align="left">cytoplasmic translation, T cell differentiation in
+thymus, cellular response to epidermal growth factor stimulus, T cell
+differentiation</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, MT-CO1, KLF6, RPS18, RPL34, RPS27, MALAT1, TXNIP,
+CD79A, PTMA, RPS8, JUND, MS4A1, RPS11, EEF1A1, RPS20, RPS29, RPL11,
+CXCR4, MT-CO3</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">MT-ND2, MT-ND4, MT-CYB, MT-ND1, MT-ND5, MT-ATP6,
+MT-CO2, TXNIP, MT-ND3, MT-ND6, MALAT1, MT-RNR2, MT-CO3, PTMA, MT-ND4L,
+CXCR4, PTPRC, RPS27, MTATP6P1, ZFP36L2</td>
+<td align="left"></td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, NEAT1, DDX17, MT-CO3, PNISR, PRRC2C, MT-CO2,
+DDX5, NKTR, RBM39, MT-CO1, SRSF11, AKAP9, RBM25, PTPRC, SFPQ, MT-ND4,
+OGA, HNRNPA2B1, SRRM2</td>
+<td align="left">RNA splicing, RNA splicing, via transesterification
+reactions with bulged adenosine as nucleophile, mRNA splicing, via
+spliceosome, RNA splicing, via transesterification reactions, regulation
+of mRNA splicing, via spliceosome, regulation of mRNA processing,
+regulation of RNA splicing, alternative mRNA splicing, via spliceosome,
+miRNA metabolic process, regulation of alternative mRNA splicing, via
+spliceosome, regulation of mRNA metabolic process</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, NKG7, ARL4C, B2M, PRF1, GNLY, TMSB4X, TXNIP,
+RUNX3, FGFBP2, CST7, MT-CO2, GZMB, CFL1, PFN1, MT-CO3, PTMA, KLRD1,
+SPON2, GZMA</td>
+<td align="left">cell killing, killing of cells of another organism,
+disruption of cell in another organism, disruption of anatomical
+structure in another organism, leukocyte mediated cytotoxicity,
+leukocyte mediated immunity, response to tumor cell, lymphocyte mediated
+immunity</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, PSAP, MT-CO1, CTSS, FTL, TMSB4X, ACTB, VIM,
+PABPC1, TPT1, ZFP36, S100A4, MT-CO3, MT-ND1, EEF1A1, B2M, MTCO1P12,
+MT-CO2, RPL34, MT-RNR2</td>
+<td align="left">antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide or polysaccharide antigen via MHC class II, antigen processing
+and presentation of exogenous peptide antigen, antigen processing and
+presentation of exogenous antigen</td>
+<td align="right">25</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="c-100" class="section level3">
+<h3>c = 100</h3>
+<pre class="r"><code>knitr::kable(c100_gdf)</code></pre>
+<table>
+<colgroup>
+<col width="26%" />
+<col width="72%" />
+<col width="1%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">MT-CO1, MT-CO3, MT-CO2, MT-RNR2, MT-ND4, MT-CYB,
+MT-ND3, MT-ND1, MT-ATP6, MTCO1P12, MT-ND2, RPL34, MT-ND5, TPT1, MT-RNR1,
+RPL31, TMSB4X, RPS18, MT-ND6, RPS13</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, MT-CO1, S100A8, MT-ND1, PSAP, TMSB4X, MT-CO2,
+ACTB, CTSS, MT-CO3, MT-ND3, MT-RNR2, MT-ND2, FTL, SRGN, MT-ND4, MT-CYB,
+VIM, FCN1, S100A4</td>
+<td align="left">sequestering of metal ion, maintenance of location in
+cell, maintenance of location, astrocyte development, toll-like receptor
+signaling pathway, pattern recognition receptor signaling pathway,
+innate immune response-activating signaling pathway, astrocyte
+differentiation, activation of innate immune response</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO1, MT-CO2, ARL4C, GNLY, NKG7, MT-ND4, B2M, MT-ND5,
+TMSB4X, MT-ND2, MT-CO3, PRF1, RUNX3, MT-ATP6, ZFP36, PTMA, CST7, CFL1,
+IL2RB, PFN1</td>
+<td align="left">cell killing</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, MT-ND1, MT-RNR2, IL1B, MT-CO3, MT-CO2, MT-ND2,
+MT-ND4, MT-CYB, MT-ND3, NFKBIA, CTSS, CD74, PSAP, ZFP36, TMSB4X,
+MT-ATP6, S100A9, SRGN, ACTB</td>
+<td align="left">maintenance of location, regulation of inflammatory
+response</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">TNFAIP3, MT-CO1, CXCR4, RPS27, RPL34, EEF1A1, B2M,
+TMSB4X, RPS18, ARL4C, MT-ND2, MT-ND5, IL7R, TPT1, MT-ND1, RPS29,
+ZFP36L2, MT-CO3, CD3E, RPS12</td>
+<td align="left">cytoplasmic translation, T cell differentiation in
+thymus</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">MALAT1, MT-RNR2, IFITM2, G0S2, CXCL8, SAT1, DUSP1,
+CSF3R, JUNB, MNDA, SRGN, ZFP36, CXCR2, S100A9, RGS2, B2M, TMSB4X, TXNIP,
+BTG2, TAGLN2</td>
+<td align="left">cell chemotaxis, leukocyte chemotaxis, myeloid
+leukocyte migration, neutrophil chemotaxis, chemotaxis, taxis,
+granulocyte chemotaxis, neutrophil migration</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-ND4, RPL34, MT-ND2, MT-CO1, MT-ND1, MT-CO3, RPS18,
+MT-CO2, MT-CYB, RPS12, RPL31, RPS6, RPS27, EEF1A1, TPT1, MT-ND3, RPL21,
+RPL32, RPS14, RPS29</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribosomal small subunit assembly</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">CD74, MT-CO1, MT-ND4, MT-ND2, MT-CO2, MT-ND1, MT-CO3,
+MT-CYB, MT-ND3, CXCR4, MT-RNR2, MT-ATP6, MT-ND5, JUND, RPS27, CD79A,
+RPL34, BTG1, PTMA, MT-ND6</td>
+<td align="left"></td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">RGS2, MT-RNR2, CTSS, ITM2B, B2M, TXNIP, MALAT1, PTPRC,
+NAMPT, CSF3R, EVI2B, TAGLN2, SRGN, NCOA4, SMAP2, FTL, PSAP, TMSB4X,
+H3F3B, LCP1</td>
+<td align="left"></td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">KLF6, MT-ND2, JUND, MT-ND4, MT-ND1, MT-CYB, MYADM,
+MT-CO2, TSC22D3, MT-ATP6, TNFAIP3, RGCC, MT-CO3, MT-ND3, MT-RNR2,
+TAGLN2, VIM, PTMA, FOSB, ANXA1</td>
+<td align="left"></td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO1, TMSB4X, MT-ND5, B2M, MT-CO2, MT-CYB, MT-ND4,
+MT-ND2, NKG7, RPS27, MT-ND6, GNLY, MT-ATP6, MT-CO3, MT-ND1, ARL4C, CD3E,
+RPL34, S100A4, EEF1A1</td>
+<td align="left"></td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">CXCR4, MT-ND2, MT-CO1, ZFP36, MT-ND4, MT-ND1, JUND,
+ARL4C, TMSB4X, PTMA, MT-CO2, MT-CO3, TNFAIP3, MT-CYB, PIK3R1, YPEL5,
+BTG1, MT-ATP6, RPS27, ZFP36L2</td>
+<td align="left">cellular response to tumor necrosis factor</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">RPL34, RPS18, RPS27, RPS12, RPL31, RPS6, EEF1A1, TPT1,
+RPL21, RPS8, RPS29, RPS14, MT-ND2, RPS20, RPS27A, RPL32, MT-ND4, RPS13,
+RPL23, MT-ND1</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribonucleoprotein complex biogenesis,
+rRNA processing, rRNA metabolic process</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">MALAT1, MT-RNR2, NEAT1, DDX17, MT-CO3, PRRC2C, PNISR,
+RBM39, DDX5, MT-CO2, PTPRC, NKTR, SRSF11, AKAP9, RBM25, SFPQ, OGA,
+CCNL1, HNRNPA2B1, ARGLU1</td>
+<td align="left">RNA splicing, regulation of RNA splicing, regulation of
+mRNA splicing, via spliceosome, regulation of mRNA processing, RNA
+splicing, via transesterification reactions with bulged adenosine as
+nucleophile, mRNA splicing, via spliceosome, RNA splicing, via
+transesterification reactions, alternative mRNA splicing, via
+spliceosome, miRNA metabolic process, regulation of alternative mRNA
+splicing, via spliceosome, regulation of mRNA metabolic process</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-RNR2, MALAT1, MT-RNR1, MT-ND1, MT-ND4, MT-ND5,
+TMSB4X, TPT1, RPL34, PABPC1, PTPRC, UBE2D3, ACTB, MBNL1, PNRC1, YPEL5,
+LCP1, SUB1, ATP5F1E, RPL39</td>
+<td align="left"></td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">ACTB, TMSB4X, MT-CO2, CFL1, PFN1, ACTG1, MT-ATP6,
+MT-ND4, MT-CYB, MT-CO3, MT-ND2, MT-ND1, PTMA, ARPC2, RAC2, B2M, CALM1,
+LCP1, MT-RNR2, ARHGDIB</td>
+<td align="left">actin filament organization, actin polymerization or
+depolymerization</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-ND4, MT-ND2, MT-CYB, MT-ND1, MT-CO2, MT-CO3,
+MT-ATP6, MT-ND3, MT-ND5, MT-CO1, MT-ND6, MT-RNR2, MT-ND4L, MTATP6P1,
+TXNIP, MTCO1P12, MT-ATP8, RPS27, MT-RNR1, RPL34</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, S100A9, VIM, PSAP, MT-ND1, CD74, MT-CO2,
+S100A8, MT-RNR2, CTSS, ACTB, VCAN, TPT1, PABPC1, MT-CO3, S100A4, FTL,
+EEF1A1, MT-ND3, MT-ND4</td>
+<td align="left">sequestering of metal ion, astrocyte development,
+regulation of apoptotic signaling pathway, regulation of intrinsic
+apoptotic signaling pathway</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO1, RPL34, TPT1, TMSB4X, TXNIP, RPS27, RPL31,
+RPS13, RPL32, FYB1, KLF2, RPL11, IL7R, RPS29, EEF1A1, CD3E, MALAT1,
+PABPC1, RPL21, ETS1</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, MT-RNR2, S100A8, IFITM2, MALAT1, SRGN, ACTB,
+G0S2, RGS2, C5AR1, TMSB4X, MNDA, FOS, FTL, DUSP1, CSF3R, NAMPT, H3F3B,
+SELL, S100A4</td>
+<td align="left">sequestering of metal ion, chemotaxis, taxis, cell
+chemotaxis, leukocyte migration, maintenance of location in cell,
+leukocyte chemotaxis, myeloid leukocyte migration, neutrophil
+chemotaxis, granulocyte chemotaxis, neutrophil migration, astrocyte
+development, granulocyte migration, maintenance of location</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">FOS, DUSP1, ZFP36, MALAT1, MT-RNR2, JUND, JUNB, KLF6,
+TSC22D3, FOSB, MCL1, PPP1R15A, KLF2, ZFP36L2, MT-ND4, MYADM, ACTB,
+MT-CO2, MT-ND1, NEAT1</td>
+<td align="left">cellular response to calcium ion, response to
+glucocorticoid, cellular response to epidermal growth factor stimulus,
+response to calcium ion, response to epidermal growth factor, integrated
+stress response signaling, response to corticosteroid</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">CD74, IGKC, MT-CO1, MT-RNR2, MT-ND4, MT-CO2, MT-ND1,
+MT-ND3, MS4A1, MALAT1, MT-CO3, RPS18, CD79A, MT-ND2, KLF6, PTMA, TMSB4X,
+RPL34, RPS8, RPS11</td>
+<td align="left">cytoplasmic translation, B cell receptor signaling
+pathway, B cell activation</td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">TXNIP, MT-ND4, MALAT1, MT-CYB, MT-ND5, CXCR4, PTMA,
+MT-ND6, RPS27, MT-CO2, MT-ND3, PTPRC, MT-ATP6, DDX5, PABPC1, RPL21,
+SRSF5, RPS6, RPS29, HNRNPA2B1</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">ZFP36, JUN, CD69, NFKBIA, MT-CO1, CXCR4, BTG2, TNFAIP3,
+JUND, MT-CO3, DUSP2, MT-CO2, MT-ND4, MT-ND2, IER2, MT-ND1, MT-ATP6,
+MT-CYB, PPP1R15A, JUNB</td>
+<td align="left">integrated stress response signaling</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO1, CD74, MT-ND1, PSAP, TMSB4X, CTSS, MT-CO2,
+MT-RNR2, MT-ND2, MT-ND3, MT-CO3, FTL, ACTB, MT-ND4, TPT1, MT-CYB, RPL34,
+PABPC1, DUSP6, MT-ATP6</td>
+<td align="left"></td>
+<td align="right">25</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="c-1000" class="section level3">
+<h3>c = 1000</h3>
+<pre class="r"><code>knitr::kable(c1000_gdf)</code></pre>
+<table>
+<colgroup>
+<col width="26%" />
+<col width="72%" />
+<col width="1%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">MT-CO1, MT-CO3, MT-ND4, RPL34, MT-CO2, MT-ND1, MT-ND2,
+RPS18, MT-CYB, RPS27, RPS12, EEF1A1, RPL31, RPS6, MT-ND3, TPT1, RPL21,
+RPS8, RPS29, MT-ATP6</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribonucleoprotein complex
+biogenesis</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">CD74, MT-CO1, MT-RNR2, MT-ND4, MT-CO2, MT-ND3, MT-CO3,
+MALAT1, IGKC, MT-ND1, MS4A1, MT-ND2, MT-CYB, PTMA, TMSB4X, CD79A, RPS18,
+MT-ATP6, KLF6, RPL34</td>
+<td align="left">B cell receptor signaling pathway, B cell activation, B
+cell proliferation</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-RNR2, IFI6, B2M, SAT1, IFITM2, IRF1, SELL, STAT1,
+IFITM3, CTSS, IFIT2, SP110, FYB1, PTPRC, ITM2B, SRGN, PARP9, H3F3B, MX2,
+GBP2</td>
+<td align="left">defense response to virus, response to virus, response
+to type II interferon, response to interferon-beta, interferon-mediated
+signaling pathway, response to interferon-alpha, type II
+interferon-mediated signaling pathway, cellular response to
+interferon-beta, cellular response to type II interferon</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, CD74, MT-ND1, PSAP, CTSS, TMSB4X, MT-CO2,
+MT-RNR2, MT-ND2, MT-ND3, MT-CO3, FTL, MT-ND4, ACTB, MT-CYB, TPT1, DUSP6,
+MT-ATP6, B2M, RPL34</td>
+<td align="left">antigen processing and presentation of exogenous
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide antigen via MHC class II, antigen processing and presentation of
+peptide or polysaccharide antigen via MHC class II, antigen processing
+and presentation of exogenous peptide antigen, antigen processing and
+presentation of exogenous antigen, antigen processing and presentation
+of peptide antigen</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, MT-RNR2, IFITM2, G0S2, DUSP1, RGS2, FOS, CSF3R,
+JUNB, CXCL8, ZFP36, SAT1, SRGN, MNDA, CXCR2, TXNIP, S100A9, TMSB4X, B2M,
+ACTB</td>
+<td align="left">cell chemotaxis, regulation of hemopoiesis, leukocyte
+chemotaxis, myeloid leukocyte migration, neutrophil chemotaxis,
+chemotaxis, taxis, granulocyte chemotaxis, neutrophil migration</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">TXNIP, MALAT1, MT-ND4, MT-ND5, MT-CYB, CXCR4, MT-ND6,
+RPS27, MT-ATP6, RPS29, RPL21, PTMA, RPS27A, RPL34, ZFP36L2, PTPRC,
+MT-CO2, MT-RNR2, ACTB, DDX5</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">RPL34, RPS18, TPT1, RPL31, RPS12, RPS27, RPS6, EEF1A1,
+RPL32, RPS13, RPL21, RPS29, RPS14, TMSB4X, RPS8, RPL11, RPS20, RPL23,
+PABPC1, RPS27A</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribonucleoprotein complex biogenesis,
+rRNA processing, positive regulation of signal transduction by p53 class
+mediator, rRNA metabolic process, ribosome assembly</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">MALAT1, MT-RNR2, NEAT1, DDX17, MT-CO3, PNISR, PRRC2C,
+RBM39, DDX5, NKTR, SRSF11, CCNL1, PTPRC, MCL1, RBM25, SFPQ, OGA, AKAP9,
+HNRNPA2B1, ARGLU1</td>
+<td align="left">RNA splicing, regulation of RNA splicing, regulation of
+mRNA splicing, via spliceosome, regulation of mRNA processing, RNA
+splicing, via transesterification reactions with bulged adenosine as
+nucleophile, mRNA splicing, via spliceosome, RNA splicing, via
+transesterification reactions, alternative mRNA splicing, via
+spliceosome, miRNA metabolic process, regulation of alternative mRNA
+splicing, via spliceosome, regulation of mRNA metabolic process</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">PTPRC, PABPC1, H3F3B, PTP4A2, MT-RNR2, CCNI, DDX5, B2M,
+TAGLN2, YWHAZ, ACTR2, PRRC2C, OSBPL8, IQGAP1, PTBP3, ARPC2, EIF4G2,
+SORL1, GNAS, SON</td>
+<td align="left"></td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, MT-CO3, MT-CO2, MT-RNR2, MT-ND3, MT-ND1,
+MT-CYB, MT-ND4, MT-ATP6, MTCO1P12, TMSB4X, MT-RNR1, TPT1, MT-ND2, RPL34,
+MTATP6P1, PABPC1, B2M, RPL31, RPS24</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO1, TMSB4X, MT-ND5, B2M, NKG7, MT-CO2, MT-CYB,
+MT-ND6, MT-ND4, GNLY, RPS27, MT-ATP6, ARL4C, MT-ND2, CD3E, S100A4, CFL1,
+CALM1, GZMH, RUNX3</td>
+<td align="left">cell killing</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">ZFP36, FOS, JUN, CD69, JUND, NFKBIA, DUSP1, CXCR4,
+BTG2, TNFAIP3, JUNB, DUSP2, MT-CO1, PPP1R15A, IER2, MT-ND4, MT-CO3,
+MT-CO2, MALAT1, MT-ND2</td>
+<td align="left">integrated stress response signaling</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-ND2, MT-ND1, MT-ND4, MT-CYB, MT-CO3, RPL34, MT-CO2,
+MT-ND3, RPS18, RPS27, MT-ATP6, RPS6, RPL31, TPT1, RPS12, RPL21, EEF1A1,
+RPS8, RPS29, RPS27A</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, MT-CO2, ARL4C, NKG7, GNLY, MT-ND4, B2M, MT-ND5,
+TMSB4X, MT-ATP6, RUNX3, MT-ND2, PRF1, ZFP36, PTMA, IL2RB, MT-CO3, CFL1,
+MT-ND6, CST7</td>
+<td align="left">cell killing</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-RNR2, MALAT1, MT-RNR1, MT-ND1, MT-ND4, MT-ND5,
+MT-CO2, TMSB4X, MT-CYB, MT-CO3, TPT1, RPL34, PABPC1, MT-ND3, PTPRC,
+UBE2D3, PNRC1, MT-ND6, YPEL5, MBNL1</td>
+<td align="left"></td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">NFKBIA, IL1B, MT-RNR2, ZFP36, G0S2, TNFAIP3, NFKBIZ,
+CXCL8, SRGN, PLEK, MT-ND1, ZFP36L1, TMSB4X, MT-CO3, DUSP1, MT-ND2, SAT1,
+MARCKS, JUNB, PPP1R15A</td>
+<td align="left">cellular response to lipopolysaccharide, cellular
+response to molecule of bacterial origin, cellular response to tumor
+necrosis factor, response to tumor necrosis factor, cellular response to
+biotic stimulus, p38MAPK cascade, response to lipopolysaccharide,
+response to molecule of bacterial origin, regulation of inflammatory
+response, epithelial cell apoptotic process</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-ND4, MT-ND2, MT-CYB, MT-ND1, MT-CO2, MT-CO3,
+MT-ATP6, MT-ND3, MT-CO1, MT-ND5, MT-ND6, MT-RNR2, MT-ND4L, MTATP6P1,
+MTCO1P12, MT-ATP8, MT-RNR1, RPS20, RPL34, CXCR4</td>
+<td align="left"></td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">ACTB, MT-CO2, TMSB4X, CFL1, PFN1, MT-ND4, MT-ND2,
+MT-ATP6, MT-ND1, MT-CYB, ACTG1, MT-CO3, RAC2, B2M, ARPC2, PTMA, CALM1,
+LCP1, ARHGDIB, MT-RNR2</td>
+<td align="left">actin filament organization, actin polymerization or
+depolymerization</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">TNFAIP3, MT-CO1, RPS27, CXCR4, TMSB4X, MT-ND5, RPL34,
+MT-ND2, EEF1A1, IL7R, B2M, TPT1, RPS18, RPS29, MT-CYB, ARL4C, MT-ND1,
+CD3E, ZFP36L2, MT-ND6</td>
+<td align="left">T cell differentiation in thymus, cytoplasmic
+translation</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, MT-RNR2, S100A8, IFITM2, MALAT1, FOS, SRGN,
+RGS2, ACTB, TMSB4X, DUSP1, G0S2, C5AR1, MNDA, FTL, NAMPT, CSF3R, H3F3B,
+JUNB, CTSS</td>
+<td align="left">sequestering of metal ion, cell chemotaxis, maintenance
+of location in cell, leukocyte chemotaxis, myeloid leukocyte migration,
+neutrophil chemotaxis, chemotaxis, taxis, granulocyte chemotaxis,
+neutrophil migration, positive regulation of apoptotic signaling
+pathway, astrocyte development, granulocyte migration</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO1, CXCR4, TNFAIP3, TMSB4X, JUND, ZFP36, MT-ND2,
+ARL4C, PTMA, MT-ND4, RPS27, MT-CO3, MT-CO2, MT-ND1, ZFP36L2, PIK3R1,
+YPEL5, CD74, BTG1, MT-ND5</td>
+<td align="left"></td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">CD74, MT-CO1, IGKC, MT-ND4, MT-RNR2, MT-CO2, MT-ND1,
+MT-CO3, CXCR4, MT-ND3, MT-ND2, MT-CYB, MT-ATP6, JUND, CD79A, MT-ND5,
+RPS27, RPL34, BTG1, PTMA</td>
+<td align="left"></td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">KLF6, JUND, MT-ND2, FOS, MYADM, TSC22D3, MT-ND4,
+MT-ND1, MT-CO2, MT-CYB, RGCC, FOSB, MT-RNR2, TAGLN2, DUSP1, MT-CO3,
+MT-ATP6, MCL1, MALAT1, KLF2</td>
+<td align="left">cellular response to calcium ion</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">S100A9, MT-CO1, S100A8, MT-ND1, MT-CO2, MT-CO3,
+MT-RNR2, TMSB4X, MT-ND3, PSAP, CTSS, ACTB, MT-ND2, MT-CYB, MT-ND4, FTL,
+SRGN, VIM, FCN1, MT-ATP6</td>
+<td align="left">sequestering of metal ion, maintenance of location in
+cell, maintenance of location, astrocyte development, pattern
+recognition receptor signaling pathway, toll-like receptor signaling
+pathway, innate immune response-activating signaling pathway, astrocyte
+differentiation, activation of innate immune response, leukocyte
+aggregation</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO1, MT-CO2, MT-ND1, MT-CO3, MT-RNR2, CD74, S100A9,
+PSAP, VIM, MT-ND3, MT-ND4, TPT1, MT-ATP6, ACTB, CTSS, PABPC1, TMSB4X,
+EEF1A1, FTL, RPL34</td>
+<td align="left"></td>
+<td align="right">25</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="nmf" class="section level3">
+<h3>nmf</h3>
+<pre class="r"><code>knitr::kable(cnmf_gdf)</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="28%" />
+<col width="70%" />
+<col width="1%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">driving_genes</th>
+<th align="left">go_terms</th>
+<th align="right">factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">MT-CO1, MT-ND1, CD74, PSAP, MT-CO2, MT-CO3, MT-ND3,
+CTSS, MT-ND2, MT-ND4, MT-RNR2, TMSB4X, MT-CYB, FTL, TPT1, ACTB, MT-ATP6,
+VIM, MTCO1P12, PABPC1</td>
+<td align="left"></td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">CD74, MT-CO1, MT-ND4, MT-RNR2, MT-CO2, MT-CO3, MT-ND3,
+MT-ND1, MT-ND2, MT-CYB, MALAT1, MT-ATP6, RPS18, RPL34, MS4A1, PTMA,
+TMSB4X, RPS27, CD79A, RPS8</td>
+<td align="left">cytoplasmic translation, B cell proliferation</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">ZFP36, NFKBIA, MT-RNR2, JUNB, TNFAIP3, MT-ND1, MT-ND2,
+MALAT1, BTG2, NFKBIZ, MT-ATP6, DUSP1, CXCR4, MT-ND4, MT-CYB, PPP1R15A,
+MT-CO3, IER2, MT-ND3, MT-CO2</td>
+<td align="left">cellular response to lipopolysaccharide, cellular
+response to molecule of bacterial origin, cellular response to biotic
+stimulus</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">MT-RNR2, PTMA, PABPC1, PTPRC, MT-CO3, DDX5, YWHAZ,
+RPS24, PTP4A2, MT-ATP6, SRSF5, EIF4A2, MALAT1, HNRNPA2B1, RPL23, SET,
+MT-CO2, MT-ND4, RPS6, HNRNPU</td>
+<td align="left">cytoplasmic translation, RNA splicing, via
+transesterification reactions with bulged adenosine as nucleophile, mRNA
+splicing, via spliceosome, RNA splicing, via transesterification
+reactions</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">S100A9, S100A8, MT-RNR2, ACTB, SRGN, TMSB4X, S100A4,
+C5AR1, VIM, RGS2, FTL, CTSS, S100A6, SELL, CFL1, PSAP, S100A12, MCL1,
+MT-ND1, FOS</td>
+<td align="left">astrocyte development, sequestering of metal ion,
+astrocyte differentiation, maintenance of location in cell, neutrophil
+chemotaxis, chemotaxis, taxis, granulocyte chemotaxis, neutrophil
+migration, glial cell development, positive regulation of apoptotic
+signaling pathway, cell chemotaxis, granulocyte migration, maintenance
+of location</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">RPL34, RPS18, RPS27, RPL31, RPS12, EEF1A1, RPS6, TPT1,
+RPS8, RPL21, RPS14, RPS29, RPS20, RPL32, RPS13, RPS27A, RPL23, MT-CO3,
+RPS28, RPL37</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis, ribonucleoprotein complex biogenesis,
+ribosomal small subunit assembly, rRNA processing, positive regulation
+of signal transduction by p53 class mediator, rRNA metabolic process,
+maturation of SSU-rRNA, ribosome assembly, ncRNA processing</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-ND2, MT-ND4, MT-CYB, MT-ND1, MT-CO2, MT-ATP6,
+MT-ND5, MT-ND3, MT-CO3, MT-ND6, MT-ND4L, MT-RNR2, MTATP6P1, RPS27,
+TXNIP, PTMA, RPS29, RPL34, CXCR4, RPS20</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, MT-CO2, NKG7, ARL4C, MT-CO3, B2M, GNLY, MT-ND4,
+TMSB4X, PRF1, RUNX3, PTMA, MT-ATP6, PFN1, CST7, CFL1, IL2RB, GZMB,
+CALM1, BTG1</td>
+<td align="left">killing of cells of another organism, disruption of
+cell in another organism, cell killing, disruption of anatomical
+structure in another organism, leukocyte mediated cytotoxicity,
+lymphocyte mediated immunity</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">ACTB, MT-CO2, TMSB4X, MT-CO3, MT-CO1, CFL1, PFN1,
+ACTG1, MT-ATP6, MT-RNR2, PTMA, ARPC2, RAC2, CD74, MT-ND4, LCP1, CALM1,
+S100A4, RPS18, ATP5F1E</td>
+<td align="left">actin filament organization, actin polymerization or
+depolymerization</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, GNLY, TMSB4X, NKG7, B2M, MT-CO2, ARL4C, RPS27,
+MT-ND5, MT-ND4, MT-CYB, MT-ND2, RUNX3, MT-ND6, CD3E, CST7, CFL1, PFN1,
+RPL21, MALAT1</td>
+<td align="left"></td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">CXCR4, MT-CO1, MT-ND2, JUND, ZFP36, TMSB4X, MT-CO3,
+MT-ND1, ARL4C, PTMA, MT-ND4, YPEL5, MT-CO2, DUSP2, BTG1, PIK3R1, RPS27,
+EIF1, TNFAIP3, PABPC1</td>
+<td align="left"></td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, TNFAIP3, MT-CO3, CXCR4, MT-ND1, MT-ND2, RPS27,
+MT-CO2, RPL34, MT-ND4, EEF1A1, B2M, MT-CYB, TMSB4X, ARL4C, RPS18,
+ZFP36L2, IL7R, TPT1, RPS29</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-ND4, MT-CO1, MT-CO3, MT-ND2, RPL34, MT-ND1, MT-CO2,
+MT-ND3, MT-CYB, RPS18, RPS12, RPL31, RPS6, RPL21, RPS27, TPT1, TMSB4X,
+RPL32, EEF1A1, RPS13</td>
+<td align="left">cytoplasmic translation, ribosomal small subunit
+biogenesis, ribosome biogenesis</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">IGKC, MT-RNR2, MT-ND1, MT-CO1, JCHAIN, MT-CO2, MT-CO3,
+MT-ND4, IGHA1, MT-ND3, MT-CYB, MT-ND2, MT-ATP6, MT-ND5, TPT1, HSP90B1,
+CD74, RPS18, RPS8, MT-ND6</td>
+<td align="left">regulation of respiratory burst</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">FOS, JUN, CD69, ZFP36, JUND, DUSP1, BTG2, CXCR4, JUNB,
+FOSB, NFKBIA, KLF6, PPP1R15A, DUSP2, MALAT1, EGR1, IER2, MT-ND4, MT-CO2,
+TSC22D3</td>
+<td align="left">integrated stress response signaling, positive
+regulation of miRNA metabolic process, cellular response to metal ion,
+cellular response to calcium ion, regulation of miRNA metabolic process,
+response to mechanical stimulus, cellular response to inorganic
+substance, miRNA metabolic process, response to calcium ion</td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">MT-CO1, TMSB4X, B2M, RPS27, MT-CO2, MT-CO3, RPL34,
+CD3E, MT-ND5, CXCR4, NKG7, S100A4, ARL4C, TRAC, EEF1A1, MTCO1P12, RPL31,
+CALM1, MT-ND6, RPS19</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-CO1, MT-CO3, MT-ND4, MT-CO2, MT-CYB, MT-ND1, MT-ND2,
+MT-ATP6, MT-ND3, MT-ND5, MT-RNR2, MT-ND6, MTCO1P12, MT-ND4L, MTATP6P1,
+MT-RNR1, TMSB4X, RPL34, TPT1, MT-ATP8</td>
+<td align="left"></td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">KLF6, MT-ND2, JUND, MT-ND4, MT-ND1, MT-CYB, TSC22D3,
+MYADM, MT-ATP6, TNFAIP3, MT-CO2, RGCC, MT-CO3, MT-ND5, TAGLN2, MT-ND3,
+MCL1, FOSB, VIM, TMSB4X</td>
+<td align="left"></td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">MALAT1, MT-RNR2, NEAT1, DDX17, PNISR, NKTR, PRRC2C,
+RBM39, MCL1, PTPRC, SRSF11, DDX5, RBM25, CCNL1, OGA, SFPQ, AKAP9,
+MT-CO3, FUS, N4BP2L2</td>
+<td align="left">RNA splicing, regulation of RNA splicing, alternative
+mRNA splicing, via spliceosome, miRNA metabolic process, regulation of
+mRNA splicing, via spliceosome, regulation of mRNA processing, RNA
+splicing, via transesterification reactions with bulged adenosine as
+nucleophile, mRNA splicing, via spliceosome, RNA splicing, via
+transesterification reactions, regulation of alternative mRNA splicing,
+via spliceosome</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">TXNIP, MT-ND5, MALAT1, MT-ND4, CXCR4, MT-ND6, MT-CYB,
+MT-CO1, RPS27, ZFP36L2, MT-ATP6, MT-RNR2, TSC22D3, RPS29, ACTB, PTPRC,
+RPS27A, PABPC1, RPS28, MT-ND4L</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">RPL34, TMSB4X, TPT1, MT-CO1, RPS27, TXNIP, RPL31, IL7R,
+KLF2, RPL11, FYB1, RPL32, RPS29, RPS13, MALAT1, CD3E, RPL21, B2M, ETS1,
+RPS27A</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">MT-RNR2, MALAT1, MT-RNR1, MT-ND4, MT-ND1, TMSB4X,
+MT-CO2, MT-CO3, MT-CYB, JUNB, CFL1, TPT1, RPL34, PFN1, PTPRC, PABPC1,
+PNRC1, UBE2D3, ATP5F1E, TAGLN2</td>
+<td align="left"></td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">CD74, CXCR4, MT-CO1, MT-ND4, MT-ND1, MT-CO2, MT-ND3,
+MT-CO3, RPS27, MT-RNR2, RPL34, MT-ND2, JUND, CD79A, PTMA, RPS8, BTG1,
+RPS18, RPL21, MT-CYB</td>
+<td align="left">cytoplasmic translation</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">MT-RNR2, MT-ND1, MT-ND2, MT-CO2, MT-ND3, MT-ND4,
+MT-CYB, MT-ATP6, TMSB4X, MT-RNR1, MT-CO3, NEAT1, B2M, MALAT1, SRGN,
+ACTB, H3F3B, CFL1, EIF1, ITM2B</td>
+<td align="left">regulation of miRNA catabolic process</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">MT-RNR2, MALAT1, IFITM2, FOS, G0S2, DUSP1, RGS2,
+S100A9, SRGN, CSF3R, MNDA, B2M, JUNB, CXCL8, SAT1, TMSB4X, S100A8, ACTB,
+ITM2B, CXCR2</td>
+<td align="left">cell chemotaxis, neutrophil chemotaxis, leukocyte
+chemotaxis, myeloid leukocyte migration, granulocyte chemotaxis,
+neutrophil migration, chemotaxis, taxis, granulocyte migration,
+leukocyte migration</td>
+<td align="right">25</td>
+</tr>
+</tbody>
+</table>
+<p>I think the takeaway here is the same as for the documents. That is,
+in the topic model you see many of the same genes appearing as the top
+genes in each factor. Smaller values of <span
+class="math inline">\(c\)</span>, however, seem to lead to each factor
+encoding different information.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/New_York
+tzcode source: internal
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] org.Hs.eg.db_3.19.1    AnnotationDbi_1.66.0   IRanges_2.38.0        
+ [4] S4Vectors_0.42.0       Biobase_2.64.0         BiocGenerics_0.50.0   
+ [7] fgsea_1.30.0           clusterProfiler_4.12.0 stringr_1.5.1         
+[10] stringi_1.8.4          tidyr_1.3.1            ggplot2_3.5.1         
+[13] dplyr_1.1.4            Matrix_1.7-0          
+
+loaded via a namespace (and not attached):
+  [1] DBI_1.2.3               gson_0.1.0              shadowtext_0.1.3       
+  [4] gridExtra_2.3           rlang_1.1.4             magrittr_2.0.3         
+  [7] DOSE_3.30.1             git2r_0.33.0            compiler_4.4.0         
+ [10] RSQLite_2.3.7           png_0.1-8               vctrs_0.6.5            
+ [13] reshape2_1.4.4          pkgconfig_2.0.3         crayon_1.5.3           
+ [16] fastmap_1.2.0           XVector_0.44.0          labeling_0.4.3         
+ [19] ggraph_2.2.1            utf8_1.2.4              HDO.db_0.99.1          
+ [22] promises_1.3.0          rmarkdown_2.27          tzdb_0.4.0             
+ [25] enrichplot_1.24.0       UCSC.utils_1.0.0        purrr_1.0.2            
+ [28] bit_4.0.5               xfun_0.45               zlibbioc_1.50.0        
+ [31] cachem_1.1.0            aplot_0.2.3             GenomeInfoDb_1.40.1    
+ [34] jsonlite_1.8.8          blob_1.2.4              highr_0.11             
+ [37] later_1.3.2             tweenr_2.0.3            BiocParallel_1.38.0    
+ [40] parallel_4.4.0          R6_2.5.1                RColorBrewer_1.1-3     
+ [43] bslib_0.7.0             jquerylib_0.1.4         GOSemSim_2.30.0        
+ [46] Rcpp_1.0.13             knitr_1.47              readr_2.1.5            
+ [49] httpuv_1.6.15           splines_4.4.0           igraph_2.0.3           
+ [52] tidyselect_1.2.1        viridis_0.6.5           qvalue_2.36.0          
+ [55] rstudioapi_0.16.0       yaml_2.3.8              codetools_0.2-20       
+ [58] lattice_0.22-6          tibble_3.2.1            plyr_1.8.9             
+ [61] treeio_1.28.0           withr_3.0.0             KEGGREST_1.44.1        
+ [64] evaluate_0.24.0         Rtsne_0.17              gridGraphics_0.5-1     
+ [67] scatterpie_0.2.3        polyclip_1.10-6         Biostrings_2.72.1      
+ [70] ggtree_3.12.0           pillar_1.9.0            ggfun_0.1.5            
+ [73] generics_0.1.3          rprojroot_2.0.4         hms_1.1.3              
+ [76] tidytree_0.4.6          munsell_0.5.1           scales_1.3.0           
+ [79] glue_1.7.0              lazyeval_0.2.2          tools_4.4.0            
+ [82] data.table_1.15.4       graphlayouts_1.1.1      fs_1.6.4               
+ [85] fastmatch_1.1-4         tidygraph_1.3.1         cowplot_1.1.3          
+ [88] grid_4.4.0              ape_5.8                 colorspace_2.1-0       
+ [91] nlme_3.1-165            patchwork_1.2.0         GenomeInfoDbData_1.2.12
+ [94] ggforce_0.4.2           cli_3.6.3               workflowr_1.7.1        
+ [97] fansi_1.0.6             viridisLite_0.4.2       gtable_0.3.5           
+[100] yulab.utils_0.1.4       sass_0.4.9              digest_0.6.36          
+[103] ggplotify_0.1.2         ggrepel_0.9.5           farver_2.1.2           
+[106] memoise_2.0.1           htmltools_0.5.8.1       lifecycle_1.0.4        
+[109] httr_1.4.7              GO.db_3.19.1            bit64_4.0.5            
+[112] MASS_7.3-61            </code></pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

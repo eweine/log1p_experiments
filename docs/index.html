@@ -289,7 +289,7 @@ $(document).ready(function () {
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -300,8 +300,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -310,13 +310,13 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-11-10
+<strong>Last updated:</strong> 2024-11-15
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
@@ -339,33 +339,36 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreef0da2a0b3db21fc5f1c7034743e39f8a6fc29a01targetblankf0da2a0a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree5d74653d94fd46afb4ec22f9c2e0e06e849f7021targetblank5d74653a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/f0da2a0b3db21fc5f1c7034743e39f8a6fc29a01" target="_blank">f0da2a0</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/5d74653d94fd46afb4ec22f9c2e0e06e849f7021" target="_blank">5d74653</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreef0da2a0b3db21fc5f1c7034743e39f8a6fc29a01targetblankf0da2a0a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree5d74653d94fd46afb4ec22f9c2e0e06e849f7021targetblank5d74653a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -375,7 +378,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/f0da2a0b3db21fc5f1c7034743e39f8a6fc29a01" target="_blank">f0da2a0</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/5d74653d94fd46afb4ec22f9c2e0e06e849f7021" target="_blank">5d74653</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -393,8 +396,10 @@ Ignored files:
     Ignored:    .Rhistory
 
 Untracked files:
-    Untracked:  analysis/bbc.Rmd
-    Untracked:  analysis/statistical abstracts.Rmd
+    Untracked:  analysis/liu_pbmc.Rmd
+
+Unstaged changes:
+    Modified:   analysis/index.Rmd
 
 </code></pre>
 <p>
@@ -439,6 +444,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/9fe544c67b0c8e3863eb4f72ba8ecd8c00ef672f/docs/index.html" target="_blank">9fe544c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2024-11-10
+</td>
+<td>
+added files I forgot to commit
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1077,6 +1099,7 @@ Models</a></p>
 <p><a href="computational_complexity_analysis.html">Log-likelihood
 Approximation and Computational Considerations</a></p>
 <p><a href="bbc.html">Analysis of BBC Articles</a></p>
+<p><a href="liu_pbmc.html">Analysis of Liu PBMC Dataset</a></p>
 </div>
 
 
