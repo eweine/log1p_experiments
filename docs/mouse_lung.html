@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2024-11-15" />
+
+<title>Single Cell Mouse Embryo Lung Analysis</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Single Cell Mouse Embryo Lung Analysis</h1>
+<h4 class="date">2024-11-15</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-11-16
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee2781743caea804a06bab81c59987221b4abc444targetblanke278174a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/e2781743caea804a06bab81c59987221b4abc444" target="_blank">e278174</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee2781743caea804a06bab81c59987221b4abc444targetblanke278174a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/e2781743caea804a06bab81c59987221b4abc444" target="_blank">e278174</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+
+Untracked files:
+    Untracked:  analysis/mouse_lung.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Here, I will apply the <code>log1p</code> matrix factorization model
+to a dataset of approximately <span class="math inline">\(10K\)</span>
+single cells labeled from the lung tissue of mouse embryos.</p>
+<pre class="r"><code>library(dplyr)
+dat &lt;- readr::read_rds(&quot;~/Documents/data/lung_and_airway.rds&quot;)
+
+cells &lt;- dat@meta.data
+genes &lt;- dat@assays$RNA@meta.features
+
+counts &lt;- Matrix::t(dat@assays$RNA@counts)
+
+genes &lt;- genes %&gt;% dplyr::filter(feature_type == &quot;protein_coding&quot;)
+
+counts &lt;- counts[, colnames(counts) %in% rownames(genes)]
+
+day_str &lt;- substr(cells$author_day, 2, 5)
+day_str &lt;- ifelse(day_str == &quot;0000&quot;, &quot;1900&quot;, day_str)
+day &lt;- as.numeric(day_str)
+
+cells$day &lt;- day
+
+cells &lt;- cells %&gt;% dplyr::filter(day &gt;= 1725)
+cells &lt;- cells %&gt;% dplyr::filter(author_cell_type != &quot;Lung progenitor cells&quot;)
+
+set.seed(1)
+df_list &lt;- list()
+i &lt;- 1
+for (d in unique(cells$author_day)) {
+
+  for (ct in unique(cells$author_cell_type)) {
+
+    ctd_df &lt;- cells %&gt;% dplyr::filter(author_day == d &amp; author_cell_type == ct)
+
+    if (nrow(ctd_df) &gt; 500) {
+
+      ctd_df &lt;- ctd_df %&gt;% dplyr::sample_n(500)
+
+    }
+
+    if (nrow(ctd_df) &gt;= 25) {
+
+      df_list[[i]] &lt;- ctd_df
+      i &lt;- i + 1
+
+    }
+
+  }
+
+}
+
+dfo &lt;- do.call(rbind, df_list)
+
+counts &lt;- counts[rownames(dfo), ]
+
+counts &lt;- counts[, Matrix::colSums(counts) &gt; 0]
+genes_to_use &lt;- which(Matrix::colSums(counts&gt;0)&gt;4)
+counts &lt;- counts[,genes_to_use]
+
+counts &lt;- as(counts, &quot;CsparseMatrix&quot;)
+
+n &lt;- nrow(counts)
+p &lt;- ncol(counts)
+K &lt;- 12
+
+cc_vec &lt;- c(0.0001, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+rs &lt;- Matrix::rowSums(counts)
+s &lt;- rs / mean(rs)</code></pre>
+<p>I filtered out genes that are not expressed in at least <span
+class="math inline">\(5\)</span> cells. This leaves <span
+class="math inline">\(10020\)</span> cells and <span
+class="math inline">\(15874\)</span> genes.</p>
+<p>Now, we fit the <code>log1p</code> model for a variety of values of
+<span class="math inline">\(c\)</span>. I initialize each model with a
+rank 1 fit and then I fit a model with <span class="math inline">\(K =
+25\)</span> (where I do <em>not</em> fix the first factor).</p>
+<pre class="r"><code>nmf_k1 &lt;- fastTopics:::fit_pnmf_rank1(counts)
+
+nmf_LL &lt;- nmf_k1$L %&gt;%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+rownames(nmf_LL) &lt;- rownames(counts)
+
+nmf_FF &lt;- nmf_k1$F %&gt;%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+rownames(nmf_FF) &lt;- colnames(counts)
+
+set.seed(1)
+nmf_fit0 &lt;- fastTopics::init_poisson_nmf(
+  X = counts,
+  L = nmf_LL,
+  F = nmf_FF
+)
+
+nmf_fit &lt;- fastTopics::fit_poisson_nmf(
+  X = counts,
+  fit0 = nmf_fit0
+)
+
+readr::write_rds(
+  nmf_fit, &quot;~/Documents/data/passPCA/lung_embryo_results/nmf_k12.rds&quot;
+)
+
+library(passPCA)
+library(Matrix)
+cc_vec &lt;- c(0.0001, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+rs &lt;- Matrix::rowSums(counts)
+s &lt;- rs / mean(rs)
+
+
+for (cc in cc_vec) {
+
+  print(cc)
+
+  set.seed(1)
+  log1p_k1 &lt;- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = 1,
+    maxiter = 10,
+    s = cc * s,
+    init_method = &quot;frob_nmf&quot;
+  )
+
+  init_LL &lt;- log1p_k1$U %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  init_FF &lt;- log1p_k1$V %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+
+  set.seed(1)
+  fit &lt;- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s
+  )
+
+  rownames(fit$U) &lt;- rownames(counts)
+  rownames(fit$V) &lt;- colnames(counts)
+
+  readr::write_rds(
+    fit, glue::glue(&quot;~/Documents/data/passPCA/lung_embryo_results/log1p_c{cc}_k12.rds&quot;)
+  )
+
+}
+
+fit_list &lt;- list()
+
+fit_list[[&quot;nmf&quot;]] &lt;- readr::read_rds(&quot;~/Documents/data/passPCA/lung_embryo_results/nmf_k12.rds&quot;)
+
+cc_vec &lt;- c(0.0001, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+for (cc in cc_vec) {
+
+  print(cc)
+
+  fit_list[[as.character(cc)]] &lt;- readr::read_rds(
+    glue::glue(&quot;~/Documents/data/passPCA/lung_embryo_results/log1p_c{cc}_k12.rds&quot;)
+  )
+
+}
+
+readr::write_rds(
+  fit_list, glue::glue(&quot;~/Documents/data/passPCA/lung_embryo_results/k12_fit_list.rds&quot;)
+)</code></pre>
+<pre class="r"><code>fit_list &lt;- readr::read_rds(
+  &quot;~/Documents/data/passPCA/lung_embryo_results/k12_fit_list.rds&quot;
+  )</code></pre>
+</div>
+<div id="analysis-of-fits" class="section level1">
+<h1>Analysis of fits</h1>
+<div id="log-likelihood" class="section level2">
+<h2>Log-likelihood</h2>
+<p>Below is a plot of the log-likelihoods of the data under a Poisson
+model using different values of <span class="math inline">\(c\)</span>.
+The dashed red line is the log-likelihood of the topic model as fit via
+<code>fastTopics</code>. Again, very small values of <span
+class="math inline">\(c\)</span> actually lead to the highest likelihood
+by far.</p>
+<pre class="r"><code>Y &lt;- as.matrix(counts)
+
+ll_vec &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list[[as.character(cc)]]
+  B &lt;- fit$U %*% t(fit$V)
+  Lambda &lt;- cc * (exp(B) - 1)
+  Lambda &lt;- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+
+  ll &lt;- sum(
+    dpois(
+      x = as.vector(Y),
+      lambda = as.vector(Lambda),
+      log = TRUE
+    )
+  )
+
+  ll_vec &lt;- c(ll_vec, ll)
+
+}
+
+ll_nmf &lt;- sum(
+  dpois(
+    x = as.vector(Y),
+    lambda = as.vector(fit_list$nmf$L %*% t(fit_list$nmf$F)),
+    log = TRUE
+  )
+)
+
+df &lt;- data.frame(
+  cc = cc_vec,
+  ll_diff = max(ll_vec) - ll_vec + 1
+)
+rm(Y)</code></pre>
+<pre class="r"><code>library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = ll_diff)) +
+  geom_line(aes(x = cc, y = ll_diff)) +
+  xlab(&quot;c&quot;) +
+  ylab(&quot;Distance from best log-likelihood&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = max(ll_vec) - ll_nmf + 1, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/mouse_lung.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="loadings" class="section level2">
+<h2>Loadings</h2>
+<pre class="r"><code>normalize_bars &lt;- function(LL) {
+
+  max_col &lt;- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = &quot;/&quot;)
+
+}</code></pre>
+<p>Each cell in the original dataset has a FACS label (one of 10
+different cell types). Below, I plot the loadings stratified by each
+label.</p>
+<pre class="r"><code>library(tidyr)
+library(stringi)
+library(stringr)
+cell.type &lt;- as.factor(paste0(dfo$author_cell_type, sep = &quot; &quot;, dfo$day))
+
+LL_c0001 &lt;- normalize_bars(fit_list$`1e-04`$U)
+
+# Downsample the number of cells and sort them using tSNE.
+set.seed(8675309)
+cell.idx &lt;- numeric(0)
+cell.types &lt;- levels(cell.type)
+for (i in 1:length(cell.types)) {
+  which.idx &lt;- which(cell.type == cell.types[i])
+  # Downsample common cell types.
+  if (length(which.idx) &gt; 2000) {
+    which.idx &lt;- sample(which.idx, 2000)
+  }
+  # Don&#39;t include rare cell types.
+  if (length(which.idx) &gt; 10) {
+    # Sort using tsne.
+    tsne.res &lt;- Rtsne::Rtsne(
+      LL_c0001[which.idx, ],
+      dims = 1,
+      pca = FALSE,
+      normalize = FALSE,
+      perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+      theta = 0.1,
+      max_iter = 1000,
+      eta = 200,
+      check_duplicates = FALSE
+    )$Y[, 1]
+    which.idx &lt;- which.idx[order(tsne.res)]
+    cell.idx &lt;- c(cell.idx, which.idx)
+  }
+}
+
+cell.type &lt;- cell.type[cell.idx]
+cell.type &lt;- droplevels(cell.type)
+
+LL_c0001 &lt;- LL_c0001[cell.idx, ]
+LL_c001 &lt;- normalize_bars(fit_list$`0.001`$U)
+LL_c001 &lt;- LL_c001[cell.idx, ]
+LL_c01 &lt;- normalize_bars(fit_list$`0.01`$U)
+LL_c01 &lt;- LL_c01[cell.idx, ]
+LL_cp1 &lt;- normalize_bars(fit_list$`0.1`$U)
+LL_cp1 &lt;- LL_cp1[cell.idx, ]
+LL_c1 &lt;- normalize_bars(fit_list$`1`$U)
+LL_c1 &lt;- LL_c1[cell.idx, ]
+LL_c10 &lt;- normalize_bars(fit_list$`10`$U)
+LL_c10 &lt;- LL_c10[cell.idx, ]
+LL_c100 &lt;- normalize_bars(fit_list$`100`$U)
+LL_c100 &lt;- LL_c100[cell.idx, ]
+LL_c1000 &lt;- normalize_bars(fit_list$`1000`$U)
+LL_c1000 &lt;- LL_c1000[cell.idx, ]
+LL_cinf &lt;- normalize_bars(fit_list$nmf$L)
+LL_cinf &lt;- LL_cinf[cell.idx, ]
+
+make.heatmap.tib &lt;- function(FF) {
+  tib &lt;- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %&gt;%
+    mutate(Cell.type = cell.type) %&gt;%
+    arrange(Cell.type) %&gt;%
+    mutate(Cell.idx = row_number())
+  
+  tib &lt;- tib %&gt;%
+    pivot_longer(
+      -c(Cell.idx, Cell.type),
+      names_to = &quot;Factor&quot;,
+      values_to = &quot;Loading&quot;,
+      values_drop_na = TRUE
+    ) %&gt;%
+    mutate(Factor = as.numeric(str_extract(Factor, &quot;[0-9]+&quot;)))
+  
+  return(tib)
+}
+
+LL_c0001_tib &lt;- make.heatmap.tib(LL_c0001)
+LL_c001_tib &lt;- make.heatmap.tib(LL_c001)
+LL_c01_tib &lt;- make.heatmap.tib(LL_c01)
+LL_cp1_tib &lt;- make.heatmap.tib(LL_cp1)
+LL_c1_tib &lt;- make.heatmap.tib(LL_c1)
+LL_c10_tib &lt;- make.heatmap.tib(LL_c10)
+LL_c100_tib &lt;- make.heatmap.tib(LL_c100)
+LL_c1000_tib &lt;- make.heatmap.tib(LL_c1000)
+LL_cinf_tib &lt;- make.heatmap.tib(LL_cinf)
+
+heatmap.tib &lt;- LL_c0001_tib %&gt;% mutate(Method = &quot;c = 0.0001&quot;) %&gt;%
+  bind_rows(LL_c001_tib %&gt;% mutate(Method = &quot;c = 0.001&quot;)) %&gt;%
+  bind_rows(LL_c01_tib %&gt;% mutate(Method = &quot;c = 0.01&quot;)) %&gt;%
+  bind_rows(LL_cp1_tib %&gt;% mutate(Method = &quot;c = 0.1&quot;)) %&gt;%
+  bind_rows(LL_c1_tib %&gt;% mutate(Method = &quot;c = 1&quot;)) %&gt;%
+  bind_rows(LL_c10_tib %&gt;% mutate(Method = &quot;c = 10&quot;)) %&gt;%
+  bind_rows(LL_c100_tib %&gt;% mutate(Method = &quot;c = 100&quot;)) %&gt;%
+  bind_rows(LL_c1000_tib %&gt;% mutate(Method = &quot;c = 1000&quot;)) %&gt;%
+  bind_rows(LL_cinf_tib %&gt;% mutate(Method = &quot;Topic Model&quot;)) %&gt;% 
+  mutate(Method = factor(Method, levels = c(&quot;c = 0.0001&quot;, &quot;c = 0.001&quot;, &quot;c = 0.01&quot;, &quot;c = 0.1&quot;, &quot;c = 1&quot;, &quot;c = 10&quot;, &quot;c = 100&quot;, &quot;c = 1000&quot;, &quot;Topic Model&quot;)))
+
+tib &lt;- heatmap.tib %&gt;%
+  group_by(Cell.type, Cell.idx) %&gt;%
+  summarize()
+
+cell_type_breaks &lt;- c(1, which(tib$Cell.type[-1] != tib$Cell.type[-nrow(tib)]))
+label_pos &lt;- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib)) / 2
+
+library(ggplot2)
+
+plt &lt;- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = &quot;white&quot;, high = &quot;firebrick&quot;) +
+  labs(y = &quot;&quot;) +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = &quot;all&quot;) +
+  theme(legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 16)) 
+
+plt</code></pre>
+<p><img src="figure/mouse_lung.Rmd/unnamed-chunk-7-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>Now, I plot the sparsity of the loadings as a function of
+<code>c</code>, where the dashed red line is the sparsity of the
+loadings in the topic model.</p>
+<pre class="r"><code>L_sparsity_vec &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list[[as.character(cc)]]
+  LL &lt;- normalize_bars(fit$U)
+  L_sparsity &lt;- mean(LL &lt; 1e-5)
+  L_sparsity_vec &lt;- c(L_sparsity_vec, L_sparsity)
+
+
+}
+
+nmf_sparsity &lt;- mean(normalize_bars(fit_list$nmf$L) &lt; 1e-5)
+df &lt;- data.frame(
+  cc = cc_vec,
+  l_sparsity = L_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = l_sparsity)) +
+  geom_line(aes(x = cc, y = l_sparsity)) +
+  xlab(&quot;c&quot;) +
+  ylab(&quot;Sparsity of Loadings&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/mouse_lung.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" />
+Here, we actually see that the relationship between the sparsity of the
+loadings and <span class="math inline">\(c\)</span> is non-monotonic. I
+looks like the most sparse fit is for <span class="math inline">\(c =
+10\)</span>, with <span class="math inline">\(c = 1\)</span> a close
+second.</p>
+<pre class="r"><code>cc_out_vec &lt;- c(
+  rep(&quot;1e-4&quot;, nrow(counts) * 12),
+  rep(&quot;1e-3&quot;, nrow(counts) * 12),
+  rep(&quot;1e-2&quot;, nrow(counts) * 12),
+  rep(&quot;1e-1&quot;, nrow(counts) * 12),
+  rep(&quot;1&quot;, nrow(counts) * 12),
+  rep(&quot;1e1&quot;, nrow(counts) * 12),
+  rep(&quot;1e2&quot;, nrow(counts) * 12),
+  rep(&quot;1e3&quot;, nrow(counts) * 12),
+  rep(&quot;nmf&quot;, nrow(counts) * 12)
+)
+
+cc_out_vector &lt;- factor(
+  x = cc_out_vec,
+  levels = c(&quot;1e-4&quot;, &quot;1e-3&quot;, &quot;1e-2&quot;, &quot;1e-1&quot;, &quot;1&quot;, &quot;1e1&quot;, &quot;1e2&quot;, &quot;1e3&quot;, &quot;nmf&quot;)
+)
+
+l_df &lt;- data.frame(
+  l = c(
+    as.vector(LL_c0001),
+    as.vector(LL_c001),
+    as.vector(LL_c01),
+    as.vector(LL_cp1),
+    as.vector(LL_c1),
+    as.vector(LL_c10),
+    as.vector(LL_c100),
+    as.vector(LL_c1000),
+    as.vector(LL_cinf)
+  ),
+  cc = cc_out_vector
+)</code></pre>
+<pre class="r"><code>ggplot(l_df, aes(x = l)) +
+  geom_histogram(bins = 40, fill = &quot;blue&quot;, color = &quot;black&quot;, alpha = 0.7) +
+  facet_wrap(~ cc) +
+  labs(title = &quot;Histograms of loadings by c&quot;,
+       x = &quot;l&quot;,
+       y = &quot;Count&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/mouse_lung.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="factors" class="section level2">
+<h2>Factors</h2>
+<p>First, I plot the sparsity of the factors as a function of
+<code>c</code>, where the dashed red line is the sparsity of the factors
+in the topic model.</p>
+<pre class="r"><code>F_sparsity_vec &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list[[as.character(cc)]]
+  FF &lt;- normalize_bars(fit$V)
+  F_sparsity &lt;- mean(FF &lt; 1e-5)
+  F_sparsity_vec &lt;- c(F_sparsity_vec, F_sparsity)
+
+
+}
+
+nmf_sparsity &lt;- mean(normalize_bars(fit_list$nmf$F) &lt; 1e-5)
+df &lt;- data.frame(
+  cc = cc_vec,
+  f_sparsity = F_sparsity_vec
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = f_sparsity)) +
+  geom_line(aes(x = cc, y = f_sparsity)) +
+  xlab(&quot;c&quot;) +
+  ylab(&quot;Sparsity of Factors&quot;) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_hline(yintercept = nmf_sparsity, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/mouse_lung.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Again, we see a non-monotonic relationship, with the sparsest
+loadings occuring when <span class="math inline">\(c = 0.1\)</span>.</p>
+<p>I also plot the histogram of normalized factor values.</p>
+<pre class="r"><code>cc_out_vec &lt;- c(
+  rep(&quot;1e-4&quot;, ncol(counts) * 12),
+  rep(&quot;1e-3&quot;, ncol(counts) * 12),
+  rep(&quot;1e-2&quot;, ncol(counts) * 12),
+  rep(&quot;1e-1&quot;, ncol(counts) * 12),
+  rep(&quot;1&quot;, ncol(counts) * 12),
+  rep(&quot;1e1&quot;, ncol(counts) * 12),
+  rep(&quot;1e2&quot;, ncol(counts) * 12),
+  rep(&quot;1e3&quot;, ncol(counts) * 12),
+  rep(&quot;nmf&quot;, ncol(counts) * 12)
+)
+
+cc_out_vector &lt;- factor(
+  x = cc_out_vec,
+  levels = c(&quot;1e-4&quot;, &quot;1e-3&quot;, &quot;1e-2&quot;, &quot;1e-1&quot;, &quot;1&quot;, &quot;1e1&quot;, &quot;1e2&quot;, &quot;1e3&quot;, &quot;nmf&quot;)
+)
+
+f_df &lt;- data.frame(
+  f = c(
+    as.vector(normalize_bars(fit_list$`1e-04`$V)),
+    as.vector(normalize_bars(fit_list$`0.001`$V)),
+    as.vector(normalize_bars(fit_list$`0.01`$V)),
+    as.vector(normalize_bars(fit_list$`0.1`$V)),
+    as.vector(normalize_bars(fit_list$`1`$V)),
+    as.vector(normalize_bars(fit_list$`10`$V)),
+    as.vector(normalize_bars(fit_list$`100`$V)),
+    as.vector(normalize_bars(fit_list$`1000`$V)),
+    as.vector(normalize_bars(fit_list$nmf$F))
+  ),
+  cc = cc_out_vector
+)</code></pre>
+<pre class="r"><code>ggplot(f_df, aes(x = f)) +
+  geom_histogram(bins = 40, fill = &quot;blue&quot;, color = &quot;black&quot;, alpha = 0.7) +
+  facet_wrap(~ cc) +
+  labs(title = &quot;Histograms of factors by c&quot;,
+       x = &quot;f&quot;,
+       y = &quot;Count&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/mouse_lung.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/New_York
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] stringr_1.5.1 stringi_1.8.4 tidyr_1.3.1   ggplot2_3.5.1 dplyr_1.1.4  
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.9        utf8_1.2.4        generics_0.1.3    lattice_0.22-6   
+ [5] hms_1.1.3         digest_0.6.36     magrittr_2.0.3    evaluate_0.24.0  
+ [9] grid_4.4.0        fastmap_1.2.0     rprojroot_2.0.4   workflowr_1.7.1  
+[13] jsonlite_1.8.8    Matrix_1.7-0      promises_1.3.0    purrr_1.0.2      
+[17] fansi_1.0.6       scales_1.3.0      jquerylib_0.1.4   cli_3.6.3        
+[21] rlang_1.1.4       cowplot_1.1.3     munsell_0.5.1     withr_3.0.0      
+[25] cachem_1.1.0      yaml_2.3.8        Rtsne_0.17        tools_4.4.0      
+[29] tzdb_0.4.0        colorspace_2.1-0  httpuv_1.6.15     vctrs_0.6.5      
+[33] R6_2.5.1          lifecycle_1.0.4   git2r_0.33.0      fs_1.6.4         
+[37] pkgconfig_2.0.3   pillar_1.9.0      bslib_0.7.0       later_1.3.2      
+[41] gtable_0.3.5      glue_1.7.0        Rcpp_1.0.13       xfun_0.45        
+[45] tibble_3.2.1      tidyselect_1.2.1  highr_0.11        rstudioapi_0.16.0
+[49] knitr_1.47        farver_2.1.2      htmltools_0.5.8.1 labeling_0.4.3   
+[53] rmarkdown_2.27    readr_2.1.5       compiler_4.4.0   </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

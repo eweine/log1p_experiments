@@ -38,6 +38,8 @@ Welcome to my research website.
 
 [Analysis of Sex Differences in GTEX](gtex_sex_diff.html)
 
+[Analysis of Mouse Lung Cells](mouse_lung.html)
+
 ## Paper Preparation
 
 [Formal Connections Between Factor Models](model_connections.html)
