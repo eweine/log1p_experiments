@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2024-10-29" />
+<meta name="date" content="2024-12-30" />
 
-<title>Computational Considerations</title>
+<title>Approximation Comparison</title>
 
 <script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -370,8 +370,8 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Computational Considerations</h1>
-<h4 class="date">2024-10-29</h4>
+<h1 class="title toc-ignore">Approximation Comparison</h1>
+<h4 class="date">2024-12-30</h4>
 
 </div>
 
@@ -379,7 +379,7 @@ div.tocify {
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -390,8 +390,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -400,13 +400,13 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-12-17
+<strong>Last updated:</strong> 2024-12-31
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
@@ -429,18 +429,21 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
@@ -566,6 +569,12 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
 
+Untracked files:
+    Untracked:  analysis/liu_pbmc_approx_eval.Rmd
+
+Unstaged changes:
+    Modified:   analysis/bbc.Rmd
+
 </code></pre>
 <p>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not
@@ -579,524 +588,413 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were
-made to the R Markdown
-(<code>analysis/computational_complexity_analysis.Rmd</code>) and HTML
-(<code>docs/computational_complexity_analysis.html</code>) files. If
-you’ve configured a remote Git repository (see
-<code>?wflow_git_remote</code>), click on the hyperlinks in the table
-below to view the files as they were in that past version.
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
 </p>
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-File
-</th>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-<th>
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/8edac006b9fa0bdd2f8b75fff0611de303792343/analysis/computational_complexity_analysis.Rmd" target="_blank">8edac00</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-10-30
-</td>
-<td>
-added analysis of computational approximation
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/eweine/log1p_experiments/8edac006b9fa0bdd2f8b75fff0611de303792343/docs/computational_complexity_analysis.html" target="_blank">8edac00</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-10-30
-</td>
-<td>
-added analysis of computational approximation
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <hr>
 </div>
 </div>
 </div>
-<div
-id="computational-complexity-of-computing-the-log-likelihoods-of-pmf-models"
-class="section level1">
-<h1>Computational Complexity of Computing the log-likelihoods of PMF
-Models</h1>
-<div id="topic-model" class="section level2">
-<h2>Topic model</h2>
-<p>Recall that the log-likelihood of the topic model can be written
-as:</p>
-<p><span class="math display">\[\ell_{TM}(\boldsymbol{L},
-\boldsymbol{F}) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij}
-\log\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) - \sum_{k = 1}^{K}
-\ell_{ik} f_{jk}.\]</span> Define the set <span
-class="math inline">\(\mathcal{I}_{0} = \{(i, j): y_{ij} = 0\}\)</span>.
-Then, the computational complexity of computing <span
-class="math inline">\(\ell_{TM}\)</span> is</p>
-<p><span class="math display">\[\mathcal{O}((|n \cdot m -
-\mathcal{I}_{0}|)\cdot k) + \mathcal{O}\left((n+m)\cdot
-k\right).\]</span></p>
-</div>
-<div id="glm-pca" class="section level2">
-<h2>GLM-PCA</h2>
-<p>Recall that the log-likelihood of the GLM-PCA model can be written
-as</p>
-<p><span class="math display">\[\ell_{GPCA}(\boldsymbol{L},
-\boldsymbol{F}) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \left(\sum_{k
-= 1}^{K} \ell_{ik} f_{jk} \right) - \exp\left(\sum_{k = 1}^{K} \ell_{ik}
-f_{jk}\right).\]</span> This has a much worse computational complexity
-of <span class="math inline">\(\mathcal{O}\left(n \cdot m \cdot
-k\right).\)</span></p>
-</div>
-<div id="log1p-model" class="section level2">
-<h2>log1p model</h2>
-<p>We can write the log-likelihood of the <code>log1p</code> model
-as</p>
-<p><span class="math display">\[\ell_{log1p}(\boldsymbol{L},
-\boldsymbol{F}, c) = \sum_{i = 1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(c
-\cdot \exp\left\{ \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right\} - c \right)
-- c \cdot \exp\left( \sum_{k = 1}^{K} \ell_{ik} f_{jk} \right) +
-c.\]</span> This will also have a computational complexity of <span
-class="math inline">\(\mathcal{O}\left(n \cdot m \cdot
-k\right).\)</span> However, consider approximating the function <span
-class="math inline">\(\exp(x) = a_{0} + a_{1}x + a_{2}x^{2}\)</span> for
-fixed constants <span class="math inline">\(a_{0}, a_{1},
-a_{2}\)</span>. This approximation will not work well for a large range
-of <span class="math inline">\(x\)</span>. However, for <span
-class="math inline">\(y_{ij} = 0\)</span>, we can expect that <span
-class="math inline">\(\sum_{k = 1}^{K} \ell_{ik} f_{jk}\)</span> to be
-close to <span class="math inline">\(0\)</span>. This motivates the
-following approximation:</p>
-<p><span class="math display">\[\begin{align*}
-\ell_{log1p}(\boldsymbol{L}, \boldsymbol{F}, c) &amp;\approx \sum_{i =
-1}^{n}\sum_{j = 1}^{m} y_{ij} \log\left(c \cdot \exp\left\{ \sum_{k =
-1}^{K} \ell_{ik} f_{jk} \right\} - c \right) - c\sum_{(i,j) \notin
-\mathcal{I}_{0}} \exp\left(\sum_{k = 1}^{K} \ell_{ik} f_{jk}\right)\\
-&amp; - ca_{1} \sum_{(i,j) \in \mathcal{I}_{0}} \sum_{k = 1}^{K}
-\ell_{ik} f_{jk} - ca_{2}\sum_{(i,j) \in \mathcal{I}_{0}} \left(\sum_{k
-= 1}^{K} \ell_{ik} f_{jk}\right)^{2} + c,
-\end{align*}\]</span></p>
-<p>where we select the constants <span
-class="math inline">\(a_{1}\)</span> and <span
-class="math inline">\(a_{2}\)</span> to approximate <span
-class="math inline">\(\exp(x)\)</span> well near <span
-class="math inline">\(0\)</span>.</p>
-<p>This has computational complexity</p>
-<p><span class="math display">\[\mathcal{O}((n \cdot m -
-|\mathcal{I}_{0}|)\cdot k) + \mathcal{O}((n + m) \cdot k) +
-\mathcal{O}((n + m) \cdot k^{2}).\]</span></p>
-<p>The reason for this is that to compute the quadratic and linear
-approximation terms, you can first compute <span
-class="math inline">\(\sum_{i = 1}^{n}\sum_{j = 1}^{m} \sum_{k = 1}^{K}
-\ell_{ik} f_{jk}\)</span> in <span class="math inline">\(\mathcal{O}((n
-+ m) \cdot k)\)</span> time and then you can compute <span
-class="math inline">\(\sum_{i = 1}^{n}\sum_{j = 1}^{m} \left( \sum_{k =
-1}^{K} \ell_{ik} f_{jk} \right)^{2} = \textrm{trace}\left(\boldsymbol{F}
-\boldsymbol{L}^{T} \boldsymbol{L} \boldsymbol{F}^{T} \right)\)</span> in
-<span class="math inline">\(\mathcal{O}((n + m) \cdot k^{2})\)</span>.
-To compute these terms <em>only</em> for the terms in <span
-class="math inline">\(\mathcal{I}_{0}\)</span>, we can simply subtract
-off the values of <span class="math inline">\(\sum_{k = 1}^{K} \ell_{ik}
-f_{jk}\)</span> and <span class="math inline">\(\left(\sum_{k = 1}^{K}
-\ell_{ik} f_{jk}\right)^{2}\)</span> from the full linear and quadratic
-terms, respectively. Since we already have to compute these terms in
-order to calculate the first and second terms of the approximate
-log-likelihood, this final step adds only <span
-class="math inline">\(\mathcal{O}(n \cdot m -
-|\mathcal{I}_{0}|)\)</span> operations, which I have ommitted from the
-computational complexity formula above.</p>
-<pre class="r"><code>get_glmpca_o &lt;- function(n, m, k) {
-  
-  n * m * k
-  
-}
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Here, I applied both the exact and approximate <code>log1p</code>
+matrix factorization methods to get a sense of how accurate the
+approximation is for different values of <span
+class="math inline">\(c\)</span>. Below, column A was optimized using
+the exact algorithm, column B was optimized using the sparse
+approximation to the exact algorithm, and column C is frobenius NMF
+(using <code>NNLM</code>) applied to the transformed data.</p>
+<pre class="r"><code>library(Matrix)
+library(dplyr)
+library(passPCA)
 
-get_tm_o &lt;- function(n, m, k, pct_0) {
-  
-  size_nz &lt;- n * m * (1 - pct_0)
-  ((n + m) * k) + size_nz * k
-  
-}
+#load(&quot;/home/ericw456/pbmc/liu_data.Rdata&quot;)
+load(&quot;~/Documents/data/passPCA/liu_data.Rdata&quot;)
 
-get_log1p_approx_o &lt;- function(n, m, k, pct_0) {
-  
-  size_nz &lt;- n * m * (1 - pct_0)
-  ((n + m) * (k + k^2)) + size_nz * k
-  
-}</code></pre>
-<pre class="r"><code>m &lt;- 20000
-n_vec &lt;- seq(10, 1000000, 1000)
-k &lt;- 25
-pct_0 &lt;- 0.95
 
-o_glmpca &lt;- numeric(length(n_vec))
-o_tm &lt;- numeric(length(n_vec))
-o_log1p_approx &lt;- numeric(length(n_vec))
+counts &lt;- counts[,Matrix::colSums(counts) &gt; 0]
+# require that all used genes appear in at least 5 cells
+s &lt;- Matrix::rowSums(counts)
+s &lt;- s / mean(s)
+genes_to_use &lt;- which(Matrix::colSums(counts&gt;0)&gt;4)
+counts &lt;- counts[,genes_to_use]
+K &lt;- 25
+cc_vec &lt;- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)</code></pre>
+<pre class="r"><code>n &lt;- nrow(counts)
+p &lt;- ncol(counts)
 
-for (i in 1:length(n_vec)) {
-  
-  o_glmpca[i] &lt;- get_glmpca_o(n_vec[i], m, k)
-  o_tm[i] &lt;- get_tm_o(n_vec[i], m, k, pct_0)
-  o_log1p_approx[i] &lt;- get_log1p_approx_o(n_vec[i], m, k, pct_0)
-  
-}
+for (cc in cc_vec) {
 
-o_df &lt;- data.frame(
-  o = c(
-    o_glmpca,
-    o_tm,
-    o_log1p_approx
-  ),
-  model = c(
-    rep(&quot;GLMPCA&quot;, length(o_glmpca)),
-    rep(&quot;Topic Model&quot;, length(o_tm)),
-    rep(&quot;log1p Approximation&quot;, length(o_tm))
-  ),
-  n = rep(n_vec, 3)
-)</code></pre>
-<pre class="r"><code>library(ggplot2)
+  print(cc)
 
-ggplot(data = o_df, aes(x = n, y = o, color = model)) +
-  geom_point() +
-  geom_line() +
-  scale_y_log10() +
-  scale_x_continuous(labels = function(x) format(x, scientific = TRUE)) +
-  ylab(&quot;Computational Complexity&quot;) +
-  cowplot::theme_cowplot() +
-  ggtitle(&quot;Computational Scaling for m = 20,000, K = 25&quot;)</code></pre>
-<p><img src="figure/computational_complexity_analysis.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
-Past versions of unnamed-chunk-3-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-3-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/8edac006b9fa0bdd2f8b75fff0611de303792343/docs/figure/computational_complexity_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">8edac00</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-10-30
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<pre class="r"><code>m &lt;- 20000
-n &lt;- 10000
-k_vec &lt;- seq(1, 200, 1)
-pct_0 &lt;- 0.95
-
-o_glmpca &lt;- numeric(length(k_vec))
-o_tm &lt;- numeric(length(k_vec))
-o_log1p_approx &lt;- numeric(length(k_vec))
-
-for (i in 1:length(k_vec)) {
-  
-  o_glmpca[i] &lt;- get_glmpca_o(n, m, k_vec[i])
-  o_tm[i] &lt;- get_tm_o(n, m, k_vec[i], pct_0)
-  o_log1p_approx[i] &lt;- get_log1p_approx_o(n, m, k_vec[i], pct_0)
-  
-}
-
-o_df &lt;- data.frame(
-  o = c(
-    o_glmpca,
-    o_tm,
-    o_log1p_approx
-  ),
-  model = c(
-    rep(&quot;GLMPCA&quot;, length(o_glmpca)),
-    rep(&quot;Topic Model&quot;, length(o_tm)),
-    rep(&quot;log1p Approximation&quot;, length(o_tm))
-  ),
-  k = rep(k_vec, 3)
-)</code></pre>
-<pre class="r"><code>library(ggplot2)
-
-ggplot(data = o_df, aes(x = k, y = o, color = model)) +
-  geom_point() +
-  geom_line() +
-  scale_y_log10() +
-  ylab(&quot;Computational Complexity&quot;) +
-  cowplot::theme_cowplot() +
-  ggtitle(&quot;Computational Scaling for m = 20,000, n = 10,000&quot;)</code></pre>
-<p><img src="figure/computational_complexity_analysis.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
-Past versions of unnamed-chunk-5-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-5-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/8edac006b9fa0bdd2f8b75fff0611de303792343/docs/figure/computational_complexity_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">8edac00</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-10-30
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div id="experiments" class="section level2">
-<h2>Experiments</h2>
-<p>One important aspect to consider is how accurate the approximation is
-for different values of <span class="math inline">\(c\)</span>. In
-particular, for large values of <span class="math inline">\(c\)</span>,
-the values of <span class="math inline">\(\boldsymbol{L}\)</span> and
-<span class="math inline">\(\boldsymbol{F}\)</span> will get smaller,
-which will cause the approximation of <span
-class="math inline">\(\exp(x)\)</span> near <span
-class="math inline">\(x = 0\)</span> to be increasingly accurate for the
-<span class="math inline">\(0\)</span> counts. On the other hand, for
-small values of <span class="math inline">\(c\)</span>, even a <span
-class="math inline">\(0\)</span> count could correspond to a large value
-of <span class="math inline">\(\sum_{k = 1}^{K}
-\ell_{ik}f_{jk}\)</span>, and thus I would expect the approximation to
-perform poorly. I test this hypothesis below:</p>
-<p>I generated data from a topic model with <span
-class="math inline">\(K = 4\)</span>. I then fit a <span
-class="math inline">\(K = 4\)</span> log1p model with increasing values
-of <span class="math inline">\(c\)</span> using both an exact MLE method
-and the approximate method setting <span
-class="math inline">\(a_{1}\)</span> and <span
-class="math inline">\(a_{2}\)</span> to be the coefficients of a second
-order Taylor approximation of <span
-class="math inline">\(\exp(x)\)</span> about <span
-class="math inline">\(x = 0\)</span>.</p>
-<pre class="r"><code>set.seed(1)
-n &lt;- 500
-p &lt;- 250
-K &lt;- 4
-
-library(distr)
-library(Matrix)
-
-l_dist &lt;- UnivarMixingDistribution(
-  Unif(0,0.05),
-  Exp(rate = 1.75),
-  mixCoeff = rep(1/2,2)
-)
-
-f_dist &lt;- UnivarMixingDistribution(
-  Unif(0,0.05),
-  Exp(rate = 1.75),
-  mixCoeff = rep(1/2,2)
-)
-
-l_sampler &lt;- distr::r(l_dist)
-f_sampler &lt;- distr::r(f_dist)
-
-LL &lt;- matrix(
-  data = l_sampler(n = n * K),
-  nrow = n,
-  ncol = K
-)
-
-FF &lt;- matrix(
-  data = f_sampler(n = p * K),
-  nrow = p,
-  ncol = K
-)
-
-Lambda &lt;- LL %*% t(FF)
-
-Y &lt;- matrix(
-  data = rpois(n = prod(dim(Lambda)), lambda = as.vector(Lambda)),
-  nrow = n,
-  ncol = p
-)
-
-Y_dense &lt;- Y
-Y &lt;- as(Y, &quot;CsparseMatrix&quot;)
-
-c_vec &lt;- c(
-  0.01, 0.1, 0.25, 0.5, 0.75, 1, 2.5,
-  5, 7.5, 10, 25, 50, 75, 100, 250,
-  500, 750, 1000, 2500, 5000, 7500, 10000
-)
-ll_vec &lt;- numeric(length(c_vec))
-ll_vec_approx &lt;- numeric(length(c_vec))
-
-for (i in 1:length(c_vec)) {
-  
   set.seed(1)
-  log1p &lt;- passPCA::fit_factor_model_log1p_exact(
-    Y = Y,
-    K = 4,
-    maxiter = 10000,
-    s = rep(c_vec[i], n)
+  log1p_k1 &lt;- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = 1,
+    maxiter = 10,
+    s = cc * s,
+    init_method = &quot;frob_nmf&quot;
   )
-  
-  log1p_approx &lt;- passPCA::fit_factor_model_log1p_quad_approx_sparse(
-    Y = Y,
-    K = 4,
-    maxiter = 10000,
-    s = rep(c_vec[i], n),
+
+  init_LL &lt;- log1p_k1$U %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  init_FF &lt;- log1p_k1$V %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+  tictoc::tic()
+  set.seed(1)
+  fit &lt;- fit_factor_model_log1p_quad_approx_sparse(
+    Y = counts,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s,
     approx_method = &quot;taylor&quot;
   )
+  total_time &lt;- tictoc::toc()
+
+  fit[[&quot;total_time&quot;]] &lt;- total_time$toc
+  rownames(fit$U) &lt;- rownames(counts)
+  rownames(fit$V) &lt;- colnames(counts)
+
+  readr::write_rds(
+    fit, glue::glue(&quot;~/Documents/data/passPCA/liu_pbmc_log1p_c{cc}_k25_approx_taylor_100_iter.rds&quot;)
+  )
+
+}</code></pre>
+<pre class="r"><code>fit_list_exact &lt;- list()
+fit_list_approx_taylor &lt;- list()
+fit_list_approx_frob &lt;- list()
+
+for (cc in cc_vec) {
   
-  H &lt;- exp(log1p$U %*% t(log1p$V)) - 1
-  H_approx &lt;- exp(log1p_approx$U %*% t(log1p_approx$V)) - 1
+  fit_list_exact[[as.character(cc)]] &lt;- readr::read_rds(
+    glue::glue(
+      &quot;~/Documents/data/passPCA/paper_figures_res/liu_pbmc/liu_pbmc_log1p_c{cc}_k25_exact_100_iter.rds&quot;
+      )
+    )
   
-  ll_vec[i] &lt;- sum(
+  fit_list_approx_taylor[[as.character(cc)]] &lt;- readr::read_rds(
+    glue::glue(
+      &quot;~/Documents/data/passPCA/paper_figures_res/liu_pbmc/liu_pbmc_log1p_c{cc}_k25_approx_taylor_100_iter.rds&quot;
+      )
+    )
+  
+  fit_list_approx_frob[[as.character(cc)]] &lt;- readr::read_rds(
+    glue::glue(
+      &quot;~/Documents/data/passPCA/paper_figures_res/liu_pbmc/liu_pbmc_log1p_c{cc}_k25_approx_frob_100_iter.rds&quot;
+      )
+    )
+  
+}</code></pre>
+<pre class="r"><code>normalize_bars &lt;- function(LL) {
+
+  max_col &lt;- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = &quot;/&quot;)
+
+}</code></pre>
+<pre class="r"><code>Y &lt;- as.matrix(counts)
+
+ll_vec_exact &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list_exact[[as.character(cc)]]
+  B &lt;- fit$U %*% t(fit$V)
+  Lambda &lt;- cc * (exp(B) - 1)
+  Lambda &lt;- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+
+  ll &lt;- sum(
     dpois(
-      x = as.vector(Y_dense),
-      lambda = c_vec[i] * as.vector(H),
+      x = as.vector(Y),
+      lambda = as.vector(Lambda),
       log = TRUE
     )
   )
-  
-  ll_vec_approx[i] &lt;- sum(
-    dpois(
-      x = as.vector(Y_dense),
-      lambda = c_vec[i] * as.vector(H_approx),
-      log = TRUE
-    )
-  )
-  
+
+  ll_vec_exact &lt;- c(ll_vec_exact, ll)
+
 }
 
-df &lt;- data.frame(
-  c_val = rep(c_vec, 2),
-  ll = c(ll_vec, ll_vec_approx),
-  algorithm = c(rep(&quot;exact&quot;, length(c_vec)), rep(&quot;approximate&quot;, length(c_vec)))
-)</code></pre>
-<pre class="r"><code>df &lt;- readr::read_rds(
-  &quot;~/Documents/data/passPCA/experiment_results/c_approx_accuracy.rds&quot;
+ll_vec_approx &lt;- c()
+
+for (cc in cc_vec) {
+
+  fit &lt;- fit_list_approx_taylor[[as.character(cc)]]
+  B &lt;- fit$U %*% t(fit$V)
+  Lambda &lt;- cc * (exp(B) - 1)
+  Lambda &lt;- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+
+  ll &lt;- sum(
+    dpois(
+      x = as.vector(Y),
+      lambda = as.vector(Lambda),
+      log = TRUE
+    )
   )
+
+  ll_vec_approx &lt;- c(ll_vec_approx, ll)
+
+}
+
+ll_df &lt;- data.frame(
+  ll_diff = pmax(1, ll_vec_exact - ll_vec_approx),
+  c = cc_vec
+)</code></pre>
+<pre class="r"><code>library(ggplot2)
+ggplot(data = ll_df, aes(x = c, y = ll_diff)) +
+  geom_point() +
+  geom_line() +
+  ylab(&quot;Approximation Error (Log-Likelihood)&quot;) +
+  xlab(&quot;c&quot;) +
+  scale_y_continuous(transform = &quot;log10&quot;) +
+  scale_x_continuous(transform = &quot;log10&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<pre class="r"><code>library(tidyr)
+library(stringi)
+library(stringr)
+library(ggpubr)
+cell.type &lt;- as.factor(ct$celltype)
+
+LL_c1_exact &lt;- normalize_bars(fit_list_exact$`1`$U)
+
+# Downsample the number of cells and sort them using tSNE.
+set.seed(8675309)
+cell.idx &lt;- numeric(0)
+cell.types &lt;- levels(cell.type)
+for (i in 1:length(cell.types)) {
+  which.idx &lt;- which(cell.type == cell.types[i])
+  # Downsample common cell types.
+  if (length(which.idx) &gt; 2000) {
+    which.idx &lt;- sample(which.idx, 2000)
+  }
+  # Don&#39;t include rare cell types.
+  if (length(which.idx) &gt; 10) {
+    # Sort using tsne.
+    tsne.res &lt;- Rtsne::Rtsne(
+      LL_c1_exact[which.idx, ],
+      dims = 1,
+      pca = FALSE,
+      normalize = FALSE,
+      perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+      theta = 0.1,
+      max_iter = 1000,
+      eta = 200,
+      check_duplicates = FALSE
+    )$Y[, 1]
+    which.idx &lt;- which.idx[order(tsne.res)]
+    cell.idx &lt;- c(cell.idx, which.idx)
+  }
+}
+
+cell.type &lt;- cell.type[cell.idx]
+cell.type &lt;- droplevels(cell.type)
+
+LL_c1_exact &lt;- LL_c1_exact[cell.idx, ]
+LL_c001_exact &lt;- normalize_bars(fit_list_exact$`0.001`$U)
+LL_c001_exact &lt;- LL_c001_exact[cell.idx, ]
+LL_c01_exact &lt;- normalize_bars(fit_list_exact$`0.01`$U)
+LL_c01_exact &lt;- LL_c01_exact[cell.idx, ]
+LL_cp1_exact &lt;- normalize_bars(fit_list_exact$`0.1`$U)
+LL_cp1_exact &lt;- LL_cp1_exact[cell.idx, ]
+LL_c10_exact &lt;- normalize_bars(fit_list_exact$`10`$U)
+LL_c10_exact &lt;- LL_c10_exact[cell.idx, ]
+LL_c100_exact &lt;- normalize_bars(fit_list_exact$`100`$U)
+LL_c100_exact &lt;- LL_c100_exact[cell.idx, ]
+LL_c1000_exact &lt;- normalize_bars(fit_list_exact$`1000`$U)
+LL_c1000_exact &lt;- LL_c1000_exact[cell.idx, ]
+
+LL_c1_approx_taylor &lt;- normalize_bars(fit_list_approx_taylor$`1`$U)
+LL_c1_approx_taylor &lt;- LL_c1_approx_taylor[cell.idx, ]
+LL_c001_approx_taylor &lt;- normalize_bars(fit_list_approx_taylor$`0.001`$U)
+LL_c001_approx_taylor &lt;- LL_c001_approx_taylor[cell.idx, ]
+LL_c01_approx_taylor &lt;- normalize_bars(fit_list_approx_taylor$`0.01`$U)
+LL_c01_approx_taylor &lt;- LL_c01_approx_taylor[cell.idx, ]
+LL_cp1_approx_taylor &lt;- normalize_bars(fit_list_approx_taylor$`0.1`$U)
+LL_cp1_approx_taylor &lt;- LL_cp1_approx_taylor[cell.idx, ]
+LL_c10_approx_taylor &lt;- normalize_bars(fit_list_approx_taylor$`10`$U)
+LL_c10_approx_taylor &lt;- LL_c10_approx_taylor[cell.idx, ]
+LL_c100_approx_taylor &lt;- normalize_bars(fit_list_approx_taylor$`100`$U)
+LL_c100_approx_taylor &lt;- LL_c100_approx_taylor[cell.idx, ]
+LL_c1000_approx_taylor &lt;- normalize_bars(fit_list_approx_taylor$`1000`$U)
+LL_c1000_approx_taylor &lt;- LL_c1000_approx_taylor[cell.idx, ]
+
+LL_c1_approx_frob &lt;- normalize_bars(fit_list_approx_frob$`1`$W)
+LL_c1_approx_frob &lt;- LL_c1_approx_frob[cell.idx, ]
+LL_c001_approx_frob &lt;- normalize_bars(fit_list_approx_frob$`0.001`$W)
+LL_c001_approx_frob &lt;- LL_c001_approx_frob[cell.idx, ]
+LL_c01_approx_frob &lt;- normalize_bars(fit_list_approx_frob$`0.01`$W)
+LL_c01_approx_frob &lt;- LL_c01_approx_frob[cell.idx, ]
+LL_cp1_approx_frob &lt;- normalize_bars(fit_list_approx_frob$`0.1`$W)
+LL_cp1_approx_frob &lt;- LL_cp1_approx_frob[cell.idx, ]
+LL_c10_approx_frob &lt;- normalize_bars(fit_list_approx_frob$`10`$W)
+LL_c10_approx_frob &lt;- LL_c10_approx_frob[cell.idx, ]
+LL_c100_approx_frob &lt;- normalize_bars(fit_list_approx_frob$`100`$W)
+LL_c100_approx_frob &lt;- LL_c100_approx_frob[cell.idx, ]
+LL_c1000_approx_frob &lt;- normalize_bars(fit_list_approx_frob$`1000`$W)
+LL_c1000_approx_frob &lt;- LL_c1000_approx_frob[cell.idx, ]
+
+make.heatmap.tib &lt;- function(FF) {
+  tib &lt;- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %&gt;%
+    mutate(Cell.type = cell.type) %&gt;%
+    arrange(Cell.type) %&gt;%
+    mutate(Cell.idx = row_number())
+  
+  tib &lt;- tib %&gt;%
+    pivot_longer(
+      -c(Cell.idx, Cell.type),
+      names_to = &quot;Factor&quot;,
+      values_to = &quot;Loading&quot;,
+      values_drop_na = TRUE
+    ) %&gt;%
+    mutate(Factor = as.numeric(str_extract(Factor, &quot;[0-9]+&quot;)))
+  
+  return(tib)
+}
+
+LL_c001_tib_exact &lt;- make.heatmap.tib(LL_c001_exact)
+LL_c01_tib_exact &lt;- make.heatmap.tib(LL_c01_exact)
+LL_cp1_tib_exact &lt;- make.heatmap.tib(LL_cp1_exact)
+LL_c1_tib_exact &lt;- make.heatmap.tib(LL_c1_exact)
+LL_c10_tib_exact &lt;- make.heatmap.tib(LL_c10_exact)
+LL_c100_tib_exact &lt;- make.heatmap.tib(LL_c100_exact)
+LL_c1000_tib_exact &lt;- make.heatmap.tib(LL_c1000_exact)
+
+LL_c001_tib_approx_taylor &lt;- make.heatmap.tib(LL_c001_approx_taylor)
+LL_c01_tib_approx_taylor &lt;- make.heatmap.tib(LL_c01_approx_taylor)
+LL_cp1_tib_approx_taylor &lt;- make.heatmap.tib(LL_cp1_approx_taylor)
+LL_c1_tib_approx_taylor &lt;- make.heatmap.tib(LL_c1_approx_taylor)
+LL_c10_tib_approx_taylor &lt;- make.heatmap.tib(LL_c10_approx_taylor)
+LL_c100_tib_approx_taylor &lt;- make.heatmap.tib(LL_c100_approx_taylor)
+LL_c1000_tib_approx_taylor &lt;- make.heatmap.tib(LL_c1000_approx_taylor)
+
+LL_c001_tib_approx_frob &lt;- make.heatmap.tib(LL_c001_approx_frob)
+LL_c01_tib_approx_frob &lt;- make.heatmap.tib(LL_c01_approx_frob)
+LL_cp1_tib_approx_frob &lt;- make.heatmap.tib(LL_cp1_approx_frob)
+LL_c1_tib_approx_frob &lt;- make.heatmap.tib(LL_c1_approx_frob)
+LL_c10_tib_approx_frob &lt;- make.heatmap.tib(LL_c10_approx_frob)
+LL_c100_tib_approx_frob &lt;- make.heatmap.tib(LL_c100_approx_frob)
+LL_c1000_tib_approx_frob &lt;- make.heatmap.tib(LL_c1000_approx_frob)
+
+heatmap.tib_exact &lt;- LL_c001_tib_exact %&gt;% mutate(Method = &quot;c = 0.001&quot;) %&gt;%
+  bind_rows(LL_c01_tib_exact %&gt;% mutate(Method = &quot;c = 0.01&quot;)) %&gt;%
+  bind_rows(LL_cp1_tib_exact %&gt;% mutate(Method = &quot;c = 0.1&quot;)) %&gt;%
+  bind_rows(LL_c1_tib_exact %&gt;% mutate(Method = &quot;c = 1&quot;)) %&gt;%
+  bind_rows(LL_c10_tib_exact %&gt;% mutate(Method = &quot;c = 10&quot;)) %&gt;%
+  bind_rows(LL_c100_tib_exact %&gt;% mutate(Method = &quot;c = 100&quot;)) %&gt;%
+  bind_rows(LL_c1000_tib_exact %&gt;% mutate(Method = &quot;c = 1000&quot;)) %&gt;%
+  mutate(Method = factor(
+    Method, 
+    levels = c(
+      &quot;c = 0.001&quot;, &quot;c = 0.01&quot;, &quot;c = 0.1&quot;, &quot;c = 1&quot;, &quot;c = 10&quot;, &quot;c = 100&quot;, &quot;c = 1000&quot;
+      )))
+
+heatmap.tib_approx_taylor &lt;- LL_c001_tib_approx_taylor %&gt;% mutate(Method = &quot;c = 0.001&quot;) %&gt;%
+  bind_rows(LL_c01_tib_approx_taylor %&gt;% mutate(Method = &quot;c = 0.01&quot;)) %&gt;%
+  bind_rows(LL_cp1_tib_approx_taylor %&gt;% mutate(Method = &quot;c = 0.1&quot;)) %&gt;%
+  bind_rows(LL_c1_tib_approx_taylor %&gt;% mutate(Method = &quot;c = 1&quot;)) %&gt;%
+  bind_rows(LL_c10_tib_approx_taylor %&gt;% mutate(Method = &quot;c = 10&quot;)) %&gt;%
+  bind_rows(LL_c100_tib_approx_taylor %&gt;% mutate(Method = &quot;c = 100&quot;)) %&gt;%
+  bind_rows(LL_c1000_tib_approx_taylor %&gt;% mutate(Method = &quot;c = 1000&quot;)) %&gt;%
+  mutate(Method = factor(
+    Method, 
+    levels = c(
+      &quot;c = 0.001&quot;, &quot;c = 0.01&quot;, &quot;c = 0.1&quot;, &quot;c = 1&quot;, &quot;c = 10&quot;, &quot;c = 100&quot;, &quot;c = 1000&quot;
+      )))
+
+heatmap.tib_approx_frob &lt;- LL_c001_tib_approx_frob %&gt;% mutate(Method = &quot;c = 0.001&quot;) %&gt;%
+  bind_rows(LL_c01_tib_approx_frob %&gt;% mutate(Method = &quot;c = 0.01&quot;)) %&gt;%
+  bind_rows(LL_cp1_tib_approx_frob %&gt;% mutate(Method = &quot;c = 0.1&quot;)) %&gt;%
+  bind_rows(LL_c1_tib_approx_frob %&gt;% mutate(Method = &quot;c = 1&quot;)) %&gt;%
+  bind_rows(LL_c10_tib_approx_frob %&gt;% mutate(Method = &quot;c = 10&quot;)) %&gt;%
+  bind_rows(LL_c100_tib_approx_frob %&gt;% mutate(Method = &quot;c = 100&quot;)) %&gt;%
+  bind_rows(LL_c1000_tib_approx_frob %&gt;% mutate(Method = &quot;c = 1000&quot;)) %&gt;%
+  mutate(Method = factor(
+    Method, 
+    levels = c(
+      &quot;c = 0.001&quot;, &quot;c = 0.01&quot;, &quot;c = 0.1&quot;, &quot;c = 1&quot;, &quot;c = 10&quot;, &quot;c = 100&quot;, &quot;c = 1000&quot;
+      )))
+
+tib_exact &lt;- heatmap.tib_exact %&gt;%
+  group_by(Cell.type, Cell.idx) %&gt;%
+  summarize()
+
+tib_approx_taylor &lt;- heatmap.tib_approx_taylor %&gt;%
+  group_by(Cell.type, Cell.idx) %&gt;%
+  summarize()
+
+tib_approx_frob &lt;- heatmap.tib_approx_frob %&gt;%
+  group_by(Cell.type, Cell.idx) %&gt;%
+  summarize()
+
+cell_type_breaks &lt;- c(1, which(tib_exact$Cell.type[-1] != tib_exact$Cell.type[-nrow(tib_exact)]))
+label_pos &lt;- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib_exact)) / 2
 
 library(ggplot2)
 
-ggplot(data = df, aes(x = c_val, y = ll, color = algorithm)) +
-  geom_point() +
-  geom_line() +
-  scale_x_log10() +
-  xlab(&quot;c&quot;) +
-  ylab(&quot;log-likelihood&quot;) +
-  cowplot::theme_cowplot()</code></pre>
-<p><img src="figure/computational_complexity_analysis.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
-Past versions of unnamed-chunk-7-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-7-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/8edac006b9fa0bdd2f8b75fff0611de303792343/docs/figure/computational_complexity_analysis.Rmd/unnamed-chunk-7-1.png" target="_blank">8edac00</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2024-10-30
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Here, we can see that the approximation can be quite bad for small
-values of <span class="math inline">\(c\)</span>, but for large values
-of <span class="math inline">\(c\)</span> it seems to work quite well.
-Exactly where the approximation breaks down should be investigated
-further, but in my computational experiments I have found that the
-approximation seems typically seems to work reasonably well for <span
-class="math inline">\(c = 1\)</span>.</p>
+plt_exact &lt;- ggplot(heatmap.tib_exact, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = &quot;white&quot;, high = &quot;firebrick&quot;) +
+  labs(y = &quot;&quot;) +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = &quot;all&quot;) +
+  theme(legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 16)) 
+
+plt_approx_taylor &lt;- ggplot(heatmap.tib_approx_taylor, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = &quot;white&quot;, high = &quot;firebrick&quot;) +
+  labs(y = &quot;&quot;) +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = &quot;all&quot;) +
+  theme(legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 16)) 
+
+plt_approx_frob &lt;- ggplot(heatmap.tib_approx_frob, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = &quot;white&quot;, high = &quot;firebrick&quot;) +
+  labs(y = &quot;&quot;) +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = &quot;all&quot;) +
+  theme(legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 16)) 
+
+ggarrange(plt_exact, plt_approx_taylor, plt_approx_frob, nrow = 1, labels = &quot;AUTO&quot;)</code></pre>
+<p><img src="figure/liu_pbmc_approx_eval.Rmd/unnamed-chunk-7-1.png" width="1920" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1117,31 +1015,33 @@ LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlap
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
-time zone: America/New_York
+time zone: America/Chicago
 tzcode source: internal
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggplot2_3.5.1
+[1] ggpubr_0.6.0  ggplot2_3.5.1 stringr_1.5.1 stringi_1.8.4 tidyr_1.3.1  
+[6] passPCA_0.1.0 dplyr_1.1.4   Matrix_1.7-0 
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.9        utf8_1.2.4        generics_0.1.3    stringi_1.8.4    
- [5] hms_1.1.3         digest_0.6.36     magrittr_2.0.3    evaluate_0.24.0  
- [9] grid_4.4.0        fastmap_1.2.0     rprojroot_2.0.4   workflowr_1.7.1  
-[13] jsonlite_1.8.8    whisker_0.4.1     promises_1.3.0    fansi_1.0.6      
-[17] scales_1.3.0      jquerylib_0.1.4   cli_3.6.3         rlang_1.1.4      
-[21] cowplot_1.1.3     munsell_0.5.1     withr_3.0.0       cachem_1.1.0     
-[25] yaml_2.3.8        tools_4.4.0       tzdb_0.4.0        dplyr_1.1.4      
-[29] colorspace_2.1-0  httpuv_1.6.15     vctrs_0.6.5       R6_2.5.1         
-[33] lifecycle_1.0.4   git2r_0.33.0      stringr_1.5.1     fs_1.6.4         
-[37] pkgconfig_2.0.3   pillar_1.9.0      bslib_0.7.0       later_1.3.2      
-[41] gtable_0.3.5      glue_1.7.0        Rcpp_1.0.13       xfun_0.45        
-[45] tibble_3.2.1      tidyselect_1.2.1  highr_0.11        rstudioapi_0.16.0
-[49] knitr_1.47        farver_2.1.2      htmltools_0.5.8.1 rmarkdown_2.27   
-[53] labeling_0.4.3    readr_2.1.5       compiler_4.4.0   </code></pre>
-</div>
+ [1] sass_0.4.9        utf8_1.2.4        generics_0.1.3    rstatix_0.7.2    
+ [5] lattice_0.22-6    hms_1.1.3         digest_0.6.36     magrittr_2.0.3   
+ [9] evaluate_0.24.0   grid_4.4.0        fastmap_1.2.0     rprojroot_2.0.4  
+[13] workflowr_1.7.1   jsonlite_1.8.8    backports_1.5.0   promises_1.3.0   
+[17] purrr_1.0.2       fansi_1.0.6       scales_1.3.0      jquerylib_0.1.4  
+[21] abind_1.4-5       cli_3.6.3         rlang_1.1.4       cowplot_1.1.3    
+[25] munsell_0.5.1     withr_3.0.0       cachem_1.1.0      yaml_2.3.8       
+[29] Rtsne_0.17        tools_4.4.0       tzdb_0.4.0        ggsignif_0.6.4   
+[33] colorspace_2.1-0  httpuv_1.6.15     broom_1.0.6       vctrs_0.6.5      
+[37] R6_2.5.1          lifecycle_1.0.4   git2r_0.33.0      car_3.1-2        
+[41] fs_1.6.4          pkgconfig_2.0.3   pillar_1.9.0      bslib_0.7.0      
+[45] later_1.3.2       gtable_0.3.5      glue_1.7.0        Rcpp_1.0.13      
+[49] highr_0.11        xfun_0.45         tibble_3.2.1      tidyselect_1.2.1 
+[53] rstudioapi_0.16.0 knitr_1.47        farver_2.1.2      htmltools_0.5.8.1
+[57] labeling_0.4.3    carData_3.0-5     rmarkdown_2.27    readr_2.1.5      
+[61] compiler_4.4.0   </code></pre>
 </div>
 </div>
 

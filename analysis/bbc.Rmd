@@ -114,6 +114,16 @@ for (cc in cc_vec) {
     s = cc * s
   )
   
+  fit_approx <- fit_factor_model_log1p_quad_approx_sparse(
+    Y = dtm2,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s,
+    approx_method = "taylor"
+  )
+  
   fit_list[[as.character(cc)]] <- fit
   
 }
@@ -137,6 +147,7 @@ Below is a plot of the log-likelihoods of the data under a Poisson model using d
 
 ```{r}
 ll_vec <- c()
+ll_vec_approx <- c()
 
 for (cc in cc_vec) {
 
@@ -155,6 +166,20 @@ for (cc in cc_vec) {
   
   ll_vec <- c(ll_vec, ll)
   
+  fit <- fit_list$approx[[as.character(cc)]] 
+  B <- fit$U %*% t(fit$V)
+  Lambda <- cc * (exp(B) - 1)
+  Lambda <- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+  
+  ll <- sum(
+    dpois(
+      x = as.vector(as.matrix(dtm2)),
+      lambda = as.vector(Lambda),
+      log = TRUE
+    )
+  )
+  ll_vec_approx <- c(ll_vec_approx, ll)
+  
 }
 
 ll_nmf <- sum(
@@ -169,7 +194,12 @@ ll_nmf <- sum(
 ```{r}
 df <- data.frame(
   cc = cc_vec,
-  ll_diff = max(ll_vec) - ll_vec + 1
+  ll_diff = c(
+    max(ll_vec) - ll_vec + 1
+  ),
+  model = c(
+    rep("log1p Exact", length(cc_vec))
+  )
 )
 
 library(ggplot2)
@@ -181,6 +211,23 @@ ggplot(data = df) +
   scale_x_log10() +
   scale_y_log10() +
   geom_hline(yintercept = max(ll_vec) - ll_nmf + 1, color = "red", linetype = "dashed")
+```
+```{r}
+df <- data.frame(
+  cc = cc_vec,
+  ll_diff = pmax(c(
+    ll_vec - ll_vec_approx
+  ), 1)
+)
+
+library(ggplot2)
+ggplot(data = df) +
+  geom_point(aes(x = cc, y = ll_diff)) +
+  geom_line(aes(x = cc, y = ll_diff)) +
+  xlab("c") +
+  ylab("Approximation error (difference in log-likelihood)") +
+  scale_x_log10() +
+  scale_y_log10() 
 ```
 
 ## Loadings

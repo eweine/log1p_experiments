@@ -1,0 +1,427 @@
+---
+title: "Approximation Comparison"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2024-12-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Introduction
+
+Here, I applied both the exact and approximate `log1p` matrix factorization methods to get a sense of how accurate the approximation is for different values of $c$. Below, column A was optimized using the exact algorithm, column B was optimized using the sparse approximation to the exact algorithm, and column C is frobenius NMF (using `NNLM`) applied to the transformed data.
+
+```{r}
+library(Matrix)
+library(dplyr)
+library(passPCA)
+
+#load("/home/ericw456/pbmc/liu_data.Rdata")
+load("~/Documents/data/passPCA/liu_data.Rdata")
+
+
+counts <- counts[,Matrix::colSums(counts) > 0]
+# require that all used genes appear in at least 5 cells
+s <- Matrix::rowSums(counts)
+s <- s / mean(s)
+genes_to_use <- which(Matrix::colSums(counts>0)>4)
+counts <- counts[,genes_to_use]
+K <- 25
+cc_vec <- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+```
+
+
+```{r, eval=FALSE}
+n <- nrow(counts)
+p <- ncol(counts)
+
+for (cc in cc_vec) {
+
+  print(cc)
+
+  set.seed(1)
+  log1p_k1 <- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = 1,
+    maxiter = 10,
+    s = cc * s,
+    init_method = "frob_nmf"
+  )
+
+  init_LL <- log1p_k1$U %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  init_FF <- log1p_k1$V %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+  tictoc::tic()
+  set.seed(1)
+  fit <- fit_factor_model_log1p_quad_approx_sparse(
+    Y = counts,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s,
+    approx_method = "taylor"
+  )
+  total_time <- tictoc::toc()
+
+  fit[["total_time"]] <- total_time$toc
+  rownames(fit$U) <- rownames(counts)
+  rownames(fit$V) <- colnames(counts)
+
+  readr::write_rds(
+    fit, glue::glue("~/Documents/data/passPCA/liu_pbmc_log1p_c{cc}_k25_approx_taylor_100_iter.rds")
+  )
+
+}
+```
+
+```{r}
+fit_list_exact <- list()
+fit_list_approx_taylor <- list()
+fit_list_approx_frob <- list()
+
+for (cc in cc_vec) {
+  
+  fit_list_exact[[as.character(cc)]] <- readr::read_rds(
+    glue::glue(
+      "~/Documents/data/passPCA/paper_figures_res/liu_pbmc/liu_pbmc_log1p_c{cc}_k25_exact_100_iter.rds"
+      )
+    )
+  
+  fit_list_approx_taylor[[as.character(cc)]] <- readr::read_rds(
+    glue::glue(
+      "~/Documents/data/passPCA/paper_figures_res/liu_pbmc/liu_pbmc_log1p_c{cc}_k25_approx_taylor_100_iter.rds"
+      )
+    )
+  
+  fit_list_approx_frob[[as.character(cc)]] <- readr::read_rds(
+    glue::glue(
+      "~/Documents/data/passPCA/paper_figures_res/liu_pbmc/liu_pbmc_log1p_c{cc}_k25_approx_frob_100_iter.rds"
+      )
+    )
+  
+}
+```
+
+```{r}
+normalize_bars <- function(LL) {
+
+  max_col <- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = "/")
+
+}
+```
+
+```{r, eval=FALSE}
+Y <- as.matrix(counts)
+
+ll_vec_exact <- c()
+
+for (cc in cc_vec) {
+
+  fit <- fit_list_exact[[as.character(cc)]]
+  B <- fit$U %*% t(fit$V)
+  Lambda <- cc * (exp(B) - 1)
+  Lambda <- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+
+  ll <- sum(
+    dpois(
+      x = as.vector(Y),
+      lambda = as.vector(Lambda),
+      log = TRUE
+    )
+  )
+
+  ll_vec_exact <- c(ll_vec_exact, ll)
+
+}
+
+ll_vec_approx <- c()
+
+for (cc in cc_vec) {
+
+  fit <- fit_list_approx_taylor[[as.character(cc)]]
+  B <- fit$U %*% t(fit$V)
+  Lambda <- cc * (exp(B) - 1)
+  Lambda <- as.matrix(Matrix::Diagonal(x = s) %*% Lambda)
+
+  ll <- sum(
+    dpois(
+      x = as.vector(Y),
+      lambda = as.vector(Lambda),
+      log = TRUE
+    )
+  )
+
+  ll_vec_approx <- c(ll_vec_approx, ll)
+
+}
+
+ll_df <- data.frame(
+  ll_diff = pmax(1, ll_vec_exact - ll_vec_approx),
+  c = cc_vec
+)
+```
+
+```{r, eval=FALSE}
+library(ggplot2)
+ggplot(data = ll_df, aes(x = c, y = ll_diff)) +
+  geom_point() +
+  geom_line() +
+  ylab("Approximation Error (Log-Likelihood)") +
+  xlab("c") +
+  scale_y_continuous(transform = "log10") +
+  scale_x_continuous(transform = "log10") +
+  cowplot::theme_cowplot()
+```
+
+
+```{r, fig.width=20, fig.height=40}
+library(tidyr)
+library(stringi)
+library(stringr)
+library(ggpubr)
+cell.type <- as.factor(ct$celltype)
+
+LL_c1_exact <- normalize_bars(fit_list_exact$`1`$U)
+
+# Downsample the number of cells and sort them using tSNE.
+set.seed(8675309)
+cell.idx <- numeric(0)
+cell.types <- levels(cell.type)
+for (i in 1:length(cell.types)) {
+  which.idx <- which(cell.type == cell.types[i])
+  # Downsample common cell types.
+  if (length(which.idx) > 2000) {
+    which.idx <- sample(which.idx, 2000)
+  }
+  # Don't include rare cell types.
+  if (length(which.idx) > 10) {
+    # Sort using tsne.
+    tsne.res <- Rtsne::Rtsne(
+      LL_c1_exact[which.idx, ],
+      dims = 1,
+      pca = FALSE,
+      normalize = FALSE,
+      perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+      theta = 0.1,
+      max_iter = 1000,
+      eta = 200,
+      check_duplicates = FALSE
+    )$Y[, 1]
+    which.idx <- which.idx[order(tsne.res)]
+    cell.idx <- c(cell.idx, which.idx)
+  }
+}
+
+cell.type <- cell.type[cell.idx]
+cell.type <- droplevels(cell.type)
+
+LL_c1_exact <- LL_c1_exact[cell.idx, ]
+LL_c001_exact <- normalize_bars(fit_list_exact$`0.001`$U)
+LL_c001_exact <- LL_c001_exact[cell.idx, ]
+LL_c01_exact <- normalize_bars(fit_list_exact$`0.01`$U)
+LL_c01_exact <- LL_c01_exact[cell.idx, ]
+LL_cp1_exact <- normalize_bars(fit_list_exact$`0.1`$U)
+LL_cp1_exact <- LL_cp1_exact[cell.idx, ]
+LL_c10_exact <- normalize_bars(fit_list_exact$`10`$U)
+LL_c10_exact <- LL_c10_exact[cell.idx, ]
+LL_c100_exact <- normalize_bars(fit_list_exact$`100`$U)
+LL_c100_exact <- LL_c100_exact[cell.idx, ]
+LL_c1000_exact <- normalize_bars(fit_list_exact$`1000`$U)
+LL_c1000_exact <- LL_c1000_exact[cell.idx, ]
+
+LL_c1_approx_taylor <- normalize_bars(fit_list_approx_taylor$`1`$U)
+LL_c1_approx_taylor <- LL_c1_approx_taylor[cell.idx, ]
+LL_c001_approx_taylor <- normalize_bars(fit_list_approx_taylor$`0.001`$U)
+LL_c001_approx_taylor <- LL_c001_approx_taylor[cell.idx, ]
+LL_c01_approx_taylor <- normalize_bars(fit_list_approx_taylor$`0.01`$U)
+LL_c01_approx_taylor <- LL_c01_approx_taylor[cell.idx, ]
+LL_cp1_approx_taylor <- normalize_bars(fit_list_approx_taylor$`0.1`$U)
+LL_cp1_approx_taylor <- LL_cp1_approx_taylor[cell.idx, ]
+LL_c10_approx_taylor <- normalize_bars(fit_list_approx_taylor$`10`$U)
+LL_c10_approx_taylor <- LL_c10_approx_taylor[cell.idx, ]
+LL_c100_approx_taylor <- normalize_bars(fit_list_approx_taylor$`100`$U)
+LL_c100_approx_taylor <- LL_c100_approx_taylor[cell.idx, ]
+LL_c1000_approx_taylor <- normalize_bars(fit_list_approx_taylor$`1000`$U)
+LL_c1000_approx_taylor <- LL_c1000_approx_taylor[cell.idx, ]
+
+LL_c1_approx_frob <- normalize_bars(fit_list_approx_frob$`1`$W)
+LL_c1_approx_frob <- LL_c1_approx_frob[cell.idx, ]
+LL_c001_approx_frob <- normalize_bars(fit_list_approx_frob$`0.001`$W)
+LL_c001_approx_frob <- LL_c001_approx_frob[cell.idx, ]
+LL_c01_approx_frob <- normalize_bars(fit_list_approx_frob$`0.01`$W)
+LL_c01_approx_frob <- LL_c01_approx_frob[cell.idx, ]
+LL_cp1_approx_frob <- normalize_bars(fit_list_approx_frob$`0.1`$W)
+LL_cp1_approx_frob <- LL_cp1_approx_frob[cell.idx, ]
+LL_c10_approx_frob <- normalize_bars(fit_list_approx_frob$`10`$W)
+LL_c10_approx_frob <- LL_c10_approx_frob[cell.idx, ]
+LL_c100_approx_frob <- normalize_bars(fit_list_approx_frob$`100`$W)
+LL_c100_approx_frob <- LL_c100_approx_frob[cell.idx, ]
+LL_c1000_approx_frob <- normalize_bars(fit_list_approx_frob$`1000`$W)
+LL_c1000_approx_frob <- LL_c1000_approx_frob[cell.idx, ]
+
+make.heatmap.tib <- function(FF) {
+  tib <- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %>%
+    mutate(Cell.type = cell.type) %>%
+    arrange(Cell.type) %>%
+    mutate(Cell.idx = row_number())
+  
+  tib <- tib %>%
+    pivot_longer(
+      -c(Cell.idx, Cell.type),
+      names_to = "Factor",
+      values_to = "Loading",
+      values_drop_na = TRUE
+    ) %>%
+    mutate(Factor = as.numeric(str_extract(Factor, "[0-9]+")))
+  
+  return(tib)
+}
+
+LL_c001_tib_exact <- make.heatmap.tib(LL_c001_exact)
+LL_c01_tib_exact <- make.heatmap.tib(LL_c01_exact)
+LL_cp1_tib_exact <- make.heatmap.tib(LL_cp1_exact)
+LL_c1_tib_exact <- make.heatmap.tib(LL_c1_exact)
+LL_c10_tib_exact <- make.heatmap.tib(LL_c10_exact)
+LL_c100_tib_exact <- make.heatmap.tib(LL_c100_exact)
+LL_c1000_tib_exact <- make.heatmap.tib(LL_c1000_exact)
+
+LL_c001_tib_approx_taylor <- make.heatmap.tib(LL_c001_approx_taylor)
+LL_c01_tib_approx_taylor <- make.heatmap.tib(LL_c01_approx_taylor)
+LL_cp1_tib_approx_taylor <- make.heatmap.tib(LL_cp1_approx_taylor)
+LL_c1_tib_approx_taylor <- make.heatmap.tib(LL_c1_approx_taylor)
+LL_c10_tib_approx_taylor <- make.heatmap.tib(LL_c10_approx_taylor)
+LL_c100_tib_approx_taylor <- make.heatmap.tib(LL_c100_approx_taylor)
+LL_c1000_tib_approx_taylor <- make.heatmap.tib(LL_c1000_approx_taylor)
+
+LL_c001_tib_approx_frob <- make.heatmap.tib(LL_c001_approx_frob)
+LL_c01_tib_approx_frob <- make.heatmap.tib(LL_c01_approx_frob)
+LL_cp1_tib_approx_frob <- make.heatmap.tib(LL_cp1_approx_frob)
+LL_c1_tib_approx_frob <- make.heatmap.tib(LL_c1_approx_frob)
+LL_c10_tib_approx_frob <- make.heatmap.tib(LL_c10_approx_frob)
+LL_c100_tib_approx_frob <- make.heatmap.tib(LL_c100_approx_frob)
+LL_c1000_tib_approx_frob <- make.heatmap.tib(LL_c1000_approx_frob)
+
+heatmap.tib_exact <- LL_c001_tib_exact %>% mutate(Method = "c = 0.001") %>%
+  bind_rows(LL_c01_tib_exact %>% mutate(Method = "c = 0.01")) %>%
+  bind_rows(LL_cp1_tib_exact %>% mutate(Method = "c = 0.1")) %>%
+  bind_rows(LL_c1_tib_exact %>% mutate(Method = "c = 1")) %>%
+  bind_rows(LL_c10_tib_exact %>% mutate(Method = "c = 10")) %>%
+  bind_rows(LL_c100_tib_exact %>% mutate(Method = "c = 100")) %>%
+  bind_rows(LL_c1000_tib_exact %>% mutate(Method = "c = 1000")) %>%
+  mutate(Method = factor(
+    Method, 
+    levels = c(
+      "c = 0.001", "c = 0.01", "c = 0.1", "c = 1", "c = 10", "c = 100", "c = 1000"
+      )))
+
+heatmap.tib_approx_taylor <- LL_c001_tib_approx_taylor %>% mutate(Method = "c = 0.001") %>%
+  bind_rows(LL_c01_tib_approx_taylor %>% mutate(Method = "c = 0.01")) %>%
+  bind_rows(LL_cp1_tib_approx_taylor %>% mutate(Method = "c = 0.1")) %>%
+  bind_rows(LL_c1_tib_approx_taylor %>% mutate(Method = "c = 1")) %>%
+  bind_rows(LL_c10_tib_approx_taylor %>% mutate(Method = "c = 10")) %>%
+  bind_rows(LL_c100_tib_approx_taylor %>% mutate(Method = "c = 100")) %>%
+  bind_rows(LL_c1000_tib_approx_taylor %>% mutate(Method = "c = 1000")) %>%
+  mutate(Method = factor(
+    Method, 
+    levels = c(
+      "c = 0.001", "c = 0.01", "c = 0.1", "c = 1", "c = 10", "c = 100", "c = 1000"
+      )))
+
+heatmap.tib_approx_frob <- LL_c001_tib_approx_frob %>% mutate(Method = "c = 0.001") %>%
+  bind_rows(LL_c01_tib_approx_frob %>% mutate(Method = "c = 0.01")) %>%
+  bind_rows(LL_cp1_tib_approx_frob %>% mutate(Method = "c = 0.1")) %>%
+  bind_rows(LL_c1_tib_approx_frob %>% mutate(Method = "c = 1")) %>%
+  bind_rows(LL_c10_tib_approx_frob %>% mutate(Method = "c = 10")) %>%
+  bind_rows(LL_c100_tib_approx_frob %>% mutate(Method = "c = 100")) %>%
+  bind_rows(LL_c1000_tib_approx_frob %>% mutate(Method = "c = 1000")) %>%
+  mutate(Method = factor(
+    Method, 
+    levels = c(
+      "c = 0.001", "c = 0.01", "c = 0.1", "c = 1", "c = 10", "c = 100", "c = 1000"
+      )))
+
+tib_exact <- heatmap.tib_exact %>%
+  group_by(Cell.type, Cell.idx) %>%
+  summarize()
+
+tib_approx_taylor <- heatmap.tib_approx_taylor %>%
+  group_by(Cell.type, Cell.idx) %>%
+  summarize()
+
+tib_approx_frob <- heatmap.tib_approx_frob %>%
+  group_by(Cell.type, Cell.idx) %>%
+  summarize()
+
+cell_type_breaks <- c(1, which(tib_exact$Cell.type[-1] != tib_exact$Cell.type[-nrow(tib_exact)]))
+label_pos <- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib_exact)) / 2
+
+library(ggplot2)
+
+plt_exact <- ggplot(heatmap.tib_exact, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "firebrick") +
+  labs(y = "") +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = "all") +
+  theme(legend.position = "none", 
+        strip.text = element_text(size = 16)) 
+
+plt_approx_taylor <- ggplot(heatmap.tib_approx_taylor, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "firebrick") +
+  labs(y = "") +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = "all") +
+  theme(legend.position = "none", 
+        strip.text = element_text(size = 16)) 
+
+plt_approx_frob <- ggplot(heatmap.tib_approx_frob, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "firebrick") +
+  labs(y = "") +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = "all") +
+  theme(legend.position = "none", 
+        strip.text = element_text(size = 16)) 
+
+ggarrange(plt_exact, plt_approx_taylor, plt_approx_frob, nrow = 1, labels = "AUTO")
+```
