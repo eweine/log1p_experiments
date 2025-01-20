@@ -207,7 +207,7 @@ plot_list[["Inf"]] <- structure_plot(
 ggarrange(
   plotlist = plot_list,
   ncol = 1,
-  labels = paste0("K = ", names(plot_list))
+  labels = paste0("c = ", names(plot_list))
 )
 ```
 
