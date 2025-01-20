@@ -51,3 +51,5 @@ Welcome to my research website.
 [Analysis of Liu PBMC Dataset](liu_pbmc.html)
 
 [Comparison of Computational Approximations on Liu PBMC Dataset](liu_pbmc_approx_eval.html)
+
+[Pancreas Dataset Analysis](pancreas.html)
