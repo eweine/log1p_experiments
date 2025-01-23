@@ -152,6 +152,81 @@ readr::write_rds(
 
 I also ran Frobenius NMF on the transformed counts $\log(1 + y/(c \cdot s))$, where $s$ is the same size factor used above. To attempt to keep things consistent with the Poisson models, I initialized the NMF models with the models from above after one iteration on the $K = 9$ fits.
 
+```{r, eval=FALSE}
+Y_tilde <- Matrix::Diagonal(x = 1/s) %*% counts
+
+library(passPCA)
+
+K <- 9
+cc_vec <- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+n <- nrow(counts)
+p <- ncol(counts)
+
+for (cc in cc_vec) {
+  
+  print(cc)
+  
+  set.seed(1)
+  log1p_k1 <- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = 1,
+    maxiter = 10,
+    s = cc * s,
+    init_method = "frob_nmf"
+  )
+  
+  set.seed(1)
+  init_LL <- log1p_k1$U %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+  
+  set.seed(1)
+  init_FF <- log1p_k1$V %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+  
+  fit <- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 1,
+    s = cc * s
+  )
+
+  Y_tilde_cc <- MatrixExtra::mapSparse(Y_tilde, function(x){log1p(x/cc)})
+  
+  nmf_fit <- nnmf(
+    A = as.matrix(Y_tilde_cc), 
+    k = 9,
+    init = list(
+      W = fit$U, H = t(fit$V)
+    )
+  )
+  
+  readr::write_rds(
+    nmf_fit, glue::glue("~/Documents/data/passPCA/pancreas/pancreas_log1p_c{cc}_nnlm.rds")
+  )
+  
+}
+```
+
+
 Below are the structure plots for each of the models:
 
 ```{r}

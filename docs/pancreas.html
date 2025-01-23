@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree6187eaf3a0ead5d1290c343e3334f5374d41430etargetblank6187eafa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree44da750b2dd15e71c8a4ffa9168b4a3d54f326c0targetblank44da750a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/6187eaf3a0ead5d1290c343e3334f5374d41430e" target="_blank">6187eaf</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/44da750b2dd15e71c8a4ffa9168b4a3d54f326c0" target="_blank">44da750</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree6187eaf3a0ead5d1290c343e3334f5374d41430etargetblank6187eafa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree44da750b2dd15e71c8a4ffa9168b4a3d54f326c0targetblank44da750a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/6187eaf3a0ead5d1290c343e3334f5374d41430e" target="_blank">6187eaf</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/44da750b2dd15e71c8a4ffa9168b4a3d54f326c0" target="_blank">44da750</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -622,6 +622,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/44da750b2dd15e71c8a4ffa9168b4a3d54f326c0/analysis/pancreas.Rmd" target="_blank">44da750</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-01-22
+</td>
+<td>
+added figures for NNLM
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/44da750b2dd15e71c8a4ffa9168b4a3d54f326c0/docs/pancreas.html" target="_blank">44da750</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-01-22
+</td>
+<td>
+added figures for NNLM
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -842,6 +876,77 @@ class="math inline">\(s\)</span> is the same size factor used above. To
 attempt to keep things consistent with the Poisson models, I initialized
 the NMF models with the models from above after one iteration on the
 <span class="math inline">\(K = 9\)</span> fits.</p>
+<pre class="r"><code>Y_tilde &lt;- Matrix::Diagonal(x = 1/s) %*% counts
+
+library(passPCA)
+
+K &lt;- 9
+cc_vec &lt;- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+n &lt;- nrow(counts)
+p &lt;- ncol(counts)
+
+for (cc in cc_vec) {
+  
+  print(cc)
+  
+  set.seed(1)
+  log1p_k1 &lt;- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = 1,
+    maxiter = 10,
+    s = cc * s,
+    init_method = &quot;frob_nmf&quot;
+  )
+  
+  set.seed(1)
+  init_LL &lt;- log1p_k1$U %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+  
+  set.seed(1)
+  init_FF &lt;- log1p_k1$V %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+  
+  fit &lt;- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 1,
+    s = cc * s
+  )
+
+  Y_tilde_cc &lt;- MatrixExtra::mapSparse(Y_tilde, function(x){log1p(x/cc)})
+  
+  nmf_fit &lt;- nnmf(
+    A = as.matrix(Y_tilde_cc), 
+    k = 9,
+    init = list(
+      W = fit$U, H = t(fit$V)
+    )
+  )
+  
+  readr::write_rds(
+    nmf_fit, glue::glue(&quot;~/Documents/data/passPCA/pancreas/pancreas_log1p_c{cc}_nnlm.rds&quot;)
+  )
+  
+}</code></pre>
 <p>Below are the structure plots for each of the models:</p>
 <pre class="r"><code>library(ggpubr)
 library(fastTopics)
@@ -929,7 +1034,7 @@ plot_list[[&quot;Inf&quot;]] &lt;- structure_plot(
   ncol = 1,
   labels = paste0(&quot;c = &quot;, names(plot_list))
 )</code></pre>
-<p><img src="figure/pancreas.Rmd/unnamed-chunk-6-1.png" width="1920" style="display: block; margin: auto;" /></p>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-7-1.png" width="1920" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
