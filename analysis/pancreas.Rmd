@@ -1,5 +1,5 @@
 ---
-title: "Analysis of "
+title: "Analysis of Pancreas Cel-Seq Data"
 output:
   workflowr::wflow_html:
     code_folding: hide
@@ -150,12 +150,15 @@ readr::write_rds(
 )
 ```
 
+I also ran Frobenius NMF on the transformed counts $\log(1 + y/(c \cdot s))$, where $s$ is the same size factor used above. To attempt to keep things consistent with the Poisson models, I initialized the NMF models with the models from above after one iteration on the $K = 9$ fits.
+
 Below are the structure plots for each of the models:
 
-```{r, results='hide'}
+```{r}
 library(ggpubr)
 library(fastTopics)
 fit_list <- list()
+fit_list_nnlm <- list()
 
 for (cc in cc_vec) {
 
@@ -164,6 +167,16 @@ for (cc in cc_vec) {
       "~/Documents/data/passPCA/pancreas/pancreas_log1p_c{cc}_k9_exact_100_iter.rds"
     )
   )
+  
+  fit_list[[as.character(cc)]][["Lambda"]] <- cc * (exp(
+    fit_list[[as.character(cc)]]$U %*% t(fit_list[[as.character(cc)]]$V)) - 1)
+  
+  fit_list_nnlm[[as.character(cc)]] <- readr::read_rds(
+    glue::glue(
+      "~/Documents/data/passPCA/pancreas/pancreas_log1p_c{cc}_nnlm.rds"
+      )
+  )
+    
 
 }
 
@@ -171,6 +184,30 @@ fit_list[["Inf"]] <- readr::read_rds(
   glue::glue("~/Documents/data/passPCA/pancreas/pancreas_pois_nmf_k9_exact_100_iter.rds")
 )
 
+fit_list[["Inf"]][["Lambda"]] <- fit_list[["Inf"]]$L %*% t(fit_list[["Inf"]]$F) 
+```
+
+```{r}
+# library(ggplot2)
+# 
+# df <- data.frame(
+#   hat = Matrix::colMeans(counts),
+#   lr_hat = colMeans(fit_list$`1000`$Lambda)
+# )
+# 
+# ggplot(data = df) +
+#   geom_point(aes(x = hat, y = lr_hat), alpha = 0.25) +
+#   scale_x_continuous(transform = "log10") +
+#   scale_y_continuous(transform = "log10") +
+#   geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") +
+#   xlab("Average Expression") +
+#   ylab("Low Rank Mean Expression") +
+#   ggtitle("K = 1000") +
+#   cowplot::theme_cowplot()
+```
+
+
+```{r, results='hide'}
 normalize_bars <- function(LL) {
 
   max_col <- apply(LL, 2, max)
@@ -190,8 +227,13 @@ plot_list <- list()
 
 for (cc in cc_vec) {
 
-  plot_list[[as.character(cc)]] <- structure_plot(
+  plot_list[[glue::glue("{cc}: Poisson")]] <- structure_plot(
     normalize_bars(fit_list[[as.character(cc)]]$U),
+    grouping = celltype,gap = 20,perplexity = 70,n = Inf, font.size = 12
+    )
+  
+  plot_list[[glue::glue("{cc}: Vanilla NMF")]] <- structure_plot(
+    normalize_bars(fit_list_nnlm[[as.character(cc)]]$W),
     grouping = celltype,gap = 20,perplexity = 70,n = Inf, font.size = 12
     )
 
@@ -203,7 +245,7 @@ plot_list[["Inf"]] <- structure_plot(
   )
 ```
 
-```{r, fig.width=20, fig.height=40}
+```{r, fig.width=20, fig.height=70}
 ggarrange(
   plotlist = plot_list,
   ncol = 1,

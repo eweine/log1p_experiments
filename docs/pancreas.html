@@ -12,7 +12,7 @@
 
 <meta name="date" content="2024-12-30" />
 
-<title>Analysis of</title>
+<title>Analysis of Pancreas Cel-Seq Data</title>
 
 <script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -370,7 +370,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Analysis of</h1>
+<h1 class="title toc-ignore">Analysis of Pancreas Cel-Seq Data</h1>
 <h4 class="date">2024-12-30</h4>
 
 </div>
@@ -400,7 +400,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-01-20
+<strong>Last updated:</strong> 2025-01-22
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed308eae36035ff81884021e8fefbb63c5dc31334targetblankd308eaea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree6187eaf3a0ead5d1290c343e3334f5374d41430etargetblank6187eafa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/d308eae36035ff81884021e8fefbb63c5dc31334" target="_blank">d308eae</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/6187eaf3a0ead5d1290c343e3334f5374d41430e" target="_blank">6187eaf</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed308eae36035ff81884021e8fefbb63c5dc31334targetblankd308eaea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree6187eaf3a0ead5d1290c343e3334f5374d41430etargetblank6187eafa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/d308eae36035ff81884021e8fefbb63c5dc31334" target="_blank">d308eae</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/6187eaf3a0ead5d1290c343e3334f5374d41430e" target="_blank">6187eaf</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -622,6 +622,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/6187eaf3a0ead5d1290c343e3334f5374d41430e/analysis/pancreas.Rmd" target="_blank">6187eaf</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-01-20
+</td>
+<td>
+changed K to c
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/6187eaf3a0ead5d1290c343e3334f5374d41430e/docs/pancreas.html" target="_blank">6187eaf</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-01-20
+</td>
+<td>
+changed K to c
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -802,10 +836,17 @@ fit_nmf &lt;- fit_poisson_nmf(
 readr::write_rds(
   fit_nmf, glue::glue(&quot;~/Documents/data/passPCA/pancreas/pancreas_pois_nmf_k9_exact_100_iter.rds&quot;)
 )</code></pre>
+<p>I also ran Frobenius NMF on the transformed counts <span
+class="math inline">\(\log(1 + y/(c \cdot s))\)</span>, where <span
+class="math inline">\(s\)</span> is the same size factor used above. To
+attempt to keep things consistent with the Poisson models, I initialized
+the NMF models with the models from above after one iteration on the
+<span class="math inline">\(K = 9\)</span> fits.</p>
 <p>Below are the structure plots for each of the models:</p>
 <pre class="r"><code>library(ggpubr)
 library(fastTopics)
 fit_list &lt;- list()
+fit_list_nnlm &lt;- list()
 
 for (cc in cc_vec) {
 
@@ -814,6 +855,16 @@ for (cc in cc_vec) {
       &quot;~/Documents/data/passPCA/pancreas/pancreas_log1p_c{cc}_k9_exact_100_iter.rds&quot;
     )
   )
+  
+  fit_list[[as.character(cc)]][[&quot;Lambda&quot;]] &lt;- cc * (exp(
+    fit_list[[as.character(cc)]]$U %*% t(fit_list[[as.character(cc)]]$V)) - 1)
+  
+  fit_list_nnlm[[as.character(cc)]] &lt;- readr::read_rds(
+    glue::glue(
+      &quot;~/Documents/data/passPCA/pancreas/pancreas_log1p_c{cc}_nnlm.rds&quot;
+      )
+  )
+    
 
 }
 
@@ -821,7 +872,24 @@ fit_list[[&quot;Inf&quot;]] &lt;- readr::read_rds(
   glue::glue(&quot;~/Documents/data/passPCA/pancreas/pancreas_pois_nmf_k9_exact_100_iter.rds&quot;)
 )
 
-normalize_bars &lt;- function(LL) {
+fit_list[[&quot;Inf&quot;]][[&quot;Lambda&quot;]] &lt;- fit_list[[&quot;Inf&quot;]]$L %*% t(fit_list[[&quot;Inf&quot;]]$F) </code></pre>
+<pre class="r"><code># library(ggplot2)
+# 
+# df &lt;- data.frame(
+#   hat = Matrix::colMeans(counts),
+#   lr_hat = colMeans(fit_list$`1000`$Lambda)
+# )
+# 
+# ggplot(data = df) +
+#   geom_point(aes(x = hat, y = lr_hat), alpha = 0.25) +
+#   scale_x_continuous(transform = &quot;log10&quot;) +
+#   scale_y_continuous(transform = &quot;log10&quot;) +
+#   geom_abline(slope = 1, intercept = 0, color = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+#   xlab(&quot;Average Expression&quot;) +
+#   ylab(&quot;Low Rank Mean Expression&quot;) +
+#   ggtitle(&quot;K = 1000&quot;) +
+#   cowplot::theme_cowplot()</code></pre>
+<pre class="r"><code>normalize_bars &lt;- function(LL) {
 
   max_col &lt;- apply(LL, 2, max)
   sweep(LL, 2, max_col, FUN = &quot;/&quot;)
@@ -840,8 +908,13 @@ plot_list &lt;- list()
 
 for (cc in cc_vec) {
 
-  plot_list[[as.character(cc)]] &lt;- structure_plot(
+  plot_list[[glue::glue(&quot;{cc}: Poisson&quot;)]] &lt;- structure_plot(
     normalize_bars(fit_list[[as.character(cc)]]$U),
+    grouping = celltype,gap = 20,perplexity = 70,n = Inf, font.size = 12
+    )
+  
+  plot_list[[glue::glue(&quot;{cc}: Vanilla NMF&quot;)]] &lt;- structure_plot(
+    normalize_bars(fit_list_nnlm[[as.character(cc)]]$W),
     grouping = celltype,gap = 20,perplexity = 70,n = Inf, font.size = 12
     )
 
@@ -856,44 +929,7 @@ plot_list[[&quot;Inf&quot;]] &lt;- structure_plot(
   ncol = 1,
   labels = paste0(&quot;c = &quot;, names(plot_list))
 )</code></pre>
-<p><img src="figure/pancreas.Rmd/unnamed-chunk-4-1.png" width="1920" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
-Past versions of unnamed-chunk-4-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-4-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/d308eae36035ff81884021e8fefbb63c5dc31334/docs/figure/pancreas.Rmd/unnamed-chunk-4-1.png" target="_blank">d308eae</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2025-01-19
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-6-1.png" width="1920" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
