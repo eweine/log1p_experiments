@@ -1,0 +1,290 @@
+---
+title: "Analysis of Newsgroups Data"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2025-01-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Introduction
+
+Here, I analyzed the Newsgroups dataset.
+
+```{r}
+load("~/Downloads/newsgroups.RData")
+library(dplyr)
+library(Matrix)
+library(fastTopics)
+library(passPCA)
+rm(counts)
+
+# I did the following to the original dataset
+# counts <- counts[, !(colnames(counts) %in% stopwords("SMART"))]
+# colnames(counts) <- wordStem(colnames(counts))
+
+counts <- readr::read_rds(
+  "~/Downloads/newsgroups_stemmed_stopwords.rds"
+)
+
+topics <- topics[Matrix::rowSums(counts) > 9]
+counts <- counts[Matrix::rowSums(counts) > 9, ]
+genes_to_use <- which(Matrix::colSums(counts>0)>4)
+counts <- counts[,genes_to_use]
+s <- Matrix::rowSums(counts)
+s <- s / mean(s)
+
+
+K <- 12
+cc_vec <- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+n <- nrow(counts)
+p <- ncol(counts)
+```
+
+Now, I fit the log1p model for many values of $c$. I also fit Poisson NMF using `fastTopics`. To fit each model, I first fit a rank $1$ model. Then, I initialize each model with $K = 12$, where the first factor is taken from the rank 1 model and the other $11$ are randomly iniitalized.
+
+```{r, eval=FALSE}
+for (cc in cc_vec) {
+
+  print(cc)
+
+  set.seed(1)
+  log1p_k1 <- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = 1,
+    maxiter = 5,
+    s = cc * s,
+    init_method = "frob_nmf"
+  )
+
+  set.seed(1)
+  init_LL <- log1p_k1$U %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  set.seed(1)
+  init_FF <- log1p_k1$V %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+  tictoc::tic()
+  set.seed(1)
+  fit <- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s
+  )
+  total_time <- tictoc::toc()
+
+  fit[["total_time"]] <- total_time$toc
+  rownames(fit$U) <- rownames(counts)
+  rownames(fit$V) <- colnames(counts)
+
+  readr::write_rds(
+    fit, glue::glue("~/Documents/data/passPCA/news/news_log1p_c{cc}_k12_exact_100_iter.rds")
+  )
+
+}
+
+fit0_nmf <- fastTopics:::fit_pnmf_rank1(counts)
+
+set.seed(1)
+init_LL <- fit0_nmf$L %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+
+set.seed(1)
+init_FF <- fit0_nmf$F %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+rownames(init_LL) <- rownames(counts)
+rownames(init_FF) <- colnames(counts)
+
+fit0_K <- init_poisson_nmf(
+  X = counts, F = init_FF, L = init_LL
+)
+
+fit_nmf <- fit_poisson_nmf(
+  X = counts,
+  fit0 = fit0_K,
+  control = list(list(nc = 7))
+)
+
+readr::write_rds(
+  fit_nmf, glue::glue("~/Documents/data/passPCA/news/news_pois_nmf_k12_exact_100_iter.rds")
+)
+```
+
+Below are the structure plots for each of the models:
+
+```{r}
+library(ggpubr)
+library(fastTopics)
+fit_list <- list()
+
+
+for (cc in cc_vec) {
+
+  fit_list[[as.character(cc)]] <- readr::read_rds(
+    glue::glue(
+      "~/Documents/data/passPCA/news/news_log1p_c{cc}_k12_exact_100_iter.rds"
+    )
+  )
+
+}
+
+fit_list[["Inf"]] <- readr::read_rds(
+  glue::glue("~/Documents/data/passPCA/news/news_pois_nmf_k12_exact_100_iter.rds")
+)
+```
+
+
+```{r, results='hide'}
+normalize_bars <- function(LL) {
+
+  max_col <- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = "/")
+
+}
+
+plot_list <- list()
+
+for (cc in cc_vec) {
+
+  plot_list[[glue::glue("{cc}: Poisson")]] <- structure_plot(
+    normalize_bars(fit_list[[as.character(cc)]]$U),
+    grouping = topics,gap = 50,perplexity = 70,n = Inf, font.size = 12
+    )
+
+}
+
+plot_list[["Inf"]] <- structure_plot(
+  fit_list[["Inf"]],
+  grouping = topics,gap = 50,perplexity = 70,n = Inf,font.size = 12
+  )
+```
+
+```{r, fig.width=20, fig.height=70}
+ggarrange(
+  plotlist = plot_list,
+  ncol = 1,
+  labels = paste0("c = ", names(plot_list))
+)
+```
+
+```{r}
+get_keywords <- function(V) {
+  
+  kw_list <- list()
+  
+  for (k in 1:ncol(V)) {
+    
+    kw_list[[k]] <- names(head(sort(V[,k], decreasing = T), 10))
+    
+  }
+  
+  return(kw_list)
+  
+}
+```
+
+## Keywords
+
+```{r}
+kw_lists <- list()
+
+for (cc in c(cc_vec)) {
+  
+  fit <- fit_list[[as.character(cc)]]
+  
+  kw_lists[[as.character(cc)]] <- get_keywords(fit$V)
+
+}
+
+kw_lists[["Inf"]] <- get_keywords(fit_list$`Inf`$F)
+```
+
+### c = 1e-3
+
+```{r}
+print(kw_lists[[as.character(1e-3)]])
+```
+
+### c = 1e-2
+
+```{r}
+print(kw_lists[[as.character(1e-2)]])
+```
+
+### c = 1e-1
+
+```{r}
+print(kw_lists[[as.character(1e-1)]])
+```
+
+### c = 1
+
+```{r}
+print(kw_lists[[as.character(1)]])
+```
+
+### c = 10
+
+```{r}
+print(kw_lists[[as.character(10)]])
+```
+
+### c = 100
+
+```{r}
+print(kw_lists[[as.character(100)]])
+```
+
+### c = 1000
+
+```{r}
+print(kw_lists[[as.character(1000)]])
+```
+
+### c = Inf
+
+```{r}
+print(kw_lists[["Inf"]])
+```
+
