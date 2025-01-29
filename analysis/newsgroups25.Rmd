@@ -150,6 +150,15 @@ readr::write_rds(
 ```
 
 ```{r}
+normalize_F <- function(LL, FF) {
+
+  max_col <- apply(LL, 2, max)
+  sweep(FF, 2, max_col, FUN = "*")
+
+}
+```
+
+```{r}
 library(ggpubr)
 library(fastTopics)
 fit_list <- list()
@@ -161,11 +170,17 @@ for (cc in cc_vec) {
       "~/Documents/data/passPCA/news/news_log1p_c{cc}_k{K}_exact_100_iter.rds"
     )
   )
+  fit_list[[as.character(cc)]]$F_normalized <- normalize_F(
+    fit_list[[as.character(cc)]]$U, fit_list[[as.character(cc)]]$V
+    )
 
 }
 
 fit_list[["Inf"]] <- readr::read_rds(
   glue::glue("~/Documents/data/passPCA/news/news_pois_nmf_k{K}_exact_100_iter.rds")
+)
+fit_list[["Inf"]]$F_normalized <- normalize_F(
+  fit_list[["Inf"]]$L, fit_list[["Inf"]]$F
 )
 ```
 
@@ -326,7 +341,10 @@ get_keywords <- function(V) {
   for (k in 1:ncol(V)) {
     
     kw_list[[k]] <- names(head(sort(V[,k], decreasing = T), 10))
-    
+    names(kw_list[[k]]) <- round(head(sort(V[,k], decreasing = T), 10) / max(
+      head(sort(V[,k], decreasing = T), 10)
+    ), 1)
+
   }
   
   return(kw_list)
@@ -340,11 +358,11 @@ kw_lists <- list()
 for (cc in c(cc_vec)) {
   
   fit <- fit_list[[as.character(cc)]]
-  kw_lists[[as.character(cc)]] <- get_keywords(fit$V)
+  kw_lists[[as.character(cc)]] <- get_keywords(fit$F_normalized)
 
 }
 
-kw_lists[["Inf"]] <- get_keywords(fit_list$`Inf`$F)
+kw_lists[["Inf"]] <- get_keywords(fit_list$`Inf`$F_normalized)
 ```
 
 ### c = 1e-3
