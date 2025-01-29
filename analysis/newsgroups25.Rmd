@@ -235,7 +235,8 @@ LL_c100 <- normalize_bars(fit_list$`100`$U)
 LL_c100 <- LL_c100[cell.idx, ]
 LL_c1000 <- normalize_bars(fit_list$`1000`$U)
 LL_c1000 <- LL_c1000[cell.idx, ]
-LL_cinf <- normalize_bars(fit_list$`Inf`$L)
+LL_cinf <- Matrix::Diagonal(x = 1 / s) %*% fit_list$`Inf`$L
+LL_cinf <- normalize_bars(as.matrix(LL_cinf))
 LL_cinf <- LL_cinf[cell.idx, ]
 
 make.heatmap.tib <- function(FF) {
