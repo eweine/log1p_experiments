@@ -54,4 +54,6 @@ Welcome to my research website.
 
 [Pancreas Dataset Analysis](pancreas.html)
 
-[Newsgroups Dataset Analysis](newsgroup.html)
+[Newsgroups Dataset Analysis - K = 12](newsgroup.html)
+
+[Newsgroups Dataset Analysis - K = 25](newsgroups25.html)

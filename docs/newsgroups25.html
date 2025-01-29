@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2025-01-29" />
+
+<title>Newsgroups 25 Factors</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Newsgroups 25 Factors</h1>
+<h4 class="date">2025-01-29</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2025-01-29
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed0a464930ae785172b0a3c939bc71b7c353145aetargetblankd0a4649a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/d0a464930ae785172b0a3c939bc71b7c353145ae" target="_blank">d0a4649</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed0a464930ae785172b0a3c939bc71b7c353145aetargetblankd0a4649a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/d0a464930ae785172b0a3c939bc71b7c353145ae" target="_blank">d0a4649</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    data/.DS_Store
+
+Untracked files:
+    Untracked:  analysis/newsgroups25.Rmd
+    Untracked:  data/pancreas.zip
+    Untracked:  data/pancreas/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Here, I will apply the <code>log1p</code> matrix factorization model
+to the Newsgroups dataset using 25 factors.</p>
+<pre class="r"><code>load(&quot;~/Downloads/newsgroups.RData&quot;)
+library(dplyr)
+library(Matrix)
+library(fastTopics)
+library(passPCA)
+rm(counts)
+
+# I did the following to the original dataset
+# counts &lt;- counts[, !(colnames(counts) %in% stopwords(&quot;SMART&quot;))]
+# colnames(counts) &lt;- wordStem(colnames(counts))
+
+counts &lt;- readr::read_rds(
+  &quot;~/Downloads/newsgroups_stemmed_stopwords.rds&quot;
+)
+
+topics &lt;- topics[Matrix::rowSums(counts) &gt; 9]
+counts &lt;- counts[Matrix::rowSums(counts) &gt; 9, ]
+genes_to_use &lt;- which(Matrix::colSums(counts&gt;0)&gt;4)
+counts &lt;- counts[,genes_to_use]
+s &lt;- Matrix::rowSums(counts)
+s &lt;- s / mean(s)
+
+
+K &lt;- 25
+cc_vec &lt;- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+n &lt;- nrow(counts)
+p &lt;- ncol(counts)</code></pre>
+<pre class="r"><code>for (cc in cc_vec) {
+
+  print(cc)
+
+  set.seed(1)
+  log1p_k1 &lt;- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = 1,
+    maxiter = 5,
+    s = cc * s,
+    init_method = &quot;frob_nmf&quot;
+  )
+
+  set.seed(1)
+  init_LL &lt;- log1p_k1$U %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  set.seed(1)
+  init_FF &lt;- log1p_k1$V %&gt;%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+  tictoc::tic()
+  set.seed(1)
+  fit &lt;- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s
+  )
+  total_time &lt;- tictoc::toc()
+
+  fit[[&quot;total_time&quot;]] &lt;- total_time$toc
+  rownames(fit$U) &lt;- rownames(counts)
+  rownames(fit$V) &lt;- colnames(counts)
+
+  readr::write_rds(
+    fit, glue::glue(&quot;~/Documents/data/passPCA/news/news_log1p_c{cc}_k12_exact_100_iter.rds&quot;)
+  )
+
+}
+
+fit0_nmf &lt;- fastTopics:::fit_pnmf_rank1(counts)
+
+set.seed(1)
+init_LL &lt;- fit0_nmf$L %&gt;%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+
+set.seed(1)
+init_FF &lt;- fit0_nmf$F %&gt;%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+rownames(init_LL) &lt;- rownames(counts)
+rownames(init_FF) &lt;- colnames(counts)
+
+fit0_K &lt;- init_poisson_nmf(
+  X = counts, F = init_FF, L = init_LL
+)
+
+fit_nmf &lt;- fit_poisson_nmf(
+  X = counts,
+  fit0 = fit0_K,
+  control = list(list(nc = 7))
+)
+
+readr::write_rds(
+  fit_nmf, glue::glue(&quot;~/Documents/data/passPCA/news/news_pois_nmf_k12_exact_100_iter.rds&quot;)
+)</code></pre>
+<pre class="r"><code>library(ggpubr)
+library(fastTopics)
+fit_list &lt;- list()
+
+for (cc in cc_vec) {
+
+  fit_list[[as.character(cc)]] &lt;- readr::read_rds(
+    glue::glue(
+      &quot;~/Documents/data/passPCA/news/news_log1p_c{cc}_k{K}_exact_100_iter.rds&quot;
+    )
+  )
+
+}
+
+fit_list[[&quot;Inf&quot;]] &lt;- readr::read_rds(
+  glue::glue(&quot;~/Documents/data/passPCA/news/news_pois_nmf_k{K}_exact_100_iter.rds&quot;)
+)</code></pre>
+</div>
+<div id="analysis-of-fits" class="section level1">
+<h1>Analysis of fits</h1>
+<div id="loadings" class="section level2">
+<h2>Loadings</h2>
+<pre class="r"><code>normalize_bars &lt;- function(LL) {
+
+  max_col &lt;- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = &quot;/&quot;)
+
+}</code></pre>
+<pre class="r"><code>library(tidyr)
+library(stringi)
+library(stringr)
+cell.type &lt;- as.factor(topics)
+
+LL_c001 &lt;- normalize_bars(fit_list$`0.001`$U)
+
+# Downsample the number of cells and sort them using tSNE.
+set.seed(8675309)
+cell.idx &lt;- numeric(0)
+cell.types &lt;- levels(cell.type)
+for (i in 1:length(cell.types)) {
+  which.idx &lt;- which(cell.type == cell.types[i])
+  # Downsample common cell types.
+  if (length(which.idx) &gt; 2000) {
+    which.idx &lt;- sample(which.idx, 2000)
+  }
+  # Don&#39;t include rare cell types.
+  if (length(which.idx) &gt; 10) {
+    # Sort using tsne.
+    tsne.res &lt;- Rtsne::Rtsne(
+      LL_c001[which.idx, ],
+      dims = 1,
+      pca = FALSE,
+      normalize = FALSE,
+      perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+      theta = 0.1,
+      max_iter = 1000,
+      eta = 200,
+      check_duplicates = FALSE
+    )$Y[, 1]
+    which.idx &lt;- which.idx[order(tsne.res)]
+    cell.idx &lt;- c(cell.idx, which.idx)
+  }
+}
+
+cell.type &lt;- cell.type[cell.idx]
+cell.type &lt;- droplevels(cell.type)
+
+LL_c001 &lt;- LL_c001[cell.idx, ]
+LL_c01 &lt;- normalize_bars(fit_list$`0.01`$U)
+LL_c01 &lt;- LL_c01[cell.idx, ]
+LL_cp1 &lt;- normalize_bars(fit_list$`0.1`$U)
+LL_cp1 &lt;- LL_cp1[cell.idx, ]
+LL_c1 &lt;- normalize_bars(fit_list$`1`$U)
+LL_c1 &lt;- LL_c1[cell.idx, ]
+LL_c10 &lt;- normalize_bars(fit_list$`10`$U)
+LL_c10 &lt;- LL_c10[cell.idx, ]
+LL_c100 &lt;- normalize_bars(fit_list$`100`$U)
+LL_c100 &lt;- LL_c100[cell.idx, ]
+LL_c1000 &lt;- normalize_bars(fit_list$`1000`$U)
+LL_c1000 &lt;- LL_c1000[cell.idx, ]
+LL_cinf &lt;- normalize_bars(fit_list$`Inf`$L)
+LL_cinf &lt;- LL_cinf[cell.idx, ]
+
+make.heatmap.tib &lt;- function(FF) {
+  tib &lt;- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %&gt;%
+    mutate(Cell.type = cell.type) %&gt;%
+    arrange(Cell.type) %&gt;%
+    mutate(Cell.idx = row_number())
+  
+  tib &lt;- tib %&gt;%
+    pivot_longer(
+      -c(Cell.idx, Cell.type),
+      names_to = &quot;Factor&quot;,
+      values_to = &quot;Loading&quot;,
+      values_drop_na = TRUE
+    ) %&gt;%
+    mutate(Factor = as.numeric(str_extract(Factor, &quot;[0-9]+&quot;)))
+  
+  return(tib)
+}
+
+LL_c001_tib &lt;- make.heatmap.tib(LL_c001)
+LL_c01_tib &lt;- make.heatmap.tib(LL_c01)
+LL_cp1_tib &lt;- make.heatmap.tib(LL_cp1)
+LL_c1_tib &lt;- make.heatmap.tib(LL_c1)
+LL_c10_tib &lt;- make.heatmap.tib(LL_c10)
+LL_c100_tib &lt;- make.heatmap.tib(LL_c100)
+LL_c1000_tib &lt;- make.heatmap.tib(LL_c1000)
+LL_cinf_tib &lt;- make.heatmap.tib(LL_cinf)
+
+heatmap.tib &lt;- LL_c001_tib %&gt;% mutate(Method = &quot;c = 0.001&quot;) %&gt;%
+  bind_rows(LL_c01_tib %&gt;% mutate(Method = &quot;c = 0.01&quot;)) %&gt;%
+  bind_rows(LL_cp1_tib %&gt;% mutate(Method = &quot;c = 0.1&quot;)) %&gt;%
+  bind_rows(LL_c1_tib %&gt;% mutate(Method = &quot;c = 1&quot;)) %&gt;%
+  bind_rows(LL_c10_tib %&gt;% mutate(Method = &quot;c = 10&quot;)) %&gt;%
+  bind_rows(LL_c100_tib %&gt;% mutate(Method = &quot;c = 100&quot;)) %&gt;%
+  bind_rows(LL_c1000_tib %&gt;% mutate(Method = &quot;c = 1000&quot;)) %&gt;%
+  bind_rows(LL_cinf_tib %&gt;% mutate(Method = &quot;Topic Model&quot;)) %&gt;% 
+  mutate(Method = factor(Method, levels = c(
+    &quot;c = 0.001&quot;, &quot;c = 0.01&quot;, &quot;c = 0.1&quot;, &quot;c = 1&quot;, &quot;c = 10&quot;, &quot;c = 100&quot;, &quot;c = 1000&quot;, &quot;Topic Model&quot;)))
+
+tib &lt;- heatmap.tib %&gt;%
+  group_by(Cell.type, Cell.idx) %&gt;%
+  summarize()
+
+cell_type_breaks &lt;- c(1, which(tib$Cell.type[-1] != tib$Cell.type[-nrow(tib)]))
+label_pos &lt;- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib)) / 2
+
+library(ggplot2)
+
+plt &lt;- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = &quot;white&quot;, high = &quot;firebrick&quot;) +
+  labs(y = &quot;&quot;) +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = &quot;all&quot;) +
+  theme(legend.position = &quot;none&quot;, 
+        strip.text = element_text(size = 16)) 
+
+plt</code></pre>
+<p><img src="figure/newsgroups25.Rmd/unnamed-chunk-5-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>The plot of the fastTopics fit above looks weird, and I believe it is
+perhaps because the most loaded document on each topic is often much
+more loaded than any other topic, and so normalizing the columns to have
+maximum value <span class="math inline">\(1\)</span> distorts the fit. I
+plot a structure plot of the fastTopcis fit below:</p>
+<pre class="r"><code>sp &lt;- fastTopics::structure_plot(fit_list$`Inf`, grouping = topics, gap = 40)</code></pre>
+<pre class="r"><code>sp</code></pre>
+<p><img src="figure/newsgroups25.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="factors" class="section level2">
+<h2>Factors</h2>
+<p>Below, I print out the top <span class="math inline">\(10\)</span>
+words for each factor from each model.</p>
+<pre class="r"><code>get_keywords &lt;- function(V) {
+  
+  kw_list &lt;- list()
+  
+  for (k in 1:ncol(V)) {
+    
+    kw_list[[k]] &lt;- names(head(sort(V[,k], decreasing = T), 10))
+    
+  }
+  
+  return(kw_list)
+  
+}</code></pre>
+<pre class="r"><code>kw_lists &lt;- list()
+
+for (cc in c(cc_vec)) {
+  
+  fit &lt;- fit_list[[as.character(cc)]]
+  kw_lists[[as.character(cc)]] &lt;- get_keywords(fit$V)
+
+}
+
+kw_lists[[&quot;Inf&quot;]] &lt;- get_keywords(fit_list$`Inf`$F)</code></pre>
+<div id="c-1e-3" class="section level3">
+<h3>c = 1e-3</h3>
+<pre class="r"><code>print(kw_lists[[as.character(1e-3)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;stephanopoulo&quot; &quot;don&quot;           &quot;ll&quot;            &quot;ve&quot;           
+ [5] &quot;talk&quot;          &quot;thing&quot;         &quot;peopl&quot;         &quot;job&quot;          
+ [9] &quot;didn&quot;          &quot;mr&quot;           
+
+[[2]]
+ [1] &quot;ei&quot; &quot;um&quot; &quot;pa&quot; &quot;el&quot; &quot;mu&quot; &quot;ma&quot; &quot;di&quot; &quot;mf&quot; &quot;cx&quot; &quot;ta&quot;
+
+[[3]]
+ [1] &quot;scsi&quot;        &quot;mb&quot;          &quot;card&quot;        &quot;mhz&quot;         &quot;motherboard&quot;
+ [6] &quot;dx&quot;          &quot;bu&quot;          &quot;modem&quot;       &quot;meg&quot;         &quot;ram&quot;        
+
+[[4]]
+ [1] &quot;encrypt&quot; &quot;clipper&quot; &quot;kei&quot;     &quot;escrow&quot;  &quot;nsa&quot;     &quot;wiretap&quot; &quot;crypto&quot; 
+ [8] &quot;chip&quot;    &quot;privaci&quot; &quot;pgp&quot;    
+
+[[5]]
+ [1] &quot;georgia&quot;   &quot;circuit&quot;   &quot;prism&quot;     &quot;wpi&quot;       &quot;gatech&quot;    &quot;amp&quot;      
+ [7] &quot;uga&quot;       &quot;covington&quot; &quot;mcovingt&quot;  &quot;voltag&quot;   
+
+[[6]]
+ [1] &quot;batf&quot;     &quot;koresh&quot;   &quot;fbi&quot;      &quot;fire&quot;     &quot;atf&quot;      &quot;compound&quot;
+ [7] &quot;davidian&quot; &quot;bd&quot;       &quot;tank&quot;     &quot;survivor&quot;
+
+[[7]]
+ [1] &quot;atheist&quot;   &quot;moral&quot;     &quot;atheism&quot;   &quot;belief&quot;    &quot;religion&quot;  &quot;theist&quot;   
+ [7] &quot;christian&quot; &quot;god&quot;       &quot;theism&quot;    &quot;exist&quot;    
+
+[[8]]
+ [1] &quot;istanbul&quot; &quot;ankara&quot;   &quot;armenian&quot; &quot;turk&quot;     &quot;turkish&quot;  &quot;turkei&quot;  
+ [7] &quot;ermeni&quot;   &quot;osmanli&quot;  &quot;armenia&quot;  &quot;book&quot;    
+
+[[9]]
+ [1] &quot;diseas&quot;    &quot;patient&quot;   &quot;infect&quot;    &quot;drug&quot;      &quot;medic&quot;     &quot;cancer&quot;   
+ [7] &quot;physician&quot; &quot;clinic&quot;    &quot;diet&quot;      &quot;treatment&quot;
+
+[[10]]
+ [1] &quot;orbit&quot;    &quot;nasa&quot;     &quot;shuttl&quot;   &quot;moon&quot;     &quot;solar&quot;    &quot;launch&quot;  
+ [7] &quot;mission&quot;  &quot;lunar&quot;    &quot;satellit&quot; &quot;henri&quot;   
+
+[[11]]
+ [1] &quot;car&quot;      &quot;ford&quot;     &quot;mustang&quot;  &quot;camaro&quot;   &quot;sho&quot;      &quot;callison&quot;
+ [7] &quot;auto&quot;     &quot;engin&quot;    &quot;chevi&quot;    &quot;torqu&quot;   
+
+[[12]]
+ [1] &quot;homosexu&quot; &quot;cramer&quot;   &quot;clayton&quot;  &quot;optilink&quot; &quot;gai&quot;      &quot;kaldi&quot;   
+ [7] &quot;promiscu&quot; &quot;sexual&quot;   &quot;do&quot;       &quot;sex&quot;     
+
+[[13]]
+ [1] &quot;bike&quot;      &quot;dod&quot;       &quot;motorcycl&quot; &quot;biker&quot;     &quot;ride&quot;      &quot;harlei&quot;   
+ [7] &quot;rider&quot;     &quot;bmw&quot;       &quot;dog&quot;       &quot;helmet&quot;   
+
+[[14]]
+ [1] &quot;xterm&quot;      &quot;lib&quot;        &quot;openwindow&quot; &quot;motif&quot;      &quot;xdm&quot;       
+ [6] &quot;usr&quot;        &quot;olwm&quot;       &quot;twm&quot;        &quot;widget&quot;     &quot;client&quot;    
+
+[[15]]
+ [1] &quot;sale&quot;  &quot;price&quot; &quot;ship&quot;  &quot;sell&quot;  &quot;mint&quot;  &quot;offer&quot; &quot;insur&quot; &quot;obo&quot;   &quot;bid&quot;  
+[10] &quot;comic&quot;
+
+[[16]]
+ [1] &quot;hockei&quot;   &quot;team&quot;     &quot;leaf&quot;     &quot;lemieux&quot;  &quot;goal&quot;     &quot;playoff&quot; 
+ [7] &quot;nhl&quot;      &quot;pt&quot;       &quot;calgari&quot;  &quot;winnipeg&quot;
+
+[[17]]
+ [1] &quot;francisco&quot; &quot;adl&quot;       &quot;request&quot;   &quot;san&quot;       &quot;pope&quot;      &quot;list&quot;     
+ [7] &quot;confer&quot;    &quot;bullock&quot;   &quot;address&quot;   &quot;baltimor&quot; 
+
+[[18]]
+ [1] &quot;isra&quot;        &quot;israel&quot;      &quot;simm&quot;        &quot;arab&quot;        &quot;nysernet&quot;   
+ [6] &quot;hasan&quot;       &quot;mcgill&quot;      &quot;mcrcim&quot;      &quot;uiuc&quot;        &quot;palestinian&quot;
+
+[[19]]
+ [1] &quot;pitcher&quot; &quot;pitch&quot;   &quot;basebal&quot; &quot;hitter&quot;  &quot;team&quot;    &quot;brave&quot;   &quot;player&quot; 
+ [8] &quot;cub&quot;     &quot;yanke&quot;   &quot;rbi&quot;    
+
+[[20]]
+ [1] &quot;output&quot;  &quot;printf&quot;  &quot;char&quot;    &quot;int&quot;     &quot;fprintf&quot; &quot;eof&quot;     &quot;stream&quot; 
+ [8] &quot;input&quot;   &quot;stderr&quot;  &quot;byte&quot;   
+
+[[21]]
+ [1] &quot;iran&quot;     &quot;bosnian&quot;  &quot;serb&quot;     &quot;bosnia&quot;   &quot;russia&quot;   &quot;war&quot;     
+ [7] &quot;govern&quot;   &quot;european&quot; &quot;ethnic&quot;   &quot;muslim&quot;  
+
+[[22]]
+ [1] &quot;imag&quot;     &quot;graphic&quot;  &quot;format&quot;   &quot;color&quot;    &quot;gif&quot;      &quot;jpeg&quot;    
+ [7] &quot;ftp&quot;      &quot;pub&quot;      &quot;file&quot;     &quot;sharewar&quot;
+
+[[23]]
+ [1] &quot;christ&quot;  &quot;jesu&quot;    &quot;sin&quot;     &quot;lord&quot;    &quot;god&quot;     &quot;heaven&quot;  &quot;psalm&quot;  
+ [8] &quot;jehovah&quot; &quot;father&quot;  &quot;spirit&quot; 
+
+[[24]]
+ [1] &quot;azerbaijani&quot; &quot;apart&quot;       &quot;sumgait&quot;     &quot;baku&quot;        &quot;azerbaijan&quot; 
+ [6] &quot;azeri&quot;       &quot;henrik&quot;      &quot;floor&quot;       &quot;father&quot;      &quot;color&quot;      
+
+[[25]]
+ [1] &quot;firearm&quot; &quot;gun&quot;     &quot;handgun&quot; &quot;weapon&quot;  &quot;militia&quot; &quot;amend&quot;   &quot;printer&quot;
+ [8] &quot;homicid&quot; &quot;rkba&quot;    &quot;font&quot;   </code></pre>
+</div>
+<div id="c-1e-2" class="section level3">
+<h3>c = 1e-2</h3>
+<pre class="r"><code>print(kw_lists[[as.character(1e-2)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;don&quot;     &quot;bit&quot;     &quot;thing&quot;   &quot;peopl&quot;   &quot;point&quot;   &quot;ve&quot;      &quot;read&quot;   
+ [8] &quot;make&quot;    &quot;absolut&quot; &quot;doesn&quot;  
+
+[[2]]
+ [1] &quot;ei&quot; &quot;um&quot; &quot;de&quot; &quot;pa&quot; &quot;db&quot; &quot;el&quot; &quot;di&quot; &quot;ma&quot; &quot;mu&quot; &quot;em&quot;
+
+[[3]]
+ [1] &quot;imag&quot;    &quot;graphic&quot; &quot;ftp&quot;     &quot;file&quot;    &quot;pub&quot;     &quot;format&quot;  &quot;gif&quot;    
+ [8] &quot;softwar&quot; &quot;jpeg&quot;    &quot;version&quot;
+
+[[4]]
+ [1] &quot;kei&quot;       &quot;encrypt&quot;   &quot;clipper&quot;   &quot;chip&quot;      &quot;escrow&quot;    &quot;secur&quot;    
+ [7] &quot;nsa&quot;       &quot;privaci&quot;   &quot;pgp&quot;       &quot;algorithm&quot;
+
+[[5]]
+ [1] &quot;homosexu&quot; &quot;cramer&quot;   &quot;gai&quot;      &quot;optilink&quot; &quot;sexual&quot;   &quot;sex&quot;     
+ [7] &quot;men&quot;      &quot;clayton&quot;  &quot;male&quot;     &quot;san&quot;     
+
+[[6]]
+ [1] &quot;didn&quot;  &quot;apart&quot; &quot;door&quot;  &quot;don&quot;   &quot;told&quot;  &quot;back&quot;  &quot;home&quot;  &quot;ll&quot;    &quot;start&quot;
+[10] &quot;shout&quot;
+
+[[7]]
+ [1] &quot;book&quot;     &quot;printer&quot;  &quot;font&quot;     &quot;theori&quot;   &quot;print&quot;    &quot;scienc&quot;  
+ [7] &quot;larson&quot;   &quot;paper&quot;    &quot;text&quot;     &quot;scientif&quot;
+
+[[8]]
+ [1] &quot;armenian&quot; &quot;turkish&quot;  &quot;turk&quot;     &quot;turkei&quot;   &quot;armenia&quot;  &quot;muslim&quot;  
+ [7] &quot;greek&quot;    &quot;genocid&quot;  &quot;soviet&quot;   &quot;ottoman&quot; 
+
+[[9]]
+ [1] &quot;patient&quot;   &quot;diseas&quot;    &quot;drug&quot;      &quot;infect&quot;    &quot;medic&quot;     &quot;treatment&quot;
+ [7] &quot;vitamin&quot;   &quot;doctor&quot;    &quot;diet&quot;      &quot;cancer&quot;   
+
+[[10]]
+ [1] &quot;moral&quot;    &quot;atheist&quot;  &quot;god&quot;      &quot;atheism&quot;  &quot;religion&quot; &quot;islam&quot;   
+ [7] &quot;belief&quot;   &quot;object&quot;   &quot;exist&quot;    &quot;muslim&quot;  
+
+[[11]]
+ [1] &quot;wire&quot;    &quot;circuit&quot; &quot;ground&quot;  &quot;amp&quot;     &quot;batteri&quot; &quot;voltag&quot;  &quot;signal&quot; 
+ [8] &quot;db&quot;      &quot;power&quot;   &quot;led&quot;    
+
+[[12]]
+ [1] &quot;do&quot;        &quot;window&quot;    &quot;disk&quot;      &quot;drive&quot;     &quot;driver&quot;    &quot;microsoft&quot;
+ [7] &quot;file&quot;      &quot;o&quot;         &quot;win&quot;       &quot;mous&quot;     
+
+[[13]]
+ [1] &quot;mhz&quot;     &quot;card&quot;    &quot;appl&quot;    &quot;simm&quot;    &quot;monitor&quot; &quot;mac&quot;     &quot;price&quot;  
+ [8] &quot;dx&quot;      &quot;chip&quot;    &quot;video&quot;  
+
+[[14]]
+ [1] &quot;uiuc&quot;   &quot;ac&quot;     &quot;apr&quot;    &quot;articl&quot; &quot;cso&quot;    &quot;org&quot;    &quot;write&quot;  &quot;gov&quot;   
+ [9] &quot;gatech&quot; &quot;ohio&quot;  
+
+[[15]]
+ [1] &quot;presid&quot;        &quot;myer&quot;          &quot;m&quot;             &quot;stephanopoulo&quot;
+ [5] &quot;administr&quot;     &quot;tax&quot;           &quot;packag&quot;        &quot;meet&quot;         
+ [9] &quot;fund&quot;          &quot;senat&quot;        
+
+[[16]]
+ [1] &quot;pit&quot;    &quot;det&quot;    &quot;period&quot; &quot;bo&quot;     &quot;tor&quot;    &quot;chi&quot;    &quot;pt&quot;     &quot;la&quot;    
+ [9] &quot;goal&quot;   &quot;van&quot;   
+
+[[17]]
+ [1] &quot;orbit&quot;      &quot;launch&quot;     &quot;space&quot;      &quot;mission&quot;    &quot;earth&quot;     
+ [6] &quot;moon&quot;       &quot;shuttl&quot;     &quot;solar&quot;      &quot;spacecraft&quot; &quot;satellit&quot;  
+
+[[18]]
+ [1] &quot;israel&quot;      &quot;isra&quot;        &quot;arab&quot;        &quot;jew&quot;         &quot;palestinian&quot;
+ [6] &quot;jewish&quot;      &quot;occupi&quot;      &quot;lebanes&quot;     &quot;war&quot;         &quot;boni&quot;       
+
+[[19]]
+ [1] &quot;hockei&quot;   &quot;gm&quot;       &quot;game&quot;     &quot;espn&quot;     &quot;team&quot;     &quot;ca&quot;      
+ [7] &quot;fan&quot;      &quot;canadian&quot; &quot;sport&quot;    &quot;basebal&quot; 
+
+[[20]]
+ [1] &quot;pitch&quot;   &quot;pitcher&quot; &quot;game&quot;    &quot;hitter&quot;  &quot;basebal&quot; &quot;team&quot;    &quot;bat&quot;    
+ [8] &quot;win&quot;     &quot;hit&quot;     &quot;brave&quot;  
+
+[[21]]
+ [1] &quot;god&quot;       &quot;jesu&quot;      &quot;christian&quot; &quot;christ&quot;    &quot;sin&quot;       &quot;church&quot;   
+ [7] &quot;bibl&quot;      &quot;lord&quot;      &quot;scriptur&quot;  &quot;faith&quot;    
+
+[[22]]
+ [1] &quot;widget&quot;  &quot;lib&quot;     &quot;xterm&quot;   &quot;window&quot;  &quot;usr&quot;     &quot;server&quot;  &quot;motif&quot;  
+ [8] &quot;defin&quot;   &quot;displai&quot; &quot;string&quot; 
+
+[[23]]
+ [1] &quot;car&quot;       &quot;bike&quot;      &quot;dod&quot;       &quot;ride&quot;      &quot;bmw&quot;       &quot;motorcycl&quot;
+ [7] &quot;wheel&quot;     &quot;brake&quot;     &quot;road&quot;      &quot;honda&quot;    
+
+[[24]]
+ [1] &quot;fbi&quot;      &quot;koresh&quot;   &quot;batf&quot;     &quot;compound&quot; &quot;fire&quot;     &quot;bd&quot;      
+ [7] &quot;atf&quot;      &quot;cult&quot;     &quot;davidian&quot; &quot;ga&quot;      
+
+[[25]]
+ [1] &quot;gun&quot;       &quot;firearm&quot;   &quot;weapon&quot;    &quot;law&quot;       &quot;crime&quot;     &quot;handgun&quot;  
+ [7] &quot;amend&quot;     &quot;drug&quot;      &quot;crimin&quot;    &quot;constitut&quot;</code></pre>
+</div>
+<div id="c-1e-1" class="section level3">
+<h3>c = 1e-1</h3>
+<pre class="r"><code>print(kw_lists[[as.character(1e-1)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;don&quot;     &quot;thing&quot;   &quot;peopl&quot;   &quot;ve&quot;      &quot;ll&quot;      &quot;didn&quot;    &quot;good&quot;   
+ [8] &quot;time&quot;    &quot;back&quot;    &quot;problem&quot;
+
+[[2]]
+ [1] &quot;homosexu&quot; &quot;cramer&quot;   &quot;sex&quot;      &quot;gai&quot;      &quot;men&quot;      &quot;drug&quot;    
+ [7] &quot;sexual&quot;   &quot;optilink&quot; &quot;govern&quot;   &quot;articl&quot;  
+
+[[3]]
+ [1] &quot;armenian&quot; &quot;turkish&quot;  &quot;turk&quot;     &quot;armenia&quot;  &quot;turkei&quot;   &quot;greek&quot;   
+ [7] &quot;soviet&quot;   &quot;russian&quot;  &quot;muslim&quot;   &quot;genocid&quot; 
+
+[[4]]
+ [1] &quot;kei&quot;       &quot;encrypt&quot;   &quot;chip&quot;      &quot;secur&quot;     &quot;clipper&quot;   &quot;govern&quot;   
+ [7] &quot;escrow&quot;    &quot;law&quot;       &quot;algorithm&quot; &quot;phone&quot;    
+
+[[5]]
+ [1] &quot;imag&quot;    &quot;jpeg&quot;    &quot;file&quot;    &quot;graphic&quot; &quot;format&quot;  &quot;gif&quot;     &quot;color&quot;  
+ [8] &quot;bit&quot;     &quot;program&quot; &quot;displai&quot;
+
+[[6]]
+ [1] &quot;mail&quot;      &quot;list&quot;      &quot;post&quot;      &quot;send&quot;      &quot;address&quot;   &quot;inform&quot;   
+ [7] &quot;newsgroup&quot; &quot;book&quot;      &quot;email&quot;     &quot;group&quot;    
+
+[[7]]
+ [1] &quot;god&quot;       &quot;jesu&quot;      &quot;christian&quot; &quot;christ&quot;    &quot;church&quot;    &quot;sin&quot;      
+ [7] &quot;bibl&quot;      &quot;lord&quot;      &quot;faith&quot;     &quot;word&quot;     
+
+[[8]]
+ [1] &quot;presid&quot;        &quot;mr&quot;            &quot;state&quot;         &quot;stephanopoulo&quot;
+ [5] &quot;tax&quot;           &quot;m&quot;             &quot;american&quot;      &quot;myer&quot;         
+ [9] &quot;insur&quot;         &quot;govern&quot;       
+
+[[9]]
+ [1] &quot;patient&quot; &quot;diseas&quot;  &quot;medic&quot;   &quot;doctor&quot;  &quot;food&quot;    &quot;drug&quot;    &quot;effect&quot; 
+ [8] &quot;infect&quot;  &quot;cancer&quot;  &quot;studi&quot;  
+
+[[10]]
+ [1] &quot;god&quot;       &quot;exist&quot;     &quot;moral&quot;     &quot;atheist&quot;   &quot;object&quot;    &quot;belief&quot;   
+ [7] &quot;religion&quot;  &quot;christian&quot; &quot;argument&quot;  &quot;evid&quot;     
+
+[[11]]
+ [1] &quot;gun&quot;     &quot;fire&quot;    &quot;fbi&quot;     &quot;weapon&quot;  &quot;koresh&quot;  &quot;batf&quot;    &quot;firearm&quot;
+ [8] &quot;govern&quot;  &quot;arm&quot;     &quot;law&quot;    
+
+[[12]]
+ [1] &quot;game&quot;    &quot;team&quot;    &quot;year&quot;    &quot;player&quot;  &quot;hit&quot;     &quot;pitch&quot;   &quot;run&quot;    
+ [8] &quot;basebal&quot; &quot;win&quot;     &quot;pitcher&quot;
+
+[[13]]
+ [1] &quot;car&quot;     &quot;wire&quot;    &quot;power&quot;   &quot;engin&quot;   &quot;ground&quot;  &quot;batteri&quot; &quot;circuit&quot;
+ [8] &quot;drive&quot;   &quot;oil&quot;     &quot;speed&quot;  
+
+[[14]]
+ [1] &quot;articl&quot;  &quot;write&quot;   &quot;apr&quot;     &quot;ac&quot;      &quot;c&quot;       &quot;univers&quot; &quot;uk&quot;     
+ [8] &quot;ca&quot;      &quot;uiuc&quot;    &quot;cc&quot;     
+
+[[15]]
+ [1] &quot;space&quot;    &quot;nasa&quot;     &quot;launch&quot;   &quot;shuttl&quot;   &quot;orbit&quot;    &quot;henri&quot;   
+ [7] &quot;cost&quot;     &quot;gov&quot;      &quot;mission&quot;  &quot;satellit&quot;
+
+[[16]]
+ [1] &quot;game&quot;   &quot;team&quot;   &quot;hockei&quot; &quot;player&quot; &quot;plai&quot;   &quot;ca&quot;     &quot;fan&quot;    &quot;win&quot;   
+ [9] &quot;season&quot; &quot;gm&quot;    
+
+[[17]]
+ [1] &quot;earth&quot;      &quot;planet&quot;     &quot;orbit&quot;      &quot;space&quot;      &quot;energi&quot;    
+ [6] &quot;water&quot;      &quot;atmospher&quot;  &quot;spacecraft&quot; &quot;physic&quot;     &quot;probe&quot;     
+
+[[18]]
+ [1] &quot;israel&quot;      &quot;arab&quot;        &quot;isra&quot;        &quot;jew&quot;         &quot;jewish&quot;     
+ [6] &quot;palestinian&quot; &quot;muslim&quot;      &quot;war&quot;         &quot;write&quot;       &quot;kill&quot;       
+
+[[19]]
+ [1] &quot;sale&quot;    &quot;price&quot;   &quot;offer&quot;   &quot;ship&quot;    &quot;sell&quot;    &quot;st&quot;      &quot;appear&quot; 
+ [8] &quot;condit&quot;  &quot;printer&quot; &quot;copi&quot;   
+
+[[20]]
+ [1] &quot;window&quot;  &quot;file&quot;    &quot;widget&quot;  &quot;entri&quot;   &quot;program&quot; &quot;output&quot;  &quot;set&quot;    
+ [8] &quot;displai&quot; &quot;server&quot;  &quot;motif&quot;  
+
+[[21]]
+ [1] &quot;db&quot; &quot;ei&quot; &quot;bh&quot; &quot;um&quot; &quot;di&quot; &quot;si&quot; &quot;pa&quot; &quot;el&quot; &quot;de&quot; &quot;ma&quot;
+
+[[22]]
+ [1] &quot;drive&quot;   &quot;scsi&quot;    &quot;card&quot;    &quot;mb&quot;      &quot;mhz&quot;     &quot;mac&quot;     &quot;control&quot;
+ [8] &quot;bu&quot;      &quot;monitor&quot; &quot;id&quot;     
+
+[[23]]
+ [1] &quot;bike&quot;      &quot;dod&quot;       &quot;ride&quot;      &quot;motorcycl&quot; &quot;write&quot;     &quot;dog&quot;      
+ [7] &quot;articl&quot;    &quot;road&quot;      &quot;bmw&quot;       &quot;rider&quot;    
+
+[[24]]
+ [1] &quot;pt&quot;     &quot;pit&quot;    &quot;la&quot;     &quot;period&quot; &quot;det&quot;    &quot;bo&quot;     &quot;chi&quot;    &quot;tor&quot;   
+ [9] &quot;van&quot;    &quot;pp&quot;    
+
+[[25]]
+ [1] &quot;window&quot;    &quot;do&quot;        &quot;file&quot;      &quot;driver&quot;    &quot;run&quot;       &quot;o&quot;        
+ [7] &quot;program&quot;   &quot;disk&quot;      &quot;microsoft&quot; &quot;m&quot;        </code></pre>
+</div>
+<div id="c-1" class="section level3">
+<h3>c = 1</h3>
+<pre class="r"><code>print(kw_lists[[as.character(1)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;mail&quot;    &quot;inform&quot;  &quot;post&quot;    &quot;list&quot;    &quot;book&quot;    &quot;address&quot; &quot;group&quot;  
+ [8] &quot;send&quot;    &quot;email&quot;   &quot;univers&quot;
+
+[[2]]
+ [1] &quot;presid&quot;   &quot;mr&quot;       &quot;state&quot;    &quot;tax&quot;      &quot;year&quot;     &quot;american&quot;
+ [7] &quot;work&quot;     &quot;program&quot;  &quot;monei&quot;    &quot;govern&quot;  
+
+[[3]]
+ [1] &quot;write&quot;   &quot;articl&quot;  &quot;apr&quot;     &quot;ca&quot;      &quot;c&quot;       &quot;ac&quot;      &quot;univers&quot;
+ [8] &quot;uk&quot;      &quot;cc&quot;      &quot;uiuc&quot;   
+
+[[4]]
+ [1] &quot;de&quot; &quot;ei&quot; &quot;pa&quot; &quot;um&quot; &quot;ma&quot; &quot;el&quot; &quot;ve&quot; &quot;di&quot; &quot;sg&quot; &quot;mu&quot;
+
+[[5]]
+ [1] &quot;power&quot;   &quot;wire&quot;    &quot;ground&quot;  &quot;batteri&quot; &quot;circuit&quot; &quot;radio&quot;   &quot;work&quot;   
+ [8] &quot;signal&quot;  &quot;heat&quot;    &quot;switch&quot; 
+
+[[6]]
+ [1] &quot;fire&quot;     &quot;fbi&quot;      &quot;koresh&quot;   &quot;batf&quot;     &quot;write&quot;    &quot;gun&quot;     
+ [7] &quot;articl&quot;   &quot;children&quot; &quot;govern&quot;   &quot;compound&quot;
+
+[[7]]
+ [1] &quot;space&quot;    &quot;nasa&quot;     &quot;orbit&quot;    &quot;launch&quot;   &quot;earth&quot;    &quot;gov&quot;     
+ [7] &quot;mission&quot;  &quot;satellit&quot; &quot;system&quot;   &quot;moon&quot;    
+
+[[8]]
+ [1] &quot;armenian&quot; &quot;turkish&quot;  &quot;muslim&quot;   &quot;turk&quot;     &quot;war&quot;      &quot;armenia&quot; 
+ [7] &quot;turkei&quot;   &quot;greek&quot;    &quot;peopl&quot;    &quot;genocid&quot; 
+
+[[9]]
+ [1] &quot;medic&quot;     &quot;diseas&quot;    &quot;patient&quot;   &quot;effect&quot;    &quot;doctor&quot;    &quot;food&quot;     
+ [7] &quot;studi&quot;     &quot;drug&quot;      &quot;health&quot;    &quot;treatment&quot;
+
+[[10]]
+ [1] &quot;god&quot;      &quot;exist&quot;    &quot;moral&quot;    &quot;homosexu&quot; &quot;object&quot;   &quot;religion&quot;
+ [7] &quot;atheist&quot;  &quot;evid&quot;     &quot;write&quot;    &quot;argument&quot;
+
+[[11]]
+ [1] &quot;car&quot;    &quot;engin&quot;  &quot;drive&quot;  &quot;speed&quot;  &quot;mile&quot;   &quot;price&quot;  &quot;oil&quot;    &quot;dealer&quot;
+ [9] &quot;auto&quot;   &quot;ford&quot;  
+
+[[12]]
+ [1] &quot;gun&quot;    &quot;law&quot;    &quot;state&quot;  &quot;govern&quot; &quot;crime&quot;  &quot;peopl&quot;  &quot;right&quot;  &quot;weapon&quot;
+ [9] &quot;legal&quot;  &quot;drug&quot;  
+
+[[13]]
+ [1] &quot;bike&quot;      &quot;dod&quot;       &quot;ride&quot;      &quot;write&quot;     &quot;articl&quot;    &quot;motorcycl&quot;
+ [7] &quot;dog&quot;       &quot;ca&quot;        &quot;cb&quot;        &quot;apr&quot;      
+
+[[14]]
+ [1] &quot;graphic&quot; &quot;imag&quot;    &quot;ftp&quot;     &quot;data&quot;    &quot;pub&quot;     &quot;system&quot;  &quot;program&quot;
+ [8] &quot;support&quot; &quot;version&quot; &quot;softwar&quot;
+
+[[15]]
+ [1] &quot;window&quot;  &quot;do&quot;      &quot;price&quot;   &quot;pc&quot;      &quot;modem&quot;   &quot;softwar&quot; &quot;system&quot; 
+ [8] &quot;o&quot;       &quot;sale&quot;    &quot;printer&quot;
+
+[[16]]
+ [1] &quot;drive&quot;   &quot;card&quot;    &quot;scsi&quot;    &quot;mb&quot;      &quot;disk&quot;    &quot;system&quot;  &quot;control&quot;
+ [8] &quot;bu&quot;      &quot;mhz&quot;     &quot;mac&quot;    
+
+[[17]]
+ [1] &quot;don&quot;     &quot;peopl&quot;   &quot;thing&quot;   &quot;good&quot;    &quot;make&quot;    &quot;ve&quot;      &quot;write&quot;  
+ [8] &quot;time&quot;    &quot;problem&quot; &quot;articl&quot; 
+
+[[18]]
+ [1] &quot;israel&quot;      &quot;arab&quot;        &quot;isra&quot;        &quot;jew&quot;         &quot;jewish&quot;     
+ [6] &quot;palestinian&quot; &quot;write&quot;       &quot;kill&quot;        &quot;peac&quot;        &quot;war&quot;        
+
+[[19]]
+ [1] &quot;game&quot;    &quot;year&quot;    &quot;team&quot;    &quot;hit&quot;     &quot;player&quot;  &quot;run&quot;     &quot;basebal&quot;
+ [8] &quot;win&quot;     &quot;pitch&quot;   &quot;plai&quot;   
+
+[[20]]
+ [1] &quot;window&quot;  &quot;file&quot;    &quot;program&quot; &quot;db&quot;      &quot;entri&quot;   &quot;set&quot;     &quot;displai&quot;
+ [8] &quot;widget&quot;  &quot;output&quot;  &quot;applic&quot; 
+
+[[21]]
+ [1] &quot;god&quot;       &quot;christian&quot; &quot;jesu&quot;      &quot;church&quot;    &quot;bibl&quot;      &quot;christ&quot;   
+ [7] &quot;sin&quot;       &quot;word&quot;      &quot;love&quot;      &quot;lord&quot;     
+
+[[22]]
+ [1] &quot;file&quot;    &quot;imag&quot;    &quot;window&quot;  &quot;jpeg&quot;    &quot;program&quot; &quot;color&quot;   &quot;bit&quot;    
+ [8] &quot;gif&quot;     &quot;format&quot;  &quot;version&quot;
+
+[[23]]
+ [1] &quot;game&quot;   &quot;team&quot;   &quot;plai&quot;   &quot;hockei&quot; &quot;player&quot; &quot;goal&quot;   &quot;win&quot;    &quot;season&quot;
+ [9] &quot;pt&quot;     &quot;period&quot;
+
+[[24]]
+ [1] &quot;peopl&quot; &quot;time&quot;  &quot;didn&quot;  &quot;kill&quot;  &quot;home&quot;  &quot;dai&quot;   &quot;live&quot;  &quot;told&quot;  &quot;left&quot; 
+[10] &quot;start&quot;
+
+[[25]]
+ [1] &quot;kei&quot;     &quot;encrypt&quot; &quot;chip&quot;    &quot;secur&quot;   &quot;clipper&quot; &quot;govern&quot;  &quot;system&quot; 
+ [8] &quot;phone&quot;   &quot;de&quot;      &quot;escrow&quot; </code></pre>
+</div>
+<div id="c-10" class="section level3">
+<h3>c = 10</h3>
+<pre class="r"><code>print(kw_lists[[as.character(10)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;kei&quot;     &quot;encrypt&quot; &quot;chip&quot;    &quot;secur&quot;   &quot;govern&quot;  &quot;clipper&quot; &quot;system&quot; 
+ [8] &quot;public&quot;  &quot;phone&quot;   &quot;privaci&quot;
+
+[[2]]
+ [1] &quot;price&quot;    &quot;mail&quot;     &quot;sell&quot;     &quot;bui&quot;      &quot;offer&quot;    &quot;sale&quot;    
+ [7] &quot;email&quot;    &quot;interest&quot; &quot;phone&quot;    &quot;compani&quot; 
+
+[[3]]
+ [1] &quot;window&quot;  &quot;do&quot;      &quot;file&quot;    &quot;program&quot; &quot;run&quot;     &quot;driver&quot;  &quot;system&quot; 
+ [8] &quot;disk&quot;    &quot;o&quot;       &quot;m&quot;      
+
+[[4]]
+ [1] &quot;server&quot; &quot;file&quot;   &quot;list&quot;   &quot;mail&quot;   &quot;mit&quot;    &quot;run&quot;    &quot;sun&quot;    &quot;motif&quot; 
+ [9] &quot;system&quot; &quot;user&quot;  
+
+[[5]]
+ [1] &quot;power&quot;   &quot;wire&quot;    &quot;ground&quot;  &quot;batteri&quot; &quot;work&quot;    &quot;water&quot;   &quot;circuit&quot;
+ [8] &quot;light&quot;   &quot;signal&quot;  &quot;radio&quot;  
+
+[[6]]
+ [1] &quot;game&quot;    &quot;team&quot;    &quot;plai&quot;    &quot;hockei&quot;  &quot;player&quot;  &quot;goal&quot;    &quot;win&quot;    
+ [8] &quot;season&quot;  &quot;playoff&quot; &quot;period&quot; 
+
+[[7]]
+ [1] &quot;presid&quot;   &quot;mr&quot;       &quot;nation&quot;   &quot;state&quot;    &quot;inform&quot;   &quot;program&quot; 
+ [7] &quot;american&quot; &quot;year&quot;     &quot;univers&quot;  &quot;report&quot;  
+
+[[8]]
+ [1] &quot;armenian&quot; &quot;turkish&quot;  &quot;muslim&quot;   &quot;turk&quot;     &quot;turkei&quot;   &quot;armenia&quot; 
+ [7] &quot;greek&quot;    &quot;peopl&quot;    &quot;genocid&quot;  &quot;war&quot;     
+
+[[9]]
+ [1] &quot;medic&quot;     &quot;diseas&quot;    &quot;patient&quot;   &quot;health&quot;    &quot;doctor&quot;    &quot;effect&quot;   
+ [7] &quot;food&quot;      &quot;drug&quot;      &quot;studi&quot;     &quot;treatment&quot;
+
+[[10]]
+ [1] &quot;moral&quot;    &quot;exist&quot;    &quot;homosexu&quot; &quot;god&quot;      &quot;object&quot;   &quot;peopl&quot;   
+ [7] &quot;write&quot;    &quot;atheist&quot;  &quot;evid&quot;     &quot;belief&quot;  
+
+[[11]]
+ [1] &quot;de&quot;  &quot;pa&quot;  &quot;ei&quot;  &quot;ma&quot;  &quot;um&quot;  &quot;uni&quot; &quot;el&quot;  &quot;sg&quot;  &quot;mc&quot;  &quot;nl&quot; 
+
+[[12]]
+ [1] &quot;don&quot;     &quot;peopl&quot;   &quot;make&quot;    &quot;thing&quot;   &quot;time&quot;    &quot;good&quot;    &quot;ve&quot;     
+ [8] &quot;write&quot;   &quot;problem&quot; &quot;point&quot;  
+
+[[13]]
+ [1] &quot;car&quot;    &quot;bike&quot;   &quot;dod&quot;    &quot;write&quot;  &quot;articl&quot; &quot;ride&quot;   &quot;engin&quot;  &quot;drive&quot; 
+ [9] &quot;road&quot;   &quot;speed&quot; 
+
+[[14]]
+ [1] &quot;write&quot;   &quot;articl&quot;  &quot;apr&quot;     &quot;ca&quot;      &quot;c&quot;       &quot;ac&quot;      &quot;univers&quot;
+ [8] &quot;uk&quot;      &quot;uiuc&quot;    &quot;post&quot;   
+
+[[15]]
+ [1] &quot;drive&quot;   &quot;card&quot;    &quot;scsi&quot;    &quot;mb&quot;      &quot;mac&quot;     &quot;system&quot;  &quot;appl&quot;   
+ [8] &quot;control&quot; &quot;monitor&quot; &quot;disk&quot;   
+
+[[16]]
+ [1] &quot;space&quot;    &quot;nasa&quot;     &quot;orbit&quot;    &quot;gov&quot;      &quot;launch&quot;   &quot;earth&quot;   
+ [7] &quot;mission&quot;  &quot;system&quot;   &quot;satellit&quot; &quot;moon&quot;    
+
+[[17]]
+ [1] &quot;fire&quot;     &quot;fbi&quot;      &quot;koresh&quot;   &quot;write&quot;    &quot;batf&quot;     &quot;peopl&quot;   
+ [7] &quot;articl&quot;   &quot;children&quot; &quot;govern&quot;   &quot;compound&quot;
+
+[[18]]
+ [1] &quot;israel&quot;      &quot;arab&quot;        &quot;isra&quot;        &quot;jew&quot;         &quot;jewish&quot;     
+ [6] &quot;war&quot;         &quot;palestinian&quot; &quot;kill&quot;        &quot;write&quot;       &quot;peac&quot;       
+
+[[19]]
+ [1] &quot;game&quot;    &quot;year&quot;    &quot;team&quot;    &quot;hit&quot;     &quot;player&quot;  &quot;run&quot;     &quot;basebal&quot;
+ [8] &quot;plai&quot;    &quot;pitch&quot;   &quot;win&quot;    
+
+[[20]]
+ [1] &quot;db&quot;       &quot;entri&quot;    &quot;program&quot;  &quot;file&quot;     &quot;window&quot;   &quot;output&quot;  
+ [7] &quot;line&quot;     &quot;displai&quot;  &quot;widget&quot;   &quot;function&quot;
+
+[[21]]
+ [1] &quot;god&quot;       &quot;christian&quot; &quot;jesu&quot;      &quot;church&quot;    &quot;christ&quot;    &quot;sin&quot;      
+ [7] &quot;bibl&quot;      &quot;love&quot;      &quot;faith&quot;     &quot;peopl&quot;    
+
+[[22]]
+ [1] &quot;imag&quot;    &quot;file&quot;    &quot;graphic&quot; &quot;format&quot;  &quot;program&quot; &quot;jpeg&quot;    &quot;color&quot;  
+ [8] &quot;data&quot;    &quot;softwar&quot; &quot;bit&quot;    
+
+[[23]]
+ [1] &quot;book&quot;     &quot;word&quot;     &quot;read&quot;     &quot;islam&quot;    &quot;write&quot;    &quot;refer&quot;   
+ [7] &quot;quot&quot;     &quot;text&quot;     &quot;post&quot;     &quot;religion&quot;
+
+[[24]]
+ [1] &quot;dai&quot;   &quot;time&quot;  &quot;peopl&quot; &quot;live&quot;  &quot;home&quot;  &quot;kill&quot;  &quot;didn&quot;  &quot;night&quot; &quot;back&quot; 
+[10] &quot;told&quot; 
+
+[[25]]
+ [1] &quot;gun&quot;     &quot;law&quot;     &quot;govern&quot;  &quot;state&quot;   &quot;peopl&quot;   &quot;crime&quot;   &quot;right&quot;  
+ [8] &quot;weapon&quot;  &quot;legal&quot;   &quot;control&quot;</code></pre>
+</div>
+<div id="c-100" class="section level3">
+<h3>c = 100</h3>
+<pre class="r"><code>print(kw_lists[[as.character(100)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;mail&quot;     &quot;inform&quot;   &quot;list&quot;     &quot;univers&quot;  &quot;post&quot;     &quot;comput&quot;  
+ [7] &quot;email&quot;    &quot;send&quot;     &quot;address&quot;  &quot;internet&quot;
+
+[[2]]
+ [1] &quot;write&quot;    &quot;articl&quot;   &quot;au&quot;       &quot;apr&quot;      &quot;caltech&quot;  &quot;don&quot;     
+ [7] &quot;ti&quot;       &quot;keith&quot;    &quot;se&quot;       &quot;detector&quot;
+
+[[3]]
+ [1] &quot;write&quot;  &quot;articl&quot; &quot;apr&quot;    &quot;ca&quot;     &quot;c&quot;      &quot;ac&quot;     &quot;uk&quot;     &quot;uiuc&quot;  
+ [9] &quot;cc&quot;     &quot;new&quot;   
+
+[[4]]
+ [1] &quot;space&quot;    &quot;nasa&quot;     &quot;orbit&quot;    &quot;launch&quot;   &quot;gov&quot;      &quot;earth&quot;   
+ [7] &quot;mission&quot;  &quot;satellit&quot; &quot;system&quot;   &quot;moon&quot;    
+
+[[5]]
+ [1] &quot;god&quot;       &quot;exist&quot;     &quot;moral&quot;     &quot;religion&quot;  &quot;christian&quot; &quot;atheist&quot;  
+ [7] &quot;peopl&quot;     &quot;belief&quot;    &quot;write&quot;     &quot;don&quot;      
+
+[[6]]
+ [1] &quot;fire&quot;     &quot;fbi&quot;      &quot;peopl&quot;    &quot;koresh&quot;   &quot;children&quot; &quot;kill&quot;    
+ [7] &quot;start&quot;    &quot;batf&quot;     &quot;govern&quot;   &quot;dai&quot;     
+
+[[7]]
+ [1] &quot;god&quot;       &quot;christian&quot; &quot;jesu&quot;      &quot;church&quot;    &quot;christ&quot;    &quot;bibl&quot;     
+ [7] &quot;sin&quot;       &quot;love&quot;      &quot;lord&quot;      &quot;peopl&quot;    
+
+[[8]]
+ [1] &quot;armenian&quot; &quot;turkish&quot;  &quot;muslim&quot;   &quot;turk&quot;     &quot;armenia&quot;  &quot;turkei&quot;  
+ [7] &quot;greek&quot;    &quot;peopl&quot;    &quot;war&quot;      &quot;russian&quot; 
+
+[[9]]
+ [1] &quot;medic&quot;     &quot;diseas&quot;    &quot;patient&quot;   &quot;doctor&quot;    &quot;food&quot;      &quot;effect&quot;   
+ [7] &quot;health&quot;    &quot;drug&quot;      &quot;studi&quot;     &quot;treatment&quot;
+
+[[10]]
+ [1] &quot;point&quot;    &quot;question&quot; &quot;claim&quot;    &quot;discuss&quot;  &quot;word&quot;     &quot;reason&quot;  
+ [7] &quot;make&quot;     &quot;fact&quot;     &quot;evid&quot;     &quot;peopl&quot;   
+
+[[11]]
+ [1] &quot;gatech&quot;  &quot;mil&quot;     &quot;pa&quot;      &quot;ai&quot;      &quot;ma&quot;      &quot;ei&quot;      &quot;georgia&quot;
+ [8] &quot;navi&quot;    &quot;prism&quot;   &quot;um&quot;     
+
+[[12]]
+ [1] &quot;gun&quot;      &quot;law&quot;      &quot;peopl&quot;    &quot;state&quot;    &quot;crime&quot;    &quot;weapon&quot;  
+ [7] &quot;right&quot;    &quot;homosexu&quot; &quot;drug&quot;     &quot;firearm&quot; 
+
+[[13]]
+ [1] &quot;car&quot;    &quot;bike&quot;   &quot;dod&quot;    &quot;ride&quot;   &quot;engin&quot;  &quot;drive&quot;  &quot;articl&quot; &quot;write&quot; 
+ [9] &quot;road&quot;   &quot;speed&quot; 
+
+[[14]]
+ [1] &quot;window&quot;  &quot;do&quot;      &quot;run&quot;     &quot;file&quot;    &quot;server&quot;  &quot;program&quot; &quot;system&quot; 
+ [8] &quot;applic&quot;  &quot;version&quot; &quot;font&quot;   
+
+[[15]]
+ [1] &quot;drive&quot;   &quot;card&quot;    &quot;disk&quot;    &quot;scsi&quot;    &quot;mb&quot;      &quot;system&quot;  &quot;mac&quot;    
+ [8] &quot;work&quot;    &quot;problem&quot; &quot;driver&quot; 
+
+[[16]]
+ [1] &quot;presid&quot;   &quot;govern&quot;   &quot;mr&quot;       &quot;state&quot;    &quot;tax&quot;      &quot;american&quot;
+ [7] &quot;monei&quot;    &quot;nation&quot;   &quot;clinton&quot;  &quot;peopl&quot;   
+
+[[17]]
+ [1] &quot;don&quot;   &quot;time&quot;  &quot;thing&quot; &quot;peopl&quot; &quot;good&quot;  &quot;ve&quot;    &quot;make&quot;  &quot;ll&quot;    &quot;back&quot; 
+[10] &quot;lot&quot;  
+
+[[18]]
+ [1] &quot;price&quot;  &quot;sell&quot;   &quot;sale&quot;   &quot;offer&quot;  &quot;ship&quot;   &quot;book&quot;   &quot;copi&quot;   &quot;includ&quot;
+ [9] &quot;st&quot;     &quot;condit&quot;
+
+[[19]]
+ [1] &quot;game&quot;    &quot;year&quot;    &quot;team&quot;    &quot;hit&quot;     &quot;player&quot;  &quot;run&quot;     &quot;basebal&quot;
+ [8] &quot;plai&quot;    &quot;win&quot;     &quot;pitch&quot;  
+
+[[20]]
+ [1] &quot;file&quot;     &quot;db&quot;       &quot;entri&quot;    &quot;program&quot;  &quot;output&quot;   &quot;line&quot;    
+ [7] &quot;widget&quot;   &quot;function&quot; &quot;set&quot;      &quot;event&quot;   
+
+[[21]]
+ [1] &quot;israel&quot;      &quot;jew&quot;         &quot;arab&quot;        &quot;isra&quot;        &quot;jewish&quot;     
+ [6] &quot;war&quot;         &quot;palestinian&quot; &quot;peopl&quot;       &quot;kill&quot;        &quot;write&quot;      
+
+[[22]]
+ [1] &quot;imag&quot;    &quot;file&quot;    &quot;graphic&quot; &quot;program&quot; &quot;format&quot;  &quot;color&quot;   &quot;ftp&quot;    
+ [8] &quot;jpeg&quot;    &quot;bit&quot;     &quot;gif&quot;    
+
+[[23]]
+ [1] &quot;game&quot;    &quot;team&quot;    &quot;plai&quot;    &quot;hockei&quot;  &quot;player&quot;  &quot;goal&quot;    &quot;win&quot;    
+ [8] &quot;season&quot;  &quot;playoff&quot; &quot;la&quot;     
+
+[[24]]
+ [1] &quot;power&quot;   &quot;wire&quot;    &quot;ground&quot;  &quot;work&quot;    &quot;batteri&quot; &quot;water&quot;   &quot;circuit&quot;
+ [8] &quot;light&quot;   &quot;signal&quot;  &quot;switch&quot; 
+
+[[25]]
+ [1] &quot;kei&quot;     &quot;encrypt&quot; &quot;chip&quot;    &quot;secur&quot;   &quot;govern&quot;  &quot;clipper&quot; &quot;system&quot; 
+ [8] &quot;phone&quot;   &quot;de&quot;      &quot;public&quot; </code></pre>
+</div>
+<div id="c-1000" class="section level3">
+<h3>c = 1000</h3>
+<pre class="r"><code>print(kw_lists[[as.character(1000)]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;drive&quot;  &quot;card&quot;   &quot;do&quot;     &quot;disk&quot;   &quot;system&quot; &quot;window&quot; &quot;scsi&quot;   &quot;mb&quot;    
+ [9] &quot;pc&quot;     &quot;driver&quot;
+
+[[2]]
+ [1] &quot;de&quot;      &quot;se&quot;      &quot;germani&quot; &quot;pa&quot;      &quot;ei&quot;      &quot;fi&quot;      &quot;um&quot;     
+ [8] &quot;ma&quot;      &quot;sweden&quot;  &quot;nl&quot;     
+
+[[3]]
+ [1] &quot;write&quot;  &quot;articl&quot; &quot;apr&quot;    &quot;ca&quot;     &quot;c&quot;      &quot;uiuc&quot;   &quot;cc&quot;     &quot;david&quot; 
+ [9] &quot;new&quot;    &quot;don&quot;   
+
+[[4]]
+ [1] &quot;write&quot;    &quot;articl&quot;   &quot;toronto&quot;  &quot;org&quot;      &quot;henri&quot;    &quot;sun&quot;     
+ [7] &quot;apr&quot;      &quot;isc&quot;      &quot;berkelei&quot; &quot;eng&quot;     
+
+[[5]]
+ [1] &quot;gun&quot;    &quot;fire&quot;   &quot;peopl&quot;  &quot;fbi&quot;    &quot;weapon&quot; &quot;law&quot;    &quot;koresh&quot; &quot;govern&quot;
+ [9] &quot;arm&quot;    &quot;kill&quot;  
+
+[[6]]
+ [1] &quot;dai&quot;   &quot;time&quot;  &quot;peopl&quot; &quot;kill&quot;  &quot;home&quot;  &quot;didn&quot;  &quot;back&quot;  &quot;call&quot;  &quot;told&quot; 
+[10] &quot;start&quot;
+
+[[7]]
+ [1] &quot;govern&quot;   &quot;presid&quot;   &quot;state&quot;    &quot;mr&quot;       &quot;peopl&quot;    &quot;tax&quot;     
+ [7] &quot;american&quot; &quot;monei&quot;    &quot;nation&quot;   &quot;clinton&quot; 
+
+[[8]]
+ [1] &quot;armenian&quot; &quot;turkish&quot;  &quot;muslim&quot;   &quot;war&quot;      &quot;turk&quot;     &quot;peopl&quot;   
+ [7] &quot;turkei&quot;   &quot;greek&quot;    &quot;armenia&quot;  &quot;genocid&quot; 
+
+[[9]]
+ [1] &quot;drug&quot;      &quot;medic&quot;     &quot;diseas&quot;    &quot;patient&quot;   &quot;effect&quot;    &quot;doctor&quot;   
+ [7] &quot;food&quot;      &quot;studi&quot;     &quot;health&quot;    &quot;treatment&quot;
+
+[[10]]
+ [1] &quot;homosexu&quot; &quot;sex&quot;      &quot;peopl&quot;    &quot;men&quot;      &quot;islam&quot;    &quot;write&quot;   
+ [7] &quot;articl&quot;   &quot;sexual&quot;   &quot;gai&quot;      &quot;brian&quot;   
+
+[[11]]
+ [1] &quot;space&quot;    &quot;nasa&quot;     &quot;orbit&quot;    &quot;gov&quot;      &quot;launch&quot;   &quot;earth&quot;   
+ [7] &quot;system&quot;   &quot;mission&quot;  &quot;satellit&quot; &quot;moon&quot;    
+
+[[12]]
+ [1] &quot;mail&quot;      &quot;post&quot;      &quot;list&quot;      &quot;send&quot;      &quot;email&quot;     &quot;group&quot;    
+ [7] &quot;address&quot;   &quot;newsgroup&quot; &quot;internet&quot;  &quot;messag&quot;   
+
+[[13]]
+ [1] &quot;bike&quot;      &quot;dod&quot;       &quot;write&quot;     &quot;articl&quot;    &quot;ride&quot;      &quot;motorcycl&quot;
+ [7] &quot;dog&quot;       &quot;cb&quot;        &quot;sandvik&quot;   &quot;ca&quot;       
+
+[[14]]
+ [1] &quot;ac&quot;     &quot;uk&quot;     &quot;window&quot; &quot;write&quot;  &quot;au&quot;     &quot;o&quot;      &quot;articl&quot; &quot;m&quot;     
+ [9] &quot;mit&quot;    &quot;comput&quot;
+
+[[15]]
+ [1] &quot;car&quot;    &quot;price&quot;  &quot;engin&quot;  &quot;sell&quot;   &quot;sale&quot;   &quot;bui&quot;    &quot;drive&quot;  &quot;offer&quot; 
+ [9] &quot;dealer&quot; &quot;speed&quot; 
+
+[[16]]
+ [1] &quot;power&quot;   &quot;db&quot;      &quot;monitor&quot; &quot;wire&quot;    &quot;work&quot;    &quot;cabl&quot;    &quot;batteri&quot;
+ [8] &quot;ground&quot;  &quot;appl&quot;    &quot;circuit&quot;
+
+[[17]]
+ [1] &quot;univers&quot;  &quot;book&quot;     &quot;inform&quot;   &quot;research&quot; &quot;comput&quot;   &quot;center&quot;  
+ [7] &quot;includ&quot;   &quot;page&quot;     &quot;scienc&quot;   &quot;year&quot;    
+
+[[18]]
+ [1] &quot;israel&quot;      &quot;arab&quot;        &quot;isra&quot;        &quot;jew&quot;         &quot;jewish&quot;     
+ [6] &quot;palestinian&quot; &quot;peac&quot;        &quot;kill&quot;        &quot;war&quot;         &quot;write&quot;      
+
+[[19]]
+ [1] &quot;game&quot;   &quot;team&quot;   &quot;plai&quot;   &quot;player&quot; &quot;year&quot;   &quot;win&quot;    &quot;hockei&quot; &quot;season&quot;
+ [9] &quot;fan&quot;    &quot;score&quot; 
+
+[[20]]
+ [1] &quot;window&quot;  &quot;file&quot;    &quot;program&quot; &quot;server&quot;  &quot;applic&quot;  &quot;font&quot;    &quot;run&quot;    
+ [8] &quot;displai&quot; &quot;set&quot;     &quot;entri&quot;  
+
+[[21]]
+ [1] &quot;exist&quot;    &quot;god&quot;      &quot;moral&quot;    &quot;object&quot;   &quot;reason&quot;   &quot;argument&quot;
+ [7] &quot;evid&quot;     &quot;peopl&quot;    &quot;claim&quot;    &quot;religion&quot;
+
+[[22]]
+ [1] &quot;imag&quot;    &quot;file&quot;    &quot;graphic&quot; &quot;program&quot; &quot;ftp&quot;     &quot;format&quot;  &quot;color&quot;  
+ [8] &quot;softwar&quot; &quot;version&quot; &quot;jpeg&quot;   
+
+[[23]]
+ [1] &quot;god&quot;       &quot;christian&quot; &quot;jesu&quot;      &quot;church&quot;    &quot;bibl&quot;      &quot;christ&quot;   
+ [7] &quot;sin&quot;       &quot;word&quot;      &quot;peopl&quot;     &quot;love&quot;     
+
+[[24]]
+ [1] &quot;don&quot;     &quot;good&quot;    &quot;thing&quot;   &quot;time&quot;    &quot;make&quot;    &quot;peopl&quot;   &quot;ve&quot;     
+ [8] &quot;problem&quot; &quot;write&quot;   &quot;lot&quot;    
+
+[[25]]
+ [1] &quot;kei&quot;     &quot;encrypt&quot; &quot;chip&quot;    &quot;secur&quot;   &quot;clipper&quot; &quot;govern&quot;  &quot;system&quot; 
+ [8] &quot;phone&quot;   &quot;law&quot;     &quot;public&quot; </code></pre>
+</div>
+<div id="nmf" class="section level3">
+<h3>nmf</h3>
+<pre class="r"><code>print(kw_lists[[&quot;Inf&quot;]])</code></pre>
+<pre><code>[[1]]
+ [1] &quot;gun&quot;    &quot;state&quot;  &quot;govern&quot; &quot;law&quot;    &quot;presid&quot; &quot;mr&quot;     &quot;peopl&quot;  &quot;right&quot; 
+ [9] &quot;tax&quot;    &quot;crime&quot; 
+
+[[2]]
+ [1] &quot;don&quot;     &quot;time&quot;    &quot;peopl&quot;   &quot;thing&quot;   &quot;good&quot;    &quot;make&quot;    &quot;ve&quot;     
+ [8] &quot;ll&quot;      &quot;work&quot;    &quot;problem&quot;
+
+[[3]]
+ [1] &quot;window&quot;  &quot;do&quot;      &quot;drive&quot;   &quot;disk&quot;    &quot;file&quot;    &quot;system&quot;  &quot;run&quot;    
+ [8] &quot;program&quot; &quot;m&quot;       &quot;o&quot;      
+
+[[4]]
+ [1] &quot;kei&quot;     &quot;encrypt&quot; &quot;chip&quot;    &quot;secur&quot;   &quot;clipper&quot; &quot;govern&quot;  &quot;system&quot; 
+ [8] &quot;phone&quot;   &quot;public&quot;  &quot;privaci&quot;
+
+[[5]]
+ [1] &quot;power&quot;   &quot;wire&quot;    &quot;ground&quot;  &quot;work&quot;    &quot;batteri&quot; &quot;water&quot;   &quot;circuit&quot;
+ [8] &quot;signal&quot;  &quot;switch&quot;  &quot;light&quot;  
+
+[[6]]
+ [1] &quot;window&quot;  &quot;file&quot;    &quot;program&quot; &quot;server&quot;  &quot;entri&quot;   &quot;widget&quot;  &quot;applic&quot; 
+ [8] &quot;set&quot;     &quot;run&quot;     &quot;sun&quot;    
+
+[[7]]
+ [1] &quot;imag&quot;    &quot;file&quot;    &quot;graphic&quot; &quot;ftp&quot;     &quot;program&quot; &quot;format&quot;  &quot;version&quot;
+ [8] &quot;jpeg&quot;    &quot;data&quot;    &quot;pub&quot;    
+
+[[8]]
+ [1] &quot;medic&quot;     &quot;diseas&quot;    &quot;patient&quot;   &quot;doctor&quot;    &quot;studi&quot;     &quot;effect&quot;   
+ [7] &quot;health&quot;    &quot;treatment&quot; &quot;cancer&quot;    &quot;drug&quot;     
+
+[[9]]
+ [1] &quot;exist&quot;    &quot;god&quot;      &quot;moral&quot;    &quot;reason&quot;   &quot;evid&quot;     &quot;claim&quot;   
+ [7] &quot;religion&quot; &quot;object&quot;   &quot;question&quot; &quot;peopl&quot;   
+
+[[10]]
+ [1] &quot;homosexu&quot; &quot;write&quot;    &quot;articl&quot;   &quot;peopl&quot;    &quot;sex&quot;      &quot;men&quot;     
+ [7] &quot;islam&quot;    &quot;sexual&quot;   &quot;gai&quot;      &quot;cramer&quot;  
+
+[[11]]
+ [1] &quot;db&quot;  &quot;de&quot;  &quot;pa&quot;  &quot;di&quot;  &quot;ei&quot;  &quot;si&quot;  &quot;um&quot;  &quot;ma&quot;  &quot;bh&quot;  &quot;uni&quot;
+
+[[12]]
+ [1] &quot;mail&quot;    &quot;post&quot;    &quot;list&quot;    &quot;inform&quot;  &quot;book&quot;    &quot;send&quot;    &quot;comput&quot; 
+ [8] &quot;email&quot;   &quot;univers&quot; &quot;address&quot;
+
+[[13]]
+ [1] &quot;card&quot;  &quot;scsi&quot;  &quot;mac&quot;   &quot;mb&quot;    &quot;appl&quot;  &quot;drive&quot; &quot;bit&quot;   &quot;bu&quot;    &quot;pc&quot;   
+[10] &quot;mhz&quot;  
+
+[[14]]
+ [1] &quot;write&quot;  &quot;articl&quot; &quot;apr&quot;    &quot;ca&quot;     &quot;c&quot;      &quot;ac&quot;     &quot;uk&quot;     &quot;uiuc&quot;  
+ [9] &quot;cc&quot;     &quot;new&quot;   
+
+[[15]]
+ [1] &quot;color&quot;   &quot;hp&quot;      &quot;monitor&quot; &quot;screen&quot;  &quot;print&quot;   &quot;printer&quot; &quot;line&quot;   
+ [8] &quot;problem&quot; &quot;font&quot;    &quot;displai&quot;
+
+[[16]]
+ [1] &quot;la&quot;     &quot;pt&quot;     &quot;period&quot; &quot;shot&quot;   &quot;van&quot;    &quot;goal&quot;   &quot;pit&quot;    &quot;bo&quot;    
+ [9] &quot;det&quot;    &quot;chi&quot;   
+
+[[17]]
+ [1] &quot;write&quot;  &quot;articl&quot; &quot;drug&quot;   &quot;brian&quot;  &quot;food&quot;   &quot;ohio&quot;   &quot;netcom&quot; &quot;apr&quot;   
+ [9] &quot;msg&quot;    &quot;state&quot; 
+
+[[18]]
+ [1] &quot;american&quot; &quot;san&quot;      &quot;canada&quot;   &quot;citi&quot;     &quot;insur&quot;    &quot;year&quot;    
+ [7] &quot;april&quot;    &quot;nation&quot;   &quot;york&quot;     &quot;south&quot;   
+
+[[19]]
+ [1] &quot;game&quot;   &quot;team&quot;   &quot;plai&quot;   &quot;hockei&quot; &quot;player&quot; &quot;fan&quot;    &quot;win&quot;    &quot;season&quot;
+ [9] &quot;ca&quot;     &quot;year&quot;  
+
+[[20]]
+ [1] &quot;game&quot;    &quot;year&quot;    &quot;hit&quot;     &quot;player&quot;  &quot;run&quot;     &quot;team&quot;    &quot;pitch&quot;  
+ [8] &quot;basebal&quot; &quot;plai&quot;    &quot;win&quot;    
+
+[[21]]
+ [1] &quot;god&quot;       &quot;christian&quot; &quot;jesu&quot;      &quot;church&quot;    &quot;bibl&quot;      &quot;christ&quot;   
+ [7] &quot;sin&quot;       &quot;word&quot;      &quot;love&quot;      &quot;peopl&quot;    
+
+[[22]]
+ [1] &quot;space&quot;    &quot;nasa&quot;     &quot;orbit&quot;    &quot;launch&quot;   &quot;earth&quot;    &quot;gov&quot;     
+ [7] &quot;mission&quot;  &quot;system&quot;   &quot;satellit&quot; &quot;moon&quot;    
+
+[[23]]
+ [1] &quot;car&quot;    &quot;bike&quot;   &quot;dod&quot;    &quot;ride&quot;   &quot;engin&quot;  &quot;drive&quot;  &quot;articl&quot; &quot;write&quot; 
+ [9] &quot;road&quot;   &quot;speed&quot; 
+
+[[24]]
+ [1] &quot;fire&quot;     &quot;kill&quot;     &quot;peopl&quot;    &quot;fbi&quot;      &quot;children&quot; &quot;koresh&quot;  
+ [7] &quot;gun&quot;      &quot;start&quot;    &quot;batf&quot;     &quot;death&quot;   
+
+[[25]]
+ [1] &quot;armenian&quot; &quot;israel&quot;   &quot;jew&quot;      &quot;arab&quot;     &quot;isra&quot;     &quot;turkish&quot; 
+ [7] &quot;war&quot;      &quot;muslim&quot;   &quot;peopl&quot;    &quot;jewish&quot;  </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/New_York
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] stringr_1.5.1      stringi_1.8.4      tidyr_1.3.1        ggpubr_0.6.0      
+[5] ggplot2_3.5.1      passPCA_0.1-2      fastTopics_0.6-175 Matrix_1.7-0      
+[9] dplyr_1.1.4       
+
+loaded via a namespace (and not attached):
+ [1] tidyselect_1.2.1    viridisLite_0.4.2   farver_2.1.2       
+ [4] fastmap_1.2.0       lazyeval_0.2.2      promises_1.3.0     
+ [7] digest_0.6.36       lifecycle_1.0.4     invgamma_1.1       
+[10] magrittr_2.0.3      compiler_4.4.0      rlang_1.1.4        
+[13] sass_0.4.9          progress_1.2.3      tools_4.4.0        
+[16] utf8_1.2.4          yaml_2.3.8          data.table_1.15.4  
+[19] knitr_1.47          ggsignif_0.6.4      prettyunits_1.2.0  
+[22] labeling_0.4.3      htmlwidgets_1.6.4   abind_1.4-5        
+[25] Rtsne_0.17          workflowr_1.7.1     withr_3.0.0        
+[28] purrr_1.0.2         grid_4.4.0          fansi_1.0.6        
+[31] git2r_0.33.0        colorspace_2.1-0    scales_1.3.0       
+[34] gtools_3.9.5        cli_3.6.3           rmarkdown_2.27     
+[37] crayon_1.5.3        generics_0.1.3      RcppParallel_5.1.7 
+[40] rstudioapi_0.16.0   httr_1.4.7          tzdb_0.4.0         
+[43] pbapply_1.7-2       cachem_1.1.0        parallel_4.4.0     
+[46] vctrs_0.6.5         jsonlite_1.8.8      carData_3.0-5      
+[49] car_3.1-2           hms_1.1.3           mixsqp_0.3-54      
+[52] ggrepel_0.9.5       rstatix_0.7.2       irlba_2.3.5.1      
+[55] plotly_4.10.4       jquerylib_0.1.4     glue_1.7.0         
+[58] cowplot_1.1.3       uwot_0.2.2          gtable_0.3.5       
+[61] later_1.3.2         quadprog_1.5-8      munsell_0.5.1      
+[64] tibble_3.2.1        pillar_1.9.0        htmltools_0.5.8.1  
+[67] truncnorm_1.0-9     R6_2.5.1            rprojroot_2.0.4    
+[70] evaluate_0.24.0     lattice_0.22-6      readr_2.1.5        
+[73] highr_0.11          backports_1.5.0     RhpcBLASctl_0.23-42
+[76] broom_1.0.6         SQUAREM_2021.1      ashr_2.2-63        
+[79] httpuv_1.6.15       bslib_0.7.0         Rcpp_1.0.13        
+[82] xfun_0.45           fs_1.6.4            pkgconfig_2.0.3    </code></pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

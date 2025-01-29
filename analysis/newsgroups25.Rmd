@@ -1,0 +1,395 @@
+---
+title: "Newsgroups 25 Factors"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2025-01-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Introduction
+
+Here, I will apply the `log1p` matrix factorization model to the Newsgroups dataset using 25 factors.
+
+```{r}
+load("~/Downloads/newsgroups.RData")
+library(dplyr)
+library(Matrix)
+library(fastTopics)
+library(passPCA)
+rm(counts)
+
+# I did the following to the original dataset
+# counts <- counts[, !(colnames(counts) %in% stopwords("SMART"))]
+# colnames(counts) <- wordStem(colnames(counts))
+
+counts <- readr::read_rds(
+  "~/Downloads/newsgroups_stemmed_stopwords.rds"
+)
+
+topics <- topics[Matrix::rowSums(counts) > 9]
+counts <- counts[Matrix::rowSums(counts) > 9, ]
+genes_to_use <- which(Matrix::colSums(counts>0)>4)
+counts <- counts[,genes_to_use]
+s <- Matrix::rowSums(counts)
+s <- s / mean(s)
+
+
+K <- 25
+cc_vec <- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+n <- nrow(counts)
+p <- ncol(counts)
+```
+
+```{r, eval=FALSE}
+for (cc in cc_vec) {
+
+  print(cc)
+
+  set.seed(1)
+  log1p_k1 <- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = 1,
+    maxiter = 5,
+    s = cc * s,
+    init_method = "frob_nmf"
+  )
+
+  set.seed(1)
+  init_LL <- log1p_k1$U %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = n * (K - 1), rate = 15
+        ),
+        nrow = n,
+        ncol = K - 1
+      )
+    )
+
+  set.seed(1)
+  init_FF <- log1p_k1$V %>%
+    cbind(
+      matrix(
+        data = rexp(
+          n = p * (K - 1), rate = 15
+        ),
+        nrow = p,
+        ncol = K - 1
+      )
+    )
+
+  tictoc::tic()
+  set.seed(1)
+  fit <- fit_factor_model_log1p_exact(
+    Y = counts,
+    K = K,
+    init_U = init_LL,
+    init_V = init_FF,
+    maxiter = 100,
+    s = cc * s
+  )
+  total_time <- tictoc::toc()
+
+  fit[["total_time"]] <- total_time$toc
+  rownames(fit$U) <- rownames(counts)
+  rownames(fit$V) <- colnames(counts)
+
+  readr::write_rds(
+    fit, glue::glue("~/Documents/data/passPCA/news/news_log1p_c{cc}_k12_exact_100_iter.rds")
+  )
+
+}
+
+fit0_nmf <- fastTopics:::fit_pnmf_rank1(counts)
+
+set.seed(1)
+init_LL <- fit0_nmf$L %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+
+set.seed(1)
+init_FF <- fit0_nmf$F %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+rownames(init_LL) <- rownames(counts)
+rownames(init_FF) <- colnames(counts)
+
+fit0_K <- init_poisson_nmf(
+  X = counts, F = init_FF, L = init_LL
+)
+
+fit_nmf <- fit_poisson_nmf(
+  X = counts,
+  fit0 = fit0_K,
+  control = list(list(nc = 7))
+)
+
+readr::write_rds(
+  fit_nmf, glue::glue("~/Documents/data/passPCA/news/news_pois_nmf_k12_exact_100_iter.rds")
+)
+```
+
+```{r}
+library(ggpubr)
+library(fastTopics)
+fit_list <- list()
+
+for (cc in cc_vec) {
+
+  fit_list[[as.character(cc)]] <- readr::read_rds(
+    glue::glue(
+      "~/Documents/data/passPCA/news/news_log1p_c{cc}_k{K}_exact_100_iter.rds"
+    )
+  )
+
+}
+
+fit_list[["Inf"]] <- readr::read_rds(
+  glue::glue("~/Documents/data/passPCA/news/news_pois_nmf_k{K}_exact_100_iter.rds")
+)
+```
+
+# Analysis of fits
+
+## Loadings
+
+```{r}
+normalize_bars <- function(LL) {
+
+  max_col <- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = "/")
+
+}
+```
+
+```{r, fig.width=12, fig.height=33}
+library(tidyr)
+library(stringi)
+library(stringr)
+cell.type <- as.factor(topics)
+
+LL_c001 <- normalize_bars(fit_list$`0.001`$U)
+
+# Downsample the number of cells and sort them using tSNE.
+set.seed(8675309)
+cell.idx <- numeric(0)
+cell.types <- levels(cell.type)
+for (i in 1:length(cell.types)) {
+  which.idx <- which(cell.type == cell.types[i])
+  # Downsample common cell types.
+  if (length(which.idx) > 2000) {
+    which.idx <- sample(which.idx, 2000)
+  }
+  # Don't include rare cell types.
+  if (length(which.idx) > 10) {
+    # Sort using tsne.
+    tsne.res <- Rtsne::Rtsne(
+      LL_c001[which.idx, ],
+      dims = 1,
+      pca = FALSE,
+      normalize = FALSE,
+      perplexity = min(100, floor((length(which.idx) - 1) / 3) - 1),
+      theta = 0.1,
+      max_iter = 1000,
+      eta = 200,
+      check_duplicates = FALSE
+    )$Y[, 1]
+    which.idx <- which.idx[order(tsne.res)]
+    cell.idx <- c(cell.idx, which.idx)
+  }
+}
+
+cell.type <- cell.type[cell.idx]
+cell.type <- droplevels(cell.type)
+
+LL_c001 <- LL_c001[cell.idx, ]
+LL_c01 <- normalize_bars(fit_list$`0.01`$U)
+LL_c01 <- LL_c01[cell.idx, ]
+LL_cp1 <- normalize_bars(fit_list$`0.1`$U)
+LL_cp1 <- LL_cp1[cell.idx, ]
+LL_c1 <- normalize_bars(fit_list$`1`$U)
+LL_c1 <- LL_c1[cell.idx, ]
+LL_c10 <- normalize_bars(fit_list$`10`$U)
+LL_c10 <- LL_c10[cell.idx, ]
+LL_c100 <- normalize_bars(fit_list$`100`$U)
+LL_c100 <- LL_c100[cell.idx, ]
+LL_c1000 <- normalize_bars(fit_list$`1000`$U)
+LL_c1000 <- LL_c1000[cell.idx, ]
+LL_cinf <- normalize_bars(fit_list$`Inf`$L)
+LL_cinf <- LL_cinf[cell.idx, ]
+
+make.heatmap.tib <- function(FF) {
+  tib <- as_tibble(scale(FF, center = FALSE, scale = apply(FF, 2, max))) %>%
+    mutate(Cell.type = cell.type) %>%
+    arrange(Cell.type) %>%
+    mutate(Cell.idx = row_number())
+  
+  tib <- tib %>%
+    pivot_longer(
+      -c(Cell.idx, Cell.type),
+      names_to = "Factor",
+      values_to = "Loading",
+      values_drop_na = TRUE
+    ) %>%
+    mutate(Factor = as.numeric(str_extract(Factor, "[0-9]+")))
+  
+  return(tib)
+}
+
+LL_c001_tib <- make.heatmap.tib(LL_c001)
+LL_c01_tib <- make.heatmap.tib(LL_c01)
+LL_cp1_tib <- make.heatmap.tib(LL_cp1)
+LL_c1_tib <- make.heatmap.tib(LL_c1)
+LL_c10_tib <- make.heatmap.tib(LL_c10)
+LL_c100_tib <- make.heatmap.tib(LL_c100)
+LL_c1000_tib <- make.heatmap.tib(LL_c1000)
+LL_cinf_tib <- make.heatmap.tib(LL_cinf)
+
+heatmap.tib <- LL_c001_tib %>% mutate(Method = "c = 0.001") %>%
+  bind_rows(LL_c01_tib %>% mutate(Method = "c = 0.01")) %>%
+  bind_rows(LL_cp1_tib %>% mutate(Method = "c = 0.1")) %>%
+  bind_rows(LL_c1_tib %>% mutate(Method = "c = 1")) %>%
+  bind_rows(LL_c10_tib %>% mutate(Method = "c = 10")) %>%
+  bind_rows(LL_c100_tib %>% mutate(Method = "c = 100")) %>%
+  bind_rows(LL_c1000_tib %>% mutate(Method = "c = 1000")) %>%
+  bind_rows(LL_cinf_tib %>% mutate(Method = "Topic Model")) %>% 
+  mutate(Method = factor(Method, levels = c(
+    "c = 0.001", "c = 0.01", "c = 0.1", "c = 1", "c = 10", "c = 100", "c = 1000", "Topic Model")))
+
+tib <- heatmap.tib %>%
+  group_by(Cell.type, Cell.idx) %>%
+  summarize()
+
+cell_type_breaks <- c(1, which(tib$Cell.type[-1] != tib$Cell.type[-nrow(tib)]))
+label_pos <- cell_type_breaks / 2 + c(cell_type_breaks[-1], nrow(tib)) / 2
+
+library(ggplot2)
+
+plt <- ggplot(heatmap.tib, aes(x = Factor, y = -Cell.idx, fill = Loading)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "firebrick") +
+  labs(y = "") +
+  scale_y_continuous(breaks = -label_pos,
+                     minor_breaks = NULL,
+                     labels = levels(cell.type)) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  theme_minimal() +
+  geom_hline(yintercept = -cell_type_breaks, size = 0.1) +
+  facet_wrap(~Method, ncol = 1, axes = "all") +
+  theme(legend.position = "none", 
+        strip.text = element_text(size = 16)) 
+
+plt
+```
+
+The plot of the fastTopics fit above looks weird, and I believe it is perhaps because the most loaded document on each topic is often much more loaded than any other topic, and so normalizing the columns to have maximum value $1$ distorts the fit. I plot a structure plot of the fastTopcis fit below:
+
+```{r, results='hide'}
+sp <- fastTopics::structure_plot(fit_list$`Inf`, grouping = topics, gap = 40)
+```
+
+```{r}
+sp
+```
+
+
+## Factors
+
+Below, I print out the top $10$ words for each factor from each model.
+
+```{r}
+get_keywords <- function(V) {
+  
+  kw_list <- list()
+  
+  for (k in 1:ncol(V)) {
+    
+    kw_list[[k]] <- names(head(sort(V[,k], decreasing = T), 10))
+    
+  }
+  
+  return(kw_list)
+  
+}
+```
+
+```{r}
+kw_lists <- list()
+
+for (cc in c(cc_vec)) {
+  
+  fit <- fit_list[[as.character(cc)]]
+  kw_lists[[as.character(cc)]] <- get_keywords(fit$V)
+
+}
+
+kw_lists[["Inf"]] <- get_keywords(fit_list$`Inf`$F)
+```
+
+### c = 1e-3
+
+```{r}
+print(kw_lists[[as.character(1e-3)]])
+```
+
+### c = 1e-2
+
+```{r}
+print(kw_lists[[as.character(1e-2)]])
+```
+
+### c = 1e-1
+
+```{r}
+print(kw_lists[[as.character(1e-1)]])
+```
+
+### c = 1
+
+```{r}
+print(kw_lists[[as.character(1)]])
+```
+
+### c = 10
+
+```{r}
+print(kw_lists[[as.character(10)]])
+```
+
+### c = 100
+
+```{r}
+print(kw_lists[[as.character(100)]])
+```
+
+### c = 1000
+
+```{r}
+print(kw_lists[[as.character(1000)]])
+```
+
+### nmf
+
+```{r}
+print(kw_lists[["Inf"]])
+```
