@@ -328,3 +328,300 @@ ggarrange(
 )
 ```
 
+
+## A closer look at the loadings and the factors
+
+First, I looked at the correlations between the factors:
+
+```{r}
+cor_plot_list <- list()
+
+cor_df <- expand.grid(1:9, 1:9)
+colnames(cor_df) <- c("row", "col")
+
+for (cc in cc_vec) {
+  
+  cor_df$cor <- as.vector(cor(fit_list[[as.character(cc)]]$V))
+    
+  library(ggplot2)
+  cor_plot_list[[glue::glue("c = {cc}")]] <- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient2(
+      low = "blue",
+      mid = "white",
+      high = "red",
+      midpoint = 0,
+      limits = c(-1, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:9, labels = 1:9) +
+    scale_y_reverse(breaks = 1:9, labels = 1:9) +
+    xlab("factor") +
+    ylab("factor")
+
+}
+
+cor_df$cor <- as.vector(cor(fit_list$`Inf`$F))
+
+cor_plot_list[[glue::glue("c = {cc}")]] <- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient2(
+      low = "blue",
+      mid = "white",
+      high = "red",
+      midpoint = 0,
+      limits = c(-1, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:9, labels = 1:9) +
+    scale_y_reverse(breaks = 1:9, labels = 1:9) +
+    xlab("factor") +
+    ylab("factor")
+```
+
+```{r, fig.width=15, fig.height=15}
+ggarrange(
+  plotlist = cor_plot_list,
+  ncol = 3,
+  nrow = 3,
+  labels = names(cor_plot_list),
+  common.legend = TRUE,
+  legend = "right"
+)
+```
+
+There is a noticable increase in correlation as $c$ gets larger. 
+
+I also looked at the overlap in the "driving genes." To do this, I took the top $25$ genes for each factor and computed the Jaccard Index for each pair of factors.
+
+```{r}
+compare_overlap <- function(X, top = 10, method = c("intersection", "jaccard")) {
+  # Check input validity
+  if (!is.matrix(X)) stop("X must be a matrix")
+  if (is.null(rownames(X))) stop("Matrix X must have rownames")
+  method <- match.arg(method)
+  
+  # For each column, get the top 'top' rownames based on largest values
+  top_names <- lapply(seq_len(ncol(X)), function(j) {
+    sorted_indices <- order(X[, j], decreasing = TRUE)
+    rownames(X)[sorted_indices][1:min(top, length(sorted_indices))]
+  })
+  names(top_names) <- colnames(X)
+  
+  # Create a pairwise matrix to store overlap values
+  ncols <- ncol(X)
+  overlap_mat <- matrix(0, nrow = ncols, ncol = ncols)
+  rownames(overlap_mat) <- colnames(X)
+  colnames(overlap_mat) <- colnames(X)
+  
+  # Calculate pairwise overlap between columns
+  for(i in seq_len(ncols)) {
+    for(j in seq_len(ncols)) {
+      inter <- length(intersect(top_names[[i]], top_names[[j]]))
+      if (method == "intersection") {
+        overlap_mat[i, j] <- inter
+      } else if (method == "jaccard") {
+        union_length <- length(union(top_names[[i]], top_names[[j]]))
+        overlap_mat[i, j] <- inter / union_length
+      }
+    }
+  }
+  return(overlap_mat)
+}
+```
+
+```{r}
+ov_nmf <- compare_overlap(fit_list$`0.001`$V, top = 25, method = "jaccard")
+
+cor_plot_list <- list()
+
+cor_df <- expand.grid(1:9, 1:9)
+colnames(cor_df) <- c("row", "col")
+
+for (cc in cc_vec) {
+  
+  cor_df$cor <- as.vector(compare_overlap(
+    fit_list[[as.character(cc)]]$V,
+    top = 25, 
+    method = "jaccard"
+    ))
+    
+  library(ggplot2)
+  cor_plot_list[[glue::glue("c = {cc}")]] <- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient(
+      low = "white",
+      high = "red",
+      limits = c(0, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:9, labels = 1:9) +
+    scale_y_reverse(breaks = 1:9, labels = 1:9) +
+    xlab("factor") +
+    ylab("factor")
+
+}
+
+  cor_df$cor <- as.vector(compare_overlap(
+    fit_list$`Inf`$F,
+    top = 25, 
+    method = "jaccard"
+    ))
+
+cor_plot_list[[glue::glue("c = {cc}")]] <- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient2(
+      low = "blue",
+      mid = "white",
+      high = "red",
+      limits = c(-1, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:9, labels = 1:9) +
+    scale_y_reverse(breaks = 1:9, labels = 1:9) +
+    xlab("factor") +
+    ylab("factor")
+```
+
+
+```{r, fig.width=15, fig.height=15}
+ggarrange(
+  plotlist = cor_plot_list,
+  ncol = 3,
+  nrow = 3,
+  labels = names(cor_plot_list),
+  common.legend = TRUE,
+  legend = "right"
+)
+```
+
+Again, for the models with larger $c$, the overlap in the driving genes between factors is much greater. 
+
+Finally, I wanted to look at the distribution of the values of the loadings and factors for each value of $c$. Because the scale varies greatly for different values of $c$, the simplest way to visualize this is to normalize each column so that its largest value is $1$.
+
+Below are the loadings:
+
+```{r}
+LL_c001 <- normalize_bars(fit_list$`0.001`$U)
+LL_c01 <- normalize_bars(fit_list$`0.01`$U)
+LL_cp1 <- normalize_bars(fit_list$`0.1`$U)
+LL_c1 <- normalize_bars(fit_list$`1`$U)
+LL_c10 <- normalize_bars(fit_list$`10`$U)
+LL_c100 <- normalize_bars(fit_list$`100`$U)
+LL_c1000 <- normalize_bars(fit_list$`1000`$U)
+LL_cinf <- normalize_bars(fit_list$`Inf`$L)
+
+cc_out_vec <- c(
+  rep("1e-3", nrow(counts) * 9),
+  rep("1e-2", nrow(counts) * 9),
+  rep("1e-1", nrow(counts) * 9),
+  rep("1", nrow(counts) * 9),
+  rep("1e1", nrow(counts) * 9),
+  rep("1e2", nrow(counts) * 9),
+  rep("1e3", nrow(counts) * 9),
+  rep("Inf", nrow(counts) * 9)
+)
+
+cc_out_vector <- factor(
+  x = cc_out_vec,
+  levels = c("1e-3", "1e-2", "1e-1", "1", "1e1", "1e2", "1e3", "Inf")
+)
+
+l_df <- data.frame(
+  l = c(
+    as.vector(LL_c001),
+    as.vector(LL_c01),
+    as.vector(LL_cp1),
+    as.vector(LL_c1),
+    as.vector(LL_c10),
+    as.vector(LL_c100),
+    as.vector(LL_c1000),
+    as.vector(LL_cinf)
+  ),
+  cc = cc_out_vector
+)
+```
+
+```{r}
+ggplot(l_df, aes(x = l)) +
+  geom_histogram(bins = 40, fill = "blue", color = "black", alpha = 0.7) +
+  facet_wrap(~ cc) +
+  labs(title = "Histograms of loadings by c",
+       x = "l",
+       y = "Count") +
+  theme_minimal()
+```
+
+And here are the factors:
+
+```{r}
+LL_c001 <- normalize_bars(fit_list$`0.001`$V)
+LL_c01 <- normalize_bars(fit_list$`0.01`$V)
+LL_cp1 <- normalize_bars(fit_list$`0.1`$V)
+LL_c1 <- normalize_bars(fit_list$`1`$V)
+LL_c10 <- normalize_bars(fit_list$`10`$V)
+LL_c100 <- normalize_bars(fit_list$`100`$V)
+LL_c1000 <- normalize_bars(fit_list$`1000`$V)
+LL_cinf <- normalize_bars(fit_list$`Inf`$F)
+
+cc_out_vec <- c(
+  rep("1e-3", ncol(counts) * 9),
+  rep("1e-2", ncol(counts) * 9),
+  rep("1e-1", ncol(counts) * 9),
+  rep("1", ncol(counts) * 9),
+  rep("1e1", ncol(counts) * 9),
+  rep("1e2", ncol(counts) * 9),
+  rep("1e3", ncol(counts) * 9),
+  rep("Inf", ncol(counts) * 9)
+)
+
+cc_out_vector <- factor(
+  x = cc_out_vec,
+  levels = c("1e-3", "1e-2", "1e-1", "1", "1e1", "1e2", "1e3", "Inf")
+)
+
+l_df <- data.frame(
+  l = c(
+    as.vector(LL_c001),
+    as.vector(LL_c01),
+    as.vector(LL_cp1),
+    as.vector(LL_c1),
+    as.vector(LL_c10),
+    as.vector(LL_c100),
+    as.vector(LL_c1000),
+    as.vector(LL_cinf)
+  ),
+  cc = cc_out_vector
+)
+```
+
+```{r}
+ggplot(l_df, aes(x = l)) +
+  geom_histogram(bins = 40, fill = "blue", color = "black", alpha = 0.7) +
+  facet_wrap(~ cc) +
+  labs(title = "Histograms of factors by c",
+       x = "l",
+       y = "Count") +
+  theme_minimal()
+```
+Interestingly, both the loadings and the factors appear to get more sparse as $c$ increases.

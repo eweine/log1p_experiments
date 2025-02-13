@@ -400,7 +400,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-01-22
+<strong>Last updated:</strong> 2025-02-13
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree44da750b2dd15e71c8a4ffa9168b4a3d54f326c0targetblank44da750a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree0c710e573a7e67e0cda1eebfc8199051a067f91atargetblank0c710e5a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/44da750b2dd15e71c8a4ffa9168b4a3d54f326c0" target="_blank">44da750</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/0c710e573a7e67e0cda1eebfc8199051a067f91a" target="_blank">0c710e5</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree44da750b2dd15e71c8a4ffa9168b4a3d54f326c0targetblank44da750a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree0c710e573a7e67e0cda1eebfc8199051a067f91atargetblank0c710e5a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/44da750b2dd15e71c8a4ffa9168b4a3d54f326c0" target="_blank">44da750</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/0c710e573a7e67e0cda1eebfc8199051a067f91a" target="_blank">0c710e5</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -570,10 +570,6 @@ Ignored files:
     Ignored:    .DS_Store
     Ignored:    .Rhistory
     Ignored:    data/.DS_Store
-
-Untracked files:
-    Untracked:  data/pancreas.zip
-    Untracked:  data/pancreas/
 
 Unstaged changes:
     Modified:   analysis/pancreas.Rmd
@@ -622,6 +618,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/ca596b7b7292f2ac94c2f00ee218d9105c9aefa1/analysis/pancreas.Rmd" target="_blank">ca596b7</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-01-22
+</td>
+<td>
+added code for nnlm fits
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/ca596b7b7292f2ac94c2f00ee218d9105c9aefa1/docs/pancreas.html" target="_blank">ca596b7</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-01-22
+</td>
+<td>
+added code for nnlm fits
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1035,6 +1065,321 @@ plot_list[[&quot;Inf&quot;]] &lt;- structure_plot(
   labels = paste0(&quot;c = &quot;, names(plot_list))
 )</code></pre>
 <p><img src="figure/pancreas.Rmd/unnamed-chunk-7-1.png" width="1920" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/ca596b7b7292f2ac94c2f00ee218d9105c9aefa1/docs/figure/pancreas.Rmd/unnamed-chunk-7-1.png" target="_blank">ca596b7</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-01-22
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="a-closer-look-at-the-loadings-and-the-factors"
+class="section level2">
+<h2>A closer look at the loadings and the factors</h2>
+<p>First, I looked at the correlations between the factors:</p>
+<pre class="r"><code>cor_plot_list &lt;- list()
+
+cor_df &lt;- expand.grid(1:9, 1:9)
+colnames(cor_df) &lt;- c(&quot;row&quot;, &quot;col&quot;)
+
+for (cc in cc_vec) {
+  
+  cor_df$cor &lt;- as.vector(cor(fit_list[[as.character(cc)]]$V))
+    
+  library(ggplot2)
+  cor_plot_list[[glue::glue(&quot;c = {cc}&quot;)]] &lt;- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient2(
+      low = &quot;blue&quot;,
+      mid = &quot;white&quot;,
+      high = &quot;red&quot;,
+      midpoint = 0,
+      limits = c(-1, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:9, labels = 1:9) +
+    scale_y_reverse(breaks = 1:9, labels = 1:9) +
+    xlab(&quot;factor&quot;) +
+    ylab(&quot;factor&quot;)
+
+}
+
+cor_df$cor &lt;- as.vector(cor(fit_list$`Inf`$F))
+
+cor_plot_list[[glue::glue(&quot;c = {cc}&quot;)]] &lt;- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient2(
+      low = &quot;blue&quot;,
+      mid = &quot;white&quot;,
+      high = &quot;red&quot;,
+      midpoint = 0,
+      limits = c(-1, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:9, labels = 1:9) +
+    scale_y_reverse(breaks = 1:9, labels = 1:9) +
+    xlab(&quot;factor&quot;) +
+    ylab(&quot;factor&quot;)</code></pre>
+<pre class="r"><code>ggarrange(
+  plotlist = cor_plot_list,
+  ncol = 3,
+  nrow = 3,
+  labels = names(cor_plot_list),
+  common.legend = TRUE,
+  legend = &quot;right&quot;
+)</code></pre>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-9-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p>There is a noticable increase in correlation as <span
+class="math inline">\(c\)</span> gets larger.</p>
+<p>I also looked at the overlap in the “driving genes.” To do this, I
+took the top <span class="math inline">\(25\)</span> genes for each
+factor and computed the Jaccard Index for each pair of factors.</p>
+<pre class="r"><code>compare_overlap &lt;- function(X, top = 10, method = c(&quot;intersection&quot;, &quot;jaccard&quot;)) {
+  # Check input validity
+  if (!is.matrix(X)) stop(&quot;X must be a matrix&quot;)
+  if (is.null(rownames(X))) stop(&quot;Matrix X must have rownames&quot;)
+  method &lt;- match.arg(method)
+  
+  # For each column, get the top &#39;top&#39; rownames based on largest values
+  top_names &lt;- lapply(seq_len(ncol(X)), function(j) {
+    sorted_indices &lt;- order(X[, j], decreasing = TRUE)
+    rownames(X)[sorted_indices][1:min(top, length(sorted_indices))]
+  })
+  names(top_names) &lt;- colnames(X)
+  
+  # Create a pairwise matrix to store overlap values
+  ncols &lt;- ncol(X)
+  overlap_mat &lt;- matrix(0, nrow = ncols, ncol = ncols)
+  rownames(overlap_mat) &lt;- colnames(X)
+  colnames(overlap_mat) &lt;- colnames(X)
+  
+  # Calculate pairwise overlap between columns
+  for(i in seq_len(ncols)) {
+    for(j in seq_len(ncols)) {
+      inter &lt;- length(intersect(top_names[[i]], top_names[[j]]))
+      if (method == &quot;intersection&quot;) {
+        overlap_mat[i, j] &lt;- inter
+      } else if (method == &quot;jaccard&quot;) {
+        union_length &lt;- length(union(top_names[[i]], top_names[[j]]))
+        overlap_mat[i, j] &lt;- inter / union_length
+      }
+    }
+  }
+  return(overlap_mat)
+}</code></pre>
+<pre class="r"><code>ov_nmf &lt;- compare_overlap(fit_list$`0.001`$V, top = 25, method = &quot;jaccard&quot;)
+
+cor_plot_list &lt;- list()
+
+cor_df &lt;- expand.grid(1:9, 1:9)
+colnames(cor_df) &lt;- c(&quot;row&quot;, &quot;col&quot;)
+
+for (cc in cc_vec) {
+  
+  cor_df$cor &lt;- as.vector(compare_overlap(
+    fit_list[[as.character(cc)]]$V,
+    top = 25, 
+    method = &quot;jaccard&quot;
+    ))
+    
+  library(ggplot2)
+  cor_plot_list[[glue::glue(&quot;c = {cc}&quot;)]] &lt;- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient(
+      low = &quot;white&quot;,
+      high = &quot;red&quot;,
+      limits = c(0, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:9, labels = 1:9) +
+    scale_y_reverse(breaks = 1:9, labels = 1:9) +
+    xlab(&quot;factor&quot;) +
+    ylab(&quot;factor&quot;)
+
+}
+
+  cor_df$cor &lt;- as.vector(compare_overlap(
+    fit_list$`Inf`$F,
+    top = 25, 
+    method = &quot;jaccard&quot;
+    ))
+
+cor_plot_list[[glue::glue(&quot;c = {cc}&quot;)]] &lt;- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient2(
+      low = &quot;blue&quot;,
+      mid = &quot;white&quot;,
+      high = &quot;red&quot;,
+      limits = c(-1, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:9, labels = 1:9) +
+    scale_y_reverse(breaks = 1:9, labels = 1:9) +
+    xlab(&quot;factor&quot;) +
+    ylab(&quot;factor&quot;)</code></pre>
+<pre class="r"><code>ggarrange(
+  plotlist = cor_plot_list,
+  ncol = 3,
+  nrow = 3,
+  labels = names(cor_plot_list),
+  common.legend = TRUE,
+  legend = &quot;right&quot;
+)</code></pre>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-12-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p>Again, for the models with larger <span
+class="math inline">\(c\)</span>, the overlap in the driving genes
+between factors is much greater.</p>
+<p>Finally, I wanted to look at the distribution of the values of the
+loadings and factors for each value of <span
+class="math inline">\(c\)</span>. Because the scale varies greatly for
+different values of <span class="math inline">\(c\)</span>, the simplest
+way to visualize this is to normalize each column so that its largest
+value is <span class="math inline">\(1\)</span>.</p>
+<p>Below are the loadings:</p>
+<pre class="r"><code>LL_c001 &lt;- normalize_bars(fit_list$`0.001`$U)
+LL_c01 &lt;- normalize_bars(fit_list$`0.01`$U)
+LL_cp1 &lt;- normalize_bars(fit_list$`0.1`$U)
+LL_c1 &lt;- normalize_bars(fit_list$`1`$U)
+LL_c10 &lt;- normalize_bars(fit_list$`10`$U)
+LL_c100 &lt;- normalize_bars(fit_list$`100`$U)
+LL_c1000 &lt;- normalize_bars(fit_list$`1000`$U)
+LL_cinf &lt;- normalize_bars(fit_list$`Inf`$L)
+
+cc_out_vec &lt;- c(
+  rep(&quot;1e-3&quot;, nrow(counts) * 9),
+  rep(&quot;1e-2&quot;, nrow(counts) * 9),
+  rep(&quot;1e-1&quot;, nrow(counts) * 9),
+  rep(&quot;1&quot;, nrow(counts) * 9),
+  rep(&quot;1e1&quot;, nrow(counts) * 9),
+  rep(&quot;1e2&quot;, nrow(counts) * 9),
+  rep(&quot;1e3&quot;, nrow(counts) * 9),
+  rep(&quot;Inf&quot;, nrow(counts) * 9)
+)
+
+cc_out_vector &lt;- factor(
+  x = cc_out_vec,
+  levels = c(&quot;1e-3&quot;, &quot;1e-2&quot;, &quot;1e-1&quot;, &quot;1&quot;, &quot;1e1&quot;, &quot;1e2&quot;, &quot;1e3&quot;, &quot;Inf&quot;)
+)
+
+l_df &lt;- data.frame(
+  l = c(
+    as.vector(LL_c001),
+    as.vector(LL_c01),
+    as.vector(LL_cp1),
+    as.vector(LL_c1),
+    as.vector(LL_c10),
+    as.vector(LL_c100),
+    as.vector(LL_c1000),
+    as.vector(LL_cinf)
+  ),
+  cc = cc_out_vector
+)</code></pre>
+<pre class="r"><code>ggplot(l_df, aes(x = l)) +
+  geom_histogram(bins = 40, fill = &quot;blue&quot;, color = &quot;black&quot;, alpha = 0.7) +
+  facet_wrap(~ cc) +
+  labs(title = &quot;Histograms of loadings by c&quot;,
+       x = &quot;l&quot;,
+       y = &quot;Count&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>And here are the factors:</p>
+<pre class="r"><code>LL_c001 &lt;- normalize_bars(fit_list$`0.001`$V)
+LL_c01 &lt;- normalize_bars(fit_list$`0.01`$V)
+LL_cp1 &lt;- normalize_bars(fit_list$`0.1`$V)
+LL_c1 &lt;- normalize_bars(fit_list$`1`$V)
+LL_c10 &lt;- normalize_bars(fit_list$`10`$V)
+LL_c100 &lt;- normalize_bars(fit_list$`100`$V)
+LL_c1000 &lt;- normalize_bars(fit_list$`1000`$V)
+LL_cinf &lt;- normalize_bars(fit_list$`Inf`$F)
+
+cc_out_vec &lt;- c(
+  rep(&quot;1e-3&quot;, ncol(counts) * 9),
+  rep(&quot;1e-2&quot;, ncol(counts) * 9),
+  rep(&quot;1e-1&quot;, ncol(counts) * 9),
+  rep(&quot;1&quot;, ncol(counts) * 9),
+  rep(&quot;1e1&quot;, ncol(counts) * 9),
+  rep(&quot;1e2&quot;, ncol(counts) * 9),
+  rep(&quot;1e3&quot;, ncol(counts) * 9),
+  rep(&quot;Inf&quot;, ncol(counts) * 9)
+)
+
+cc_out_vector &lt;- factor(
+  x = cc_out_vec,
+  levels = c(&quot;1e-3&quot;, &quot;1e-2&quot;, &quot;1e-1&quot;, &quot;1&quot;, &quot;1e1&quot;, &quot;1e2&quot;, &quot;1e3&quot;, &quot;Inf&quot;)
+)
+
+l_df &lt;- data.frame(
+  l = c(
+    as.vector(LL_c001),
+    as.vector(LL_c01),
+    as.vector(LL_cp1),
+    as.vector(LL_c1),
+    as.vector(LL_c10),
+    as.vector(LL_c100),
+    as.vector(LL_c1000),
+    as.vector(LL_cinf)
+  ),
+  cc = cc_out_vector
+)</code></pre>
+<pre class="r"><code>ggplot(l_df, aes(x = l)) +
+  geom_histogram(bins = 40, fill = &quot;blue&quot;, color = &quot;black&quot;, alpha = 0.7) +
+  facet_wrap(~ cc) +
+  labs(title = &quot;Histograms of factors by c&quot;,
+       x = &quot;l&quot;,
+       y = &quot;Count&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" />
+Interestingly, both the loadings and the factors appear to get more
+sparse as <span class="math inline">\(c\)</span> increases.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1062,40 +1407,42 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggpubr_0.6.0       passPCA_0.1.0      cowplot_1.1.3      ggplot2_3.5.1     
-[5] fastTopics_0.6-175 Matrix_1.7-0      
+[1] ggpubr_0.6.0      passPCA_0.1-2     cowplot_1.1.3     ggplot2_3.5.1    
+[5] fastTopics_0.7-07 Matrix_1.7-0     
 
 loaded via a namespace (and not attached):
- [1] tidyselect_1.2.1    viridisLite_0.4.2   dplyr_1.1.4        
- [4] farver_2.1.2        fastmap_1.2.0       lazyeval_0.2.2     
+ [1] tidyselect_1.2.1    viridisLite_0.4.2   farver_2.1.2       
+ [4] dplyr_1.1.4         fastmap_1.2.0       lazyeval_0.2.2     
  [7] promises_1.3.0      digest_0.6.36       lifecycle_1.0.4    
 [10] invgamma_1.1        magrittr_2.0.3      compiler_4.4.0     
 [13] rlang_1.1.4         sass_0.4.9          progress_1.2.3     
 [16] tools_4.4.0         utf8_1.2.4          yaml_2.3.8         
 [19] data.table_1.15.4   knitr_1.47          ggsignif_0.6.4     
-[22] prettyunits_1.2.0   labeling_0.4.3      htmlwidgets_1.6.4  
+[22] labeling_0.4.3      prettyunits_1.2.0   htmlwidgets_1.6.4  
 [25] abind_1.4-5         Rtsne_0.17          workflowr_1.7.1    
 [28] withr_3.0.0         purrr_1.0.2         grid_4.4.0         
 [31] fansi_1.0.6         git2r_0.33.0        colorspace_2.1-0   
-[34] scales_1.3.0        gtools_3.9.5        cli_3.6.3          
-[37] rmarkdown_2.27      crayon_1.5.3        generics_0.1.3     
-[40] RcppParallel_5.1.7  rstudioapi_0.16.0   httr_1.4.7         
-[43] tzdb_0.4.0          pbapply_1.7-2       cachem_1.1.0       
-[46] stringr_1.5.1       parallel_4.4.0      vctrs_0.6.5        
-[49] jsonlite_1.8.8      carData_3.0-5       car_3.1-2          
-[52] hms_1.1.3           mixsqp_0.3-54       ggrepel_0.9.5      
-[55] rstatix_0.7.2       irlba_2.3.5.1       plotly_4.10.4      
-[58] tidyr_1.3.1         jquerylib_0.1.4     glue_1.7.0         
-[61] uwot_0.2.2          stringi_1.8.4       gtable_0.3.5       
-[64] later_1.3.2         quadprog_1.5-8      munsell_0.5.1      
-[67] tibble_3.2.1        pillar_1.9.0        htmltools_0.5.8.1  
-[70] truncnorm_1.0-9     R6_2.5.1            rprojroot_2.0.4    
-[73] evaluate_0.24.0     lattice_0.22-6      highr_0.11         
-[76] readr_2.1.5         backports_1.5.0     RhpcBLASctl_0.23-42
-[79] broom_1.0.6         SQUAREM_2021.1      ashr_2.2-63        
-[82] httpuv_1.6.15       bslib_0.7.0         Rcpp_1.0.13        
-[85] whisker_0.4.1       xfun_0.45           fs_1.6.4           
-[88] pkgconfig_2.0.3    </code></pre>
+[34] scales_1.3.0        gtools_3.9.5        MASS_7.3-61        
+[37] cli_3.6.3           rmarkdown_2.27      crayon_1.5.3       
+[40] startupmsg_0.9.6.1  generics_0.1.3      RcppParallel_5.1.7 
+[43] rstudioapi_0.16.0   tzdb_0.4.0          httr_1.4.7         
+[46] pbapply_1.7-2       cachem_1.1.0        stringr_1.5.1      
+[49] parallel_4.4.0      vctrs_0.6.5         jsonlite_1.8.8     
+[52] carData_3.0-5       car_3.1-2           hms_1.1.3          
+[55] mixsqp_0.3-54       ggrepel_0.9.5       rstatix_0.7.2      
+[58] irlba_2.3.5.1       plotly_4.10.4       tidyr_1.3.1        
+[61] jquerylib_0.1.4     glue_1.7.0          uwot_0.2.2         
+[64] stringi_1.8.4       gtable_0.3.5        later_1.3.2        
+[67] sfsmisc_1.1-18      quadprog_1.5-8      munsell_0.5.1      
+[70] tibble_3.2.1        pillar_1.9.0        htmltools_0.5.8.1  
+[73] truncnorm_1.0-9     R6_2.5.1            rprojroot_2.0.4    
+[76] evaluate_0.24.0     lattice_0.22-6      highr_0.11         
+[79] readr_2.1.5         backports_1.5.0     RhpcBLASctl_0.23-42
+[82] broom_1.0.6         SQUAREM_2021.1      ashr_2.2-63        
+[85] httpuv_1.6.15       bslib_0.7.0         Rcpp_1.0.13        
+[88] gridExtra_2.3       distr_2.9.3         whisker_0.4.1      
+[91] xfun_0.45           fs_1.6.4            pkgconfig_2.0.3    </code></pre>
+</div>
 </div>
 </div>
 
