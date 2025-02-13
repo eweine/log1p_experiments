@@ -368,7 +368,7 @@ for (cc in cc_vec) {
 
 cor_df$cor <- as.vector(cor(fit_list$`Inf`$F))
 
-cor_plot_list[[glue::glue("c = {cc}")]] <- ggplot(
+cor_plot_list[["c = Inf"]] <- ggplot(
       cor_df, 
       aes(x = col, y = row, fill = cor)
     ) +
@@ -483,7 +483,7 @@ for (cc in cc_vec) {
     method = "jaccard"
     ))
 
-cor_plot_list[[glue::glue("c = {cc}")]] <- ggplot(
+cor_plot_list[["c = Inf"]] <- ggplot(
       cor_df, 
       aes(x = col, y = row, fill = cor)
     ) +

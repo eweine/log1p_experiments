@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree0c710e573a7e67e0cda1eebfc8199051a067f91atargetblank0c710e5a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed4f9ec8fdc6c311fd3e9d47ffac8f8e358847095targetblankd4f9ec8a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/0c710e573a7e67e0cda1eebfc8199051a067f91a" target="_blank">0c710e5</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095" target="_blank">d4f9ec8</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree0c710e573a7e67e0cda1eebfc8199051a067f91atargetblank0c710e5a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed4f9ec8fdc6c311fd3e9d47ffac8f8e358847095targetblankd4f9ec8a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/0c710e573a7e67e0cda1eebfc8199051a067f91a" target="_blank">0c710e5</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095" target="_blank">d4f9ec8</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -618,6 +618,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/analysis/pancreas.Rmd" target="_blank">d4f9ec8</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-13
+</td>
+<td>
+added additional pancreas analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/docs/pancreas.html" target="_blank">d4f9ec8</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-13
+</td>
+<td>
+added additional pancreas analysis
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1089,6 +1123,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/docs/figure/pancreas.Rmd/unnamed-chunk-7-1.png" target="_blank">d4f9ec8</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-13
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/ca596b7b7292f2ac94c2f00ee218d9105c9aefa1/docs/figure/pancreas.Rmd/unnamed-chunk-7-1.png" target="_blank">ca596b7</a>
 </td>
 <td>
@@ -1140,7 +1185,7 @@ for (cc in cc_vec) {
 
 cor_df$cor &lt;- as.vector(cor(fit_list$`Inf`$F))
 
-cor_plot_list[[glue::glue(&quot;c = {cc}&quot;)]] &lt;- ggplot(
+cor_plot_list[[&quot;c = Inf&quot;]] &lt;- ggplot(
       cor_df, 
       aes(x = col, y = row, fill = cor)
     ) +
@@ -1168,6 +1213,43 @@ cor_plot_list[[glue::glue(&quot;c = {cc}&quot;)]] &lt;- ggplot(
   legend = &quot;right&quot;
 )</code></pre>
 <p><img src="figure/pancreas.Rmd/unnamed-chunk-9-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/docs/figure/pancreas.Rmd/unnamed-chunk-9-1.png" target="_blank">d4f9ec8</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>There is a noticable increase in correlation as <span
 class="math inline">\(c\)</span> gets larger.</p>
 <p>I also looked at the overlap in the “driving genes.” To do this, I
@@ -1248,7 +1330,7 @@ for (cc in cc_vec) {
     method = &quot;jaccard&quot;
     ))
 
-cor_plot_list[[glue::glue(&quot;c = {cc}&quot;)]] &lt;- ggplot(
+cor_plot_list[[&quot;c = Inf&quot;]] &lt;- ggplot(
       cor_df, 
       aes(x = col, y = row, fill = cor)
     ) +
@@ -1275,6 +1357,43 @@ cor_plot_list[[glue::glue(&quot;c = {cc}&quot;)]] &lt;- ggplot(
   legend = &quot;right&quot;
 )</code></pre>
 <p><img src="figure/pancreas.Rmd/unnamed-chunk-12-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
+Past versions of unnamed-chunk-12-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/docs/figure/pancreas.Rmd/unnamed-chunk-12-1.png" target="_blank">d4f9ec8</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Again, for the models with larger <span
 class="math inline">\(c\)</span>, the overlap in the driving genes
 between factors is much greater.</p>
@@ -1331,6 +1450,43 @@ l_df &lt;- data.frame(
        y = &quot;Count&quot;) +
   theme_minimal()</code></pre>
 <p><img src="figure/pancreas.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-14-1">
+Past versions of unnamed-chunk-14-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-14-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/docs/figure/pancreas.Rmd/unnamed-chunk-14-1.png" target="_blank">d4f9ec8</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>And here are the factors:</p>
 <pre class="r"><code>LL_c001 &lt;- normalize_bars(fit_list$`0.001`$V)
 LL_c01 &lt;- normalize_bars(fit_list$`0.01`$V)
@@ -1377,8 +1533,45 @@ l_df &lt;- data.frame(
        x = &quot;l&quot;,
        y = &quot;Count&quot;) +
   theme_minimal()</code></pre>
-<p><img src="figure/pancreas.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" />
-Interestingly, both the loadings and the factors appear to get more
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
+Past versions of unnamed-chunk-16-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-16-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/docs/figure/pancreas.Rmd/unnamed-chunk-16-1.png" target="_blank">d4f9ec8</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Interestingly, both the loadings and the factors appear to get more
 sparse as <span class="math inline">\(c\)</span> increases.</p>
 <br>
 <p>
