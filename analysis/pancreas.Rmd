@@ -242,10 +242,7 @@ for (cc in cc_vec) {
       "~/Documents/data/passPCA/pancreas/pancreas_log1p_c{cc}_k9_exact_100_iter.rds"
     )
   )
-  
-  fit_list[[as.character(cc)]][["Lambda"]] <- cc * (exp(
-    fit_list[[as.character(cc)]]$U %*% t(fit_list[[as.character(cc)]]$V)) - 1)
-  
+
   fit_list_nnlm[[as.character(cc)]] <- readr::read_rds(
     glue::glue(
       "~/Documents/data/passPCA/pancreas/pancreas_log1p_c{cc}_nnlm.rds"
@@ -259,7 +256,6 @@ fit_list[["Inf"]] <- readr::read_rds(
   glue::glue("~/Documents/data/passPCA/pancreas/pancreas_pois_nmf_k9_exact_100_iter.rds")
 )
 
-fit_list[["Inf"]][["Lambda"]] <- fit_list[["Inf"]]$L %*% t(fit_list[["Inf"]]$F) 
 ```
 
 ```{r}
@@ -575,14 +571,23 @@ ggplot(l_df, aes(x = l)) +
 And here are the factors:
 
 ```{r}
-LL_c001 <- normalize_bars(fit_list$`0.001`$V)
-LL_c01 <- normalize_bars(fit_list$`0.01`$V)
-LL_cp1 <- normalize_bars(fit_list$`0.1`$V)
-LL_c1 <- normalize_bars(fit_list$`1`$V)
-LL_c10 <- normalize_bars(fit_list$`10`$V)
-LL_c100 <- normalize_bars(fit_list$`100`$V)
-LL_c1000 <- normalize_bars(fit_list$`1000`$V)
-LL_cinf <- normalize_bars(fit_list$`Inf`$F)
+# LL_c001 <- normalize_bars(fit_list$`0.001`$V)
+# LL_c01 <- normalize_bars(fit_list$`0.01`$V)
+# LL_cp1 <- normalize_bars(fit_list$`0.1`$V)
+# LL_c1 <- normalize_bars(fit_list$`1`$V)
+# LL_c10 <- normalize_bars(fit_list$`10`$V)
+# LL_c100 <- normalize_bars(fit_list$`100`$V)
+# LL_c1000 <- normalize_bars(fit_list$`1000`$V)
+# LL_cinf <- normalize_bars(fit_list$`Inf`$F)
+
+LL_c001 <- fit_list$`0.001`$V
+LL_c01 <- fit_list$`0.01`$V
+LL_cp1 <- fit_list$`0.1`$V
+LL_c1 <- fit_list$`1`$V
+LL_c10 <- fit_list$`10`$V
+LL_c100 <- fit_list$`100`$V
+LL_c1000 <- fit_list$`1000`$V
+LL_cinf <- fit_list$`Inf`$F
 
 cc_out_vec <- c(
   rep("1e-3", ncol(counts) * 9),
@@ -616,12 +621,91 @@ l_df <- data.frame(
 ```
 
 ```{r}
-ggplot(l_df, aes(x = l)) +
+ggplot(l_df, aes(x = log1p(l))) +
+  geom_histogram(bins = 20, fill = "blue", color = "black", alpha = 1, size = 0) +
+  facet_wrap(~ cc, scales = "free_x") +
+  labs(title = "Histograms of log1p(factors) by c",
+       x = "l",
+       y = "Count") +
+  theme_minimal() +
+  cowplot::theme_cowplot()
+```
+Interestingly, both the loadings and the factors appear to get more sparse as $c$ increases.
+
+```{r}
+Lambda_c001 <- 0.001 * (exp(fit_list$`0.001`$U %*% t(fit_list$`0.001`$V)) - 1)
+Lambda_c01 <- 0.01 * (exp(fit_list$`0.01`$U %*% t(fit_list$`0.01`$V)) - 1)
+Lambda_cp1 <- 0.1 * (exp(fit_list$`0.1`$U %*% t(fit_list$`0.1`$V)) - 1)
+Lambda_c1 <- (exp(fit_list$`1`$U %*% t(fit_list$`1`$V)) - 1)
+Lambda_c10 <- 10 * (exp(fit_list$`10`$U %*% t(fit_list$`10`$V)) - 1)
+Lambda_c100 <- 100 * (exp(fit_list$`100`$U %*% t(fit_list$`100`$V)) - 1)
+Lambda_c1000 <- 1000 * (exp(fit_list$`1000`$U %*% t(fit_list$`1000`$V)) - 1)
+Lambda_cinf <- fit_list$`Inf`$L %*% t(fit_list$`Inf`$F)
+```
+
+```{r}
+sample_size <- round(prod(dim(counts)) * 0.01)
+samp_idx <- sample.int(n = prod(dim(counts)), size = sample_size)
+
+l_samp_df <- data.frame(
+  lambda_c001 = as.vector(Lambda_c001)[samp_idx],
+  lambda_c1000 = as.vector(Lambda_c1000)[samp_idx]
+)
+ggplot(data = l_samp_df) +
+  geom_point(aes(x = log(lambda_c001), y = log(lambda_c1000)), alpha = 0.1) +
+  xlab("log(lambda) for c = 1e-3") +
+  ylab("log(lambda) for c = 1e3")
+```
+
+
+
+```{r}
+sample_size <- round(prod(dim(counts)) * 0.2)
+samp_idx <- sample.int(n = prod(dim(counts)), size = sample_size)
+
+cc_out_vec <- c(
+  rep("1e-3", sample_size),
+  rep("1e-2", sample_size),
+  rep("1e-1", sample_size),
+  rep("1", sample_size),
+  rep("1e1", sample_size),
+  rep("1e2", sample_size),
+  rep("1e3", sample_size),
+  rep("Inf", sample_size)
+)
+
+cc_out_vector <- factor(
+  x = cc_out_vec,
+  levels = c("1e-3", "1e-2", "1e-1", "1", "1e1", "1e2", "1e3", "Inf")
+)
+
+l_df <- data.frame(
+  l = c(
+    as.vector(Lambda_c001)[samp_idx],
+    as.vector(Lambda_c01)[samp_idx],
+    as.vector(Lambda_cp1)[samp_idx],
+    as.vector(Lambda_c1)[samp_idx],
+    as.vector(Lambda_c10)[samp_idx],
+    as.vector(Lambda_c100)[samp_idx],
+    as.vector(Lambda_c1000)[samp_idx],
+    as.vector(Lambda_cinf)[samp_idx]
+  ),
+  cc = cc_out_vector
+)
+```
+
+```{r}
+rm(fit_list, fit_list_nnlm, Lambda_c001, Lambda_c01, Lambda_c1, Lambda_c10, Lambda_c100, Lambda_c1000, Lambda_cinf, Lambda_cp1, counts, sample_info, i, genes_to_use, cc_out_vec, s, n, p, K, cc, cc_vec, cc_out_vector, sample_size, samp_idx)
+gc()
+```
+
+```{r}
+ggplot(l_df, aes(x = log(l))) +
   geom_histogram(bins = 40, fill = "blue", color = "black", alpha = 0.7) +
   facet_wrap(~ cc) +
   labs(title = "Histograms of factors by c",
-       x = "l",
+       x = "Lambda",
        y = "Count") +
   theme_minimal()
 ```
-Interestingly, both the loadings and the factors appear to get more sparse as $c$ increases.
+

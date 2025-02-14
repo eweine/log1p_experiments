@@ -1,0 +1,268 @@
+---
+title: "Analysis of Pancreas Gamma and Delta Cells in Cel-Seq Data"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2025-02-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Introduction
+
+Here, I analyzed the pancreas Cel-Seq dataset that Peter has looked at before, but this time focusing only on gamma and delta cells.
+
+```{r}
+library(passPCA)
+library(Matrix)
+library(dplyr)
+set.seed(1)
+
+load("~/Downloads/pancreas.RData")
+
+i           <- which(sample_info$tech == "celseq2")
+sample_info <- sample_info[i,]
+counts      <- counts[i,]
+sample_info <- transform(sample_info,celltype = factor(celltype))
+gd_info <- sample_info %>%
+  dplyr::filter(celltype %in% c("gamma", "delta"))
+
+counts <- counts[gd_info$id, ]
+
+counts <- counts[, Matrix::colSums(counts) > 0]
+genes_to_use <- which(Matrix::colSums(counts>0)>4)
+counts <- counts[,genes_to_use]
+s <- Matrix::rowSums(counts)
+s <- s / mean(s)
+
+K <- 3
+cc_vec <- c(1e-4, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3, 1e4)
+
+n <- nrow(counts)
+p <- ncol(counts)
+```
+
+Now, I fit the log1p model for many values of $c$. I also fit Poisson NMF using `fastTopics`. To fit each model, I first fit a rank $1$ model. Then, I initialize each model with $K = 3$, where the first factor is taken from the rank 1 model and the other $2$ are initialized to very small values.
+
+```{r, eval=FALSE}
+for (cc in cc_vec) {
+
+  print(cc)
+
+  set.seed(1)
+  fit <- fit_poisson_log1p_nmf(
+    Y = counts,
+    K = K,
+    s = s,
+    cc = cc,
+    loglik = "exact",
+    init_method = "rank1",
+    control = list(
+      maxiter = 250,
+      threads = 35
+    )
+  )
+
+  readr::write_rds(
+    fit, glue::glue("pancreas_log1p_c{cc}_k3_gamma_delta_exact_250_iter.rds")
+  )
+
+}
+
+```
+
+Below are the structure plots for each of the models:
+
+```{r, results='hide'}
+library(ggpubr)
+library(fastTopics)
+fit_list <- list()
+
+for (cc in cc_vec) {
+  
+  fit_list[[as.character(cc)]] <- readr::read_rds(
+    glue::glue(
+      "~/Documents/data/passPCA/pancreas_log1p_c{cc}_k3_gamma_delta_exact_250_iter.rds"
+    )
+  )
+
+}
+
+fit_list[["Inf"]] <- readr::read_rds(
+  glue::glue("~/Documents/data/passPCA/pancreas_nmf_k3_gamma_delta_exact_250_iter.rds")
+)
+```
+
+```{r, results='hide'}
+normalize_bars <- function(LL) {
+
+  max_col <- apply(LL, 2, max)
+  sweep(LL, 2, max_col, FUN = "/")
+
+}
+
+celltype <- gd_info$celltype
+celltype <-
+  factor(celltype,
+         c("delta","gamma"))
+
+
+plot_list <- list()
+
+for (cc in cc_vec) {
+
+  plot_list[[glue::glue("{cc}: Poisson")]] <- structure_plot(
+    normalize_bars(fit_list[[as.character(cc)]]$LL),
+    grouping = celltype,gap = 20,perplexity = 70,n = Inf, font.size = 12
+    )
+
+}
+
+plot_list[["Inf"]] <- structure_plot(
+  fit_list[["Inf"]],
+  grouping = celltype,gap = 20,perplexity = 70,n = Inf,font.size = 12
+  )
+```
+
+```{r, fig.width=20, fig.height=70}
+ggarrange(
+  plotlist = plot_list,
+  ncol = 1,
+  labels = paste0("c = ", names(plot_list))
+)
+```
+
+Below are the spearman correlations between the factors:
+
+```{r}
+cor_plot_list <- list()
+
+cor_df <- expand.grid(1:3, 1:3)
+colnames(cor_df) <- c("row", "col")
+
+for (cc in cc_vec) {
+  
+  cor_df$cor <- as.vector(cor(fit_list[[as.character(cc)]]$FF, method = "spearman"))
+    
+  library(ggplot2)
+  cor_plot_list[[glue::glue("c = {cc}")]] <- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient2(
+      low = "blue",
+      mid = "white",
+      high = "red",
+      midpoint = 0,
+      limits = c(-1, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:3, labels = 1:3) +
+    scale_y_reverse(breaks = 1:3, labels = 1:3) +
+    xlab("factor") +
+    ylab("factor")
+
+}
+
+cor_df$cor <- as.vector(cor(fit_list$`Inf`$F, method = "spearman"))
+
+cor_plot_list[["c = Inf"]] <- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient2(
+      low = "blue",
+      mid = "white",
+      high = "red",
+      midpoint = 0,
+      limits = c(-1, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:3, labels = 1:3) +
+    scale_y_reverse(breaks = 1:3, labels = 1:3) +
+    xlab("factor") +
+    ylab("factor")
+```
+
+```{r, fig.width=15, fig.height=15}
+ggarrange(
+  plotlist = cor_plot_list,
+  ncol = 3,
+  nrow = 4,
+  labels = names(cor_plot_list),
+  common.legend = TRUE,
+  legend = "right"
+)
+```
+
+```{r, fig.height=8}
+l_df <- data.frame(
+  factr = rep(c(
+    rep("1", nrow(fit_list$`1`$FF)),
+    rep("2", nrow(fit_list$`1`$FF)),
+    rep("3", nrow(fit_list$`1`$FF))
+  ), 3),
+  l = c(
+    as.vector(fit_list$`1e-04`$FF),
+    as.vector(fit_list$`1`$FF),
+    as.vector(fit_list$`1000`$FF)
+  ),
+  cc = c(
+    rep("1e-4", prod(dim(fit_list$`1`$FF))),
+    rep("1", prod(dim(fit_list$`1`$FF))),
+    rep("1e4", prod(dim(fit_list$`1`$FF)))
+  )
+)
+
+l_df$cc <- factor(l_df$cc, levels = c("1e-4", "1", "1e4"))
+
+ggplot(l_df, aes(x = log1p(l))) +
+  geom_histogram(bins = 40, fill = "blue", color = "white", alpha = 0.7) +
+  facet_wrap(~ cc + factr, scales = "free_x", labeller = "label_both") +
+  labs(title = "Histograms of factors by c",
+       y = "Count") +
+  theme_minimal() +
+  cowplot::theme_cowplot() +
+  xlab("log1p(f)")
+```
+
+```{r, fig.height=8}
+l_df <- data.frame(
+  factr = rep(c(
+    rep("1", nrow(fit_list$`1`$LL)),
+    rep("2", nrow(fit_list$`1`$LL)),
+    rep("3", nrow(fit_list$`1`$LL))
+  ), 3),
+  l = c(
+    as.vector(fit_list$`1e-04`$LL),
+    as.vector(fit_list$`1`$LL),
+    as.vector(fit_list$`1000`$LL)
+  ),
+  cc = c(
+    rep("1e-4", prod(dim(fit_list$`1`$LL))),
+    rep("1", prod(dim(fit_list$`1`$LL))),
+    rep("1e4", prod(dim(fit_list$`1`$LL)))
+  )
+)
+
+l_df$cc <- factor(l_df$cc, levels = c("1e-4", "1", "1e4"))
+
+ggplot(l_df, aes(x = log1p(l))) +
+  geom_histogram(bins = 40, fill = "blue", color = "white", alpha = 0.7) +
+  facet_wrap(~ cc + factr, scales = "free_x", labeller = "label_both") +
+  labs(title = "Histograms of loadings by c",
+       y = "Count") +
+  theme_minimal() +
+  cowplot::theme_cowplot() +
+  xlab("log1p(l)")
+```
+
+
