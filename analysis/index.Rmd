@@ -54,6 +54,8 @@ Welcome to my research website.
 
 [Pancreas Dataset Analysis](pancreas.html)
 
+[Pancreas Gamma-Delta Analysis](pancreas_gamma_delta.html)
+
 [Newsgroups Dataset Analysis - K = 12](newsgroup.html)
 
 [Newsgroups Dataset Analysis - K = 25](newsgroups25.html)
