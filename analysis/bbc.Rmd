@@ -230,6 +230,74 @@ ggplot(data = df) +
   scale_y_log10() 
 ```
 
+```{r}
+cor_plot_list <- list()
+
+cor_df <- expand.grid(1:30, 1:30)
+colnames(cor_df) <- c("row", "col")
+
+for (cc in cc_vec) {
+  
+  cor_df$cor <- as.vector(cor(fit_list[[as.character(cc)]]$V, method = "spearman"))
+    
+  library(ggplot2)
+  cor_plot_list[[glue::glue("c = {cc}")]] <- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient2(
+      low = "blue",
+      mid = "white",
+      high = "red",
+      midpoint = 0,
+      limits = c(-1, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:30, labels = 1:30) +
+    scale_y_reverse(breaks = 1:30, labels = 1:30) +
+    xlab("factor") +
+    ylab("factor")
+
+}
+
+cor_df$cor <- as.vector(cor(fit_list$nmf$F, method = "spearman"))
+
+cor_plot_list[["c = Inf"]] <- ggplot(
+      cor_df, 
+      aes(x = col, y = row, fill = cor)
+    ) +
+    geom_tile() +
+    # Optional: adjust the color scale
+    scale_fill_gradient2(
+      low = "blue",
+      mid = "white",
+      high = "red",
+      midpoint = 0,
+      limits = c(-1, 1)
+    ) +
+    theme_minimal() +
+    coord_fixed() +
+    scale_x_continuous(breaks = 1:30, labels = 1:30) +
+    scale_y_reverse(breaks = 1:30, labels = 1:30) +
+    xlab("factor") +
+    ylab("factor")
+```
+
+```{r, fig.width=15, fig.height=15}
+library(ggpubr)
+ggarrange(
+  plotlist = cor_plot_list,
+  ncol = 4,
+  nrow = 3,
+  labels = names(cor_plot_list),
+  common.legend = TRUE,
+  legend = "right"
+)
+```
+
 ## Loadings
 
 ```{r}

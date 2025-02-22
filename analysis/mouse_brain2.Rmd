@@ -1,0 +1,274 @@
+---
+title: " Mouse Brain Stimulation"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2025-02-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(Matrix)
+library(fastTopics)
+library(ggplot2)
+library(cowplot)
+
+jaccard_index <- function(vec1, vec2) {
+  
+  set1 <- unique(vec1)
+  
+  set2 <- unique(vec2)
+  
+  intersection <- length(intersect(set1, set2))
+  
+  union <- length(union(set1, set2))
+  
+  return(intersection / union)
+  
+}
+
+load("~/Downloads/mouse_brain_stim.Rdata")
+
+cells <- cells %>% dplyr::filter(!is.na(maintype))
+
+counts <- counts[rownames(counts) %in% cells$`...1`, ]
+counts <- counts[, Matrix::colSums(counts) > 0]
+counts <- counts[Matrix::rowSums(counts) > 0, ]
+
+s <- Matrix::rowSums(counts)
+s <- s / mean(s)
+
+n <- nrow(counts)
+p <- ncol(counts)
+K <- 20
+
+n_top <- 20
+
+hoyer_sparsity <- function(x) {
+  
+  n <- length(x)
+  (1 / (sqrt(n) - 1)) * (sqrt(n) - (sum(x) / (sqrt(sum(x ^ 2)))))
+  
+}
+
+fit_list <- list()
+cc_vec <- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+for (cc in cc_vec) {
+  
+  fit_list[[as.character(cc)]] <- readr::read_rds(
+    glue::glue(
+      "~/Documents/data/passPCA/mouse_log1p_c{cc}_k20_exact_100_iter.rds"
+    )
+  )
+  
+  colnames(fit_list[[as.character(cc)]]$FF) <- paste0("k", 1:20)
+  colnames(fit_list[[as.character(cc)]]$LL) <- paste0("k", 1:20)
+  
+  F_norm <- passPCA:::normalize_bars(fit_list[[as.character(cc)]]$FF)
+  top_list <- list()
+  distinct_list <- list()
+  jaccard_vec <- c()
+  
+  for (k in 1:20) {
+    
+    top_list[[k]] <- names(sort(F_norm[,k], decreasing = TRUE))[1:n_top]
+    distinct_list[[k]] <- fastTopics:::get_distinctive_features(
+      effects_matrix = F_norm,
+      k = glue::glue("k{k}"), n = n_top, feature_sign = "positive"
+    )
+    
+    jaccard_vec <- c(jaccard_vec, jaccard_index(
+      top_list[[k]],
+      distinct_list[[k]]
+    ))
+    
+  }
+  
+  fit_list[[as.character(cc)]]$top_genes <- top_list
+  fit_list[[as.character(cc)]]$distinct_genes <- distinct_list
+  fit_list[[as.character(cc)]]$jaccard <- jaccard_vec
+  
+  fit_list[[as.character(cc)]]$l_sparsity <- apply(
+    fit_list[[as.character(cc)]]$LL, 2, hoyer_sparsity
+  )
+  
+  fit_list[[as.character(cc)]]$f_sparsity <- apply(
+    fit_list[[as.character(cc)]]$FF, 2, hoyer_sparsity
+  )
+  
+  fit_list[[as.character(cc)]]$cor_mat <- cor(fit_list[[as.character(cc)]]$FF, method = "spearman")
+  
+}
+
+fit_list[["Inf"]] <- readr::read_rds(
+  glue::glue("~/Documents/data/passPCA/mouse_light_k20_nmf.rds")
+)
+
+colnames(fit_list[["Inf"]]$F) <- paste0("k", 1:20)
+
+fit_list[["Inf"]]$Ls <- Matrix::Diagonal(x = 1/s) %*% fit_list[["Inf"]]$L
+
+F_norm <- passPCA:::normalize_bars(fit_list[["Inf"]]$F)
+colnames(F_norm) <- paste0("k",1:20)
+top_list <- list()
+distinct_list <- list()
+jaccard_vec <- c()
+
+for (k in 1:20) {
+  
+  top_list[[k]] <- names(sort(F_norm[,k], decreasing = TRUE))[1:n_top]
+  distinct_list[[k]] <- fastTopics:::get_distinctive_features(
+    effects_matrix = F_norm,
+    k = glue::glue("k{k}"), n = n_top, feature_sign = "positive"
+  )
+  
+  jaccard_vec <- c(jaccard_vec, jaccard_index(
+    top_list[[k]],
+    distinct_list[[k]]
+  ))
+  
+}
+
+fit_list[["Inf"]]$top_genes <- top_list
+fit_list[["Inf"]]$distinct_genes <- distinct_list
+fit_list[["Inf"]]$jaccard <- jaccard_vec
+
+fit_list[["Inf"]]$l_sparsity <- apply(
+  fit_list[["Inf"]]$Ls, 2, hoyer_sparsity
+)
+
+fit_list[["Inf"]]$f_sparsity <- apply(
+  fit_list[["Inf"]]$F, 2, hoyer_sparsity
+)
+
+fit_list[["Inf"]]$cor_mat <- cor(fit_list[["Inf"]]$F, method = "spearman")
+
+l_sparsity_vec <- unlist(lapply(fit_list, function(x) {median(x$l_sparsity)}))
+f_sparsity_vec <- unlist(lapply(fit_list, function(x) {median(x$f_sparsity)}))
+cor_vec <- unlist(
+  lapply(fit_list, function(x) {median(x$cor_mat[lower.tri(x$cor_mat)])})
+)
+
+jaccard_vec <- unlist(
+  lapply(fit_list, function(x) {median(x$jaccard)})
+)
+
+df_sparsity_l <- data.frame(
+  cc = as.numeric(names(l_sparsity_vec)),
+  sparsity = l_sparsity_vec
+) %>% filter(is.finite(cc))
+
+df_sparsity_f <- data.frame(
+  cc = as.numeric(names(f_sparsity_vec)),
+  sparsity = f_sparsity_vec
+) %>% filter(is.finite(cc))
+
+df_cor <- data.frame(
+  cc = as.numeric(names(cor_vec)),
+  correlation = cor_vec
+) %>% filter(is.finite(cc))
+
+library(ggplot2)
+
+
+# here, I'm interested in the way that the excitatory cells are represented
+
+excit_cells <- cells %>% dplyr::filter(maintype == "Excitatory")
+
+excit_cc_vec <- c(
+  0.01, 0.1, 1, 10, 100, 1000, Inf
+)
+
+factor <- c(12, 9, 16, 6, 2, 16, 5)
+
+top_genes_vec <- c()
+distinctive_genes_vec <- c()
+
+top_go_vec <- c()
+distinctive_go_vec <- c()
+
+i <- 1
+
+library(clusterProfiler)
+library(fgsea)
+library(AnnotationDbi)
+library(org.Mm.eg.db)
+
+for (cc in excit_cc_vec) {
+  
+  print(cc)
+  
+  cc_factor <- factor[i]
+  fit <- fit_list[[as.character(cc)]]
+  if (is.finite(cc)) {
+    
+    FF <- fit$FF
+    
+  } else {
+    
+    FF <- fit$F
+    colnames(FF) <- paste0("k", 1:20)
+    
+  }
+  
+  FF <- passPCA:::normalize_bars(FF)
+  top_genes <- names(sort(FF[,cc_factor], decreasing = TRUE))[1:20]
+  distinctive_genes <- fastTopics:::get_distinctive_features(
+    effects_matrix = FF,
+    k = glue::glue("k{cc_factor}"), n = 20, feature_sign = "positive")
+  
+  go_result <- enrichGO(gene = top_genes,
+                        OrgDb = org.Mm.eg.db,
+                        keyType = "SYMBOL",
+                        ont = "BP", 
+                        pAdjustMethod = "bonferroni",
+                        pvalueCutoff = 0.01,
+                        qvalueCutoff = 0.05)@result
+  
+  go_result <- go_result %>%
+    dplyr::filter(p.adjust < .01)
+  
+  go_terms <- go_result$Description
+  
+  top_genes_vec <- c(top_genes_vec, paste(top_genes, collapse = ", "))
+  top_go_vec <- c(top_go_vec, paste(go_terms, collapse = ", "))
+  
+  go_result <- enrichGO(gene = distinctive_genes,
+                        OrgDb = org.Mm.eg.db,
+                        keyType = "SYMBOL",
+                        ont = "BP", 
+                        pAdjustMethod = "bonferroni",
+                        pvalueCutoff = 0.01,
+                        qvalueCutoff = 0.05)@result
+  
+  go_result <- go_result %>%
+    dplyr::filter(p.adjust < .01)
+  
+  go_terms <- go_result$Description
+  
+  distinctive_genes_vec <- c(distinctive_genes_vec, paste(distinctive_genes, collapse = ", "))
+  distinctive_go_vec <- c(distinctive_go_vec, paste(go_terms, collapse = ", "))
+  
+  i <- i + 1
+  
+}
+
+# now, for each factor, find both the top genes, the most
+# distinctive genes, and associated go terms for both
+
+go_df <- data.frame(
+  c = as.character(excit_cc_vec),
+  top_genes = top_genes_vec,
+  top_go_terms = top_go_vec,
+  distinctive_genes = distinctive_genes_vec,
+  distinctive_go = distinctive_go_vec
+)
+
+knitr::kable(go_df)
+```
+

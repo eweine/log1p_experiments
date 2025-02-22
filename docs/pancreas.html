@@ -400,7 +400,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-02-13
+<strong>Last updated:</strong> 2025-02-18
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed4f9ec8fdc6c311fd3e9d47ffac8f8e358847095targetblankd4f9ec8a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree93183accad128e0e4c033a48d172db1bab5c8842targetblank93183aca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095" target="_blank">d4f9ec8</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/93183accad128e0e4c033a48d172db1bab5c8842" target="_blank">93183ac</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed4f9ec8fdc6c311fd3e9d47ffac8f8e358847095targetblankd4f9ec8a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree93183accad128e0e4c033a48d172db1bab5c8842targetblank93183aca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095" target="_blank">d4f9ec8</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/93183accad128e0e4c033a48d172db1bab5c8842" target="_blank">93183ac</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -572,6 +572,7 @@ Ignored files:
     Ignored:    data/.DS_Store
 
 Unstaged changes:
+    Modified:   analysis/bbc.Rmd
     Modified:   analysis/pancreas.Rmd
 
 </code></pre>
@@ -618,6 +619,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/287cc39e1b657443d916c8f20a85ad2679d6cd32/analysis/pancreas.Rmd" target="_blank">287cc39</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-14
+</td>
+<td>
+added analysis of gamma-delta
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/3a8950d79357f41553e64efb6b09d8ecacc7d693/analysis/pancreas.Rmd" target="_blank">3a8950d</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-13
+</td>
+<td>
+added nmf fit
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/3a8950d79357f41553e64efb6b09d8ecacc7d693/docs/pancreas.html" target="_blank">3a8950d</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-13
+</td>
+<td>
+added nmf fit
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1024,10 +1076,7 @@ for (cc in cc_vec) {
       &quot;~/Documents/data/passPCA/pancreas/pancreas_log1p_c{cc}_k9_exact_100_iter.rds&quot;
     )
   )
-  
-  fit_list[[as.character(cc)]][[&quot;Lambda&quot;]] &lt;- cc * (exp(
-    fit_list[[as.character(cc)]]$U %*% t(fit_list[[as.character(cc)]]$V)) - 1)
-  
+
   fit_list_nnlm[[as.character(cc)]] &lt;- readr::read_rds(
     glue::glue(
       &quot;~/Documents/data/passPCA/pancreas/pancreas_log1p_c{cc}_nnlm.rds&quot;
@@ -1039,9 +1088,7 @@ for (cc in cc_vec) {
 
 fit_list[[&quot;Inf&quot;]] &lt;- readr::read_rds(
   glue::glue(&quot;~/Documents/data/passPCA/pancreas/pancreas_pois_nmf_k9_exact_100_iter.rds&quot;)
-)
-
-fit_list[[&quot;Inf&quot;]][[&quot;Lambda&quot;]] &lt;- fit_list[[&quot;Inf&quot;]]$L %*% t(fit_list[[&quot;Inf&quot;]]$F) </code></pre>
+)</code></pre>
 <pre class="r"><code># library(ggplot2)
 # 
 # df &lt;- data.frame(
@@ -1151,14 +1198,19 @@ Eric Weine
 class="section level2">
 <h2>A closer look at the loadings and the factors</h2>
 <p>First, I looked at the correlations between the factors:</p>
-<pre class="r"><code>cor_plot_list &lt;- list()
+<pre class="r"><code>factor_cor &lt;- c()
+cor_plot_list &lt;- list()
 
 cor_df &lt;- expand.grid(1:9, 1:9)
 colnames(cor_df) &lt;- c(&quot;row&quot;, &quot;col&quot;)
 
 for (cc in cc_vec) {
   
-  cor_df$cor &lt;- as.vector(cor(fit_list[[as.character(cc)]]$V))
+  cor_mat &lt;- cor(fit_list[[as.character(cc)]]$V, method = &quot;spearman&quot;)
+  avg_cor &lt;- mean(cor_mat[lower.tri(cor_mat)])
+  factor_cor &lt;- c(factor_cor, avg_cor)
+  
+  cor_df$cor &lt;- as.vector(cor_mat)
     
   library(ggplot2)
   cor_plot_list[[glue::glue(&quot;c = {cc}&quot;)]] &lt;- ggplot(
@@ -1183,7 +1235,9 @@ for (cc in cc_vec) {
 
 }
 
-cor_df$cor &lt;- as.vector(cor(fit_list$`Inf`$F))
+cor_mat &lt;- cor(fit_list$`Inf`$F, method = &quot;spearman&quot;)
+cor_df$cor &lt;- as.vector(cor_mat)
+#factor_cor &lt;- c(factor_cor, mean(cor_mat[lower.tri(cor_mat)]))
 
 cor_plot_list[[&quot;c = Inf&quot;]] &lt;- ggplot(
       cor_df, 
@@ -1237,6 +1291,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/3a8950d79357f41553e64efb6b09d8ecacc7d693/docs/figure/pancreas.Rmd/unnamed-chunk-9-1.png" target="_blank">3a8950d</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-13
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/docs/figure/pancreas.Rmd/unnamed-chunk-9-1.png" target="_blank">d4f9ec8</a>
 </td>
 <td>
@@ -1250,6 +1315,20 @@ Eric Weine
 </table>
 </div>
 </div>
+<pre class="r"><code>df &lt;- data.frame(
+  cc = cc_vec,
+  correlation = factor_cor
+)
+
+ggplot(data = df, aes(x = cc, y = correlation)) +
+  geom_point() +
+  geom_line() +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_x_log10() +
+  cowplot::theme_cowplot() +
+  xlab(&quot;c (log10 scale)&quot;) +
+  ylab(&quot;Average Factor Spearman Correlation&quot;)</code></pre>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>There is a noticable increase in correlation as <span
 class="math inline">\(c\)</span> gets larger.</p>
 <p>I also looked at the overlap in the “driving genes.” To do this, I
@@ -1356,44 +1435,7 @@ cor_plot_list[[&quot;c = Inf&quot;]] &lt;- ggplot(
   common.legend = TRUE,
   legend = &quot;right&quot;
 )</code></pre>
-<p><img src="figure/pancreas.Rmd/unnamed-chunk-12-1.png" width="1440" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
-Past versions of unnamed-chunk-12-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-12-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/docs/figure/pancreas.Rmd/unnamed-chunk-12-1.png" target="_blank">d4f9ec8</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2025-02-13
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-13-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <p>Again, for the models with larger <span
 class="math inline">\(c\)</span>, the overlap in the driving genes
 between factors is much greater.</p>
@@ -1449,63 +1491,35 @@ l_df &lt;- data.frame(
        x = &quot;l&quot;,
        y = &quot;Count&quot;) +
   theme_minimal()</code></pre>
-<p><img src="figure/pancreas.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-14-1">
-Past versions of unnamed-chunk-14-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-14-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/docs/figure/pancreas.Rmd/unnamed-chunk-14-1.png" target="_blank">d4f9ec8</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2025-02-13
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>And here are the factors:</p>
-<pre class="r"><code>LL_c001 &lt;- normalize_bars(fit_list$`0.001`$V)
-LL_c01 &lt;- normalize_bars(fit_list$`0.01`$V)
-LL_cp1 &lt;- normalize_bars(fit_list$`0.1`$V)
-LL_c1 &lt;- normalize_bars(fit_list$`1`$V)
-LL_c10 &lt;- normalize_bars(fit_list$`10`$V)
-LL_c100 &lt;- normalize_bars(fit_list$`100`$V)
-LL_c1000 &lt;- normalize_bars(fit_list$`1000`$V)
-LL_cinf &lt;- normalize_bars(fit_list$`Inf`$F)
+<pre class="r"><code># LL_c001 &lt;- normalize_bars(fit_list$`0.001`$V)
+# LL_c01 &lt;- normalize_bars(fit_list$`0.01`$V)
+# LL_cp1 &lt;- normalize_bars(fit_list$`0.1`$V)
+# LL_c1 &lt;- normalize_bars(fit_list$`1`$V)
+# LL_c10 &lt;- normalize_bars(fit_list$`10`$V)
+# LL_c100 &lt;- normalize_bars(fit_list$`100`$V)
+# LL_c1000 &lt;- normalize_bars(fit_list$`1000`$V)
+# LL_cinf &lt;- normalize_bars(fit_list$`Inf`$F)
+
+LL_c001 &lt;- fit_list$`0.001`$U[,-1]
+LL_c01 &lt;- fit_list$`0.01`$U[,-1]
+LL_cp1 &lt;- fit_list$`0.1`$U[,-1]
+LL_c1 &lt;- fit_list$`1`$U[,-1]
+LL_c10 &lt;- fit_list$`10`$U[,-1]
+LL_c100 &lt;- fit_list$`100`$U[,-1]
+LL_c1000 &lt;- fit_list$`1000`$U[,-1]
+LL_cinf &lt;- fit_list$`Inf`$L[,-1]
 
 cc_out_vec &lt;- c(
-  rep(&quot;1e-3&quot;, ncol(counts) * 9),
-  rep(&quot;1e-2&quot;, ncol(counts) * 9),
-  rep(&quot;1e-1&quot;, ncol(counts) * 9),
-  rep(&quot;1&quot;, ncol(counts) * 9),
-  rep(&quot;1e1&quot;, ncol(counts) * 9),
-  rep(&quot;1e2&quot;, ncol(counts) * 9),
-  rep(&quot;1e3&quot;, ncol(counts) * 9),
-  rep(&quot;Inf&quot;, ncol(counts) * 9)
+  rep(&quot;1e-3&quot;, nrow(counts) * 8),
+  rep(&quot;1e-2&quot;, nrow(counts) * 8),
+  rep(&quot;1e-1&quot;, nrow(counts) * 8),
+  rep(&quot;1&quot;, nrow(counts) * 8),
+  rep(&quot;1e1&quot;, nrow(counts) * 8),
+  rep(&quot;1e2&quot;, nrow(counts) * 8),
+  rep(&quot;1e3&quot;, nrow(counts) * 8),
+  rep(&quot;Inf&quot;, nrow(counts) * 8)
 )
 
 cc_out_vector &lt;- factor(
@@ -1526,53 +1540,82 @@ l_df &lt;- data.frame(
   ),
   cc = cc_out_vector
 )</code></pre>
-<pre class="r"><code>ggplot(l_df, aes(x = l)) +
+<pre class="r"><code>ggplot(l_df, aes(x = log1p(l))) +
+  geom_histogram(bins = 40, fill = &quot;blue&quot;, color = &quot;black&quot;, alpha = 1, size = 0) +
+  facet_wrap(~ cc, scales = &quot;free_x&quot;) +
+  labs(title = &quot;Histograms of log1p(loadings) by c&quot;,
+       x = &quot;l&quot;,
+       y = &quot;Count&quot;) +
+  theme_minimal() +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" />
+Interestingly, both the loadings and the factors appear to get more
+sparse as <span class="math inline">\(c\)</span> increases.</p>
+<pre class="r"><code>Lambda_c001 &lt;- 0.001 * (exp(fit_list$`0.001`$U %*% t(fit_list$`0.001`$V)) - 1)
+Lambda_c01 &lt;- 0.01 * (exp(fit_list$`0.01`$U %*% t(fit_list$`0.01`$V)) - 1)
+Lambda_cp1 &lt;- 0.1 * (exp(fit_list$`0.1`$U %*% t(fit_list$`0.1`$V)) - 1)
+Lambda_c1 &lt;- (exp(fit_list$`1`$U %*% t(fit_list$`1`$V)) - 1)
+Lambda_c10 &lt;- 10 * (exp(fit_list$`10`$U %*% t(fit_list$`10`$V)) - 1)
+Lambda_c100 &lt;- 100 * (exp(fit_list$`100`$U %*% t(fit_list$`100`$V)) - 1)
+Lambda_c1000 &lt;- 1000 * (exp(fit_list$`1000`$U %*% t(fit_list$`1000`$V)) - 1)
+Lambda_cinf &lt;- fit_list$`Inf`$L %*% t(fit_list$`Inf`$F)</code></pre>
+<pre class="r"><code>sample_size &lt;- round(prod(dim(counts)) * 0.01)
+samp_idx &lt;- sample.int(n = prod(dim(counts)), size = sample_size)
+
+l_samp_df &lt;- data.frame(
+  lambda_c001 = as.vector(Lambda_c001)[samp_idx],
+  lambda_c1000 = as.vector(Lambda_c1000)[samp_idx]
+)
+ggplot(data = l_samp_df) +
+  geom_point(aes(x = log(lambda_c001), y = log(lambda_c1000)), alpha = 0.1) +
+  xlab(&quot;log(lambda) for c = 1e-3&quot;) +
+  ylab(&quot;log(lambda) for c = 1e3&quot;)</code></pre>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>sample_size &lt;- round(prod(dim(counts)) * 0.2)
+samp_idx &lt;- sample.int(n = prod(dim(counts)), size = sample_size)
+
+cc_out_vec &lt;- c(
+  rep(&quot;1e-3&quot;, sample_size),
+  rep(&quot;1e-2&quot;, sample_size),
+  rep(&quot;1e-1&quot;, sample_size),
+  rep(&quot;1&quot;, sample_size),
+  rep(&quot;1e1&quot;, sample_size),
+  rep(&quot;1e2&quot;, sample_size),
+  rep(&quot;1e3&quot;, sample_size),
+  rep(&quot;Inf&quot;, sample_size)
+)
+
+cc_out_vector &lt;- factor(
+  x = cc_out_vec,
+  levels = c(&quot;1e-3&quot;, &quot;1e-2&quot;, &quot;1e-1&quot;, &quot;1&quot;, &quot;1e1&quot;, &quot;1e2&quot;, &quot;1e3&quot;, &quot;Inf&quot;)
+)
+
+l_df &lt;- data.frame(
+  l = c(
+    as.vector(Lambda_c001)[samp_idx],
+    as.vector(Lambda_c01)[samp_idx],
+    as.vector(Lambda_cp1)[samp_idx],
+    as.vector(Lambda_c1)[samp_idx],
+    as.vector(Lambda_c10)[samp_idx],
+    as.vector(Lambda_c100)[samp_idx],
+    as.vector(Lambda_c1000)[samp_idx],
+    as.vector(Lambda_cinf)[samp_idx]
+  ),
+  cc = cc_out_vector
+)</code></pre>
+<pre class="r"><code>rm(fit_list, fit_list_nnlm, Lambda_c001, Lambda_c01, Lambda_c1, Lambda_c10, Lambda_c100, Lambda_c1000, Lambda_cinf, Lambda_cp1, counts, sample_info, i, genes_to_use, cc_out_vec, s, n, p, K, cc, cc_vec, cc_out_vector, sample_size, samp_idx)
+gc()</code></pre>
+<pre><code>           used  (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
+Ncells  2859332 152.8    5010510  267.6         NA   5010510  267.6
+Vcells 89206564 680.6  514867179 3928.2      16384 638363790 4870.4</code></pre>
+<pre class="r"><code>ggplot(l_df, aes(x = log(l))) +
   geom_histogram(bins = 40, fill = &quot;blue&quot;, color = &quot;black&quot;, alpha = 0.7) +
   facet_wrap(~ cc) +
   labs(title = &quot;Histograms of factors by c&quot;,
-       x = &quot;l&quot;,
+       x = &quot;Lambda&quot;,
        y = &quot;Count&quot;) +
   theme_minimal()</code></pre>
-<p><img src="figure/pancreas.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
-Past versions of unnamed-chunk-16-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-16-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/d4f9ec8fdc6c311fd3e9d47ffac8f8e358847095/docs/figure/pancreas.Rmd/unnamed-chunk-16-1.png" target="_blank">d4f9ec8</a>
-</td>
-<td>
-Eric Weine
-</td>
-<td>
-2025-02-13
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Interestingly, both the loadings and the factors appear to get more
-sparse as <span class="math inline">\(c\)</span> increases.</p>
+<p><img src="figure/pancreas.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

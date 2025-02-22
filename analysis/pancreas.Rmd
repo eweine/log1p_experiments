@@ -330,6 +330,7 @@ ggarrange(
 First, I looked at the correlations between the factors:
 
 ```{r}
+factor_cor <- c()
 cor_plot_list <- list()
 
 cor_df <- expand.grid(1:9, 1:9)
@@ -337,7 +338,11 @@ colnames(cor_df) <- c("row", "col")
 
 for (cc in cc_vec) {
   
-  cor_df$cor <- as.vector(cor(fit_list[[as.character(cc)]]$V))
+  cor_mat <- cor(fit_list[[as.character(cc)]]$V, method = "spearman")
+  avg_cor <- mean(cor_mat[lower.tri(cor_mat)])
+  factor_cor <- c(factor_cor, avg_cor)
+  
+  cor_df$cor <- as.vector(cor_mat)
     
   library(ggplot2)
   cor_plot_list[[glue::glue("c = {cc}")]] <- ggplot(
@@ -362,7 +367,9 @@ for (cc in cc_vec) {
 
 }
 
-cor_df$cor <- as.vector(cor(fit_list$`Inf`$F))
+cor_mat <- cor(fit_list$`Inf`$F, method = "spearman")
+cor_df$cor <- as.vector(cor_mat)
+#factor_cor <- c(factor_cor, mean(cor_mat[lower.tri(cor_mat)]))
 
 cor_plot_list[["c = Inf"]] <- ggplot(
       cor_df, 
@@ -395,6 +402,23 @@ ggarrange(
   legend = "right"
 )
 ```
+
+```{r}
+df <- data.frame(
+  cc = cc_vec,
+  correlation = factor_cor
+)
+
+ggplot(data = df, aes(x = cc, y = correlation)) +
+  geom_point() +
+  geom_line() +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_x_log10() +
+  cowplot::theme_cowplot() +
+  xlab("c (log10 scale)") +
+  ylab("Average Factor Spearman Correlation")
+```
+
 
 There is a noticable increase in correlation as $c$ gets larger. 
 
@@ -580,24 +604,24 @@ And here are the factors:
 # LL_c1000 <- normalize_bars(fit_list$`1000`$V)
 # LL_cinf <- normalize_bars(fit_list$`Inf`$F)
 
-LL_c001 <- fit_list$`0.001`$V
-LL_c01 <- fit_list$`0.01`$V
-LL_cp1 <- fit_list$`0.1`$V
-LL_c1 <- fit_list$`1`$V
-LL_c10 <- fit_list$`10`$V
-LL_c100 <- fit_list$`100`$V
-LL_c1000 <- fit_list$`1000`$V
-LL_cinf <- fit_list$`Inf`$F
+LL_c001 <- fit_list$`0.001`$U[,-1]
+LL_c01 <- fit_list$`0.01`$U[,-1]
+LL_cp1 <- fit_list$`0.1`$U[,-1]
+LL_c1 <- fit_list$`1`$U[,-1]
+LL_c10 <- fit_list$`10`$U[,-1]
+LL_c100 <- fit_list$`100`$U[,-1]
+LL_c1000 <- fit_list$`1000`$U[,-1]
+LL_cinf <- fit_list$`Inf`$L[,-1]
 
 cc_out_vec <- c(
-  rep("1e-3", ncol(counts) * 9),
-  rep("1e-2", ncol(counts) * 9),
-  rep("1e-1", ncol(counts) * 9),
-  rep("1", ncol(counts) * 9),
-  rep("1e1", ncol(counts) * 9),
-  rep("1e2", ncol(counts) * 9),
-  rep("1e3", ncol(counts) * 9),
-  rep("Inf", ncol(counts) * 9)
+  rep("1e-3", nrow(counts) * 8),
+  rep("1e-2", nrow(counts) * 8),
+  rep("1e-1", nrow(counts) * 8),
+  rep("1", nrow(counts) * 8),
+  rep("1e1", nrow(counts) * 8),
+  rep("1e2", nrow(counts) * 8),
+  rep("1e3", nrow(counts) * 8),
+  rep("Inf", nrow(counts) * 8)
 )
 
 cc_out_vector <- factor(
@@ -622,9 +646,9 @@ l_df <- data.frame(
 
 ```{r}
 ggplot(l_df, aes(x = log1p(l))) +
-  geom_histogram(bins = 20, fill = "blue", color = "black", alpha = 1, size = 0) +
+  geom_histogram(bins = 40, fill = "blue", color = "black", alpha = 1, size = 0) +
   facet_wrap(~ cc, scales = "free_x") +
-  labs(title = "Histograms of log1p(factors) by c",
+  labs(title = "Histograms of log1p(loadings) by c",
        x = "l",
        y = "Count") +
   theme_minimal() +

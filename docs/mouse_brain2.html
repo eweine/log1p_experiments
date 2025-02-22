@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2025-02-22" />
+
+<title>Mouse Brain Stimulation</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Mouse Brain Stimulation</h1>
+<h4 class="date">2025-02-22</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2025-02-22
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree93183accad128e0e4c033a48d172db1bab5c8842targetblank93183aca">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/93183accad128e0e4c033a48d172db1bab5c8842" target="_blank">93183ac</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree93183accad128e0e4c033a48d172db1bab5c8842targetblank93183aca"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/93183accad128e0e4c033a48d172db1bab5c8842" target="_blank">93183ac</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    data/.DS_Store
+
+Untracked files:
+    Untracked:  analysis/mouse_brain2.Rmd
+
+Unstaged changes:
+    Modified:   analysis/bbc.Rmd
+    Modified:   analysis/pancreas.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>
+Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    filter, lag</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(Matrix)
+library(fastTopics)
+library(ggplot2)
+library(cowplot)
+
+jaccard_index &lt;- function(vec1, vec2) {
+  
+  set1 &lt;- unique(vec1)
+  
+  set2 &lt;- unique(vec2)
+  
+  intersection &lt;- length(intersect(set1, set2))
+  
+  union &lt;- length(union(set1, set2))
+  
+  return(intersection / union)
+  
+}
+
+load(&quot;~/Downloads/mouse_brain_stim.Rdata&quot;)
+
+cells &lt;- cells %&gt;% dplyr::filter(!is.na(maintype))
+
+counts &lt;- counts[rownames(counts) %in% cells$`...1`, ]
+counts &lt;- counts[, Matrix::colSums(counts) &gt; 0]
+counts &lt;- counts[Matrix::rowSums(counts) &gt; 0, ]
+
+s &lt;- Matrix::rowSums(counts)
+s &lt;- s / mean(s)
+
+n &lt;- nrow(counts)
+p &lt;- ncol(counts)
+K &lt;- 20
+
+n_top &lt;- 20
+
+hoyer_sparsity &lt;- function(x) {
+  
+  n &lt;- length(x)
+  (1 / (sqrt(n) - 1)) * (sqrt(n) - (sum(x) / (sqrt(sum(x ^ 2)))))
+  
+}
+
+fit_list &lt;- list()
+cc_vec &lt;- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+for (cc in cc_vec) {
+  
+  fit_list[[as.character(cc)]] &lt;- readr::read_rds(
+    glue::glue(
+      &quot;~/Documents/data/passPCA/mouse_log1p_c{cc}_k20_exact_100_iter.rds&quot;
+    )
+  )
+  
+  colnames(fit_list[[as.character(cc)]]$FF) &lt;- paste0(&quot;k&quot;, 1:20)
+  colnames(fit_list[[as.character(cc)]]$LL) &lt;- paste0(&quot;k&quot;, 1:20)
+  
+  F_norm &lt;- passPCA:::normalize_bars(fit_list[[as.character(cc)]]$FF)
+  top_list &lt;- list()
+  distinct_list &lt;- list()
+  jaccard_vec &lt;- c()
+  
+  for (k in 1:20) {
+    
+    top_list[[k]] &lt;- names(sort(F_norm[,k], decreasing = TRUE))[1:n_top]
+    distinct_list[[k]] &lt;- fastTopics:::get_distinctive_features(
+      effects_matrix = F_norm,
+      k = glue::glue(&quot;k{k}&quot;), n = n_top, feature_sign = &quot;positive&quot;
+    )
+    
+    jaccard_vec &lt;- c(jaccard_vec, jaccard_index(
+      top_list[[k]],
+      distinct_list[[k]]
+    ))
+    
+  }
+  
+  fit_list[[as.character(cc)]]$top_genes &lt;- top_list
+  fit_list[[as.character(cc)]]$distinct_genes &lt;- distinct_list
+  fit_list[[as.character(cc)]]$jaccard &lt;- jaccard_vec
+  
+  fit_list[[as.character(cc)]]$l_sparsity &lt;- apply(
+    fit_list[[as.character(cc)]]$LL, 2, hoyer_sparsity
+  )
+  
+  fit_list[[as.character(cc)]]$f_sparsity &lt;- apply(
+    fit_list[[as.character(cc)]]$FF, 2, hoyer_sparsity
+  )
+  
+  fit_list[[as.character(cc)]]$cor_mat &lt;- cor(fit_list[[as.character(cc)]]$FF, method = &quot;spearman&quot;)
+  
+}
+
+fit_list[[&quot;Inf&quot;]] &lt;- readr::read_rds(
+  glue::glue(&quot;~/Documents/data/passPCA/mouse_light_k20_nmf.rds&quot;)
+)
+
+colnames(fit_list[[&quot;Inf&quot;]]$F) &lt;- paste0(&quot;k&quot;, 1:20)
+
+fit_list[[&quot;Inf&quot;]]$Ls &lt;- Matrix::Diagonal(x = 1/s) %*% fit_list[[&quot;Inf&quot;]]$L
+
+F_norm &lt;- passPCA:::normalize_bars(fit_list[[&quot;Inf&quot;]]$F)
+colnames(F_norm) &lt;- paste0(&quot;k&quot;,1:20)
+top_list &lt;- list()
+distinct_list &lt;- list()
+jaccard_vec &lt;- c()
+
+for (k in 1:20) {
+  
+  top_list[[k]] &lt;- names(sort(F_norm[,k], decreasing = TRUE))[1:n_top]
+  distinct_list[[k]] &lt;- fastTopics:::get_distinctive_features(
+    effects_matrix = F_norm,
+    k = glue::glue(&quot;k{k}&quot;), n = n_top, feature_sign = &quot;positive&quot;
+  )
+  
+  jaccard_vec &lt;- c(jaccard_vec, jaccard_index(
+    top_list[[k]],
+    distinct_list[[k]]
+  ))
+  
+}
+
+fit_list[[&quot;Inf&quot;]]$top_genes &lt;- top_list
+fit_list[[&quot;Inf&quot;]]$distinct_genes &lt;- distinct_list
+fit_list[[&quot;Inf&quot;]]$jaccard &lt;- jaccard_vec
+
+fit_list[[&quot;Inf&quot;]]$l_sparsity &lt;- apply(
+  fit_list[[&quot;Inf&quot;]]$Ls, 2, hoyer_sparsity
+)
+
+fit_list[[&quot;Inf&quot;]]$f_sparsity &lt;- apply(
+  fit_list[[&quot;Inf&quot;]]$F, 2, hoyer_sparsity
+)
+
+fit_list[[&quot;Inf&quot;]]$cor_mat &lt;- cor(fit_list[[&quot;Inf&quot;]]$F, method = &quot;spearman&quot;)
+
+l_sparsity_vec &lt;- unlist(lapply(fit_list, function(x) {median(x$l_sparsity)}))
+f_sparsity_vec &lt;- unlist(lapply(fit_list, function(x) {median(x$f_sparsity)}))
+cor_vec &lt;- unlist(
+  lapply(fit_list, function(x) {median(x$cor_mat[lower.tri(x$cor_mat)])})
+)
+
+jaccard_vec &lt;- unlist(
+  lapply(fit_list, function(x) {median(x$jaccard)})
+)
+
+df_sparsity_l &lt;- data.frame(
+  cc = as.numeric(names(l_sparsity_vec)),
+  sparsity = l_sparsity_vec
+) %&gt;% filter(is.finite(cc))
+
+df_sparsity_f &lt;- data.frame(
+  cc = as.numeric(names(f_sparsity_vec)),
+  sparsity = f_sparsity_vec
+) %&gt;% filter(is.finite(cc))
+
+df_cor &lt;- data.frame(
+  cc = as.numeric(names(cor_vec)),
+  correlation = cor_vec
+) %&gt;% filter(is.finite(cc))
+
+library(ggplot2)
+
+
+# here, I&#39;m interested in the way that the excitatory cells are represented
+
+excit_cells &lt;- cells %&gt;% dplyr::filter(maintype == &quot;Excitatory&quot;)
+
+excit_cc_vec &lt;- c(
+  0.01, 0.1, 1, 10, 100, 1000, Inf
+)
+
+factor &lt;- c(12, 9, 16, 6, 2, 16, 5)
+
+top_genes_vec &lt;- c()
+distinctive_genes_vec &lt;- c()
+
+top_go_vec &lt;- c()
+distinctive_go_vec &lt;- c()
+
+i &lt;- 1
+
+library(clusterProfiler)</code></pre>
+<pre><code></code></pre>
+<pre><code>clusterProfiler v4.12.0  For help: https://yulab-smu.top/biomedical-knowledge-mining-book/
+
+If you use clusterProfiler in published research, please cite:
+T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu. clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141</code></pre>
+<pre><code>
+Attaching package: &#39;clusterProfiler&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:stats&#39;:
+
+    filter</code></pre>
+<pre class="r"><code>library(fgsea)
+library(AnnotationDbi)</code></pre>
+<pre><code>Loading required package: stats4</code></pre>
+<pre><code>Loading required package: BiocGenerics</code></pre>
+<pre><code>
+Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
+
+    combine, intersect, setdiff, union</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    Position, rank, rbind, Reduce, rownames, sapply, setdiff, table,
+    tapply, union, unique, unsplit, which.max, which.min</code></pre>
+<pre><code>Loading required package: Biobase</code></pre>
+<pre><code>Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    &#39;browseVignettes()&#39;. To cite Bioconductor, see
+    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
+<pre><code>Loading required package: IRanges</code></pre>
+<pre><code>Loading required package: S4Vectors</code></pre>
+<pre><code>
+Attaching package: &#39;S4Vectors&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:clusterProfiler&#39;:
+
+    rename</code></pre>
+<pre><code>The following objects are masked from &#39;package:Matrix&#39;:
+
+    expand, unname</code></pre>
+<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
+
+    first, rename</code></pre>
+<pre><code>The following object is masked from &#39;package:utils&#39;:
+
+    findMatches</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    expand.grid, I, unname</code></pre>
+<pre><code>
+Attaching package: &#39;IRanges&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:clusterProfiler&#39;:
+
+    slice</code></pre>
+<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
+
+    collapse, desc, slice</code></pre>
+<pre><code>
+Attaching package: &#39;AnnotationDbi&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:clusterProfiler&#39;:
+
+    select</code></pre>
+<pre><code>The following object is masked from &#39;package:dplyr&#39;:
+
+    select</code></pre>
+<pre class="r"><code>library(org.Mm.eg.db)</code></pre>
+<pre><code></code></pre>
+<pre class="r"><code>for (cc in excit_cc_vec) {
+  
+  print(cc)
+  
+  cc_factor &lt;- factor[i]
+  fit &lt;- fit_list[[as.character(cc)]]
+  if (is.finite(cc)) {
+    
+    FF &lt;- fit$FF
+    
+  } else {
+    
+    FF &lt;- fit$F
+    colnames(FF) &lt;- paste0(&quot;k&quot;, 1:20)
+    
+  }
+  
+  FF &lt;- passPCA:::normalize_bars(FF)
+  top_genes &lt;- names(sort(FF[,cc_factor], decreasing = TRUE))[1:20]
+  distinctive_genes &lt;- fastTopics:::get_distinctive_features(
+    effects_matrix = FF,
+    k = glue::glue(&quot;k{cc_factor}&quot;), n = 20, feature_sign = &quot;positive&quot;)
+  
+  go_result &lt;- enrichGO(gene = top_genes,
+                        OrgDb = org.Mm.eg.db,
+                        keyType = &quot;SYMBOL&quot;,
+                        ont = &quot;BP&quot;, 
+                        pAdjustMethod = &quot;bonferroni&quot;,
+                        pvalueCutoff = 0.01,
+                        qvalueCutoff = 0.05)@result
+  
+  go_result &lt;- go_result %&gt;%
+    dplyr::filter(p.adjust &lt; .01)
+  
+  go_terms &lt;- go_result$Description
+  
+  top_genes_vec &lt;- c(top_genes_vec, paste(top_genes, collapse = &quot;, &quot;))
+  top_go_vec &lt;- c(top_go_vec, paste(go_terms, collapse = &quot;, &quot;))
+  
+  go_result &lt;- enrichGO(gene = distinctive_genes,
+                        OrgDb = org.Mm.eg.db,
+                        keyType = &quot;SYMBOL&quot;,
+                        ont = &quot;BP&quot;, 
+                        pAdjustMethod = &quot;bonferroni&quot;,
+                        pvalueCutoff = 0.01,
+                        qvalueCutoff = 0.05)@result
+  
+  go_result &lt;- go_result %&gt;%
+    dplyr::filter(p.adjust &lt; .01)
+  
+  go_terms &lt;- go_result$Description
+  
+  distinctive_genes_vec &lt;- c(distinctive_genes_vec, paste(distinctive_genes, collapse = &quot;, &quot;))
+  distinctive_go_vec &lt;- c(distinctive_go_vec, paste(go_terms, collapse = &quot;, &quot;))
+  
+  i &lt;- i + 1
+  
+}</code></pre>
+<pre><code>[1] 0.01
+[1] 0.1
+[1] 1
+[1] 10
+[1] 100
+[1] 1000
+[1] Inf</code></pre>
+<pre class="r"><code># now, for each factor, find both the top genes, the most
+# distinctive genes, and associated go terms for both
+
+go_df &lt;- data.frame(
+  c = as.character(excit_cc_vec),
+  top_genes = top_genes_vec,
+  top_go_terms = top_go_vec,
+  distinctive_genes = distinctive_genes_vec,
+  distinctive_go = distinctive_go_vec
+)
+
+knitr::kable(go_df)</code></pre>
+<table>
+<colgroup>
+<col width="0%" />
+<col width="7%" />
+<col width="65%" />
+<col width="7%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">c</th>
+<th align="left">top_genes</th>
+<th align="left">top_go_terms</th>
+<th align="left">distinctive_genes</th>
+<th align="left">distinctive_go</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0.01</td>
+<td align="left">Nr4a2, Hba-a2, Bdnf, Fosb, Nptx2, Hbb-bs, Fosl2, Nefm,
+Scg2, Cdkn1a, Gadd45b, Homer1, Inhba, Cbln4, Ptgs2, Fos, Nr4a3, Zdbf2,
+Cbln2, Nr4a1</td>
+<td align="left">fat cell differentiation, adult behavior, regulation of
+apoptotic signaling pathway</td>
+<td align="left">Inhba, Fosb, Crem, Nptx2, Homer1, Pcsk1, Nr4a2, Fosl2,
+Zdbf2, Nfil3, Cdkn1a, Ptgs2, Bdnf, Gadd45b, Plekhg4, Hectd2, Fbxo33,
+Irs2, Cbln2, Scg2</td>
+<td align="left">regulation of apoptotic signaling pathway</td>
+</tr>
+<tr class="even">
+<td align="left">0.1</td>
+<td align="left">Bdnf, Nr4a2, Scg2, Nefm, Homer1, Nptx2, Egr1, Nefl,
+Cdkn1a, Egr4, Fosl2, Vgf, Arc, Fosb, Nr4a1, Egr2, Fos, Rheb, Cx3cl1,
+Gadd45b</td>
+<td align="left">muscle organ development, regulation of neuronal
+synaptic plasticity, skeletal muscle tissue development, skeletal muscle
+organ development, response to peptide, skeletal muscle cell
+differentiation, regulation of synapse organization, regulation of
+synapse structure or activity, regulation of neuron apoptotic process,
+positive regulation of neurogenesis, learning or memory, cognition,
+neuron apoptotic process, positive regulation of nervous system
+development, response to peptide hormone</td>
+<td align="left">Bdnf, Fosb, Nr4a2, Fosl2, Egr2, Nptx2, Egr4, Gadd45b,
+Nr4a3, Ptgs2, Npas4, Cbln2, Irs2, Inhba, Fmnl1, Vgf, Zdbf2, Cdkn1a,
+Gadd45g, Phf21b</td>
+<td align="left">response to peptide, fat cell differentiation, learning
+or memory, cognition, positive regulation of fatty acid metabolic
+process, response to peptide hormone, learning, negative regulation of
+kinase activity</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">Scg2, Homer1, Egr1, Bdnf, Nefl, Nefm, Cx3cl1, Arpp21,
+Nr4a2, Nrn1, Nrgn, Arc, Nr4a1, Vgf, Tpt1, Meg3, Hsph1, Hspa8, Rheb,
+Ppme1</td>
+<td align="left">regulation of synapse organization, regulation of
+synapse structure or activity, regulation of neuron apoptotic process,
+neuron apoptotic process, regulation of neuronal synaptic plasticity,
+negative regulation of neuron apoptotic process, negative regulation of
+apoptotic signaling pathway, regulation of postsynapse organization,
+muscle organ development, regulation of synaptic plasticity, regulation
+of apoptotic signaling pathway</td>
+<td align="left">Bdnf, Homer1, Nr4a2, Scg2, Egr4, Nefl, Nr4a1, Arc,
+Egr1, Nefm, Junb, Egr2, Nptx2, Fosb, Dnajb5, Fos, Nhp2l1, Arpp21,
+Cx3cl1, Fosl2</td>
+<td align="left">muscle organ development, skeletal muscle tissue
+development, skeletal muscle organ development, skeletal muscle cell
+differentiation, regulation of neuron apoptotic process, learning or
+memory, response to calcium ion, cognition, neuron apoptotic process,
+negative regulation of neuron apoptotic process, response to
+peptide</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">Nrgn, Meg3, Cx3cl1, Homer1, Camk2n1, Ppp3ca, Egr1,
+Rab6a, Calm1, Arpp21, Snap25, Nefl, Atp1b1, Scg2, Hsp90aa1, Rtn1, Calm2,
+Nefm, Ywhab, Baiap2</td>
+<td align="left">positive regulation of calcium ion transport, positive
+regulation of calcium ion transmembrane transport, positive regulation
+of monoatomic ion transport, regulation of calcium ion transport,
+positive regulation of cation transmembrane transport, regulation of
+monoatomic cation transmembrane transport, positive regulation of
+monoatomic ion transmembrane transport, regulation of monoatomic ion
+transmembrane transport, regulation of calcium ion transmembrane
+transport, regulation of metal ion transport, calcium ion transport,
+positive regulation of transmembrane transport, positive regulation of
+calcium ion transmembrane transporter activity, postsynaptic modulation
+of chemical synaptic transmission, calcium ion transmembrane transport,
+response to calcium ion, positive regulation of release of sequestered
+calcium ion into cytosol, long-term memory, striated muscle contraction,
+negative regulation of calcium ion transmembrane transport, calcium ion
+transmembrane import into cytosol</td>
+<td align="left">Homer1, Nefl, Egr1, Cx3cl1, Arpp21, Nefm, Scg2, Bdnf,
+Nr4a1, Nr4a2, Arc, Ppme1, Rab6a, Junb, Egr4, Vgf, Nhp2l1, R3hdm1,
+Dnajb5, Baiap2</td>
+<td align="left">regulation of neuronal synaptic plasticity, regulation
+of synapse organization, regulation of synapse structure or activity,
+regulation of neuron apoptotic process, neuron apoptotic process,
+regulation of synaptic plasticity, negative regulation of neuron
+apoptotic process</td>
+</tr>
+<tr class="odd">
+<td align="left">100</td>
+<td align="left">Nrgn, Meg3, Ppp3ca, Cx3cl1, Calm1, Snap25, Rab6a,
+Atp1b1, Egr1, Homer1, Camk2n1, Rtn1, Nefl, Hsp90aa1, Calm2, Arpp21,
+Scg2, Ywhab, Basp1, App</td>
+<td align="left">positive regulation of calcium ion transport,
+regulation of monoatomic cation transmembrane transport, regulation of
+monoatomic ion transmembrane transport, positive regulation of calcium
+ion transmembrane transport, positive regulation of monoatomic ion
+transport, regulation of calcium ion transport, response to calcium ion,
+positive regulation of cation transmembrane transport, positive
+regulation of monoatomic ion transmembrane transport, regulation of
+calcium ion transmembrane transport, regulation of monoatomic ion
+transmembrane transporter activity, regulation of metal ion transport,
+regulation of transmembrane transporter activity, calcium ion transport,
+regulation of transporter activity, positive regulation of transmembrane
+transport, regulation of cation channel activity, regulation of blood
+circulation, positive regulation of calcium ion transmembrane
+transporter activity, response to metal ion, intracellular calcium ion
+homeostasis, postsynaptic modulation of chemical synaptic transmission,
+calcium ion transmembrane transport, positive regulation of release of
+sequestered calcium ion into cytosol, calcium ion homeostasis, long-term
+memory, glutamate receptor signaling pathway, memory, striated muscle
+contraction, negative regulation of calcium ion transmembrane
+transport</td>
+<td align="left">Homer1, Egr1, Nefl, Cx3cl1, Nefm, Bdnf, Arc, Scg2,
+Nr4a1, Nr4a2, Baiap2, Arpp21, Junb, Ppme1, Egr4, Nrn1, Rheb, R3hdm1,
+Dnajb5, Vgf</td>
+<td align="left">regulation of synapse organization, regulation of
+synapse structure or activity, regulation of neuronal synaptic
+plasticity, regulation of neuron apoptotic process, regulation of
+postsynapse organization, positive regulation of neurogenesis, neuron
+apoptotic process, positive regulation of nervous system development,
+regulation of synaptic plasticity, negative regulation of neuron
+apoptotic process</td>
+</tr>
+<tr class="even">
+<td align="left">1000</td>
+<td align="left">Nrgn, Meg3, Cx3cl1, Snap25, Calm1, Atp1b1, Egr1, Rab6a,
+Homer1, Ppp3ca, Nefl, Calm2, Rtn1, Hsp90aa1, Arpp21, Scg2, Camk2n1,
+Ywhab, Basp1, Nefm</td>
+<td align="left">positive regulation of calcium ion transport, positive
+regulation of calcium ion transmembrane transport, positive regulation
+of monoatomic ion transport, regulation of calcium ion transport,
+positive regulation of cation transmembrane transport, regulation of
+monoatomic cation transmembrane transport, positive regulation of
+monoatomic ion transmembrane transport, regulation of monoatomic ion
+transmembrane transport, regulation of calcium ion transmembrane
+transport, regulation of metal ion transport, calcium ion transport,
+positive regulation of transmembrane transport, positive regulation of
+calcium ion transmembrane transporter activity, postsynaptic modulation
+of chemical synaptic transmission, calcium ion transmembrane transport,
+response to calcium ion, positive regulation of release of sequestered
+calcium ion into cytosol, long-term memory, striated muscle contraction,
+negative regulation of calcium ion transmembrane transport, calcium ion
+transmembrane import into cytosol</td>
+<td align="left">Homer1, Egr1, Cx3cl1, Nefl, Nefm, Scg2, Arpp21, Bdnf,
+Arc, Nr4a1, Nr4a2, Nrn1, Ppme1, Baiap2, Vgf, Junb, Egr4, Hsph1, Rheb,
+Nhp2l1</td>
+<td align="left">regulation of synapse organization, regulation of
+synapse structure or activity, regulation of neuron apoptotic process,
+neuron apoptotic process, regulation of neuronal synaptic plasticity,
+negative regulation of neuron apoptotic process, regulation of
+postsynapse organization, positive regulation of neurogenesis, positive
+regulation of nervous system development, regulation of synaptic
+plasticity</td>
+</tr>
+<tr class="odd">
+<td align="left">Inf</td>
+<td align="left">Nrgn, Meg3, Ppp3ca, Calm1, Cx3cl1, Snap25, Camk2n1,
+Rab6a, Egr1, Atp1b1, Rtn1, Homer1, Hsp90aa1, Nefl, Calm2, Arpp21, Basp1,
+Snhg11, Ywhab, Baiap2</td>
+<td align="left">positive regulation of calcium ion transport, positive
+regulation of calcium ion transmembrane transport, positive regulation
+of monoatomic ion transport, regulation of calcium ion transport,
+positive regulation of cation transmembrane transport, regulation of
+monoatomic cation transmembrane transport, positive regulation of
+monoatomic ion transmembrane transport, regulation of monoatomic ion
+transmembrane transport, regulation of calcium ion transmembrane
+transport, regulation of metal ion transport, calcium ion transport,
+positive regulation of transmembrane transport, positive regulation of
+calcium ion transmembrane transporter activity, postsynaptic modulation
+of chemical synaptic transmission, calcium ion transmembrane transport,
+response to calcium ion, positive regulation of release of sequestered
+calcium ion into cytosol, long-term memory, striated muscle contraction,
+negative regulation of calcium ion transmembrane transport, calcium ion
+transmembrane import into cytosol</td>
+<td align="left">Egr1, Homer1, Cx3cl1, Nefl, Nefm, Arpp21, Arc, Scg2,
+Bdnf, Nr4a1, Nr4a2, Junb, Vgf, Egr4, R3hdm1, Ppme1, Nrn1, Baiap2,
+Dnajb5, Lingo1</td>
+<td align="left">regulation of neuronal synaptic plasticity, regulation
+of synapse organization, regulation of synapse structure or activity,
+regulation of neuron apoptotic process, neuron apoptotic process,
+regulation of synaptic plasticity, negative regulation of neuron
+apoptotic process</td>
+</tr>
+</tbody>
+</table>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/New_York
+tzcode source: internal
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] org.Mm.eg.db_3.19.1    AnnotationDbi_1.66.0   IRanges_2.38.0        
+ [4] S4Vectors_0.42.0       Biobase_2.64.0         BiocGenerics_0.50.0   
+ [7] fgsea_1.30.0           clusterProfiler_4.12.0 cowplot_1.1.3         
+[10] ggplot2_3.5.1          fastTopics_0.7-24      Matrix_1.7-0          
+[13] dplyr_1.1.4           
+
+loaded via a namespace (and not attached):
+  [1] RColorBrewer_1.1-3      rstudioapi_0.16.0       jsonlite_1.8.8         
+  [4] magrittr_2.0.3          farver_2.1.2            rmarkdown_2.27         
+  [7] fs_1.6.4                zlibbioc_1.50.0         vctrs_0.6.5            
+ [10] memoise_2.0.1           ggtree_3.12.0           SQUAREM_2021.1         
+ [13] mixsqp_0.3-54           htmltools_0.5.8.1       progress_1.2.3         
+ [16] truncnorm_1.0-9         gridGraphics_0.5-1      passPCA_0.1-2          
+ [19] sass_0.4.9              bslib_0.7.0             htmlwidgets_1.6.4      
+ [22] plyr_1.8.9              plotly_4.10.4           cachem_1.1.0           
+ [25] sfsmisc_1.1-18          igraph_2.0.3            lifecycle_1.0.4        
+ [28] startupmsg_0.9.6.1      pkgconfig_2.0.3         gson_0.1.0             
+ [31] R6_2.5.1                fastmap_1.2.0           GenomeInfoDbData_1.2.12
+ [34] aplot_0.2.3             digest_0.6.36           enrichplot_1.24.0      
+ [37] colorspace_2.1-0        patchwork_1.2.0         rprojroot_2.0.4        
+ [40] irlba_2.3.5.1           RSQLite_2.3.7           invgamma_1.1           
+ [43] fansi_1.0.6             httr_1.4.7              polyclip_1.10-6        
+ [46] compiler_4.4.0          bit64_4.0.5             withr_3.0.0            
+ [49] BiocParallel_1.38.0     viridis_0.6.5           DBI_1.2.3              
+ [52] ggforce_0.4.2           MASS_7.3-61             HDO.db_0.99.1          
+ [55] gtools_3.9.5            distr_2.9.3             tools_4.4.0            
+ [58] scatterpie_0.2.3        ape_5.8                 httpuv_1.6.15          
+ [61] glue_1.7.0              quadprog_1.5-8          nlme_3.1-165           
+ [64] GOSemSim_2.30.0         promises_1.3.0          shadowtext_0.1.3       
+ [67] grid_4.4.0              Rtsne_0.17              reshape2_1.4.4         
+ [70] generics_0.1.3          gtable_0.3.5            tzdb_0.4.0             
+ [73] tidyr_1.3.1             data.table_1.15.4       hms_1.1.3              
+ [76] tidygraph_1.3.1         utf8_1.2.4              XVector_0.44.0         
+ [79] ggrepel_0.9.5           pillar_1.9.0            stringr_1.5.1          
+ [82] yulab.utils_0.1.4       later_1.3.2             splines_4.4.0          
+ [85] tweenr_2.0.3            treeio_1.28.0           lattice_0.22-6         
+ [88] bit_4.0.5               tidyselect_1.2.1        GO.db_3.19.1           
+ [91] Biostrings_2.72.1       pbapply_1.7-2           knitr_1.47             
+ [94] git2r_0.33.0            gridExtra_2.3           RhpcBLASctl_0.23-42    
+ [97] xfun_0.45               graphlayouts_1.1.1      stringi_1.8.4          
+[100] UCSC.utils_1.0.0        ggfun_0.1.5             workflowr_1.7.1        
+[103] lazyeval_0.2.2          yaml_2.3.8              evaluate_0.24.0        
+[106] codetools_0.2-20        ggraph_2.2.1            tibble_3.2.1           
+[109] qvalue_2.36.0           ggplotify_0.1.2         cli_3.6.3              
+[112] uwot_0.2.2              RcppParallel_5.1.7      munsell_0.5.1          
+[115] jquerylib_0.1.4         Rcpp_1.0.13             GenomeInfoDb_1.40.1    
+[118] png_0.1-8               parallel_4.4.0          readr_2.1.5            
+[121] blob_1.2.4              prettyunits_1.2.0       DOSE_3.30.1            
+[124] tidytree_0.4.6          viridisLite_0.4.2       scales_1.3.0           
+[127] purrr_1.0.2             crayon_1.5.3            rlang_1.1.4            
+[130] fastmatch_1.1-4         ashr_2.2-63             KEGGREST_1.44.1        </code></pre>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
