@@ -61,3 +61,6 @@ Welcome to my research website.
 [Newsgroups Dataset Analysis - K = 25](newsgroups25.html)
 
 [BBC Keywords](bbc2.html)
+
+[A Tree Simulation](tree_sim.html)
+

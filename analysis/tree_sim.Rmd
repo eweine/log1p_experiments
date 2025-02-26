@@ -1,0 +1,165 @@
+---
+title: "A Tree Based Simulation"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2025-02-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(Matrix)
+```
+
+
+## Introduction
+
+Here, I simulate data that has a tree-structure and fit both the topic model and the log1p model for various values of c.
+
+Specifically, I generated data as $y_{ij} \sim \textrm{Poisson}(\sum_{k}l_{ik}f_{jk})$ where $L$ is a hierarchical membership matrix with structure shown below:
+
+```{r}
+# number of genes
+p <- 500
+# number of cells
+n <- 1000
+K <- 7
+LL <- matrix(
+  data = 0,
+  nrow = n,
+  ncol = K
+)
+
+FF <- matrix(
+  data = 0,
+  nrow = p,
+  ncol = K
+)
+
+set.seed(1)
+# everyone loaded on the first factor
+LL[,1] <- 1
+LL[1:500, 2] <- 1
+LL[501:1000, 3] <- 1
+LL[1:250, 4] <- 1
+LL[251:500, 5] <- 1
+LL[501:750, 6] <- 1
+LL[751:1000, 7] <- 1
+
+# base rate
+FF[,1] <- 0.5
+all_idx <- sample(1:500)  # Shuffle all indices once
+split_idx <- split(all_idx, rep(1:K, each = 25))  # Divide into K groups
+
+for (k in 2:K) {
+  FF[split_idx[[k]], k] <- FF[split_idx[[k]], k] + 3
+}
+
+Lambda <- tcrossprod(LL, FF)
+
+
+set.seed(1)
+Y <- matrix(
+  data = rpois(
+    n = n * p,
+    lambda = as.vector(Lambda)
+  ),
+  nrow = n,
+  ncol = p
+)
+Y <- as(Y, "CsparseMatrix")
+
+fastTopics::structure_plot(LL, loadings_order = 1:n)
+```
+
+Topic 1 is a baseline topic, where $f$ is a constant of $0.5$ for each gene. All remaining factors add $3$ to this baseline rate across a set of $25$ non-overlapping genes specific to each factor. 
+
+First, I fit a topic model to the data with $K = 7$. To do this, I initialize the first factor to the best rank-1 fit (with all other factors set to very small values). I also experimented with just starting with a random initialization, but it didn't seem to make a difference in the final fit. Below is the structure plot from the topic model:
+
+```{r, results='hide'}
+nmf_k1 <- fastTopics:::fit_pnmf_rank1(Y)
+library(dplyr)
+set.seed(1)
+nmf_LL <- nmf_k1$L %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+rownames(nmf_LL) <- rownames(Y)
+
+set.seed(1)
+nmf_FF <- nmf_k1$F %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+rownames(nmf_FF) <- colnames(Y)
+
+set.seed(1)
+nmf_fit0 <- fastTopics::init_poisson_nmf(
+  X = Y,
+  L = nmf_LL,
+  F = nmf_FF
+)
+
+nmf_fit <- fastTopics::fit_poisson_nmf(
+  X = Y,
+  fit0 = nmf_fit0,
+  control = list(nc = 7), numiter = 250
+)
+```
+```{r}
+fastTopics::structure_plot(nmf_fit, loadings_order = 1:n)
+```
+
+
+Here, we can see that the topic model essentially just provides a clustering.
+
+Now, I experimented with fitting the log1p model to these data. First, I fit the model with $c = 1e-3$
+
+```{r, results='hide'}
+set.seed(1)
+library(passPCA)
+log1p_ft7 <- fit_poisson_log1p_nmf(
+  Y = Y, K = K, s = FALSE, cc = 1e-3, loglik = "exact"
+)
+
+```
+
+```{r}
+normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
+```
+
+
+While this isn't a perfect fit, it's certainly much closer to the hierarchical structure that we generated data from. The intercept is captured very well, and each group has their own group specific factor. The first two groups share the yellow factor to some degree.
+
+I also wanted to know what this would look like for $c = 1$.
+
+```{r, results='hide'}
+set.seed(1)
+log1p_ft7 <- fit_poisson_log1p_nmf(
+  Y = Y, K = K, s = FALSE, cc = 1, loglik = "exact"
+)
+```
+
+```{r}
+normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
+
+```
+
+
+This looks bad...
