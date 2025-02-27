@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2025-02-26" />
+
+<title>Analyzing BBC Keywords With K = 30</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Analyzing BBC Keywords With K = 30</h1>
+<h4 class="date">2025-02-26</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2025-02-26
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree52c8d182582cc439b185dc8d6bcbccd7ea6fec26targetblank52c8d18a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/52c8d182582cc439b185dc8d6bcbccd7ea6fec26" target="_blank">52c8d18</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree52c8d182582cc439b185dc8d6bcbccd7ea6fec26targetblank52c8d18a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/52c8d182582cc439b185dc8d6bcbccd7ea6fec26" target="_blank">52c8d18</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    data/.DS_Store
+
+Untracked files:
+    Untracked:  analysis/bbc3.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="structure-plots" class="section level2">
+<h2>Structure Plots</h2>
+<pre class="r"><code>dat &lt;- readr::read_csv(&quot;~/Downloads/bbc_news_text_complexity_summarization.csv&quot;)</code></pre>
+<pre><code>Rows: 2127 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (4): text, labels, text_rank_summary, lsa_summary
+dbl (3): no_sentences, Flesch Reading Ease Score, Dale-Chall Readability Score
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>library(tm)</code></pre>
+<pre><code>Loading required package: NLP</code></pre>
+<pre class="r"><code>library(SnowballC)
+
+my_corpus &lt;- VCorpus(VectorSource(dat$text))
+
+addspace &lt;- content_transformer(function(x, pattern) {
+  return(gsub(pattern, &quot; &quot;, x))
+})
+
+my_corpus &lt;- tm_map(my_corpus, addspace, &quot;-&quot;)
+
+my_corpus &lt;- tm_map(my_corpus, removeNumbers)
+
+# Transform to lower case (need to wrap in content_transformer)
+my_corpus &lt;- tm_map(my_corpus,content_transformer(tolower))
+my_corpus &lt;- tm_map(my_corpus, removeWords, stopwords(&quot;SMART&quot;))
+my_corpus &lt;- tm_map(my_corpus, removePunctuation)
+my_corpus &lt;- tm_map(my_corpus, stripWhitespace)
+
+my_corpus &lt;- tm_map(my_corpus, stemDocument)
+
+dtm &lt;- DocumentTermMatrix(my_corpus)
+dtm2 &lt;- Matrix::sparseMatrix(
+  i = dtm$i,
+  j = dtm$j,
+  x = dtm$v
+)
+
+
+colnames(dtm2) &lt;- dtm$dimnames$Terms
+words_to_use &lt;- which(Matrix::colSums(dtm2&gt;0)&gt;4)
+
+dtm2 &lt;- dtm2[,words_to_use]
+
+s &lt;- Matrix::rowSums(dtm2)
+s &lt;- s / mean(s)
+
+library(fastTopics)
+library(passPCA)
+library(Matrix)
+library(dplyr)</code></pre>
+<pre><code>
+Attaching package: &#39;dplyr&#39;
+
+The following objects are masked from &#39;package:stats&#39;:
+
+    filter, lag
+
+The following objects are masked from &#39;package:base&#39;:
+
+    intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>#cc_vec &lt;- c(1e3)
+
+n &lt;- nrow(dtm2)
+p &lt;- ncol(dtm2)
+
+K &lt;- 30
+
+hoyer_sparsity &lt;- function(x) {
+  
+  n &lt;- length(x)
+  (1 / (sqrt(n) - 1)) * (sqrt(n) - (sum(x) / (sqrt(sum(x ^ 2)))))
+  
+}
+
+fit_list &lt;- list()
+cc_vec &lt;- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+for (cc in cc_vec) {
+  
+  fit_list[[as.character(cc)]] &lt;- readr::read_rds(
+    glue::glue(
+      &quot;~/Documents/data/bbc_log1p_c{cc}_k{K}_exact_1000_iter.rds&quot;
+    )
+  )
+  
+  colnames(fit_list[[as.character(cc)]]$LL) &lt;- paste0(&quot;k&quot;, 1:K)
+  
+  fit_list[[as.character(cc)]]$l_sparsity &lt;- apply(
+    fit_list[[as.character(cc)]]$LL, 2, hoyer_sparsity
+  )
+  
+  fit_list[[as.character(cc)]]$f_sparsity &lt;- apply(
+    fit_list[[as.character(cc)]]$FF, 2, hoyer_sparsity
+  )
+  
+  fit_list[[as.character(cc)]]$cor_mat &lt;- cor(fit_list[[as.character(cc)]]$FF, method = &quot;spearman&quot;)
+  
+}
+
+fit_list[[&quot;Inf&quot;]] &lt;- readr::read_rds(
+  glue::glue(&quot;~/Documents/data/bbc_topic_model_k{K}_exact_1000_iter.rds&quot;)
+)
+
+fit_list[[&quot;Inf&quot;]]$Ls &lt;- Matrix::Diagonal(x = 1/s) %*% fit_list[[&quot;Inf&quot;]]$L
+
+fit_list[[&quot;Inf&quot;]]$l_sparsity &lt;- apply(
+  fit_list[[&quot;Inf&quot;]]$Ls, 2, hoyer_sparsity
+)
+
+fit_list[[&quot;Inf&quot;]]$f_sparsity &lt;- apply(
+  fit_list[[&quot;Inf&quot;]]$F, 2, hoyer_sparsity
+)
+
+fit_list[[&quot;Inf&quot;]]$cor_mat &lt;- cor(fit_list[[&quot;Inf&quot;]]$F, method = &quot;spearman&quot;)
+
+l_sparsity_vec &lt;- unlist(lapply(fit_list, function(x) {median(x$l_sparsity)}))
+f_sparsity_vec &lt;- unlist(lapply(fit_list, function(x) {median(x$f_sparsity)}))
+cor_vec &lt;- unlist(
+  lapply(fit_list, function(x) {median(x$cor_mat[lower.tri(x$cor_mat)])})
+)
+
+df_sparsity_l &lt;- data.frame(
+  cc = as.numeric(names(l_sparsity_vec)),
+  sparsity = l_sparsity_vec
+) %&gt;% filter(is.finite(cc))
+
+df_sparsity_f &lt;- data.frame(
+  cc = as.numeric(names(f_sparsity_vec)),
+  sparsity = f_sparsity_vec
+) %&gt;% filter(is.finite(cc))
+
+df_cor &lt;- data.frame(
+  cc = as.numeric(names(cor_vec)),
+  correlation = cor_vec
+) %&gt;% filter(is.finite(cc))
+
+library(ggpubr)</code></pre>
+<pre><code>Loading required package: ggplot2
+
+Attaching package: &#39;ggplot2&#39;
+
+The following object is masked from &#39;package:NLP&#39;:
+
+    annotate</code></pre>
+<pre class="r"><code>library(ggplot2)</code></pre>
+<pre class="r"><code>plot_list &lt;- list()
+cc_vec &lt;- c(1e-3, 1)
+
+for (cc in cc_vec) {
+  
+  plot_list[[glue::glue(&quot;c = {cc}&quot;)]] &lt;- normalized_structure_plot(
+    fit_list[[as.character(cc)]],
+    grouping = dat$labels,gap = 25,perplexity = 70,n = Inf, font.size = 12
+  ) + ggtitle(glue::glue(&quot;c = {cc}&quot;))
+  
+}</code></pre>
+<pre><code>Running tsne on 503 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 369 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 403 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 505 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 347 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 503 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 369 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 403 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 505 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 347 x 30 matrix.</code></pre>
+<pre class="r"><code>plot_list[[&quot;Topic Model&quot;]] &lt;- structure_plot(
+  fit_list[[&quot;Inf&quot;]],
+  grouping = dat$labels,gap = 25,perplexity = 70,n = Inf,font.size = 12
+) + ggtitle(&quot;Topic Model&quot;)</code></pre>
+<pre><code>Running tsne on 503 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 369 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 403 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 505 x 30 matrix.</code></pre>
+<pre><code>Running tsne on 347 x 30 matrix.</code></pre>
+<pre class="r"><code>g &lt;- ggarrange(
+  plotlist = plot_list,
+  ncol = 1,
+  labels = &quot;AUTO&quot;
+)
+
+g &lt;- annotate_figure(g,
+                     top = text_grob(&quot;BBC K = 30&quot;, size = 20, face = &quot;bold&quot;))</code></pre>
+<pre class="r"><code>g</code></pre>
+<p><img src="figure/bbc3.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="keywords" class="section level2">
+<h2>Keywords</h2>
+</div>
+<div id="c-1e-3" class="section level1">
+<h1>c = 1e-3</h1>
+<pre class="r"><code>get_top_words &lt;- function(f, n_top = 20) {
+  
+  words &lt;- names(sort(f, decreasing = TRUE))[1:n_top]
+  pasted_words &lt;- paste(words, collapse = &quot;, &quot;)
+  return(pasted_words)
+  
+}
+
+get_distinctive_words &lt;- function(FF, n_top = 20) {
+  
+  FF &lt;- passPCA:::normalize_bars(FF)
+  colnames(FF) &lt;- paste0(&quot;k_&quot;, 1:ncol(FF))
+  
+  kw_vec &lt;- c()
+  
+  for (k in 1:ncol(FF)) {
+    
+    kw &lt;- fastTopics:::get_distinctive_features(
+      effects_matrix = FF,
+      k = glue::glue(&quot;k_{k}&quot;),
+      n = n_top,
+      feature_sign = &quot;positive&quot;
+    )
+    kw_vec &lt;- c(
+      kw_vec, 
+      paste(kw, collapse = &quot;, &quot;)
+    )
+    
+  }
+  
+  return(
+    data.frame(
+      factor = paste0(&quot;k_&quot;, 1:ncol(FF)),
+      distinctive_words = kw_vec
+    )
+  )
+  
+}
+
+top_words &lt;- apply(fit_list$`0.001`$FF, 2, get_top_words)
+top_words &lt;- as.data.frame(top_words)
+colnames(top_words) &lt;- c(&quot;top_words&quot;)
+top_words$factor &lt;- rownames(top_words)
+rownames(top_words) &lt;- NULL
+top_words &lt;- top_words %&gt;% dplyr::select(c(&quot;factor&quot;, &quot;top_words&quot;))
+distinctive_words &lt;- get_distinctive_words(fit_list$`0.001`$FF)
+word_df &lt;- top_words %&gt;% dplyr::inner_join(distinctive_words)</code></pre>
+<pre><code>Joining with `by = join_by(factor)`</code></pre>
+<pre class="r"><code>knitr::kable(word_df)</code></pre>
+<table>
+<colgroup>
+<col width="1%" />
+<col width="47%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">factor</th>
+<th align="left">top_words</th>
+<th align="left">distinctive_words</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">k_1</td>
+<td align="left">patent, falcon, poppin, chancellor, bill, handheld,
+lord, blair, spur, ministeri, cunningham, linux, sourc, marr,
+parliament, intervent, book, gameboy, outlin, gazprom</td>
+<td align="left">poppin, goat, ministeri, thin, falcon, patent, cameron,
+marr, roman, concili, tinker, clare, griffith, impresario, lane,
+cunningham, compuls, mould, dame, poland</td>
+</tr>
+<tr class="even">
+<td align="left">k_2</td>
+<td align="left">penalti, minut, sub, yard, volley, corner, shot, card,
+pass, save, ball, header, lob, rang, fuller, blast, mansfield, box,
+bond, chip</td>
+<td align="left">lob, sub, yard, minut, volley, corner, snatch,
+mansfield, header, unmark, pass, rang, curl, despair, penalti, shot,
+blast, narrowli, blade, thump</td>
+</tr>
+<tr class="odd">
+<td align="left">k_3</td>
+<td align="left">wale, rugbi, england, ireland, twickenham, franc,
+squad, captain, coach, robinson, woodward, scrum, lion, slam, zealand,
+capt, player, driscol, scotland, flanker</td>
+<td align="left">twickenham, capt, scrum, captain, rugbi, eddi, lion,
+woodward, lansdown, olli, resurg, flanker, rbs, squad, england, coach,
+hodgson, stutter, lock, shirt</td>
+</tr>
+<tr class="even">
+<td align="left">k_4</td>
+<td align="left">gameplay, game, enemi, fiat, slick, addict, niggl,
+feel, bit, anim, authent, slice, parmalat, wonder, urban, atmospher,
+flair, virtual, alien, learn</td>
+<td align="left">gameplay, niggl, enemi, slick, alien, weird, liter,
+annoy, imagin, notion, joystick, midst, slice, authent, meaningless,
+beast, misunderstood, addict, sens, arcad</td>
+</tr>
+<tr class="odd">
+<td align="left">k_5</td>
+<td align="left">user, softwar, virus, program, web, malici, browser,
+site, mail, spam, microsoft, comput, window, messag, spywar, infect,
+internet, updat, googl, file</td>
+<td align="left">trojan, user, cluley, updat, savvi, phish, browser,
+circul, symantec, softwar, program, messag, site, firewal, steal,
+version, bulletin, beta, address, click</td>
+</tr>
+<tr class="even">
+<td align="left">k_6</td>
+<td align="left">broadcast, broadband, viewer, channel, satellit,
+freeview, terrestri, televis, radio, ofcom, fcc, station, telco,
+content, programm, cabl, web, audienc, sky, video</td>
+<td align="left">broadcast, broadband, viewer, channel, hook, terrestri,
+freeview, upload, explos, adsl, televis, eastend, aol, radio, jupit,
+djs, content, station, satellit, ntl</td>
+</tr>
+<tr class="odd">
+<td align="left">k_7</td>
+<td align="left">gadget, soni, portabl, mini, devic, appl, ipod, mac,
+chip, psp, consum, photo, store, mobil, camera, ces, samsung, dvd,
+player, storag</td>
+<td align="left">gadget, portabl, compat, soni, lcd, expo, devic,
+samsung, watcher, plasma, walkman, storag, jukebox, tvs, psp, ipod,
+mini, flash, keyboard, ubiquit</td>
+</tr>
+<tr class="even">
+<td align="left">k_8</td>
+<td align="left">peer, nissan, roddick, moya, dvds, carmak, merced,
+mitsubishi, job, pension, motor, worker, daimlerchrysl, piraci, airlin,
+nadal, pirat, appoint, tuc, dvd</td>
+<td align="left">peer, nissan, thwart, tuc, appoint, piraci, dvds,
+worker, phonograph, overhead, opel, rent, rio, systemat, daimlerchrysl,
+job, edonkey, napster, kinnock, dal</td>
+</tr>
+<tr class="odd">
+<td align="left">k_9</td>
+<td align="left">mobil, phone, india, handset, indian, vodafon, telecom,
+mda, telecommun, gsm, bellami, mirza, ericsson, mms, telephon, rupe,
+bet, boe, bollywood, mci</td>
+<td align="left">landlin, mda, handset, wap, phone, mobil, gprs, gsm,
+rocket, mms, telecommun, ericsson, rack, bellami, monsoon, overtak,
+orang, sms, kbps, cann</td>
+</tr>
+<tr class="even">
+<td align="left">k_10</td>
+<td align="left">sharehold, takeov, investor, stock, deutsch, share,
+bank, financi, stake, invest, creditor, bid, debt, merger, £bn, firm,
+boers, equiti, exchang, insur</td>
+<td align="left">sharehold, takeov, financi, equiti, eighteen, investor,
+deposit, stake, brokerag, enron, bid, consolid, share, bidder, tycoon,
+transact, largest, buyout, stock, magnier</td>
+</tr>
+<tr class="odd">
+<td align="left">k_11</td>
+<td align="left">turkey, european, franc, rebat, cyprus, germani,
+brussel, robot, referendum, switzerland, kerr, turkish, commiss,
+constitut, lisbon, barroso, republ, french, eurozon, union</td>
+<td align="left">barroso, brussel, criteria, luxembourg, veto, turkey,
+commiss, germani, cyprus, referendum, switzerland, rebat, allay,
+membership, enlarg, unjustifi, european, denmark, treati, constitut</td>
+</tr>
+<tr class="even">
+<td align="left">k_12</td>
+<td align="left">growth, economist, rate, economi, rise, econom,
+slowdown, quarter, rose, inflat, forecast, price, consum, export, fall,
+bank, figur, manufactur, slow, dollar</td>
+<td align="left">economist, growth, slowdown, rose, rate, fall, upward,
+grew, slow, index, softer, slight, fell, figur, inflationari, wane,
+inflat, weaker, revis, declin</td>
+</tr>
+<tr class="odd">
+<td align="left">k_13</td>
+<td align="left">brown, tax, chancellor, pension, budget, gordon, incom,
+spend, £bn, taxat, treasuri, borrow, elect, poverti, stamp, threshold,
+financ, wast, trust, pledg</td>
+<td align="left">taxat, incom, vinc, tax, budget, gordon, brown,
+giveaway, threshold, stamp, earner, pledg, expenditur, scrap, promis,
+fill, fairer, revalu, frontbench, afford</td>
+</tr>
+<tr class="even">
+<td align="left">k_14</td>
+<td align="left">flight, passeng, frankfurt, airlin, mourinho, airport,
+lufthansa, marathon, lse, plane, elvi, easterbi, refuge, airway,
+traffic, fuel, airplan, horgan, patient, jet</td>
+<td align="left">airplan, frankfurt, passeng, refuge, flight, plane,
+lufthansa, patient, diagnosi, norfolk, weather, stroke, airway,
+bandwidth, jailhous, drogba, bump, megabit, jet, cudicini</td>
+</tr>
+<tr class="odd">
+<td align="left">k_15</td>
+<td align="left">scottish, drink, pupil, women, foster, children,
+mcconnel, scotland, sturgeon, highland, ranger, bing, msps, murray,
+educ, smith, drunk, food, school, colleg</td>
+<td align="left">sturgeon, highland, holyrood, curriculum, pupil,
+colleg, recommend, ethnic, older, ruth, snp, mcdonald, mcconnel,
+secondari, food, scottish, obes, walter, taught, msp</td>
+</tr>
+<tr class="even">
+<td align="left">k_16</td>
+<td align="left">lawyer, court, dope, feder, prosecutor, lawsuit,
+violat, alleg, file, sue, case, tribun, drug, cont, appeal, legal,
+illeg, iaaf, arbitr, rule</td>
+<td align="left">sue, launder, verdict, dope, lawsuit, arbitr, upheld,
+disciplinari, lawyer, gregori, prosecutor, district, indict, innoc,
+appeal, punish, cont, substanc, uphold, litig</td>
+</tr>
+<tr class="odd">
+<td align="left">k_17</td>
+<td align="left">chart, china, xbox, releas, microsoft, consol, chines,
+game, wembley, bnp, sequel, halo, burnley, japan, hewitt, san, mubanga,
+gta, corp, focker</td>
+<td align="left">cube, twelv, chart, battlefield, releas, rockstar,
+china, phoenix, xbox, burnley, gta, formula, wembley, slimmer, beij,
+tier, halo, cow, sequel, corp</td>
+</tr>
+<tr class="even">
+<td align="left">k_18</td>
+<td align="left">india, aid, indonesia, relief, poverti, tsunami,
+southern, sri, palestinian, iraq, indian, lanka, peac, provinc,
+venezuela, african, argentina, argentin, thai, disast</td>
+<td align="left">southern, thai, aid, relief, peac, multilater, mahmoud,
+bueno, asia, hurrican, livelihood, earthquak, african, indonesian,
+provinc, wealthi, buri, palestinian, lankan, munich</td>
+</tr>
+<tr class="odd">
+<td align="left">k_19</td>
+<td align="left">wale, polic, hunt, law, prosecut, offenc, murder,
+arrest, properti, welsh, rig, leaflet, tag, hound, constabl, suspect,
+cruel, drink, hous, dog</td>
+<td align="left">polic, constabl, properti, warehous, rig, offenc,
+hound, sheep, outcri, guidanc, flush, leaflet, defiant, councillor,
+intimid, ceas, mar, plaid, tag, petit</td>
+</tr>
+<tr class="even">
+<td align="left">k_20</td>
+<td align="left">labour, parti, elect, tori, conserv, howard, blair,
+constitu, seat, campbel, vote, iraq, ukip, voter, kennedi, alastair,
+liber, democrat, campaign, polit</td>
+<td align="left">parti, alastair, seat, labour, dossier, conserv,
+disillus, constitu, tori, elect, poll, leader, general, leadership,
+campaign, vote, polit, slogan, issu, view</td>
+</tr>
+<tr class="odd">
+<td align="left">k_21</td>
+<td align="left">album, band, music, song, grammi, singer, franz,
+artist, pop, ferdinand, brit, rock, musician, concert, gig, elvi, hop,
+kean, soul, presley</td>
+<td align="left">album, band, song, duet, ferdinand, heaven, franz, pop,
+grammi, scissor, maroon, brit, bedingfield, eminem, gospel, rock, muse,
+solo, jazz, jamelia</td>
+</tr>
+<tr class="even">
+<td align="left">k_22</td>
+<td align="left">gas, yuko, oil, rover, energi, silk, rosneft, bmw,
+gazprom, yugansk, houston, kilroy, russia, cairn, search, putin, car,
+russian, baikal, khodorkovski</td>
+<td align="left">gas, unsuccess, rover, oil, forrest, gulf, memorandum,
+putin, plant, beer, bmw, petrol, breweri, kremlin, clutch, rosneft,
+ford, energi, detroit, petroleum</td>
+</tr>
+<tr class="odd">
+<td align="left">k_23</td>
+<td align="left">deport, detent, terror, detaine, nuclear, belmarsh,
+suspect, terrorist, bank, clark, intercept, indefinit, tortur, liberti,
+trial, dallaglio, visa, laptop, woodhil, guantanamo</td>
+<td align="left">deport, detent, belmarsh, woodhil, detaine, terror,
+indefinit, intercept, naiv, warrant, qaeda, tortur, liberti, utter,
+dispens, imprison, clark, terrorist, judgment, diplomat</td>
+</tr>
+<tr class="even">
+<td align="left">k_24</td>
+<td align="left">seed, australian, hewitt, tenni, safin, wimbledon,
+henman, agassi, lleyton, slam, davenport, champion, grand, beat,
+tournament, open, melbourn, johansson, win, roger</td>
+<td align="left">gaudio, gaston, wimbledon, seed, kiefer, safin,
+lleyton, marat, ancic, juan, sharapova, roger, davenport, andr, ferrero,
+ivan, coria, australian, nalbandian, semi</td>
+</tr>
+<tr class="odd">
+<td align="left">k_25</td>
+<td align="left">scientist, laser, scienc, supercomput, electr, art,
+silicon, gerrard, quango, parri, project, pearson, galleri, cell, intel,
+jone, morgan, ibm, luscomb, edward</td>
+<td align="left">scientist, laser, architectur, silicon, scienc, roof,
+art, supercomput, frequenc, river, galleri, puls, fuse, depart, hansen,
+spiral, materi, lab, sponsorship, gene</td>
+</tr>
+<tr class="even">
+<td align="left">k_26</td>
+<td align="left">indoor, athlet, holm, olymp, franci, medallist, garden,
+mcilroy, medal, gold, prix, sprinter, lewi, marathon, athen, bronz,
+radcliff, sotherton, johnson, bekel</td>
+<td align="left">indoor, medallist, bronz, prix, vaulter, maduaka,
+garden, holm, bekel, medal, athlet, darren, olymp, mauric, helsinki,
+kenenisa, hicham, quartet, vault, guerrouj</td>
+</tr>
+<tr class="odd">
+<td align="left">k_27</td>
+<td align="left">film, oscar, actor, actress, comedi, nomin, award,
+drama, hollywood, scorses, nomine, movi, star, academi, screenplay,
+staunton, sideway, foxx, eastwood, swank</td>
+<td align="left">actress, oscar, scorses, actor, nomine, biopic, film,
+clint, julia, sideway, winslet, annett, eastwood, cate, academi, comedi,
+blanchett, portman, hepburn, globe</td>
+</tr>
+<tr class="even">
+<td align="left">k_28</td>
+<td align="left">ticket, doctor, injuri, evict, princ, lanka, beatti,
+hunt, flu, accid, foot, sri, clijster, plastic, apac, miss, wrist, bath,
+knee, glasgow</td>
+<td align="left">flu, ticket, queue, absent, evict, apac, ligament,
+princ, plastic, beatti, midnight, accid, lush, surgeri, rehabilit,
+saracen, injur, ladbrok, groin, friday</td>
+</tr>
+<tr class="odd">
+<td align="left">k_29</td>
+<td align="left">kaplan, refere, fiction, journalist, sentenc,
+photograph, murder, uniform, shopper, tabloid, blog, conspiraci, book,
+mart, wal, feud, rift, apologis, squabbl, offend</td>
+<td align="left">fiction, journalist, photograph, tabloid, squabbl,
+feud, conspiraci, refere, furnitur, kaplan, kurt, fletcher, uniform,
+mart, wal, offend, lighter, contempt, nazi, apologis</td>
+</tr>
+<tr class="even">
+<td align="left">k_30</td>
+<td align="left">chelsea, arsenal, liverpool, striker, club,
+premiership, manchest, everton, leagu, ferguson, wenger, mourinho,
+midfield, footbal, gerrard, barcelona, madrid, uefa, benitez, milan</td>
+<td align="left">striker, goalkeep, arsenal, ruud, club, manchest,
+midfield, ronaldo, sol, liga, utd, everton, premiership, goran,
+portugues, wayn, bayer, chelsea, leverkusen, jen</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="c-1" class="section level1">
+<h1>c = 1</h1>
+<pre class="r"><code>top_words &lt;- apply(fit_list$`1`$FF, 2, get_top_words)
+top_words &lt;- as.data.frame(top_words)
+colnames(top_words) &lt;- c(&quot;top_words&quot;)
+top_words$factor &lt;- rownames(top_words)
+rownames(top_words) &lt;- NULL
+top_words &lt;- top_words %&gt;% dplyr::select(c(&quot;factor&quot;, &quot;top_words&quot;))
+distinctive_words &lt;- get_distinctive_words(fit_list$`1`$FF)
+word_df &lt;- top_words %&gt;% dplyr::inner_join(distinctive_words)</code></pre>
+<pre><code>Joining with `by = join_by(factor)`</code></pre>
+<pre class="r"><code>knitr::kable(word_df)</code></pre>
+<table>
+<colgroup>
+<col width="2%" />
+<col width="45%" />
+<col width="52%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">factor</th>
+<th align="left">top_words</th>
+<th align="left">distinctive_words</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">k_1</td>
+<td align="left">mobil, phone, servic, peopl, broadband, network,
+technolog, net, speed, million, digit, offer, access, user, video, call,
+oper, handset, year, number</td>
+<td align="left">phone, broadband, mobil, handset, speed, connect,
+servic, fast, vodafon, text, multimedia, access, camera, nokia,
+subscript, mbps, ericsson, gartner, subscrib, voic</td>
+</tr>
+<tr class="even">
+<td align="left">k_2</td>
+<td align="left">open, play, win, year, set, final, match, roddick,
+seed, australian, beat, game, world, number, round, time, tenni, player,
+champion, cup</td>
+<td align="left">roddick, seed, open, tenni, nadal, australian, beat,
+set, henman, hewitt, wimbledon, round, moya, agassi, serv, davenport,
+win, safin, final, rusedski</td>
+</tr>
+<tr class="odd">
+<td align="left">k_3</td>
+<td align="left">goal, minut, game, ball, unit, half, shot, arsenal,
+chanc, time, score, back, win, chelsea, play, side, left, refere, henri,
+kick</td>
+<td align="left">goal, shot, rooney, henri, keeper, yard, sub, chanc,
+cole, header, head, galla, duff, drogba, arsenal, lampard, wide, jame,
+nevill, gudjohnsen</td>
+</tr>
+<tr class="even">
+<td align="left">k_4</td>
+<td align="left">ireland, half, penalti, minut, itali, game, england,
+kick, gara, side, ball, win, scotland, victori, william, irish, score,
+back, line, hodgson</td>
+<td align="left">gara, itali, penalti, murphi, hodgson, driscol,
+edinburgh, easterbi, henson, paterson, marigni, shane, lewsey, hicki,
+stringer, orquera, humphrey, convers, horgan, munster</td>
+</tr>
+<tr class="odd">
+<td align="left">k_5</td>
+<td align="left">rugbi, england, player, world, ireland, game, year,
+zealand, team, nation, cup, lion, side, tour, match, coach, scotland,
+play, wale, win</td>
+<td align="left">lion, zealand, rugbi, woodward, tour, dallaglio,
+australia, black, south, hemispher, seven, cup, player, northern,
+republ, coach, smith, june, samoa, captain</td>
+</tr>
+<tr class="even">
+<td align="left">k_6</td>
+<td align="left">england, wale, franc, injuri, play, back, game, nation,
+robinson, squad, week, half, win, year, coach, start, player, miss,
+william, centr</td>
+<td align="left">bath, injuri, ruddock, leicest, wilkinson, stade, wale,
+squad, robinson, gloucest, laport, fit, franc, swansea, week, tindal,
+tait, barkley, vickeri, biarritz</td>
+</tr>
+<tr class="odd">
+<td align="left">k_7</td>
+<td align="left">club, play, player, leagu, manag, chelsea, game,
+liverpool, footbal, team, year, season, time, cup, real, win, told,
+arsenal, champion, move</td>
+<td align="left">club, leagu, liverpool, manag, footbal, real, gerrard,
+benitez, parri, premiership, southampton, barcelona, stadium, wenger,
+souness, stay, villa, blackburn, thing, anfield</td>
+</tr>
+<tr class="even">
+<td align="left">k_8</td>
+<td align="left">aid, countri, world, tsunami, disast, peopl, develop,
+debt, nation, africa, relief, india, intern, million, econom, sri, imf,
+money, year, poverti</td>
+<td align="left">aid, disast, tsunami, relief, sri, imf, indonesia,
+lanka, poverti, donat, affect, asia, thailand, region, reconstruct,
+tourism, impact, debt, wave, hivaid</td>
+</tr>
+<tr class="odd">
+<td align="left">k_9</td>
+<td align="left">user, search, virus, secur, softwar, site, mail, net,
+microsoft, peopl, program, comput, firm, attack, websit, googl, system,
+spam, inform, web</td>
+<td align="left">virus, search, secur, microsoft, spam, googl, user,
+mail, patent, program, attack, window, softwar, browser, net, spywar,
+infect, yahoo, malici, domain</td>
+</tr>
+<tr class="even">
+<td align="left">k_10</td>
+<td align="left">olymp, year, world, athlet, race, test, indoor, athen,
+european, champion, win, time, championship, record, run, drug, holm,
+final, ban, titl</td>
+<td align="left">olymp, athlet, athen, indoor, race, holm, kenteri,
+iaaf, medal, greek, marathon, thanou, dope, radcliff, sprinter, test,
+championship, cont, compet, paula</td>
+</tr>
+<tr class="odd">
+<td align="left">k_11</td>
+<td align="left">game, play, titl, consol, time, nintendo, gamer,
+releas, video, player, develop, onlin, xbox, peopl, world, year, soni,
+make, sale, handheld</td>
+<td align="left">nintendo, gamer, game, halo, consol, handheld, xbox,
+psp, gameboy, addict, gameplay, fun, gta, sim, multiplay, shooter,
+creatur, doom, andrea, arcad</td>
+</tr>
+<tr class="even">
+<td align="left">k_12</td>
+<td align="left">card, sale, peopl, store, work, retail, christma, shop,
+onlin, technolog, print, consum, year, ink, centr, survey, pictur, art,
+auction, make</td>
+<td align="left">card, shop, store, christma, ink, print, mart, wal,
+retail, shopper, ebay, cloth, art, collect, item, librari, map, pictur,
+tag, street</td>
+</tr>
+<tr class="odd">
+<td align="left">k_13</td>
+<td align="left">school, children, educ, women, research, peopl, govern,
+univers, report, student, parent, work, social, year, fund, young, area,
+studi, communiti, problem</td>
+<td align="left">school, educ, children, student, univers, parent,
+women, research, social, studi, young, report, child, pupil, adult,
+skill, scienc, learn, care, area</td>
+</tr>
+<tr class="even">
+<td align="left">k_14</td>
+<td align="left">lord, govern, law, home, terror, right, bill,
+secretari, rule, hous, human, court, minist, blunkett, clark, plan,
+told, case, parliament, immigr</td>
+<td align="left">lord, terror, blunkett, clark, secretari, bill,
+suspect, asylum, human, parliament, detain, right, immigr, detent, home,
+visa, detaine, goldsmith, debat, liberti</td>
+</tr>
+<tr class="odd">
+<td align="left">k_15</td>
+<td align="left">show, bbc, broadcast, seri, programm, channel, viewer,
+televis, audienc, star, film, year, radio, peopl, big, episod, host,
+time, million, sky</td>
+<td align="left">show, viewer, channel, bbc, televis, broadcast,
+programm, episod, seri, audienc, itv, bet, jackson, comic, brother, sky,
+celebr, evict, odd, station</td>
+</tr>
+<tr class="even">
+<td align="left">k_16</td>
+<td align="left">tax, govern, increas, pension, plan, cut, budget,
+servic, spend, year, peopl, pay, council, public, work, brown, £bn,
+local, elect, worker</td>
+<td align="left">pension, tax, budget, wage, minimum, council, incom,
+worker, cut, increas, employ, treasuri, local, duti, health, servant,
+pay, salari, quango, reduc</td>
+</tr>
+<tr class="odd">
+<td align="left">k_17</td>
+<td align="left">film, star, festiv, year, book, includ, award,
+director, actor, theatr, produc, play, die, role, life, music, movi,
+work, world, cinema</td>
+<td align="left">festiv, book, theatr, die, berlin, cinema, hank, mari,
+sundanc, poppin, stori, documentari, born, broadway, histori, dame,
+dark, spacey, tautou, adapt</td>
+</tr>
+<tr class="even">
+<td align="left">k_18</td>
+<td align="left">china, countri, foreign, state, presid, govern,
+european, year, oil, world, minist, chines, project, bush, turkey,
+econom, deal, europ, firm, develop</td>
+<td align="left">china, chines, turkey, foreign, presid, bush, straw,
+state, ukrain, nuclear, energi, construct, embargo, palestinian,
+turkish, germani, isra, argentina, venezuela, iran</td>
+</tr>
+<tr class="odd">
+<td align="left">k_19</td>
+<td align="left">film, award, oscar, nomin, actor, year, won, star,
+director, actress, win, aviat, categori, comedi, prize, ceremoni, offic,
+includ, british, box</td>
+<td align="left">oscar, nomin, award, nomine, categori, foxx, actress,
+academi, bafta, babi, sideway, drake, swank, ceremoni, vera, eastwood,
+staunton, scorses, aviat, dicaprio</td>
+</tr>
+<tr class="even">
+<td align="left">k_20</td>
+<td align="left">year, rate, growth, economi, price, rise, month,
+market, figur, econom, bank, dollar, expect, fall, quarter, consum,
+trade, hous, decemb, interest</td>
+<td align="left">rate, growth, economi, figur, economist, price, rise,
+month, dollar, fall, remain, decemb, slow, mortgag, trade, rose, novemb,
+econom, continu, slowdown</td>
+</tr>
+<tr class="odd">
+<td align="left">k_21</td>
+<td align="left">labour, blair, elect, parti, tori, howard, brown,
+prime, minist, campaign, leader, toni, claim, chancellor, conserv, told,
+michael, polit, issu, govern</td>
+<td align="left">blair, howard, prime, labour, toni, tori, brown,
+milburn, campaign, michael, kennedi, conserv, minist, cabinet,
+chancellor, manifesto, leader, poll, confer, peston</td>
+</tr>
+<tr class="even">
+<td align="left">k_22</td>
+<td align="left">profit, share, sale, compani, year, firm, market, car,
+euro, product, busi, analyst, expect, execut, chief, deal, sell, price,
+buy, loss</td>
+<td align="left">profit, fiat, car, loss, share, sell, product, busi,
+revenu, largest, motor, bmw, euro, brand, carmak, maker, vehicl, nissan,
+steel, wine</td>
+</tr>
+<tr class="odd">
+<td align="left">k_23</td>
+<td align="left">music, band, song, album, year, record, chart, award,
+number, singl, top, rock, artist, perform, singer, releas, includ, act,
+pop, play</td>
+<td align="left">band, album, song, chart, rock, singer, urban, concert,
+pop, singl, elvi, stone, hop, soul, brit, rapper, gig, joss, hip,
+grammi</td>
+</tr>
+<tr class="even">
+<td align="left">k_24</td>
+<td align="left">airlin, air, flight, cost, plan, year, travel, compani,
+boe, fuel, passeng, cut, plane, airport, staff, govern, london, casino,
+deal, delay</td>
+<td align="left">airlin, flight, air, boe, plane, fuel, airport,
+passeng, casino, aircraft, airbus, jet, carrier, travel, airway, delay,
+staff, transport, delta, saudi</td>
+</tr>
+<tr class="odd">
+<td align="left">k_25</td>
+<td align="left">parti, elect, ukip, vote, kilroy, silk, polit, peopl,
+candid, labour, muslim, general, seat, leader, voter, member, elector,
+europ, european, minor</td>
+<td align="left">ukip, kilroy, silk, vote, muslim, verita, elector,
+referendum, candid, parti, seat, minor, ballot, regist, constitu, islam,
+ethnic, bnp, mep, polit</td>
+</tr>
+<tr class="even">
+<td align="left">k_26</td>
+<td align="left">yuko, bank, bid, unit, russian, compani, deutsch,
+offer, oil, firm, sharehold, share, lse, gazprom, russia, court, glazer,
+tax, bankruptci, boers</td>
+<td align="left">yuko, deutsch, bid, lse, gazprom, glazer, boers,
+rosneft, yugansk, asset, russian, sharehold, russia, bankruptci,
+khodorkovski, euronext, exchang, baikal, yuganskneftega, creditor</td>
+</tr>
+<tr class="odd">
+<td align="left">k_27</td>
+<td align="left">file, music, blog, download, share, network, peer,
+onlin, appl, industri, site, peopl, legal, copi, piraci, digit,
+technolog, system, softwar, content</td>
+<td align="left">blog, file, piraci, peer, download, blogger, copi,
+podcast, pirat, copyright, bittorr, industri, distribut, itun, content,
+advertis, illeg, legal, napster, curri</td>
+</tr>
+<tr class="even">
+<td align="left">k_28</td>
+<td align="left">compani, firm, case, court, charg, fraud, alleg,
+investig, account, sentenc, ebber, worldcom, guilti, execut, face, drug,
+trial, year, lawyer, claim</td>
+<td align="left">alleg, ebber, worldcom, sentenc, investig, guilti,
+fraud, charg, account, mci, prosecutor, case, murder, lawyer, court,
+accus, tobacco, face, jail, plead</td>
+</tr>
+<tr class="odd">
+<td align="left">k_29</td>
+<td align="left">hunt, polic, peopl, law, ban, drink, parti, call,
+support, labour, minist, inform, public, chief, offic, act, tori, make,
+clear, anti</td>
+<td align="left">hunt, polic, drink, jewish, apologis, commission,
+poster, support, mcconnel, livingston, mayor, bing, protest, anim,
+apolog, ban, semit, ask, comment, racist</td>
+</tr>
+<tr class="even">
+<td align="left">k_30</td>
+<td align="left">technolog, gadget, comput, devic, digit, player, game,
+dvd, high, soni, make, appl, work, show, design, develop, electron,
+market, year, peopl</td>
+<td align="left">gadget, devic, definit, robot, dvd, mac, electron,
+design, technolog, soni, portabl, processor, intel, mini, generat,
+format, capabl, laptop, hdtv, ces</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="topic-model" class="section level1">
+<h1>Topic Model</h1>
+<pre class="r"><code>top_words &lt;- apply(fit_list$`Inf`$F, 2, get_top_words)
+top_words &lt;- as.data.frame(top_words)
+colnames(top_words) &lt;- c(&quot;top_words&quot;)
+top_words$factor &lt;- paste0(&quot;k_&quot;, rownames(top_words))
+rownames(top_words) &lt;- NULL
+top_words &lt;- top_words %&gt;% dplyr::select(c(&quot;factor&quot;, &quot;top_words&quot;))
+distinctive_words &lt;- get_distinctive_words(fit_list$`Inf`$F)
+word_df &lt;- top_words %&gt;% dplyr::inner_join(distinctive_words)</code></pre>
+<pre><code>Joining with `by = join_by(factor)`</code></pre>
+<pre class="r"><code>knitr::kable(word_df)</code></pre>
+<table>
+<colgroup>
+<col width="2%" />
+<col width="46%" />
+<col width="51%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">factor</th>
+<th align="left">top_words</th>
+<th align="left">distinctive_words</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">k_1</td>
+<td align="left">rate, growth, year, economi, bank, month, figur, rise,
+econom, market, price, quarter, expect, decemb, hous, interest, increas,
+consum, economist, rose</td>
+<td align="left">rate, growth, economi, figur, month, econom, economist,
+rise, decemb, bank, quarter, rose, slow, mortgag, forecast, inflat,
+unemploy, novemb, januari, remain</td>
+</tr>
+<tr class="even">
+<td align="left">k_2</td>
+<td align="left">game, play, consol, titl, time, video, releas, gamer,
+develop, nintendo, player, year, onlin, xbox, soni, world, sale, make,
+peopl, life</td>
+<td align="left">game, nintendo, consol, gamer, halo, gameplay, gta,
+multiplay, sim, handheld, gameboy, doom, shooter, arcad, xbox, addict,
+casual, gangster, andrea, slick</td>
+</tr>
+<tr class="odd">
+<td align="left">k_3</td>
+<td align="left">show, film, star, year, book, seri, bbc, includ, actor,
+produc, work, time, play, die, make, theatr, audienc, children,
+programm, channel</td>
+<td align="left">show, star, seri, book, theatr, die, episod, princ,
+audienc, celebr, lee, itv, viewer, comic, appear, charact, harri, mari,
+bowl, write</td>
+</tr>
+<tr class="even">
+<td align="left">k_4</td>
+<td align="left">phone, mobil, servic, peopl, broadband, network,
+million, technolog, net, broadcast, speed, offer, call, access, year,
+video, oper, number, user, digit</td>
+<td align="left">phone, mobil, broadband, servic, handset, broadcast,
+connect, fast, access, vodafon, ofcom, speed, subscript, subscrib, sky,
+telecom, mbps, ericsson, communic, cabl</td>
+</tr>
+<tr class="odd">
+<td align="left">k_5</td>
+<td align="left">music, year, song, band, album, record, chart, top,
+award, number, singl, rock, artist, includ, perform, releas, singer,
+pop, act, show</td>
+<td align="left">band, album, song, chart, rock, artist, pop, singl,
+concert, urban, music, singer, soul, stone, hop, elvi, brit, rapper,
+gig, joss</td>
+</tr>
+<tr class="even">
+<td align="left">k_6</td>
+<td align="left">injuri, england, back, week, play, train, centr, game,
+robinson, wale, nation, smith, squad, fit, leicest, miss, william, bath,
+andi, make</td>
+<td align="left">injuri, centr, leicest, bath, week, fit, back, train,
+robinson, smith, squad, gloucest, andi, wasp, edinburgh, knee, leed,
+border, glasgow, wilkinson</td>
+</tr>
+<tr class="odd">
+<td align="left">k_7</td>
+<td align="left">tax, govern, cut, plan, increas, servic, spend,
+pension, peopl, year, budget, pay, public, tori, council, brown, work,
+labour, elect, £bn</td>
+<td align="left">tax, pension, cut, wage, spend, incom, worker, minimum,
+increas, pay, treasuri, duti, promis, servant, nhs, quango, salari,
+wast, taxat, matern</td>
+</tr>
+<tr class="even">
+<td align="left">k_8</td>
+<td align="left">ireland, franc, half, itali, wale, penalti, england,
+win, game, kick, scotland, side, back, minut, william, gara, jone,
+victori, irish, thoma</td>
+<td align="left">franc, ireland, itali, gara, penalti, henson, half,
+thoma, stade, driscol, laport, jone, murphi, irish, brian, easterbi,
+shane, marigni, biarritz, hicki</td>
+</tr>
+<tr class="odd">
+<td align="left">k_9</td>
+<td align="left">file, music, download, industri, legal, network, peer,
+appl, share, copi, system, firm, piraci, content, illeg, court,
+technolog, copyright, rule, consum</td>
+<td align="left">file, download, piraci, copi, peer, industri,
+copyright, legal, pirat, illeg, tobacco, bittorr, smoke, network, swap,
+lawsuit, distribut, advertis, napster, bpi</td>
+</tr>
+<tr class="even">
+<td align="left">k_10</td>
+<td align="left">compani, firm, yuko, oil, russian, court, fraud, bank,
+account, bankruptci, state, russia, claim, gazprom, tax, govern, case,
+year, financi, worldcom</td>
+<td align="left">yuko, compani, fraud, bankruptci, russian, firm,
+gazprom, worldcom, ebber, rosneft, yugansk, russia, mci, gas, account,
+auction, khodorkovski, asset, baikal, yuganskneftega</td>
+</tr>
+<tr class="odd">
+<td align="left">k_11</td>
+<td align="left">search, peopl, site, blog, web, onlin, googl, websit,
+user, inform, news, internet, servic, net, yahoo, call, engin, page,
+creat, work</td>
+<td align="left">search, blog, googl, web, onlin, yahoo, page, site,
+blogger, podcast, desktop, jeev, librari, news, daili, tool, queri,
+journal, engin, word</td>
+</tr>
+<tr class="even">
+<td align="left">k_12</td>
+<td align="left">film, award, year, oscar, nomin, star, director, actor,
+won, actress, festiv, prize, win, includ, categori, movi, aviat,
+british, top, comedi</td>
+<td align="left">award, oscar, film, nomin, categori, festiv, actress,
+nomine, director, prize, academi, foxx, bafta, babi, sideway, ceremoni,
+drake, scorses, swank, eastwood</td>
+</tr>
+<tr class="odd">
+<td align="left">k_13</td>
+<td align="left">technolog, comput, work, make, power, develop, peopl,
+chip, project, research, world, robot, ibm, system, year, time, light,
+data, cell, design</td>
+<td align="left">chip, robot, ibm, project, power, casino, ink, comput,
+light, intel, make, electr, technolog, cell, laser, silicon, processor,
+supercomput, lab, map</td>
+</tr>
+<tr class="even">
+<td align="left">k_14</td>
+<td align="left">minut, goal, ball, score, half, time, shot, chanc,
+unit, arsenal, game, back, refere, side, left, kick, henri, win, van,
+chelsea</td>
+<td align="left">goal, minut, shot, ball, score, van, chanc, henri,
+yard, rooney, keeper, sub, left, refere, header, galla, duff, head,
+drogba, lampard</td>
+</tr>
+<tr class="odd">
+<td align="left">k_15</td>
+<td align="left">law, lord, govern, polic, home, hunt, bill, right,
+terror, peopl, court, rule, hous, secretari, case, human, plan, offic,
+clark, told</td>
+<td align="left">lord, law, polic, hunt, terror, bill, right, blunkett,
+clark, suspect, home, asylum, prison, immigr, parliament, terrorist,
+murder, arrest, sentenc, rule</td>
+</tr>
+<tr class="even">
+<td align="left">k_16</td>
+<td align="left">year, profit, sale, compani, firm, airlin, india,
+market, cost, euro, car, product, share, expect, price, execut, indian,
+analyst, cut, oper</td>
+<td align="left">profit, airlin, car, india, cost, fiat, product,
+indian, flight, maker, revenu, loss, air, sale, bmw, motor, carrier,
+airbus, plane, aircraft</td>
+</tr>
+<tr class="odd">
+<td align="left">k_17</td>
+<td align="left">blair, labour, elect, minist, prime, howard, tori,
+brown, parti, campaign, toni, claim, chancellor, leader, told, govern,
+michael, polit, public, bbc</td>
+<td align="left">blair, labour, prime, howard, toni, campaign, tori,
+brown, michael, poster, leader, milburn, chancellor, cabinet, jewish,
+answer, war, down, goldsmith, parliamentari</td>
+</tr>
+<tr class="even">
+<td align="left">k_18</td>
+<td align="left">secur, mail, virus, softwar, user, program, comput,
+net, microsoft, firm, peopl, attack, system, spam, site, patent, window,
+compani, machin, websit</td>
+<td align="left">virus, secur, mail, softwar, program, spam, patent,
+microsoft, net, window, attack, user, browser, infect, spywar, malici,
+code, domain, machin, anti</td>
+</tr>
+<tr class="odd">
+<td align="left">k_19</td>
+<td align="left">parti, elect, vote, labour, ukip, polit, peopl, kilroy,
+silk, voter, tori, campaign, kennedi, general, dem, lib, conserv, call,
+leader, democrat</td>
+<td align="left">parti, vote, ukip, kilroy, silk, seat, voter, kennedi,
+candid, elector, muslim, polit, verita, minor, constitu, regist, ballot,
+bnp, ethnic, hockney</td>
+</tr>
+<tr class="even">
+<td align="left">k_20</td>
+<td align="left">school, children, peopl, work, women, report, educ,
+govern, minist, age, year, parent, plan, univers, student, scottish,
+research, drink, committe, public</td>
+<td align="left">school, children, educ, women, report, age, parent,
+student, univers, scottish, drink, social, young, committe, communiti,
+child, adult, respons, studi, problem</td>
+</tr>
+<tr class="odd">
+<td align="left">k_21</td>
+<td align="left">dollar, price, japan, trade, deficit, year, oil, sale,
+market, euro, retail, bush, record, expect, analyst, card, christma,
+budget, store, presid</td>
+<td align="left">dollar, japan, deficit, trade, price, currenc, retail,
+japanes, bush, christma, yen, crude, reserv, korea, barrel, mart, wal,
+shop, trillion, shopper</td>
+</tr>
+<tr class="even">
+<td align="left">k_22</td>
+<td align="left">open, play, win, final, year, set, match, roddick,
+australian, seed, beat, world, game, number, time, round, cup, tenni,
+player, top</td>
+<td align="left">open, roddick, seed, australian, beat, set, tenni,
+final, match, nadal, round, henman, win, play, serv, wimbledon, hewitt,
+moya, agassi, davenport</td>
+</tr>
+<tr class="odd">
+<td align="left">k_23</td>
+<td align="left">china, countri, govern, state, european, foreign,
+presid, minist, world, chines, year, europ, germani, commiss, turkey,
+nation, iraq, union, develop, straw</td>
+<td align="left">china, foreign, chines, state, turkey, countri,
+germani, straw, ukrain, palestinian, argentina, commiss, presid,
+embargo, turkish, iraqi, isra, wto, iran, iraq</td>
+</tr>
+<tr class="even">
+<td align="left">k_24</td>
+<td align="left">club, play, player, game, manag, chelsea, leagu,
+footbal, team, liverpool, year, time, season, cup, win, arsenal, boss,
+unit, real, told</td>
+<td align="left">club, footbal, leagu, manag, liverpool, chelsea, real,
+gerrard, premiership, boss, wenger, mourinho, benitez, parri, barcelona,
+ferguson, southampton, thing, uefa, manchest</td>
+</tr>
+<tr class="odd">
+<td align="left">k_25</td>
+<td align="left">drug, ban, test, charg, alleg, year, athlet, case,
+olymp, investig, decis, claim, kenteri, greek, feder, dope, iaaf, face,
+suspend, action</td>
+<td align="left">drug, ban, test, charg, alleg, kenteri, greek, dope,
+iaaf, thanou, suspend, cont, investig, fine, tribun, balco, hear, decis,
+pair, patient</td>
+</tr>
+<tr class="even">
+<td align="left">k_26</td>
+<td align="left">gadget, player, digit, music, technolog, devic, high,
+dvd, market, show, peopl, appl, soni, video, consum, home, definit,
+imag, year, format</td>
+<td align="left">gadget, digit, dvd, devic, soni, definit, high,
+portabl, mac, format, ipod, imag, mini, video, player, camera, storag,
+drive, hard, consum</td>
+</tr>
+<tr class="odd">
+<td align="left">k_27</td>
+<td align="left">share, bid, offer, compani, deal, stock, invest, bank,
+market, london, unit, club, busi, firm, group, board, buy, financi,
+takeov, sharehold</td>
+<td align="left">share, bid, offer, takeov, deal, invest, board, lse,
+glazer, boers, deutsch, exchang, stock, stake, sharehold, sell, buy,
+group, investor, busi</td>
+</tr>
+<tr class="even">
+<td align="left">k_28</td>
+<td align="left">year, race, world, olymp, european, indoor, win,
+champion, time, athlet, championship, record, run, final, titl, holm,
+mark, compet, athen, finish</td>
+<td align="left">race, indoor, olymp, holm, championship, marathon, run,
+mark, radcliff, compet, champion, finish, gold, medal, jump, second,
+world, garden, paula, johnson</td>
+</tr>
+<tr class="odd">
+<td align="left">k_29</td>
+<td align="left">aid, world, countri, tsunami, disast, peopl, nation,
+africa, develop, debt, donat, fund, year, affect, relief, money, intern,
+million, imf, govern</td>
+<td align="left">aid, tsunami, disast, donat, relief, imf, sri, affect,
+poverti, africa, indonesia, lanka, debt, region, chariti, reconstruct,
+thailand, rebuild, hivaid, tourism</td>
+</tr>
+<tr class="even">
+<td align="left">k_30</td>
+<td align="left">england, player, rugbi, wale, nation, year, game,
+coach, play, world, side, win, team, zealand, match, cup, ireland, lion,
+captain, time</td>
+<td align="left">rugbi, zealand, lion, coach, captain, england,
+woodward, tour, dallaglio, nation, black, welsh, clive, ruddock, side,
+kaplan, seven, australia, hemispher, irb</td>
+</tr>
+</tbody>
+</table>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/New_York
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggpubr_0.6.0      ggplot2_3.5.1     dplyr_1.1.4       Matrix_1.7-0     
+[5] passPCA_0.1-2     fastTopics_0.7-24 SnowballC_0.7.1   tm_0.7-14        
+[9] NLP_0.3-0        
+
+loaded via a namespace (and not attached):
+ [1] distr_2.9.3         pbapply_1.7-2       gridExtra_2.3      
+ [4] rlang_1.1.4         magrittr_2.0.3      git2r_0.33.0       
+ [7] compiler_4.4.0      vctrs_0.6.5         reshape2_1.4.4     
+[10] quadprog_1.5-8      stringr_1.5.1       pkgconfig_2.0.3    
+[13] crayon_1.5.3        fastmap_1.2.0       backports_1.5.0    
+[16] labeling_0.4.3      utf8_1.2.4          promises_1.3.0     
+[19] rmarkdown_2.27      tzdb_0.4.0          purrr_1.0.2        
+[22] bit_4.0.5           xfun_0.45           cachem_1.1.0       
+[25] jsonlite_1.8.8      progress_1.2.3      highr_0.11         
+[28] later_1.3.2         broom_1.0.6         irlba_2.3.5.1      
+[31] parallel_4.4.0      prettyunits_1.2.0   R6_2.5.1           
+[34] bslib_0.7.0         stringi_1.8.4       SQUAREM_2021.1     
+[37] car_3.1-2           jquerylib_0.1.4     Rcpp_1.0.13        
+[40] knitr_1.47          readr_2.1.5         httpuv_1.6.15      
+[43] tidyselect_1.2.1    abind_1.4-5         rstudioapi_0.16.0  
+[46] yaml_2.3.8          lattice_0.22-6      tibble_3.2.1       
+[49] plyr_1.8.9          withr_3.0.0         evaluate_0.24.0    
+[52] Rtsne_0.17          RcppParallel_5.1.7  startupmsg_0.9.6.1 
+[55] xml2_1.3.6          pillar_1.9.0        carData_3.0-5      
+[58] plotly_4.10.4       generics_0.1.3      vroom_1.6.5        
+[61] rprojroot_2.0.4     invgamma_1.1        truncnorm_1.0-9    
+[64] hms_1.1.3           munsell_0.5.1       scales_1.3.0       
+[67] ashr_2.2-63         gtools_3.9.5        RhpcBLASctl_0.23-42
+[70] glue_1.7.0          slam_0.1-54         lazyeval_0.2.2     
+[73] tools_4.4.0         data.table_1.15.4   ggsignif_0.6.4     
+[76] fs_1.6.4            cowplot_1.1.3       grid_4.4.0         
+[79] tidyr_1.3.1         colorspace_2.1-0    sfsmisc_1.1-18     
+[82] cli_3.6.3           workflowr_1.7.1     fansi_1.0.6        
+[85] mixsqp_0.3-54       viridisLite_0.4.2   uwot_0.2.2         
+[88] gtable_0.3.5        rstatix_0.7.2       sass_0.4.9         
+[91] digest_0.6.36       ggrepel_0.9.5       farver_2.1.2       
+[94] htmlwidgets_1.6.4   htmltools_0.5.8.1   lifecycle_1.0.4    
+[97] httr_1.4.7          bit64_4.0.5         MASS_7.3-61        </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

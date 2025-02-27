@@ -1,0 +1,257 @@
+---
+title: "Analyzing BBC Keywords With K = 30"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2025-02-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Structure Plots
+
+```{r, results='hide'}
+dat <- readr::read_csv("~/Downloads/bbc_news_text_complexity_summarization.csv")
+
+library(tm)
+library(SnowballC)
+
+my_corpus <- VCorpus(VectorSource(dat$text))
+
+addspace <- content_transformer(function(x, pattern) {
+  return(gsub(pattern, " ", x))
+})
+
+my_corpus <- tm_map(my_corpus, addspace, "-")
+
+my_corpus <- tm_map(my_corpus, removeNumbers)
+
+# Transform to lower case (need to wrap in content_transformer)
+my_corpus <- tm_map(my_corpus,content_transformer(tolower))
+my_corpus <- tm_map(my_corpus, removeWords, stopwords("SMART"))
+my_corpus <- tm_map(my_corpus, removePunctuation)
+my_corpus <- tm_map(my_corpus, stripWhitespace)
+
+my_corpus <- tm_map(my_corpus, stemDocument)
+
+dtm <- DocumentTermMatrix(my_corpus)
+dtm2 <- Matrix::sparseMatrix(
+  i = dtm$i,
+  j = dtm$j,
+  x = dtm$v
+)
+
+
+colnames(dtm2) <- dtm$dimnames$Terms
+words_to_use <- which(Matrix::colSums(dtm2>0)>4)
+
+dtm2 <- dtm2[,words_to_use]
+
+s <- Matrix::rowSums(dtm2)
+s <- s / mean(s)
+
+library(fastTopics)
+library(passPCA)
+library(Matrix)
+library(dplyr)
+#cc_vec <- c(1e3)
+
+n <- nrow(dtm2)
+p <- ncol(dtm2)
+
+K <- 30
+
+hoyer_sparsity <- function(x) {
+  
+  n <- length(x)
+  (1 / (sqrt(n) - 1)) * (sqrt(n) - (sum(x) / (sqrt(sum(x ^ 2)))))
+  
+}
+
+fit_list <- list()
+cc_vec <- c(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
+
+for (cc in cc_vec) {
+  
+  fit_list[[as.character(cc)]] <- readr::read_rds(
+    glue::glue(
+      "~/Documents/data/bbc_log1p_c{cc}_k{K}_exact_1000_iter.rds"
+    )
+  )
+  
+  colnames(fit_list[[as.character(cc)]]$LL) <- paste0("k", 1:K)
+  
+  fit_list[[as.character(cc)]]$l_sparsity <- apply(
+    fit_list[[as.character(cc)]]$LL, 2, hoyer_sparsity
+  )
+  
+  fit_list[[as.character(cc)]]$f_sparsity <- apply(
+    fit_list[[as.character(cc)]]$FF, 2, hoyer_sparsity
+  )
+  
+  fit_list[[as.character(cc)]]$cor_mat <- cor(fit_list[[as.character(cc)]]$FF, method = "spearman")
+  
+}
+
+fit_list[["Inf"]] <- readr::read_rds(
+  glue::glue("~/Documents/data/bbc_topic_model_k{K}_exact_1000_iter.rds")
+)
+
+fit_list[["Inf"]]$Ls <- Matrix::Diagonal(x = 1/s) %*% fit_list[["Inf"]]$L
+
+fit_list[["Inf"]]$l_sparsity <- apply(
+  fit_list[["Inf"]]$Ls, 2, hoyer_sparsity
+)
+
+fit_list[["Inf"]]$f_sparsity <- apply(
+  fit_list[["Inf"]]$F, 2, hoyer_sparsity
+)
+
+fit_list[["Inf"]]$cor_mat <- cor(fit_list[["Inf"]]$F, method = "spearman")
+
+l_sparsity_vec <- unlist(lapply(fit_list, function(x) {median(x$l_sparsity)}))
+f_sparsity_vec <- unlist(lapply(fit_list, function(x) {median(x$f_sparsity)}))
+cor_vec <- unlist(
+  lapply(fit_list, function(x) {median(x$cor_mat[lower.tri(x$cor_mat)])})
+)
+
+df_sparsity_l <- data.frame(
+  cc = as.numeric(names(l_sparsity_vec)),
+  sparsity = l_sparsity_vec
+) %>% filter(is.finite(cc))
+
+df_sparsity_f <- data.frame(
+  cc = as.numeric(names(f_sparsity_vec)),
+  sparsity = f_sparsity_vec
+) %>% filter(is.finite(cc))
+
+df_cor <- data.frame(
+  cc = as.numeric(names(cor_vec)),
+  correlation = cor_vec
+) %>% filter(is.finite(cc))
+
+library(ggpubr)
+library(ggplot2)
+```
+
+
+```{r, results='hide'}
+
+plot_list <- list()
+cc_vec <- c(1e-3, 1)
+
+for (cc in cc_vec) {
+  
+  plot_list[[glue::glue("c = {cc}")]] <- normalized_structure_plot(
+    fit_list[[as.character(cc)]],
+    grouping = dat$labels,gap = 25,perplexity = 70,n = Inf, font.size = 12
+  ) + ggtitle(glue::glue("c = {cc}"))
+  
+}
+
+plot_list[["Topic Model"]] <- structure_plot(
+  fit_list[["Inf"]],
+  grouping = dat$labels,gap = 25,perplexity = 70,n = Inf,font.size = 12
+) + ggtitle("Topic Model")
+
+g <- ggarrange(
+  plotlist = plot_list,
+  ncol = 1,
+  labels = "AUTO"
+)
+
+g <- annotate_figure(g,
+                     top = text_grob("BBC K = 30", size = 20, face = "bold"))
+
+```
+
+```{r, fig.height=10}
+g
+```
+
+## Keywords
+
+# c = 1e-3
+
+```{r}
+get_top_words <- function(f, n_top = 20) {
+  
+  words <- names(sort(f, decreasing = TRUE))[1:n_top]
+  pasted_words <- paste(words, collapse = ", ")
+  return(pasted_words)
+  
+}
+
+get_distinctive_words <- function(FF, n_top = 20) {
+  
+  FF <- passPCA:::normalize_bars(FF)
+  colnames(FF) <- paste0("k_", 1:ncol(FF))
+  
+  kw_vec <- c()
+  
+  for (k in 1:ncol(FF)) {
+    
+    kw <- fastTopics:::get_distinctive_features(
+      effects_matrix = FF,
+      k = glue::glue("k_{k}"),
+      n = n_top,
+      feature_sign = "positive"
+    )
+    kw_vec <- c(
+      kw_vec, 
+      paste(kw, collapse = ", ")
+    )
+    
+  }
+  
+  return(
+    data.frame(
+      factor = paste0("k_", 1:ncol(FF)),
+      distinctive_words = kw_vec
+    )
+  )
+  
+}
+
+top_words <- apply(fit_list$`0.001`$FF, 2, get_top_words)
+top_words <- as.data.frame(top_words)
+colnames(top_words) <- c("top_words")
+top_words$factor <- rownames(top_words)
+rownames(top_words) <- NULL
+top_words <- top_words %>% dplyr::select(c("factor", "top_words"))
+distinctive_words <- get_distinctive_words(fit_list$`0.001`$FF)
+word_df <- top_words %>% dplyr::inner_join(distinctive_words)
+knitr::kable(word_df)
+```
+
+# c = 1
+
+```{r}
+top_words <- apply(fit_list$`1`$FF, 2, get_top_words)
+top_words <- as.data.frame(top_words)
+colnames(top_words) <- c("top_words")
+top_words$factor <- rownames(top_words)
+rownames(top_words) <- NULL
+top_words <- top_words %>% dplyr::select(c("factor", "top_words"))
+distinctive_words <- get_distinctive_words(fit_list$`1`$FF)
+word_df <- top_words %>% dplyr::inner_join(distinctive_words)
+knitr::kable(word_df)
+```
+
+# Topic Model
+
+```{r}
+top_words <- apply(fit_list$`Inf`$F, 2, get_top_words)
+top_words <- as.data.frame(top_words)
+colnames(top_words) <- c("top_words")
+top_words$factor <- paste0("k_", rownames(top_words))
+rownames(top_words) <- NULL
+top_words <- top_words %>% dplyr::select(c("factor", "top_words"))
+distinctive_words <- get_distinctive_words(fit_list$`Inf`$F)
+word_df <- top_words %>% dplyr::inner_join(distinctive_words)
+knitr::kable(word_df)
+```
+
+
