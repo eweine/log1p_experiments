@@ -161,5 +161,282 @@ normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
 
 ```
 
-
 This looks bad...
+
+## Simulations with log1p link functions
+
+Now, I looked at what happens when I use the same hierarchical loadings structure, but instead generate data with effects that are (closer) to multiplicative. First, I generated data from the model
+
+\begin{align}
+y_{ij} &\sim \textrm{Poisson}(\lambda_{ij}) \notag \\
+\log\left(1 + \frac{\lambda_{ij}}c\right) &= b_{ij} \label{eq:log1p_nmf} \\
+\mathbf{B} &= \mathbf{L}\mathbf{F}^{T}, \notag
+\end{align}
+
+### c = 1
+
+First, I generated data with $c = 1$.
+
+```{r}
+# number of genes
+p <- 500
+# number of cells
+n <- 1000
+K <- 7
+LL <- matrix(
+  data = 0,
+  nrow = n,
+  ncol = K
+)
+
+FF <- matrix(
+  data = 0,
+  nrow = p,
+  ncol = K
+)
+
+set.seed(1)
+# everyone loaded on the first factor
+LL[,1] <- 1
+LL[1:500, 2] <- 1
+LL[501:1000, 3] <- 1
+LL[1:250, 4] <- 1
+LL[251:500, 5] <- 1
+LL[501:750, 6] <- 1
+LL[751:1000, 7] <- 1
+
+# base rate
+FF[,1] <- 0.5
+all_idx <- sample(1:500)  # Shuffle all indices once
+split_idx <- split(all_idx, rep(1:K, each = 25))  # Divide into K groups
+
+for (k in 2:K) {
+  FF[split_idx[[k]], k] <- FF[split_idx[[k]], k] + 2
+}
+
+Lambda <- exp(tcrossprod(LL, FF)) - 1
+
+
+set.seed(1)
+Y <- matrix(
+  data = rpois(
+    n = n * p,
+    lambda = as.vector(Lambda)
+  ),
+  nrow = n,
+  ncol = p
+)
+Y <- as(Y, "CsparseMatrix")
+```
+
+```{r, results='hide'}
+nmf_k1 <- fastTopics:::fit_pnmf_rank1(Y)
+library(dplyr)
+set.seed(1)
+nmf_LL <- nmf_k1$L %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+rownames(nmf_LL) <- rownames(Y)
+
+set.seed(1)
+nmf_FF <- nmf_k1$F %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+rownames(nmf_FF) <- colnames(Y)
+
+set.seed(1)
+nmf_fit0 <- fastTopics::init_poisson_nmf(
+  X = Y,
+  L = nmf_LL,
+  F = nmf_FF
+)
+
+nmf_fit <- fastTopics::fit_poisson_nmf(
+  X = Y,
+  fit0 = nmf_fit0,
+  control = list(nc = 7), numiter = 250
+)
+```
+
+Below is the structure plot from the topic model:
+
+```{r}
+fastTopics::structure_plot(nmf_fit, loadings_order = 1:n)
+```
+
+```{r, results='hide'}
+set.seed(1)
+library(passPCA)
+log1p_ft7 <- fit_poisson_log1p_nmf(
+  Y = Y, K = K, s = FALSE, cc = 1e-3, loglik = "exact"
+)
+```
+
+And here is the structure plot from the model fit with $c = 1e-3$.
+
+```{r}
+normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
+```
+
+```{r, results='hide'}
+set.seed(1)
+log1p_ft7 <- fit_poisson_log1p_nmf(
+  Y = Y, K = K, s = FALSE, cc = 1, loglik = "exact"
+)
+```
+
+Finally, here is the structure plot with $c = 1$
+
+```{r}
+normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
+```
+
+### c = 1e-3
+
+Finally, I generated data with a small value of c.
+
+
+```{r}
+# number of genes
+p <- 500
+# number of cells
+n <- 1000
+K <- 7
+LL <- matrix(
+  data = 0,
+  nrow = n,
+  ncol = K
+)
+
+FF <- matrix(
+  data = 0,
+  nrow = p,
+  ncol = K
+)
+
+set.seed(1)
+# everyone loaded on the first factor
+LL[,1] <- 1
+LL[1:500, 2] <- 1
+LL[501:1000, 3] <- 1
+LL[1:250, 4] <- 1
+LL[251:500, 5] <- 1
+LL[501:750, 6] <- 1
+LL[751:1000, 7] <- 1
+
+# base rate
+FF[,1] <- 5
+all_idx <- sample(1:500)  # Shuffle all indices once
+split_idx <- split(all_idx, rep(1:K, each = 25))  # Divide into K groups
+
+for (k in 2:K) {
+  FF[split_idx[[k]], k] <- FF[split_idx[[k]], k] + 4
+}
+
+Lambda <- 1e-3 * (exp(tcrossprod(LL, FF)) - 1)
+
+
+set.seed(1)
+Y <- matrix(
+  data = rpois(
+    n = n * p,
+    lambda = as.vector(Lambda)
+  ),
+  nrow = n,
+  ncol = p
+)
+Y <- as(Y, "CsparseMatrix")
+```
+
+
+```{r, results='hide'}
+nmf_k1 <- fastTopics:::fit_pnmf_rank1(Y)
+library(dplyr)
+set.seed(1)
+nmf_LL <- nmf_k1$L %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = n * (K - 1), rate = 15
+      ),
+      nrow = n,
+      ncol = K - 1
+    )
+  )
+rownames(nmf_LL) <- rownames(Y)
+
+set.seed(1)
+nmf_FF <- nmf_k1$F %>%
+  cbind(
+    matrix(
+      data = rexp(
+        n = p * (K - 1), rate = 15
+      ),
+      nrow = p,
+      ncol = K - 1
+    )
+  )
+
+rownames(nmf_FF) <- colnames(Y)
+
+set.seed(1)
+nmf_fit0 <- fastTopics::init_poisson_nmf(
+  X = Y,
+  L = nmf_LL,
+  F = nmf_FF
+)
+
+nmf_fit <- fastTopics::fit_poisson_nmf(
+  X = Y,
+  fit0 = nmf_fit0,
+  control = list(nc = 7), numiter = 250
+)
+```
+
+Below is the structure plot from the topic model:
+
+```{r}
+fastTopics::structure_plot(nmf_fit, loadings_order = 1:n)
+```
+
+```{r, results='hide'}
+set.seed(1)
+library(passPCA)
+log1p_ft7 <- fit_poisson_log1p_nmf(
+  Y = Y, K = K, s = FALSE, cc = 1e-3, loglik = "exact"
+)
+```
+
+And here is the structure plot from the model fit with $c = 1e-3$.
+
+```{r}
+normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
+```
+
+```{r, results='hide'}
+set.seed(1)
+log1p_ft7 <- fit_poisson_log1p_nmf(
+  Y = Y, K = K, s = FALSE, cc = 1, loglik = "exact"
+)
+```
+
+Finally, here is the structure plot with $c = 1$
+
+```{r}
+normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
+```
