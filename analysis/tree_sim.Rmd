@@ -229,6 +229,7 @@ log1p_ft7 <- fit_poisson_log1p_nmf(
 normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
 
 ```
+
 ```{r, echo=FALSE}
 ft_factor_df <- data.frame(
   val = c(
@@ -331,7 +332,7 @@ LL[751:1000, 7] <- 1
 # base rate
 FF[,1] <- 0.5
 all_idx <- sample(1:500)  # Shuffle all indices once
-split_idx <- split(all_idx, rep(1:K, each = 25))  # Divide into K groups
+split_idx <- split(all_idx, rep(1:K, each = 71))  # Divide into K groups
 
 for (k in 2:K) {
   FF[split_idx[[k]], k] <- FF[split_idx[[k]], k] + 2
@@ -350,6 +351,27 @@ Y <- matrix(
   ncol = p
 )
 Y <- as(Y, "CsparseMatrix")
+```
+
+Here, I constructed the factors slightly differently
+
+```{r, echo=FALSE}
+ft_factor_df <- data.frame(
+  val = c(
+    FF[,1], FF[,2], FF[,3], FF[,4], FF[,5], FF[,6], FF[,7]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500),
+    rep("5", 500), rep("6", 500), rep("7", 500)
+  ),
+  pos = c(rep(1:500, 7))
+)
+
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
 ```
 
 ```{r, results='hide'}
@@ -402,6 +424,25 @@ Below is the structure plot from the topic model:
 fastTopics::structure_plot(nmf_fit, loadings_order = 1:n)
 ```
 
+```{r, echo=FALSE}
+ft_factor_df <- data.frame(
+  val = c(
+    nmf_fit$F[,1], nmf_fit$F[,2], nmf_fit$F[,3], nmf_fit$F[,4], nmf_fit$F[,5], nmf_fit$F[,6], nmf_fit$F[,7]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500),
+    rep("5", 500), rep("6", 500), rep("7", 500)
+  ),
+  pos = c(rep(1:500, 7))
+)
+
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+
 ```{r, results='hide'}
 set.seed(1)
 library(passPCA)
@@ -410,11 +451,32 @@ log1p_ft7 <- fit_poisson_log1p_nmf(
 )
 ```
 
+
 And here is the structure plot from the model fit with $c = 1e-3$.
 
 ```{r}
 normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
 ```
+
+```{r, echo=FALSE}
+ft_factor_df <- data.frame(
+  val = c(
+    log1p_ft7$FF[,1], log1p_ft7$FF[,2], log1p_ft7$FF[,3], log1p_ft7$FF[,4], log1p_ft7$FF[,5], log1p_ft7$FF[,6], log1p_ft7$FF[,7]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500),
+    rep("5", 500), rep("6", 500), rep("7", 500)
+  ),
+  pos = c(rep(1:500, 7))
+)
+
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+
 
 ```{r, results='hide'}
 set.seed(1)
@@ -427,6 +489,25 @@ Finally, here is the structure plot with $c = 1$
 
 ```{r}
 normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
+```
+
+```{r, echo=FALSE}
+ft_factor_df <- data.frame(
+  val = c(
+    log1p_ft7$FF[,1], log1p_ft7$FF[,2], log1p_ft7$FF[,3], log1p_ft7$FF[,4], log1p_ft7$FF[,5], log1p_ft7$FF[,6], log1p_ft7$FF[,7]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500),
+    rep("5", 500), rep("6", 500), rep("7", 500)
+  ),
+  pos = c(rep(1:500, 7))
+)
+
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
 ```
 
 ### c = 1e-3
@@ -465,7 +546,7 @@ LL[751:1000, 7] <- 1
 # base rate
 FF[,1] <- 5
 all_idx <- sample(1:500)  # Shuffle all indices once
-split_idx <- split(all_idx, rep(1:K, each = 25))  # Divide into K groups
+split_idx <- split(all_idx, rep(1:K, each = 71))  # Divide into K groups
 
 for (k in 2:K) {
   FF[split_idx[[k]], k] <- FF[split_idx[[k]], k] + 4
@@ -486,6 +567,24 @@ Y <- matrix(
 Y <- as(Y, "CsparseMatrix")
 ```
 
+```{r, echo=FALSE}
+ft_factor_df <- data.frame(
+  val = c(
+    FF[,1], FF[,2], FF[,3], FF[,4], FF[,5], FF[,6], FF[,7]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500),
+    rep("5", 500), rep("6", 500), rep("7", 500)
+  ),
+  pos = c(rep(1:500, 7))
+)
+
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
 
 ```{r, results='hide'}
 nmf_k1 <- fastTopics:::fit_pnmf_rank1(Y)
@@ -537,12 +636,50 @@ Below is the structure plot from the topic model:
 fastTopics::structure_plot(nmf_fit, loadings_order = 1:n)
 ```
 
+```{r, echo=FALSE}
+ft_factor_df <- data.frame(
+  val = c(
+    nmf_fit$F[,1], nmf_fit$F[,2], nmf_fit$F[,3], nmf_fit$F[,4], nmf_fit$F[,5], nmf_fit$F[,6], nmf_fit$F[,7]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500),
+    rep("5", 500), rep("6", 500), rep("7", 500)
+  ),
+  pos = c(rep(1:500, 7))
+)
+
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+
 ```{r, results='hide'}
 set.seed(1)
 library(passPCA)
 log1p_ft7 <- fit_poisson_log1p_nmf(
   Y = Y, K = K, s = FALSE, cc = 1e-3, loglik = "exact"
 )
+```
+
+```{r, echo=FALSE}
+ft_factor_df <- data.frame(
+  val = c(
+    log1p_ft7$FF[,1], log1p_ft7$FF[,2], log1p_ft7$FF[,3], log1p_ft7$FF[,4], log1p_ft7$FF[,5], log1p_ft7$FF[,6], log1p_ft7$FF[,7]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500),
+    rep("5", 500), rep("6", 500), rep("7", 500)
+  ),
+  pos = c(rep(1:500, 7))
+)
+
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
 ```
 
 And here is the structure plot from the model fit with $c = 1e-3$.
@@ -558,8 +695,46 @@ log1p_ft7 <- fit_poisson_log1p_nmf(
 )
 ```
 
+```{r, echo=FALSE}
+ft_factor_df <- data.frame(
+  val = c(
+    log1p_ft7$FF[,1], log1p_ft7$FF[,2], log1p_ft7$FF[,3], log1p_ft7$FF[,4], log1p_ft7$FF[,5], log1p_ft7$FF[,6], log1p_ft7$FF[,7]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500),
+    rep("5", 500), rep("6", 500), rep("7", 500)
+  ),
+  pos = c(rep(1:500, 7))
+)
+
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+
 Finally, here is the structure plot with $c = 1$
 
 ```{r}
 normalized_structure_plot(log1p_ft7, loadings_order = 1:n)
+```
+
+```{r, echo=FALSE}
+ft_factor_df <- data.frame(
+  val = c(
+    log1p_ft7$FF[,1], log1p_ft7$FF[,2], log1p_ft7$FF[,3], log1p_ft7$FF[,4], log1p_ft7$FF[,5], log1p_ft7$FF[,6], log1p_ft7$FF[,7]
+  ),
+  factor = c(
+    rep("1", 500), rep("2", 500), rep("3", 500), rep("4", 500),
+    rep("5", 500), rep("6", 500), rep("7", 500)
+  ),
+  pos = c(rep(1:500, 7))
+)
+
+ggplot(ft_factor_df, aes(x = pos, y = val)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ factor) +          # Create a panel for each group
+  labs(x = "Position", y = "Value") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
 ```
