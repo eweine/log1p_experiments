@@ -400,7 +400,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-02-27
+<strong>Last updated:</strong> 2025-03-03
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreec06f0dd47e7221b04c2567d6409fc6055f2a2b56targetblankc06f0dda">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree8b43a389e01cc4a1db26ffdffd64ecb7604e7240targetblank8b43a38a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/c06f0dd47e7221b04c2567d6409fc6055f2a2b56" target="_blank">c06f0dd</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/8b43a389e01cc4a1db26ffdffd64ecb7604e7240" target="_blank">8b43a38</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreec06f0dd47e7221b04c2567d6409fc6055f2a2b56targetblankc06f0dda"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree8b43a389e01cc4a1db26ffdffd64ecb7604e7240targetblank8b43a38a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/c06f0dd47e7221b04c2567d6409fc6055f2a2b56" target="_blank">c06f0dd</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/8b43a389e01cc4a1db26ffdffd64ecb7604e7240" target="_blank">8b43a38</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -623,6 +623,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/8b43a389e01cc4a1db26ffdffd64ecb7604e7240/analysis/tree_sim.Rmd" target="_blank">8b43a38</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-27
+</td>
+<td>
+added simulations with different values of c
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/8b43a389e01cc4a1db26ffdffd64ecb7604e7240/docs/tree_sim.html" target="_blank">8b43a38</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-27
+</td>
+<td>
+added simulations with different values of c
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/52c8d182582cc439b185dc8d6bcbccd7ea6fec26/analysis/tree_sim.Rmd" target="_blank">52c8d18</a>
 </td>
 <td>
@@ -659,7 +693,8 @@ added tree simulation
 </div>
 </div>
 </div>
-<pre class="r"><code>library(Matrix)</code></pre>
+<pre class="r"><code>library(Matrix)
+library(ggplot2)</code></pre>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Here, I simulate data that has a tree-structure and fit both the
@@ -696,12 +731,19 @@ LL[501:750, 6] &lt;- 1
 LL[751:1000, 7] &lt;- 1
 
 # base rate
-FF[,1] &lt;- 0.5
-all_idx &lt;- sample(1:500)  # Shuffle all indices once
-split_idx &lt;- split(all_idx, rep(1:K, each = 25))  # Divide into K groups
+FF[,1] &lt;- 0.25
+
+start_idx &lt;- 1
+gap &lt;- 75
 
 for (k in 2:K) {
-  FF[split_idx[[k]], k] &lt;- FF[split_idx[[k]], k] + 3
+  end_idx &lt;- start_idx + 9
+  
+  FF[start_idx:end_idx, k] &lt;- FF[
+    start_idx:end_idx, k
+    ] + 3.75
+  
+  start_idx &lt;- start_idx + gap + 10
 }
 
 Lambda &lt;- tcrossprod(LL, FF)
@@ -760,9 +802,47 @@ Eric Weine
 <p>Topic 1 is a baseline topic, where <span
 class="math inline">\(f\)</span> is a constant of <span
 class="math inline">\(0.5\)</span> for each gene. All remaining factors
-add <span class="math inline">\(3\)</span> to this baseline rate across
-a set of <span class="math inline">\(25\)</span> non-overlapping genes
-specific to each factor.</p>
+add <span class="math inline">\(4.5\)</span> to this baseline rate
+across a set of <span class="math inline">\(25\)</span> non-overlapping
+genes specific to each factor.</p>
+<p><img src="figure/tree_sim.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/52c8d182582cc439b185dc8d6bcbccd7ea6fec26/docs/figure/tree_sim.Rmd/unnamed-chunk-3-1.png" target="_blank">52c8d18</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>First, I fit a topic model to the data with <span
 class="math inline">\(K = 7\)</span>. To do this, I initialize the first
 factor to the best rank-1 fit (with all other factors set to very small
@@ -808,16 +888,16 @@ nmf_fit0 &lt;- fastTopics::init_poisson_nmf(
 nmf_fit &lt;- fastTopics::fit_poisson_nmf(
   X = Y,
   fit0 = nmf_fit0,
-  control = list(nc = 7), numiter = 250
+  control = list(nc = 7), numiter = 1000
 )</code></pre>
 <pre class="r"><code>fastTopics::structure_plot(nmf_fit, loadings_order = 1:n)</code></pre>
-<p><img src="figure/tree_sim.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/tree_sim.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
-Past versions of unnamed-chunk-4-1.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div id="fig-unnamed-chunk-5-1" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -836,7 +916,7 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/eweine/log1p_experiments/blob/52c8d182582cc439b185dc8d6bcbccd7ea6fec26/docs/figure/tree_sim.Rmd/unnamed-chunk-4-1.png" target="_blank">52c8d18</a>
+<a href="https://github.com/eweine/log1p_experiments/blob/52c8d182582cc439b185dc8d6bcbccd7ea6fec26/docs/figure/tree_sim.Rmd/unnamed-chunk-5-1.png" target="_blank">52c8d18</a>
 </td>
 <td>
 Eric Weine
@@ -851,15 +931,7 @@ Eric Weine
 </div>
 <p>Here, we can see that the topic model essentially just provides a
 clustering.</p>
-<p>Now, I experimented with fitting the log1p model to these data.
-First, I fit the model with <span class="math inline">\(c =
-1e-3\)</span></p>
-<pre class="r"><code>set.seed(1)
-library(passPCA)
-log1p_ft7 &lt;- fit_poisson_log1p_nmf(
-  Y = Y, K = K, s = FALSE, cc = 1e-3, loglik = &quot;exact&quot;
-)</code></pre>
-<pre class="r"><code>normalized_structure_plot(log1p_ft7, loadings_order = 1:n)</code></pre>
+<p>And here is a plot of the factors:</p>
 <p><img src="figure/tree_sim.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
@@ -898,15 +970,14 @@ Eric Weine
 </table>
 </div>
 </div>
-<p>While this isn’t a perfect fit, it’s certainly much closer to the
-hierarchical structure that we generated data from. The intercept is
-captured very well, and each group has their own group specific factor.
-The first two groups share the yellow factor to some degree.</p>
-<p>I also wanted to know what this would look like for <span
-class="math inline">\(c = 1\)</span>.</p>
+<p>Now, I experimented with fitting the log1p model to these data.
+First, I fit the model with <span class="math inline">\(c =
+1e-3\)</span></p>
 <pre class="r"><code>set.seed(1)
+library(passPCA)
 log1p_ft7 &lt;- fit_poisson_log1p_nmf(
-  Y = Y, K = K, s = FALSE, cc = 1, loglik = &quot;exact&quot;
+  Y = Y, K = K, s = FALSE, cc = 1e-3, loglik = &quot;exact&quot;,
+  control = list(maxiter = 1000)
 )</code></pre>
 <pre class="r"><code>normalized_structure_plot(log1p_ft7, loadings_order = 1:n)</code></pre>
 <p><img src="figure/tree_sim.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -947,247 +1018,334 @@ Eric Weine
 </table>
 </div>
 </div>
-<p>This looks bad…</p>
-</div>
-<div id="simulations-with-log1p-link-functions" class="section level2">
-<h2>Simulations with log1p link functions</h2>
-<p>Now, I looked at what happens when I use the same hierarchical
-loadings structure, but instead generate data with effects that are
-(closer) to multiplicative. First, I generated data from the model</p>
-<p><span class="math display">\[\begin{align}
-y_{ij} &amp;\sim \textrm{Poisson}(\lambda_{ij}) \notag \\
-\log\left(1 + \frac{\lambda_{ij}}c\right) &amp;= b_{ij}
-\label{eq:log1p_nmf} \\
-\mathbf{B} &amp;= \mathbf{L}\mathbf{F}^{T}, \notag
-\end{align}\]</span></p>
-<div id="c-1" class="section level3">
-<h3>c = 1</h3>
-<p>First, I generated data with <span class="math inline">\(c =
-1\)</span>.</p>
-<pre class="r"><code># number of genes
-p &lt;- 500
-# number of cells
-n &lt;- 1000
-K &lt;- 7
-LL &lt;- matrix(
-  data = 0,
-  nrow = n,
-  ncol = K
-)
-
-FF &lt;- matrix(
-  data = 0,
-  nrow = p,
-  ncol = K
-)
-
-set.seed(1)
-# everyone loaded on the first factor
-LL[,1] &lt;- 1
-LL[1:500, 2] &lt;- 1
-LL[501:1000, 3] &lt;- 1
-LL[1:250, 4] &lt;- 1
-LL[251:500, 5] &lt;- 1
-LL[501:750, 6] &lt;- 1
-LL[751:1000, 7] &lt;- 1
-
-# base rate
-FF[,1] &lt;- 0.5
-all_idx &lt;- sample(1:500)  # Shuffle all indices once
-split_idx &lt;- split(all_idx, rep(1:K, each = 25))  # Divide into K groups
-
-for (k in 2:K) {
-  FF[split_idx[[k]], k] &lt;- FF[split_idx[[k]], k] + 2
-}
-
-Lambda &lt;- exp(tcrossprod(LL, FF)) - 1
-
-
-set.seed(1)
-Y &lt;- matrix(
-  data = rpois(
-    n = n * p,
-    lambda = as.vector(Lambda)
-  ),
-  nrow = n,
-  ncol = p
-)
-Y &lt;- as(Y, &quot;CsparseMatrix&quot;)</code></pre>
-<pre class="r"><code>nmf_k1 &lt;- fastTopics:::fit_pnmf_rank1(Y)
-library(dplyr)
-set.seed(1)
-nmf_LL &lt;- nmf_k1$L %&gt;%
-  cbind(
-    matrix(
-      data = rexp(
-        n = n * (K - 1), rate = 15
-      ),
-      nrow = n,
-      ncol = K - 1
-    )
-  )
-rownames(nmf_LL) &lt;- rownames(Y)
-
-set.seed(1)
-nmf_FF &lt;- nmf_k1$F %&gt;%
-  cbind(
-    matrix(
-      data = rexp(
-        n = p * (K - 1), rate = 15
-      ),
-      nrow = p,
-      ncol = K - 1
-    )
-  )
-
-rownames(nmf_FF) &lt;- colnames(Y)
-
-set.seed(1)
-nmf_fit0 &lt;- fastTopics::init_poisson_nmf(
-  X = Y,
-  L = nmf_LL,
-  F = nmf_FF
-)
-
-nmf_fit &lt;- fastTopics::fit_poisson_nmf(
-  X = Y,
-  fit0 = nmf_fit0,
-  control = list(nc = 7), numiter = 250
+<p><img src="figure/tree_sim.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>While this isn’t a perfect fit, it’s certainly much closer to the
+hierarchical structure that we generated data from. The intercept is
+captured very well, and each group has their own group specific factor.
+The first two groups share the yellow factor to some degree.</p>
+<p>I also wanted to know what this would look like for <span
+class="math inline">\(c = 1\)</span>.</p>
+<pre class="r"><code>set.seed(1)
+log1p_ft7 &lt;- fit_poisson_log1p_nmf(
+  Y = Y, K = K, s = FALSE, cc = 1, loglik = &quot;exact&quot;,
+  control = list(maxiter = 1000)
 )</code></pre>
-<p>Below is the structure plot from the topic model:</p>
-<pre class="r"><code>fastTopics::structure_plot(nmf_fit, loadings_order = 1:n)</code></pre>
+<pre class="r"><code>normalized_structure_plot(log1p_ft7, loadings_order = 1:n)</code></pre>
 <p><img src="figure/tree_sim.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>set.seed(1)
-library(passPCA)
-log1p_ft7 &lt;- fit_poisson_log1p_nmf(
-  Y = Y, K = K, s = FALSE, cc = 1e-3, loglik = &quot;exact&quot;
-)</code></pre>
-<p>And here is the structure plot from the model fit with <span
-class="math inline">\(c = 1e-3\)</span>.</p>
-<pre class="r"><code>normalized_structure_plot(log1p_ft7, loadings_order = 1:n)</code></pre>
-<p><img src="figure/tree_sim.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>set.seed(1)
-log1p_ft7 &lt;- fit_poisson_log1p_nmf(
-  Y = Y, K = K, s = FALSE, cc = 1, loglik = &quot;exact&quot;
-)</code></pre>
-<p>Finally, here is the structure plot with <span
-class="math inline">\(c = 1\)</span></p>
-<pre class="r"><code>normalized_structure_plot(log1p_ft7, loadings_order = 1:n)</code></pre>
-<p><img src="figure/tree_sim.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/8b43a389e01cc4a1db26ffdffd64ecb7604e7240/docs/figure/tree_sim.Rmd/unnamed-chunk-11-1.png" target="_blank">8b43a38</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-27
+</td>
+</tr>
+</tbody>
+</table>
 </div>
-<div id="c-1e-3" class="section level3">
-<h3>c = 1e-3</h3>
-<p>Finally, I generated data with a small value of c.</p>
-<pre class="r"><code># number of genes
-p &lt;- 500
-# number of cells
-n &lt;- 1000
-K &lt;- 7
-LL &lt;- matrix(
-  data = 0,
-  nrow = n,
-  ncol = K
-)
-
-FF &lt;- matrix(
-  data = 0,
-  nrow = p,
-  ncol = K
-)
-
-set.seed(1)
-# everyone loaded on the first factor
-LL[,1] &lt;- 1
-LL[1:500, 2] &lt;- 1
-LL[501:1000, 3] &lt;- 1
-LL[1:250, 4] &lt;- 1
-LL[251:500, 5] &lt;- 1
-LL[501:750, 6] &lt;- 1
-LL[751:1000, 7] &lt;- 1
-
-# base rate
-FF[,1] &lt;- 5
-all_idx &lt;- sample(1:500)  # Shuffle all indices once
-split_idx &lt;- split(all_idx, rep(1:K, each = 25))  # Divide into K groups
-
-for (k in 2:K) {
-  FF[split_idx[[k]], k] &lt;- FF[split_idx[[k]], k] + 4
-}
-
-Lambda &lt;- 1e-3 * (exp(tcrossprod(LL, FF)) - 1)
-
-
-set.seed(1)
-Y &lt;- matrix(
-  data = rpois(
-    n = n * p,
-    lambda = as.vector(Lambda)
-  ),
-  nrow = n,
-  ncol = p
-)
-Y &lt;- as(Y, &quot;CsparseMatrix&quot;)</code></pre>
-<pre class="r"><code>nmf_k1 &lt;- fastTopics:::fit_pnmf_rank1(Y)
-library(dplyr)
-set.seed(1)
-nmf_LL &lt;- nmf_k1$L %&gt;%
-  cbind(
-    matrix(
-      data = rexp(
-        n = n * (K - 1), rate = 15
-      ),
-      nrow = n,
-      ncol = K - 1
-    )
-  )
-rownames(nmf_LL) &lt;- rownames(Y)
-
-set.seed(1)
-nmf_FF &lt;- nmf_k1$F %&gt;%
-  cbind(
-    matrix(
-      data = rexp(
-        n = p * (K - 1), rate = 15
-      ),
-      nrow = p,
-      ncol = K - 1
-    )
-  )
-
-rownames(nmf_FF) &lt;- colnames(Y)
-
-set.seed(1)
-nmf_fit0 &lt;- fastTopics::init_poisson_nmf(
-  X = Y,
-  L = nmf_LL,
-  F = nmf_FF
-)
-
-nmf_fit &lt;- fastTopics::fit_poisson_nmf(
-  X = Y,
-  fit0 = nmf_fit0,
-  control = list(nc = 7), numiter = 250
-)</code></pre>
-<p>Below is the structure plot from the topic model:</p>
-<pre class="r"><code>fastTopics::structure_plot(nmf_fit, loadings_order = 1:n)</code></pre>
-<p><img src="figure/tree_sim.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>set.seed(1)
-library(passPCA)
-log1p_ft7 &lt;- fit_poisson_log1p_nmf(
-  Y = Y, K = K, s = FALSE, cc = 1e-3, loglik = &quot;exact&quot;
-)</code></pre>
-<p>And here is the structure plot from the model fit with <span
-class="math inline">\(c = 1e-3\)</span>.</p>
-<pre class="r"><code>normalized_structure_plot(log1p_ft7, loadings_order = 1:n)</code></pre>
-<p><img src="figure/tree_sim.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<p><img src="figure/tree_sim.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This looks okay…</p>
+<p>Finally, I wanted to look at a large <span
+class="math inline">\(c\)</span> fit:</p>
+<p>Below is <span class="math inline">\(c = 1e3\)</span>.</p>
 <pre class="r"><code>set.seed(1)
 log1p_ft7 &lt;- fit_poisson_log1p_nmf(
-  Y = Y, K = K, s = FALSE, cc = 1, loglik = &quot;exact&quot;
+  Y = Y, K = K, s = FALSE, cc = 1e3, loglik = &quot;exact&quot;,
+  control = list(maxiter = 1000)
 )</code></pre>
-<p>Finally, here is the structure plot with <span
-class="math inline">\(c = 1\)</span></p>
 <pre class="r"><code>normalized_structure_plot(log1p_ft7, loadings_order = 1:n)</code></pre>
-<p><img src="figure/tree_sim.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/tree_sim.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/tree_sim.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-15-1">
+Past versions of unnamed-chunk-15-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-15-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/8b43a389e01cc4a1db26ffdffd64ecb7604e7240/docs/figure/tree_sim.Rmd/unnamed-chunk-15-1.png" target="_blank">8b43a38</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-02-27
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- ## Simulations with log1p link functions -->
+<!-- Now, I looked at what happens when I use the same hierarchical loadings structure, but instead generate data with effects that are (closer) to multiplicative. First, I generated data from the model -->
+<!-- \begin{align} -->
+<!-- y_{ij} &\sim \textrm{Poisson}(\lambda_{ij}) \notag \\ -->
+<!-- \log\left(1 + \frac{\lambda_{ij}}c\right) &= b_{ij} \label{eq:log1p_nmf} \\ -->
+<!-- \mathbf{B} &= \mathbf{L}\mathbf{F}^{T}, \notag -->
+<!-- \end{align} -->
+<!-- ### c = 1 -->
+<!-- First, I generated data with $c = 1$. -->
+<!-- ```{r} -->
+<!-- # number of genes -->
+<!-- p <- 500 -->
+<!-- # number of cells -->
+<!-- n <- 1000 -->
+<!-- K <- 7 -->
+<!-- LL <- matrix( -->
+<!--   data = 0, -->
+<!--   nrow = n, -->
+<!--   ncol = K -->
+<!-- ) -->
+<!-- FF <- matrix( -->
+<!--   data = 0, -->
+<!--   nrow = p, -->
+<!--   ncol = K -->
+<!-- ) -->
+<!-- set.seed(1) -->
+<!-- # everyone loaded on the first factor -->
+<!-- LL[,1] <- 1 -->
+<!-- LL[1:500, 2] <- 1 -->
+<!-- LL[501:1000, 3] <- 1 -->
+<!-- LL[1:250, 4] <- 1 -->
+<!-- LL[251:500, 5] <- 1 -->
+<!-- LL[501:750, 6] <- 1 -->
+<!-- LL[751:1000, 7] <- 1 -->
+<!-- # base rate -->
+<!-- FF[,1] <- 0.5 -->
+<!-- all_idx <- sample(1:500)  # Shuffle all indices once -->
+<!-- split_idx <- split(all_idx, rep(1:K, each = 25))  # Divide into K groups -->
+<!-- for (k in 2:K) { -->
+<!--   FF[split_idx[[k]], k] <- FF[split_idx[[k]], k] + 2 -->
+<!-- } -->
+<!-- Lambda <- exp(tcrossprod(LL, FF)) - 1 -->
+<!-- set.seed(1) -->
+<!-- Y <- matrix( -->
+<!--   data = rpois( -->
+<!--     n = n * p, -->
+<!--     lambda = as.vector(Lambda) -->
+<!--   ), -->
+<!--   nrow = n, -->
+<!--   ncol = p -->
+<!-- ) -->
+<!-- Y <- as(Y, "CsparseMatrix") -->
+<!-- ``` -->
+<!-- ```{r, results='hide'} -->
+<!-- nmf_k1 <- fastTopics:::fit_pnmf_rank1(Y) -->
+<!-- library(dplyr) -->
+<!-- set.seed(1) -->
+<!-- nmf_LL <- nmf_k1$L %>% -->
+<!--   cbind( -->
+<!--     matrix( -->
+<!--       data = rexp( -->
+<!--         n = n * (K - 1), rate = 15 -->
+<!--       ), -->
+<!--       nrow = n, -->
+<!--       ncol = K - 1 -->
+<!--     ) -->
+<!--   ) -->
+<!-- rownames(nmf_LL) <- rownames(Y) -->
+<!-- set.seed(1) -->
+<!-- nmf_FF <- nmf_k1$F %>% -->
+<!--   cbind( -->
+<!--     matrix( -->
+<!--       data = rexp( -->
+<!--         n = p * (K - 1), rate = 15 -->
+<!--       ), -->
+<!--       nrow = p, -->
+<!--       ncol = K - 1 -->
+<!--     ) -->
+<!--   ) -->
+<!-- rownames(nmf_FF) <- colnames(Y) -->
+<!-- set.seed(1) -->
+<!-- nmf_fit0 <- fastTopics::init_poisson_nmf( -->
+<!--   X = Y, -->
+<!--   L = nmf_LL, -->
+<!--   F = nmf_FF -->
+<!-- ) -->
+<!-- nmf_fit <- fastTopics::fit_poisson_nmf( -->
+<!--   X = Y, -->
+<!--   fit0 = nmf_fit0, -->
+<!--   control = list(nc = 7), numiter = 250 -->
+<!-- ) -->
+<!-- ``` -->
+<!-- Below is the structure plot from the topic model: -->
+<!-- ```{r} -->
+<!-- fastTopics::structure_plot(nmf_fit, loadings_order = 1:n) -->
+<!-- ``` -->
+<!-- ```{r, results='hide'} -->
+<!-- set.seed(1) -->
+<!-- library(passPCA) -->
+<!-- log1p_ft7 <- fit_poisson_log1p_nmf( -->
+<!--   Y = Y, K = K, s = FALSE, cc = 1e-3, loglik = "exact" -->
+<!-- ) -->
+<!-- ``` -->
+<!-- And here is the structure plot from the model fit with $c = 1e-3$. -->
+<!-- ```{r} -->
+<!-- normalized_structure_plot(log1p_ft7, loadings_order = 1:n) -->
+<!-- ``` -->
+<!-- ```{r, results='hide'} -->
+<!-- set.seed(1) -->
+<!-- log1p_ft7 <- fit_poisson_log1p_nmf( -->
+<!--   Y = Y, K = K, s = FALSE, cc = 1, loglik = "exact" -->
+<!-- ) -->
+<!-- ``` -->
+<!-- Finally, here is the structure plot with $c = 1$ -->
+<!-- ```{r} -->
+<!-- normalized_structure_plot(log1p_ft7, loadings_order = 1:n) -->
+<!-- ``` -->
+<!-- ### c = 1e-3 -->
+<!-- Finally, I generated data with a small value of c. -->
+<!-- ```{r} -->
+<!-- # number of genes -->
+<!-- p <- 500 -->
+<!-- # number of cells -->
+<!-- n <- 1000 -->
+<!-- K <- 7 -->
+<!-- LL <- matrix( -->
+<!--   data = 0, -->
+<!--   nrow = n, -->
+<!--   ncol = K -->
+<!-- ) -->
+<!-- FF <- matrix( -->
+<!--   data = 0, -->
+<!--   nrow = p, -->
+<!--   ncol = K -->
+<!-- ) -->
+<!-- set.seed(1) -->
+<!-- # everyone loaded on the first factor -->
+<!-- LL[,1] <- 1 -->
+<!-- LL[1:500, 2] <- 1 -->
+<!-- LL[501:1000, 3] <- 1 -->
+<!-- LL[1:250, 4] <- 1 -->
+<!-- LL[251:500, 5] <- 1 -->
+<!-- LL[501:750, 6] <- 1 -->
+<!-- LL[751:1000, 7] <- 1 -->
+<!-- # base rate -->
+<!-- FF[,1] <- 5 -->
+<!-- all_idx <- sample(1:500)  # Shuffle all indices once -->
+<!-- split_idx <- split(all_idx, rep(1:K, each = 25))  # Divide into K groups -->
+<!-- for (k in 2:K) { -->
+<!--   FF[split_idx[[k]], k] <- FF[split_idx[[k]], k] + 4 -->
+<!-- } -->
+<!-- Lambda <- 1e-3 * (exp(tcrossprod(LL, FF)) - 1) -->
+<!-- set.seed(1) -->
+<!-- Y <- matrix( -->
+<!--   data = rpois( -->
+<!--     n = n * p, -->
+<!--     lambda = as.vector(Lambda) -->
+<!--   ), -->
+<!--   nrow = n, -->
+<!--   ncol = p -->
+<!-- ) -->
+<!-- Y <- as(Y, "CsparseMatrix") -->
+<!-- ``` -->
+<!-- ```{r, results='hide'} -->
+<!-- nmf_k1 <- fastTopics:::fit_pnmf_rank1(Y) -->
+<!-- library(dplyr) -->
+<!-- set.seed(1) -->
+<!-- nmf_LL <- nmf_k1$L %>% -->
+<!--   cbind( -->
+<!--     matrix( -->
+<!--       data = rexp( -->
+<!--         n = n * (K - 1), rate = 15 -->
+<!--       ), -->
+<!--       nrow = n, -->
+<!--       ncol = K - 1 -->
+<!--     ) -->
+<!--   ) -->
+<!-- rownames(nmf_LL) <- rownames(Y) -->
+<!-- set.seed(1) -->
+<!-- nmf_FF <- nmf_k1$F %>% -->
+<!--   cbind( -->
+<!--     matrix( -->
+<!--       data = rexp( -->
+<!--         n = p * (K - 1), rate = 15 -->
+<!--       ), -->
+<!--       nrow = p, -->
+<!--       ncol = K - 1 -->
+<!--     ) -->
+<!--   ) -->
+<!-- rownames(nmf_FF) <- colnames(Y) -->
+<!-- set.seed(1) -->
+<!-- nmf_fit0 <- fastTopics::init_poisson_nmf( -->
+<!--   X = Y, -->
+<!--   L = nmf_LL, -->
+<!--   F = nmf_FF -->
+<!-- ) -->
+<!-- nmf_fit <- fastTopics::fit_poisson_nmf( -->
+<!--   X = Y, -->
+<!--   fit0 = nmf_fit0, -->
+<!--   control = list(nc = 7), numiter = 250 -->
+<!-- ) -->
+<!-- ``` -->
+<!-- Below is the structure plot from the topic model: -->
+<!-- ```{r} -->
+<!-- fastTopics::structure_plot(nmf_fit, loadings_order = 1:n) -->
+<!-- ``` -->
+<!-- ```{r, results='hide'} -->
+<!-- set.seed(1) -->
+<!-- library(passPCA) -->
+<!-- log1p_ft7 <- fit_poisson_log1p_nmf( -->
+<!--   Y = Y, K = K, s = FALSE, cc = 1e-3, loglik = "exact" -->
+<!-- ) -->
+<!-- ``` -->
+<!-- And here is the structure plot from the model fit with $c = 1e-3$. -->
+<!-- ```{r} -->
+<!-- normalized_structure_plot(log1p_ft7, loadings_order = 1:n) -->
+<!-- ``` -->
+<!-- ```{r, results='hide'} -->
+<!-- set.seed(1) -->
+<!-- log1p_ft7 <- fit_poisson_log1p_nmf( -->
+<!--   Y = Y, K = K, s = FALSE, cc = 1, loglik = "exact" -->
+<!-- ) -->
+<!-- ``` -->
+<!-- Finally, here is the structure plot with $c = 1$ -->
+<!-- ```{r} -->
+<!-- normalized_structure_plot(log1p_ft7, loadings_order = 1:n) -->
+<!-- ``` -->
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1215,40 +1373,39 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] passPCA_0.1-2 dplyr_1.1.4   Matrix_1.7-0 
+[1] passPCA_0.1-2 dplyr_1.1.4   ggplot2_3.5.1 Matrix_1.7-0 
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.5        xfun_0.45           bslib_0.7.0        
- [4] ggplot2_3.5.1       htmlwidgets_1.6.4   ggrepel_0.9.5      
- [7] lattice_0.22-6      quadprog_1.5-8      vctrs_0.6.5        
-[10] tools_4.4.0         generics_0.1.3      parallel_4.4.0     
-[13] tibble_3.2.1        fansi_1.0.6         highr_0.11         
-[16] pkgconfig_2.0.3     data.table_1.15.4   SQUAREM_2021.1     
-[19] RcppParallel_5.1.7  lifecycle_1.0.4     truncnorm_1.0-9    
-[22] farver_2.1.2        compiler_4.4.0      stringr_1.5.1      
-[25] git2r_0.33.0        progress_1.2.3      munsell_0.5.1      
-[28] RhpcBLASctl_0.23-42 httpuv_1.6.15       htmltools_0.5.8.1  
-[31] sass_0.4.9          yaml_2.3.8          lazyeval_0.2.2     
-[34] plotly_4.10.4       crayon_1.5.3        later_1.3.2        
-[37] pillar_1.9.0        jquerylib_0.1.4     whisker_0.4.1      
-[40] tidyr_1.3.1         MASS_7.3-61         uwot_0.2.2         
-[43] cachem_1.1.0        gtools_3.9.5        tidyselect_1.2.1   
-[46] digest_0.6.36       Rtsne_0.17          stringi_1.8.4      
-[49] reshape2_1.4.4      purrr_1.0.2         ashr_2.2-63        
-[52] labeling_0.4.3      cowplot_1.1.3       rprojroot_2.0.4    
-[55] fastmap_1.2.0       grid_4.4.0          colorspace_2.1-0   
-[58] cli_3.6.3           invgamma_1.1        magrittr_2.0.3     
-[61] utf8_1.2.4          withr_3.0.0         prettyunits_1.2.0  
-[64] scales_1.3.0        promises_1.3.0      float_0.3-2        
-[67] MatrixExtra_0.1.15  rmarkdown_2.27      httr_1.4.7         
-[70] startupmsg_0.9.6.1  fastTopics_0.7-24   workflowr_1.7.1    
-[73] hms_1.1.3           pbapply_1.7-2       evaluate_0.24.0    
-[76] distr_2.9.3         knitr_1.47          viridisLite_0.4.2  
-[79] irlba_2.3.5.1       rlang_1.1.4         Rcpp_1.0.13        
-[82] mixsqp_0.3-54       glue_1.7.0          rstudioapi_0.16.0  
-[85] jsonlite_1.8.8      plyr_1.8.9          R6_2.5.1           
-[88] sfsmisc_1.1-18      fs_1.6.4           </code></pre>
-</div>
+ [1] tidyselect_1.2.1    viridisLite_0.4.2   farver_2.1.2       
+ [4] fastmap_1.2.0       lazyeval_0.2.2      promises_1.3.0     
+ [7] digest_0.6.36       lifecycle_1.0.4     MatrixExtra_0.1.15 
+[10] invgamma_1.1        magrittr_2.0.3      compiler_4.4.0     
+[13] rlang_1.1.4         sass_0.4.9          progress_1.2.3     
+[16] tools_4.4.0         utf8_1.2.4          yaml_2.3.8         
+[19] data.table_1.15.4   knitr_1.47          prettyunits_1.2.0  
+[22] labeling_0.4.3      htmlwidgets_1.6.4   plyr_1.8.9         
+[25] Rtsne_0.17          workflowr_1.7.1     withr_3.0.0        
+[28] purrr_1.0.2         grid_4.4.0          fansi_1.0.6        
+[31] git2r_0.33.0        fastTopics_0.7-24   colorspace_2.1-0   
+[34] scales_1.3.0        gtools_3.9.5        MASS_7.3-61        
+[37] cli_3.6.3           rmarkdown_2.27      crayon_1.5.3       
+[40] startupmsg_0.9.6.1  generics_0.1.3      RcppParallel_5.1.7 
+[43] rstudioapi_0.16.0   httr_1.4.7          reshape2_1.4.4     
+[46] pbapply_1.7-2       cachem_1.1.0        stringr_1.5.1      
+[49] parallel_4.4.0      vctrs_0.6.5         jsonlite_1.8.8     
+[52] hms_1.1.3           mixsqp_0.3-54       ggrepel_0.9.5      
+[55] irlba_2.3.5.1       plotly_4.10.4       jquerylib_0.1.4    
+[58] tidyr_1.3.1         glue_1.7.0          cowplot_1.1.3      
+[61] uwot_0.2.2          stringi_1.8.4       gtable_0.3.5       
+[64] later_1.3.2         sfsmisc_1.1-18      quadprog_1.5-8     
+[67] munsell_0.5.1       tibble_3.2.1        pillar_1.9.0       
+[70] htmltools_0.5.8.1   float_0.3-2         truncnorm_1.0-9    
+[73] R6_2.5.1            rprojroot_2.0.4     evaluate_0.24.0    
+[76] lattice_0.22-6      highr_0.11          RhpcBLASctl_0.23-42
+[79] SQUAREM_2021.1      ashr_2.2-63         httpuv_1.6.15      
+[82] bslib_0.7.0         Rcpp_1.0.13         distr_2.9.3        
+[85] whisker_0.4.1       xfun_0.45           fs_1.6.4           
+[88] pkgconfig_2.0.3    </code></pre>
 </div>
 </div>
 
