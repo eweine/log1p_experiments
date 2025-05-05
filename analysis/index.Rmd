@@ -68,3 +68,5 @@ Welcome to my research website.
 
 [A Tree Simulation](tree_sim.html)
 
+[Pancreas c = 1 Fit with GO Terms](pancreas_go.html)
+

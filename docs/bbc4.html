@@ -400,7 +400,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-03-04
+<strong>Last updated:</strong> 2025-03-06
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -438,10 +438,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R
-Markdown file created these results, you’ll want to first commit it to
-the Git repo. If you’re still working on the analysis, you can ignore
-this warning. When you’re finished, you can run
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree35143a018c4686a8c49ee6f59a981f3ac2494a96targetblank35143a0a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreef678b4277b12326ddcff011ad0eb3a755c33194atargetblankf678b42a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/35143a018c4686a8c49ee6f59a981f3ac2494a96" target="_blank">35143a0</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/f678b4277b12326ddcff011ad0eb3a755c33194a" target="_blank">f678b42</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree35143a018c4686a8c49ee6f59a981f3ac2494a96targetblank35143a0a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreef678b4277b12326ddcff011ad0eb3a755c33194atargetblankf678b42a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/35143a018c4686a8c49ee6f59a981f3ac2494a96" target="_blank">35143a0</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/f678b4277b12326ddcff011ad0eb3a755c33194a" target="_blank">f678b42</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -571,8 +571,8 @@ Ignored files:
     Ignored:    .Rhistory
     Ignored:    data/.DS_Store
 
-Untracked files:
-    Untracked:  analysis/bbc4.Rmd
+Unstaged changes:
+    Modified:   analysis/bbc4.Rmd
 
 </code></pre>
 <p>
@@ -587,10 +587,73 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/bbc4.Rmd</code>) and HTML
+(<code>docs/bbc4.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/f678b4277b12326ddcff011ad0eb3a755c33194a/analysis/bbc4.Rmd" target="_blank">f678b42</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-03-04
+</td>
+<td>
+added BBC analysis with K = 10
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/f678b4277b12326ddcff011ad0eb3a755c33194a/docs/bbc4.html" target="_blank">f678b42</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-03-04
+</td>
+<td>
+added BBC analysis with K = 10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -783,6 +846,43 @@ g &lt;- annotate_figure(g,
                      top = text_grob(&quot;BBC K = 10&quot;, size = 20, face = &quot;bold&quot;))</code></pre>
 <pre class="r"><code>g</code></pre>
 <p><img src="figure/bbc4.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/f678b4277b12326ddcff011ad0eb3a755c33194a/docs/figure/bbc4.Rmd/unnamed-chunk-3-1.png" target="_blank">f678b42</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-03-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="keywords" class="section level2">
 <h2>Keywords</h2>
@@ -944,6 +1044,7 @@ chilean, undervalu, injunct, brew</td>
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>dat$k6 &lt;- fit_list$`0.01`$LL[,&quot;k6&quot;]</code></pre>
 </div>
 <div id="c-1" class="section level1">
 <h1>c = 1</h1>
@@ -1079,8 +1180,8 @@ word_df &lt;- top_words %&gt;% dplyr::inner_join(distinctive_words)</code></pre>
 <table>
 <colgroup>
 <col width="2%" />
-<col width="48%" />
-<col width="49%" />
+<col width="46%" />
+<col width="50%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1092,93 +1193,93 @@ word_df &lt;- top_words %&gt;% dplyr::inner_join(distinctive_words)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">k_1</td>
-<td align="left">film, award, star, year, show, actor, director, oscar,
-nomin, includ, won, movi, actress, win, role, prize, comedi, festiv,
-british, bbc</td>
-<td align="left">film, actor, oscar, award, star, actress, comedi,
-nomin, director, hollywood, movi, drama, theatr, academi, categori,
-cinema, nomine, role, aviat, seri</td>
+<td align="left">labour, elect, parti, blair, tori, brown, minist,
+peopl, howard, tax, govern, campaign, vote, plan, prime, leader, polit,
+conserv, chancellor, told</td>
+<td align="left">labour, elect, parti, blair, tori, brown, howard,
+conserv, prime, campaign, vote, chancellor, toni, leader, lib, dem,
+polit, voter, democrat, liber</td>
 </tr>
 <tr class="even">
 <td align="left">k_2</td>
-<td align="left">game, play, win, year, player, england, time, back,
-match, world, final, team, side, cup, ireland, half, open, wale, injuri,
-good</td>
-<td align="left">win, play, england, match, team, final, player, cup,
-time, side, back, ireland, injuri, champion, half, season, coach, rugbi,
-chelsea, minut</td>
+<td align="left">film, year, award, music, star, show, includ, actor,
+won, nomin, band, song, top, director, album, oscar, play, record,
+perform, number</td>
+<td align="left">film, award, star, actor, music, show, nomin, band,
+album, oscar, song, chart, festiv, actress, singer, includ, prize,
+comedi, rock, artist</td>
 </tr>
 <tr class="odd">
 <td align="left">k_3</td>
-<td align="left">labour, elect, parti, blair, tori, brown, minist,
-howard, tax, campaign, peopl, vote, prime, plan, govern, leader, polit,
-chancellor, conserv, claim</td>
-<td align="left">elect, labour, parti, blair, tori, brown, howard, vote,
-prime, polit, conserv, campaign, chancellor, leader, toni, lib, dem,
-voter, ukip, kennedi</td>
+<td align="left">club, game, play, player, unit, time, chelsea, manag,
+footbal, goal, leagu, team, liverpool, win, arsenal, back, year, side,
+cup, manchest</td>
+<td align="left">club, chelsea, footbal, unit, leagu, arsenal,
+liverpool, manag, goal, manchest, ferguson, gerrard, striker, boss,
+glazer, premiership, mourinho, play, player, real</td>
 </tr>
 <tr class="even">
 <td align="left">k_4</td>
-<td align="left">law, lord, rule, court, polic, case, govern, ban, told,
-year, right, drug, home, charg, decis, hunt, legal, trial, offic,
-peopl</td>
-<td align="left">law, polic, lord, rule, ban, case, court, drug, right,
-hunt, trial, evid, decis, offic, charg, human, bill, judg, terror,
-arrest</td>
+<td align="left">england, wale, ireland, game, nation, rugbi, franc,
+play, half, side, win, player, back, year, coach, scotland, team, time,
+robinson, match</td>
+<td align="left">england, wale, ireland, rugbi, franc, robinson, irish,
+itali, scotland, half, zealand, coach, lion, captain, squad, penalti,
+william, gara, cardiff, hodgson</td>
 </tr>
 <tr class="odd">
 <td align="left">k_5</td>
-<td align="left">music, year, song, band, record, album, show, top,
-number, chart, includ, award, singl, perform, artist, rock, singer,
-play, releas, radio</td>
-<td align="left">music, band, song, album, chart, artist, rock, record,
-singl, singer, pop, urban, show, label, concert, perform, musician,
-stone, hip, soul</td>
+<td align="left">year, world, win, final, set, open, olymp, play, time,
+champion, athlet, match, race, titl, game, won, roddick, test, beat,
+australian</td>
+<td align="left">olymp, final, open, athlet, set, race, world, win,
+roddick, seed, titl, indoor, australian, athen, champion, beat, event,
+holm, test, tenni</td>
 </tr>
 <tr class="even">
 <td align="left">k_6</td>
-<td align="left">compani, firm, share, deal, bid, offer, execut, yuko,
-bank, unit, year, financi, group, busi, chief, market, airlin, oil,
-oper, invest</td>
-<td align="left">compani, deal, share, bid, yuko, airlin, financi, firm,
-sharehold, execut, offer, deutsch, bankruptci, buy, takeov, own, stake,
-invest, lse, russian</td>
+<td align="left">law, court, rule, case, govern, polic, lord, legal,
+charg, claim, right, yuko, told, ban, compani, offic, trial, investig,
+hunt, action</td>
+<td align="left">law, court, rule, case, polic, yuko, legal, right,
+lord, charg, investig, hunt, trial, alleg, ban, offic, evid, lawyer,
+action, arrest</td>
 </tr>
 <tr class="odd">
 <td align="left">k_7</td>
-<td align="left">govern, peopl, countri, year, work, world, plan,
-nation, minist, fund, report, develop, aid, increas, children, servic,
-council, pension, money, make</td>
-<td align="left">countri, govern, fund, aid, pension, work, educ,
-school, children, council, local, health, worker, union, social,
-tsunami, area, parent, project, age</td>
+<td align="left">govern, countri, peopl, year, work, world, plan,
+minist, nation, report, fund, aid, develop, increas, state, make,
+council, children, money, local</td>
+<td align="left">countri, govern, aid, work, fund, pension, school,
+health, council, children, educ, local, money, union, worker, wage,
+social, age, project, area</td>
 </tr>
 <tr class="even">
 <td align="left">k_8</td>
-<td align="left">game, mobil, technolog, phone, peopl, video, digit,
-player, year, make, time, play, devic, music, develop, gadget, market,
-comput, high, work</td>
-<td align="left">mobil, video, digit, gadget, devic, soni, phone,
-camera, consol, dvd, handset, gamer, technolog, nintendo, mini, media,
-portabl, xbox, ipod, interact</td>
+<td align="left">year, market, compani, bank, sale, price, firm, share,
+growth, economi, rate, month, expect, profit, rise, china, oil, analyst,
+euro, econom</td>
+<td align="left">bank, market, price, growth, sale, economi, oil, china,
+profit, rate, share, euro, analyst, rise, expect, stock, compani,
+dollar, fall, export</td>
 </tr>
 <tr class="odd">
 <td align="left">k_9</td>
-<td align="left">peopl, user, net, servic, network, site, softwar, firm,
-internet, system, mail, comput, search, secur, call, onlin, inform,
-websit, broadband, virus</td>
-<td align="left">user, net, site, network, softwar, internet, mail,
-search, servic, virus, broadband, program, websit, web, onlin, secur,
-messag, system, file, comput</td>
+<td align="left">game, technolog, peopl, mobil, digit, video, music,
+player, phone, make, year, play, time, develop, comput, devic, gadget,
+market, work, high</td>
+<td align="left">game, digit, video, gadget, soni, devic, appl, camera,
+dvd, consol, media, gamer, electron, nintendo, mini, xbox, format,
+interact, ipod, portabl</td>
 </tr>
 <tr class="even">
 <td align="left">k_10</td>
-<td align="left">year, market, growth, price, economi, rate, sale, rise,
-month, china, bank, expect, econom, profit, figur, dollar, quarter,
-increas, analyst, trade</td>
-<td align="left">growth, price, economi, rate, china, market, rise,
-sale, dollar, figur, profit, fall, expect, export, quarter, econom,
-rose, month, deficit, forecast</td>
+<td align="left">peopl, servic, user, net, network, phone, site,
+softwar, firm, internet, mobil, system, mail, call, search, secur,
+comput, technolog, onlin, broadband</td>
+<td align="left">user, net, network, site, servic, softwar, internet,
+mail, search, broadband, virus, program, web, websit, phone, peopl,
+messag, onlin, data, blog</td>
 </tr>
 </tbody>
 </table>
@@ -1214,39 +1315,40 @@ other attached packages:
 [9] NLP_0.3-0        
 
 loaded via a namespace (and not attached):
- [1] distr_2.9.3         pbapply_1.7-2       gridExtra_2.3      
- [4] rlang_1.1.4         magrittr_2.0.3      git2r_0.33.0       
- [7] compiler_4.4.0      vctrs_0.6.5         reshape2_1.4.4     
-[10] quadprog_1.5-8      stringr_1.5.1       pkgconfig_2.0.3    
-[13] crayon_1.5.3        fastmap_1.2.0       backports_1.5.0    
-[16] labeling_0.4.3      utf8_1.2.4          promises_1.3.0     
-[19] rmarkdown_2.27      tzdb_0.4.0          purrr_1.0.2        
-[22] bit_4.0.5           xfun_0.45           cachem_1.1.0       
-[25] jsonlite_1.8.8      progress_1.2.3      highr_0.11         
-[28] later_1.3.2         broom_1.0.6         irlba_2.3.5.1      
-[31] parallel_4.4.0      prettyunits_1.2.0   R6_2.5.1           
-[34] bslib_0.7.0         stringi_1.8.4       SQUAREM_2021.1     
-[37] car_3.1-2           jquerylib_0.1.4     Rcpp_1.0.13        
-[40] knitr_1.47          readr_2.1.5         httpuv_1.6.15      
-[43] tidyselect_1.2.1    abind_1.4-5         rstudioapi_0.16.0  
-[46] yaml_2.3.8          lattice_0.22-6      tibble_3.2.1       
-[49] plyr_1.8.9          withr_3.0.0         evaluate_0.24.0    
-[52] Rtsne_0.17          RcppParallel_5.1.7  startupmsg_0.9.6.1 
-[55] xml2_1.3.6          pillar_1.9.0        carData_3.0-5      
-[58] plotly_4.10.4       generics_0.1.3      vroom_1.6.5        
-[61] rprojroot_2.0.4     invgamma_1.1        truncnorm_1.0-9    
-[64] hms_1.1.3           munsell_0.5.1       scales_1.3.0       
-[67] ashr_2.2-63         gtools_3.9.5        RhpcBLASctl_0.23-42
-[70] glue_1.7.0          slam_0.1-54         lazyeval_0.2.2     
-[73] tools_4.4.0         data.table_1.15.4   ggsignif_0.6.4     
-[76] fs_1.6.4            cowplot_1.1.3       grid_4.4.0         
-[79] tidyr_1.3.1         colorspace_2.1-0    sfsmisc_1.1-18     
-[82] cli_3.6.3           workflowr_1.7.1     fansi_1.0.6        
-[85] mixsqp_0.3-54       viridisLite_0.4.2   uwot_0.2.2         
-[88] gtable_0.3.5        rstatix_0.7.2       sass_0.4.9         
-[91] digest_0.6.36       ggrepel_0.9.5       farver_2.1.2       
-[94] htmlwidgets_1.6.4   htmltools_0.5.8.1   lifecycle_1.0.4    
-[97] httr_1.4.7          bit64_4.0.5         MASS_7.3-61        </code></pre>
+  [1] distr_2.9.3         pbapply_1.7-2       gridExtra_2.3      
+  [4] rlang_1.1.4         magrittr_2.0.3      git2r_0.33.0       
+  [7] compiler_4.4.0      vctrs_0.6.5         reshape2_1.4.4     
+ [10] quadprog_1.5-8      stringr_1.5.1       pkgconfig_2.0.3    
+ [13] crayon_1.5.3        fastmap_1.2.0       backports_1.5.0    
+ [16] labeling_0.4.3      utf8_1.2.4          promises_1.3.0     
+ [19] rmarkdown_2.27      tzdb_0.4.0          purrr_1.0.2        
+ [22] bit_4.0.5           xfun_0.45           cachem_1.1.0       
+ [25] jsonlite_1.8.8      progress_1.2.3      highr_0.11         
+ [28] later_1.3.2         broom_1.0.6         irlba_2.3.5.1      
+ [31] parallel_4.4.0      prettyunits_1.2.0   R6_2.5.1           
+ [34] bslib_0.7.0         stringi_1.8.4       SQUAREM_2021.1     
+ [37] car_3.1-2           jquerylib_0.1.4     Rcpp_1.0.13        
+ [40] knitr_1.47          readr_2.1.5         httpuv_1.6.15      
+ [43] tidyselect_1.2.1    abind_1.4-5         rstudioapi_0.16.0  
+ [46] yaml_2.3.8          lattice_0.22-6      tibble_3.2.1       
+ [49] plyr_1.8.9          withr_3.0.0         evaluate_0.24.0    
+ [52] Rtsne_0.17          RcppParallel_5.1.7  startupmsg_0.9.6.1 
+ [55] xml2_1.3.6          pillar_1.9.0        carData_3.0-5      
+ [58] whisker_0.4.1       plotly_4.10.4       generics_0.1.3     
+ [61] vroom_1.6.5         rprojroot_2.0.4     invgamma_1.1       
+ [64] truncnorm_1.0-9     hms_1.1.3           munsell_0.5.1      
+ [67] scales_1.3.0        ashr_2.2-63         gtools_3.9.5       
+ [70] RhpcBLASctl_0.23-42 glue_1.7.0          slam_0.1-54        
+ [73] lazyeval_0.2.2      tools_4.4.0         data.table_1.15.4  
+ [76] ggsignif_0.6.4      fs_1.6.4            cowplot_1.1.3      
+ [79] grid_4.4.0          tidyr_1.3.1         colorspace_2.1-0   
+ [82] sfsmisc_1.1-18      cli_3.6.3           workflowr_1.7.1    
+ [85] fansi_1.0.6         mixsqp_0.3-54       viridisLite_0.4.2  
+ [88] uwot_0.2.2          gtable_0.3.5        rstatix_0.7.2      
+ [91] sass_0.4.9          digest_0.6.36       ggrepel_0.9.5      
+ [94] farver_2.1.2        htmlwidgets_1.6.4   htmltools_0.5.8.1  
+ [97] lifecycle_1.0.4     httr_1.4.7          bit64_4.0.5        
+[100] MASS_7.3-61        </code></pre>
 </div>
 </div>
 
