@@ -226,6 +226,11 @@ word_df <- top_words %>% dplyr::inner_join(distinctive_words)
 knitr::kable(word_df)
 ```
 
+```{r}
+dat$k6 <- fit_list$`0.01`$LL[,"k6"]
+```
+
+
 # c = 1
 
 ```{r}
