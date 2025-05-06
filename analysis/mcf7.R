@@ -5,6 +5,7 @@ library(data.table)
 library(GEOquery)
 library(Matrix)
 library(fastTopics)
+library(flashier)
 set.seed(1)
 
 # Load the gene information.
@@ -82,4 +83,21 @@ temp[order(x),]
 topic_colors <- c("tomato","darkblue","gold","skyblue")
 p <- structure_plot(fit,grouping = samples$label,
                     topics = c(1,2,4),colors = topic_colors)
+print(p)
+
+# Compute the shifted log counts.
+a <- 1
+s <- rowSums(counts)
+s <- s/mean(s)
+Y <- log1p(counts/(a*s))
+
+# Fit an NMF to the shifted log counts.
+n <- nrow(counts)
+x <- rpois(1e7,1/n)
+s1 <- sd(log(x + 1))
+fl_nmf <- flash(Y,ebnm_fn = ebnm_point_exponential,var_type = 2, 
+                greedy_Kmax = 4,S = s1,backfit = TRUE)
+res <- ldf(fl_nmf,type = "i")
+p <- structure_plot(res$L,grouping = samples$label,
+                    colors = topic_colors)
 print(p)
