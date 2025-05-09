@@ -1,0 +1,22 @@
+---
+title: The MCF-7 data set as possible model system for the Poisson log1p NMF model
+author: Peter Carbonetto
+output: workflowr::wflow_html
+---
+
+In this analysis, I explore the possibility of the data from the
+[Sanford et al eLife paper][sanford2020elife] as a possible "model system" for 
+
+```{r knitr-opts, include=FALSE}
+knitr::opts_chunk$set(comment = "#",collapse = TRUE,results = "hold",
+                      fig.align = "center",dpi = 120)
+```
+
+```{r load-pkgs, message=FALSE}
+library(fastTopics)
+library(flashier)
+library(ggplot2)
+library(cowplot)
+```
+
+[sanford2020elife]: https://doi.org/10.7554/eLife.59388
