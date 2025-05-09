@@ -127,6 +127,37 @@ p1
 
 ## NMF of the shifted log counts
 
-ADD TEXT AND CODE HERE.
+Now let's try fitting an NMF to the shifted log counts using flashier.
+
+First compute the shifted log counts:
+
+```{r shifted-log-counts}
+a <- 1
+s <- rowSums(counts)
+s <- s/mean(s)
+Y <- log1p(counts/(a*s))
+```
+
+## Further analysis
+
+Next fit an NMF to the shifted log counts using flashier:
+
+```{r flashier-nmf, cache=TRUE}
+n  <- nrow(counts)
+x  <- rpois(1e7,1/n)
+s1 <- sd(log(x + 1))
+fl_nmf <- flash(Y,ebnm_fn = ebnm_point_exponential,var_type = 2, 
+                greedy_Kmax = 4,S = s1,backfit = TRUE,verbose = 0)
+```
+
+Note that I chose "greedy_Kmax" after some trial and error and found
+that 4 was a good setting.
+
+```{r structure-plot-nmf, fig.height=1.75, fig.width=5}
+res <- ldf(fl_nmf,type = "i")
+p2 <- structure_plot(res$L,grouping = samples$label,topics = 1:4,
+                     colors = topic_colors)
+p2
+```
 
 [sanford2020elife]: https://doi.org/10.7554/eLife.59388
