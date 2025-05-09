@@ -82,7 +82,7 @@ temp[order(x),]
 
 topic_colors <- c("tomato","darkblue","gold","skyblue")
 p <- structure_plot(fit,grouping = samples$label,
-                    topics = c(1,2,4),colors = topic_colors)
+                    topics = 1:4       ,colors = topic_colors)
 print(p)
 
 # Compute the shifted log counts.
