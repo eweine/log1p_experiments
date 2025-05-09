@@ -438,15 +438,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeebd0936a170c7140fa85f131f001e3b562820b0etargetblankebd0936a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3b682efdd9aaaa070406b73af9796e32ed71321etargetblank3b682efa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/ebd0936a170c7140fa85f131f001e3b562820b0e" target="_blank">ebd0936</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/3b682efdd9aaaa070406b73af9796e32ed71321e" target="_blank">3b682ef</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeebd0936a170c7140fa85f131f001e3b562820b0etargetblankebd0936a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3b682efdd9aaaa070406b73af9796e32ed71321etargetblank3b682efa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -456,7 +456,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/ebd0936a170c7140fa85f131f001e3b562820b0e" target="_blank">ebd0936</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/3b682efdd9aaaa070406b73af9796e32ed71321e" target="_blank">3b682ef</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -471,10 +471,11 @@ were generated:
 </p>
 <pre><code>
 Untracked files:
+    Untracked:  analysis/.#mcf7.Rmd
     Untracked:  data/pancreas.RData
 
 Unstaged changes:
-    Modified:   analysis/_site.yml
+    Modified:   analysis/mcf7.R
 
 </code></pre>
 <p>
@@ -519,6 +520,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/3b682efdd9aaaa070406b73af9796e32ed71321e/analysis/mcf7.Rmd" target="_blank">3b682ef</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-05-09
+</td>
+<td>
+wflow_publish("analysis/mcf7.Rmd", verbose = TRUE, view = FALSE)
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/57d755cedce84d2f238dd720f06bbca40edc483a/docs/mcf7.html" target="_blank">57d755c</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-05-09
+</td>
+<td>
+Updated the template for the mcf7 analysis.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -577,13 +612,91 @@ workflowr::wflow_publish("mcf7.Rmd")
 </div>
 </div>
 </div>
-<p>In this analysis, I explore the possibility of the data from the <a
+<p>Here I explore the possibility of the data from the <a
 href="https://doi.org/10.7554/eLife.59388">Sanford et al eLife paper</a>
-as a possible “model system” for</p>
+as a possible “model system” for the Poisson log1p NMF model. This paper
+analyzed the transcriptional response of human MCF-7 cells to retinoic
+acid and TGF-<span class="math inline">\(\beta\)</span>, applied
+individually and in combination.</p>
+<p>The following abbreviations were used in their data: EtOH = ethanol;
+RA = retinoic acid; TGFb = TGF-<span
+class="math inline">\(\beta\)</span>.</p>
+<p>Note that the data were downloaded from GEO, accession GSE152749.</p>
+<p>Load the fastTopics and flashier packages, and a few other packages
+needed to retrieve the data and create the plots.</p>
 <pre class="r"><code>library(fastTopics)
 library(flashier)
+library(data.table)
+library(GEOquery)
 library(ggplot2)
 library(cowplot)</code></pre>
+<p>Set the seed for reproducibility:</p>
+<pre class="r"><code>set.seed(1)</code></pre>
+<div id="prepare-the-data-for-analysis-with-fasttopics-and-flashier"
+class="section level2">
+<h2>Prepare the data for analysis with fastTopics and flashier</h2>
+<p>Load the gene information:</p>
+<pre class="r"><code>genes &lt;- fread(&quot;data/Human.GRCh38.p13.annot.tsv.gz&quot;,
+               sep = &quot;\t&quot;,header = TRUE,stringsAsFactors = FALSE)
+class(genes) &lt;- &quot;data.frame&quot;</code></pre>
+<p>Load the RNA-seq counts:</p>
+<pre class="r"><code>counts &lt;- fread(&quot;data/GSE152749_raw_counts_GRCh38.p13_NCBI.tsv.gz&quot;,
+                sep = &quot;\t&quot;,header = TRUE,stringsAsFactors = FALSE)
+class(counts) &lt;- &quot;data.frame&quot;
+rownames(counts) &lt;- counts$GeneID
+counts &lt;- counts[,-1]
+counts &lt;- as.matrix(counts)
+storage.mode(counts) &lt;- &quot;double&quot;
+counts &lt;- t(counts)
+ids &lt;- rownames(counts)</code></pre>
+<p>Load the sample information:</p>
+<pre class="r"><code>geo &lt;- getGEO(filename = &quot;data/GSE152749_family.soft.gz&quot;)
+samples &lt;- data.frame(id = names(GSMList(geo)),
+                      treatment = sapply(GSMList(geo),
+                                         function (x) Meta(x)$title))
+samples &lt;- samples[ids,]
+rownames(samples) &lt;- NULL
+samples &lt;- transform(samples,
+                     EtOH = grepl(&quot;EtOH&quot;,treatment,fixed = TRUE),
+                     RA   = grepl(&quot;RA&quot;,treatment,fixed = TRUE),
+                     TGFb = grepl(&quot;TGFb&quot;,treatment,fixed = TRUE))
+samples$label                 &lt;- &quot;EtOH&quot;
+samples[samples$RA,&quot;label&quot;]   &lt;- &quot;RA&quot;
+samples[samples$TGFb,&quot;label&quot;] &lt;- &quot;TGFb&quot;
+samples[with(samples,RA &amp; TGFb),&quot;label&quot;] &lt;- &quot;RA+TGFb&quot;
+samples &lt;- transform(samples,
+                     label = factor(label,c(&quot;EtOH&quot;,&quot;RA&quot;,&quot;TGFb&quot;,&quot;RA+TGFb&quot;)))</code></pre>
+<p>Remove the genes that are expressed in fewer than 4 samples:</p>
+<pre class="r"><code>x &lt;- colSums(counts &gt; 0)
+i &lt;- which(x &gt; 3)
+genes  &lt;- genes[i,]
+counts &lt;- counts[,i]</code></pre>
+</div>
+<div id="topic-model" class="section level2">
+<h2>Topic model</h2>
+<p>Let’s first try fitting a (multinomial) topic model to these data.
+After a bit of trial and error, it turns out that 4 topics are needed to
+get the right result:</p>
+<pre class="r"><code>fit0 &lt;- fit_poisson_nmf(counts,k = 4,init.method = &quot;random&quot;,numiter = 50,
+                        verbose = &quot;none&quot;,
+                        control = list(nc = 4,extrapolate = FALSE))
+fit &lt;- fit_poisson_nmf(counts,fit0 = fit0,numiter = 50,verbose = &quot;none&quot;,
+                       control = list(nc = 4,extrapolate = TRUE))</code></pre>
+<p>The topic model identifies one topic for the transcriptional
+responses to RA, one topic for the responses TGF-<span
+class="math inline">\(\beta\)</span>, and one topic for the “control” or
+“baseline” (ethanol), and the response from exposure to RA + TGF-<span
+class="math inline">\(\beta\)</span> is a fairly even mixture of the RA
+and TGF-<span class="math inline">\(\beta\)</span> topics.</p>
+<pre class="r"><code>topic_colors &lt;- c(&quot;tomato&quot;,&quot;darkblue&quot;,&quot;gold&quot;,&quot;skyblue&quot;)
+p1 &lt;- structure_plot(fit,grouping = samples$label,topics = 1:4,
+                     colors = topic_colors)
+p1</code></pre>
+<p><img src="figure/mcf7.Rmd/structure-plot-topic-model-1.png" width="600" style="display: block; margin: auto;" /></p>
+</div>
+<div id="nmf-of-the-shifted-log-counts" class="section level2">
+<h2>NMF of the shifted log counts</h2>
+<p>ADD TEXT AND CODE HERE.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -611,39 +724,47 @@ Session information
 # [1] stats     graphics  grDevices utils     datasets  methods   base     
 # 
 # other attached packages:
-# [1] cowplot_1.1.3     ggplot2_3.5.0     flashier_1.0.55   ebnm_1.1-34      
-# [5] fastTopics_0.7-24
+#  [1] cowplot_1.1.3       ggplot2_3.5.0       GEOquery_2.70.0    
+#  [4] Biobase_2.62.0      BiocGenerics_0.48.1 data.table_1.15.2  
+#  [7] flashier_1.0.55     ebnm_1.1-34         fastTopics_0.7-24  
+# [10] workflowr_1.7.1    
 # 
 # loaded via a namespace (and not attached):
-#  [1] softImpute_1.4-1     gtable_0.3.4         xfun_0.42           
-#  [4] bslib_0.6.1          htmlwidgets_1.6.4    ggrepel_0.9.5       
-#  [7] lattice_0.22-5       quadprog_1.5-8       vctrs_0.6.5         
-# [10] tools_4.3.3          generics_0.1.3       parallel_4.3.3      
-# [13] Polychrome_1.5.1     tibble_3.2.1         fansi_1.0.6         
-# [16] pkgconfig_2.0.3      Matrix_1.6-5         data.table_1.15.2   
-# [19] SQUAREM_2021.1       RColorBrewer_1.1-3   scatterplot3d_0.3-44
-# [22] RcppParallel_5.1.7   lifecycle_1.0.4      truncnorm_1.0-9     
-# [25] compiler_4.3.3       stringr_1.5.1        git2r_0.33.0        
-# [28] progress_1.2.3       munsell_0.5.0        RhpcBLASctl_0.23-42 
-# [31] httpuv_1.6.14        htmltools_0.5.8.1    sass_0.4.9          
-# [34] yaml_2.3.8           lazyeval_0.2.2       plotly_4.10.4       
-# [37] crayon_1.5.2         later_1.3.2          pillar_1.9.0        
-# [40] jquerylib_0.1.4      whisker_0.4.1        tidyr_1.3.1         
-# [43] uwot_0.2.3           cachem_1.0.8         trust_0.1-8         
-# [46] gtools_3.9.5         tidyselect_1.2.1     digest_0.6.34       
-# [49] Rtsne_0.17           stringi_1.8.3        reshape2_1.4.4      
-# [52] dplyr_1.1.4          purrr_1.0.2          ashr_2.2-66         
-# [55] splines_4.3.3        rprojroot_2.0.4      fastmap_1.1.1       
-# [58] grid_4.3.3           colorspace_2.1-0     cli_3.6.4           
-# [61] invgamma_1.1         magrittr_2.0.3       utf8_1.2.4          
-# [64] withr_3.0.2          prettyunits_1.2.0    scales_1.3.0        
-# [67] promises_1.2.1       horseshoe_0.2.0      rmarkdown_2.26      
-# [70] httr_1.4.7           deconvolveR_1.2-1    workflowr_1.7.1     
-# [73] hms_1.1.3            pbapply_1.7-2        evaluate_1.0.3      
-# [76] knitr_1.45           viridisLite_0.4.2    irlba_2.3.5.1       
-# [79] rlang_1.1.5          Rcpp_1.0.12          mixsqp_0.3-54       
-# [82] glue_1.8.0           jsonlite_1.8.8       plyr_1.8.9          
-# [85] R6_2.5.1             fs_1.6.5</code></pre>
+#   [1] pbapply_1.7-2        rlang_1.1.5          magrittr_2.0.3      
+#   [4] git2r_0.33.0         horseshoe_0.2.0      compiler_4.3.3      
+#   [7] getPass_0.2-4        callr_3.7.5          vctrs_0.6.5         
+#  [10] reshape2_1.4.4       quadprog_1.5-8       stringr_1.5.1       
+#  [13] pkgconfig_2.0.3      crayon_1.5.2         fastmap_1.1.1       
+#  [16] labeling_0.4.3       utf8_1.2.4           promises_1.2.1      
+#  [19] rmarkdown_2.26       tzdb_0.4.0           ps_1.7.6            
+#  [22] purrr_1.0.2          xfun_0.42            cachem_1.0.8        
+#  [25] trust_0.1-8          jsonlite_1.8.8       progress_1.2.3      
+#  [28] highr_0.10           later_1.3.2          irlba_2.3.5.1       
+#  [31] parallel_4.3.3       prettyunits_1.2.0    R6_2.5.1            
+#  [34] bslib_0.6.1          stringi_1.8.3        RColorBrewer_1.1-3  
+#  [37] SQUAREM_2021.1       limma_3.58.1         jquerylib_0.1.4     
+#  [40] Rcpp_1.0.12          knitr_1.45           R.utils_2.12.3      
+#  [43] readr_2.1.5          httpuv_1.6.14        Matrix_1.6-5        
+#  [46] splines_4.3.3        tidyselect_1.2.1     rstudioapi_0.15.0   
+#  [49] yaml_2.3.8           processx_3.8.3       lattice_0.22-5      
+#  [52] tibble_3.2.1         plyr_1.8.9           withr_3.0.2         
+#  [55] evaluate_1.0.3       Rtsne_0.17           RcppParallel_5.1.7  
+#  [58] xml2_1.3.6           pillar_1.9.0         whisker_0.4.1       
+#  [61] plotly_4.10.4        softImpute_1.4-1     generics_0.1.3      
+#  [64] rprojroot_2.0.4      invgamma_1.1         truncnorm_1.0-9     
+#  [67] hms_1.1.3            munsell_0.5.0        scales_1.3.0        
+#  [70] ashr_2.2-66          gtools_3.9.5         RhpcBLASctl_0.23-42 
+#  [73] glue_1.8.0           scatterplot3d_0.3-44 lazyeval_0.2.2      
+#  [76] tools_4.3.3          fs_1.6.5             grid_4.3.3          
+#  [79] tidyr_1.3.1          colorspace_2.1-0     deconvolveR_1.2-1   
+#  [82] cli_3.6.4            Polychrome_1.5.1     fansi_1.0.6         
+#  [85] mixsqp_0.3-54        viridisLite_0.4.2    dplyr_1.1.4         
+#  [88] uwot_0.2.3           gtable_0.3.4         R.methodsS3_1.8.2   
+#  [91] sass_0.4.9           digest_0.6.34        ggrepel_0.9.5       
+#  [94] farver_2.1.1         htmlwidgets_1.6.4    R.oo_1.26.0         
+#  [97] htmltools_0.5.8.1    lifecycle_1.0.4      httr_1.4.7          
+# [100] statmod_1.5.0</code></pre>
+</div>
 </div>
 
 
