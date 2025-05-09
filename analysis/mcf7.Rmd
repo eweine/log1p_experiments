@@ -100,9 +100,10 @@ counts <- counts[,i]
 
 ## Topic model
 
-Let's first try fitting a (multinomial) topic model to these
-data. After a bit of trial and error, it turns out that 4 topics are
-needed to get the right result:
+Let's first try fitting a (multinomial) topic model to these data,
+which represents an *additive model* of the transcriptional changes in
+response to the different exposures. After a bit of trial and error,
+it turns out that 4 topics are needed to get the right result:
 
 ```{r fit-topic-model}
 fit0 <- fit_poisson_nmf(counts,k = 4,init.method = "random",numiter = 50,
@@ -128,6 +129,8 @@ p1
 ## NMF of the shifted log counts
 
 Now let's try fitting an NMF to the shifted log counts using flashier.
+Implicitly, this model is a *multiplicative model* of the
+transcriptional changes in response to the different exposures.
 
 First compute the shifted log counts:
 
@@ -137,8 +140,6 @@ s <- rowSums(counts)
 s <- s/mean(s)
 Y <- log1p(counts/(a*s))
 ```
-
-## Further analysis
 
 Next fit an NMF to the shifted log counts using flashier:
 
@@ -153,11 +154,19 @@ fl_nmf <- flash(Y,ebnm_fn = ebnm_point_exponential,var_type = 2,
 Note that I chose "greedy_Kmax" after some trial and error and found
 that 4 was a good setting.
 
-```{r structure-plot-nmf, fig.height=1.75, fig.width=5}
+```{r structure-plot-nmf, fig.height=2.25, fig.width=5}
+topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
 res <- ldf(fl_nmf,type = "i")
-p2 <- structure_plot(res$L,grouping = samples$label,topics = 1:4,
+p2 <- structure_plot(res$L,grouping = samples$label,topics = c(2,3,4,1),
                      colors = topic_colors)
 p2
 ```
+
+Interestingly, the NMF model applied to the shifted log count
+decomposes the samples in nearly the same way as the topic model, with
+one key difference: it also explicitly has a *baseline factor* (factor
+1).
+
+## Further analysis
 
 [sanford2020elife]: https://doi.org/10.7554/eLife.59388
