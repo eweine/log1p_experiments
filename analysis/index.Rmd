@@ -40,6 +40,8 @@ Welcome to my research website.
 
 [Analysis of Mouse Lung Cells](mouse_lung.html)
 
+[The MCF-7 data set as possible model system for the Poisson log1p NMF model](mcf7.html)
+
 ## Paper Preparation
 
 [Formal Connections Between Factor Models](model_connections.html)
