@@ -10,19 +10,123 @@ output:
     self_contained: no
 ---
 
-In this analysis, I explore the possibility of the data from the
-[Sanford et al eLife paper][sanford2020elife] as a possible "model system" for 
+Here I explore the possibility of the data from the
+[Sanford et al eLife paper][sanford2020elife] as a possible "model
+system" for the Poisson log1p NMF model. This paper analyzed the
+transcriptional response of human MCF-7 cells to retinoic acid and
+TGF-$\beta$, applied individually and in combination.
+
+The following abbreviations were used in their data:
+EtOH = ethanol; RA = retinoic acid; TGFb = TGF-$\beta$.
+
+Note that the data were downloaded from GEO, accession GSE152749.
 
 ```{r knitr-opts, include=FALSE}
 knitr::opts_chunk$set(comment = "#",collapse = TRUE,results = "hold",
                       fig.align = "center",dpi = 120)
 ```
 
+Load the fastTopics and flashier packages, and a few other packages
+needed to retrieve the data and create the plots.
+
 ```{r load-pkgs, message=FALSE}
 library(fastTopics)
 library(flashier)
+library(data.table)
+library(GEOquery)
 library(ggplot2)
 library(cowplot)
 ```
+
+Set the seed for reproducibility:
+
+```{r set-seed}
+set.seed(1)
+```
+
+## Prepare the data for analysis with fastTopics and flashier
+
+Load the gene information:
+
+```{r load-genes}
+genes <- fread("data/Human.GRCh38.p13.annot.tsv.gz",
+               sep = "\t",header = TRUE,stringsAsFactors = FALSE)
+class(genes) <- "data.frame"
+```
+
+Load the RNA-seq counts:
+
+```{r load-rnaseq}
+counts <- fread("data/GSE152749_raw_counts_GRCh38.p13_NCBI.tsv.gz",
+                sep = "\t",header = TRUE,stringsAsFactors = FALSE)
+class(counts) <- "data.frame"
+rownames(counts) <- counts$GeneID
+counts <- counts[,-1]
+counts <- as.matrix(counts)
+storage.mode(counts) <- "double"
+counts <- t(counts)
+ids <- rownames(counts)
+```
+
+Load the sample information:
+
+```{r load-sample-info, message=FALSE}
+geo <- getGEO(filename = "data/GSE152749_family.soft.gz")
+samples <- data.frame(id = names(GSMList(geo)),
+                      treatment = sapply(GSMList(geo),
+                                         function (x) Meta(x)$title))
+samples <- samples[ids,]
+rownames(samples) <- NULL
+samples <- transform(samples,
+                     EtOH = grepl("EtOH",treatment,fixed = TRUE),
+                     RA   = grepl("RA",treatment,fixed = TRUE),
+                     TGFb = grepl("TGFb",treatment,fixed = TRUE))
+samples$label                 <- "EtOH"
+samples[samples$RA,"label"]   <- "RA"
+samples[samples$TGFb,"label"] <- "TGFb"
+samples[with(samples,RA & TGFb),"label"] <- "RA+TGFb"
+samples <- transform(samples,
+                     label = factor(label,c("EtOH","RA","TGFb","RA+TGFb")))
+```
+
+Remove the genes that are expressed in fewer than 4 samples:
+
+```{r filter-genes}
+x <- colSums(counts > 0)
+i <- which(x > 3)
+genes  <- genes[i,]
+counts <- counts[,i]
+```
+
+## Topic model
+
+Let's first try fitting a (multinomial) topic model to these
+data. After a bit of trial and error, it turns out that 4 topics are
+needed to get the right result:
+
+```{r fit-topic-model}
+fit0 <- fit_poisson_nmf(counts,k = 4,init.method = "random",numiter = 50,
+                        verbose = "none",
+                        control = list(nc = 4,extrapolate = FALSE))
+fit <- fit_poisson_nmf(counts,fit0 = fit0,numiter = 50,verbose = "none",
+                       control = list(nc = 4,extrapolate = TRUE))
+```
+
+The topic model identifies one topic for the transcriptional responses
+to RA, one topic for the responses TGF-$\beta$, and one topic for the
+"control" or "baseline" (ethanol), and the response from exposure to
+RA + TGF-$\beta$ is a fairly even mixture of the RA and TGF-$\beta$
+topics.
+
+```{r structure-plot-topic-model, fig.height=1.75, fig.width=5}
+topic_colors <- c("tomato","darkblue","gold","skyblue")
+p1 <- structure_plot(fit,grouping = samples$label,topics = 1:4,
+                     colors = topic_colors)
+p1
+```
+
+## NMF of the shifted log counts
+
+ADD TEXT AND CODE HERE.
 
 [sanford2020elife]: https://doi.org/10.7554/eLife.59388
