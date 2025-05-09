@@ -286,7 +286,7 @@ for the Poisson log1p NMF model</h1>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -297,8 +297,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -311,9 +311,9 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
@@ -407,16 +407,24 @@ versions is critical for reproducibility.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongdetected">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
 </p>
 </div>
-<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div id="strongCachestrongdetected" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Nice! There were no cached chunks for this analysis, so you can be
-confident that you successfully produced the results during this
-run.</p>
+The following chunks had caches available:
+<ul>
+<li>
+flashier-nmf
+</li>
+</ul>
+<p>To ensure reproducibility of the results, delete the cache directory
+<code>mcf7_cache</code> and re-run the analysis. To have workflowr
+automatically delete the cache directory prior to building the file, set
+<code>delete_cache = TRUE</code> when running <code>wflow_build()</code>
+or <code>wflow_publish()</code>.</p>
 </div>
 </div>
 </div>
@@ -438,15 +446,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3b682efdd9aaaa070406b73af9796e32ed71321etargetblank3b682efa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree603a5aad3c0de0a582f824c727f1496738240e6ftargetblank603a5aaa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/3b682efdd9aaaa070406b73af9796e32ed71321e" target="_blank">3b682ef</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/603a5aad3c0de0a582f824c727f1496738240e6f" target="_blank">603a5aa</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3b682efdd9aaaa070406b73af9796e32ed71321etargetblank3b682efa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree603a5aad3c0de0a582f824c727f1496738240e6ftargetblank603a5aaa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -456,7 +464,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/3b682efdd9aaaa070406b73af9796e32ed71321e" target="_blank">3b682ef</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/603a5aad3c0de0a582f824c727f1496738240e6f" target="_blank">603a5aa</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -471,11 +479,8 @@ were generated:
 </p>
 <pre><code>
 Untracked files:
-    Untracked:  analysis/.#mcf7.Rmd
+    Untracked:  analysis/mcf7_cache/
     Untracked:  data/pancreas.RData
-
-Unstaged changes:
-    Modified:   analysis/mcf7.R
 
 </code></pre>
 <p>
@@ -520,6 +525,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/603a5aad3c0de0a582f824c727f1496738240e6f/analysis/mcf7.Rmd" target="_blank">603a5aa</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-05-09
+</td>
+<td>
+Added a few notes to the mcf7 analysis.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d22faede353cb51f3e255df4fd5371abf55694b6/analysis/mcf7.Rmd" target="_blank">d22faed</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-05-09
+</td>
+<td>
+Added flashier NMF fit to mcf7 analysis.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/b777168a98cb77fe5c757b658b61546a2367f007/docs/mcf7.html" target="_blank">b777168</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-05-09
+</td>
+<td>
+Added topic model fitting and strucure plot to the mcf7 analysis.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -674,9 +730,11 @@ counts &lt;- counts[,i]</code></pre>
 </div>
 <div id="topic-model" class="section level2">
 <h2>Topic model</h2>
-<p>Let’s first try fitting a (multinomial) topic model to these data.
-After a bit of trial and error, it turns out that 4 topics are needed to
-get the right result:</p>
+<p>Let’s first try fitting a (multinomial) topic model to these data,
+which represents an <em>additive model</em> of the transcriptional
+changes in response to the different exposures. After a bit of trial and
+error, it turns out that 4 topics are needed to get the right
+result:</p>
 <pre class="r"><code>fit0 &lt;- fit_poisson_nmf(counts,k = 4,init.method = &quot;random&quot;,numiter = 50,
                         verbose = &quot;none&quot;,
                         control = list(nc = 4,extrapolate = FALSE))
@@ -693,10 +751,89 @@ p1 &lt;- structure_plot(fit,grouping = samples$label,topics = 1:4,
                      colors = topic_colors)
 p1</code></pre>
 <p><img src="figure/mcf7.Rmd/structure-plot-topic-model-1.png" width="600" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-structure-plot-topic-model-1">
+Past versions of structure-plot-topic-model-1.png
+</button>
+</p>
+<div id="fig-structure-plot-topic-model-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/b777168a98cb77fe5c757b658b61546a2367f007/docs/figure/mcf7.Rmd/structure-plot-topic-model-1.png" target="_blank">b777168</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-05-09
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="nmf-of-the-shifted-log-counts" class="section level2">
 <h2>NMF of the shifted log counts</h2>
-<p>ADD TEXT AND CODE HERE.</p>
+<p>Now let’s try fitting an NMF to the shifted log counts using
+flashier. Implicitly, this model is a <em>multiplicative model</em> of
+the transcriptional changes in response to the different exposures.</p>
+<p>First compute the shifted log counts:</p>
+<pre class="r"><code>a &lt;- 1
+s &lt;- rowSums(counts)
+s &lt;- s/mean(s)
+Y &lt;- log1p(counts/(a*s))</code></pre>
+<p>Next fit an NMF to the shifted log counts using flashier:</p>
+<pre class="r"><code>n  &lt;- nrow(counts)
+x  &lt;- rpois(1e7,1/n)
+s1 &lt;- sd(log(x + 1))
+fl_nmf &lt;- flash(Y,ebnm_fn = ebnm_point_exponential,var_type = 2, 
+                greedy_Kmax = 4,S = s1,backfit = TRUE,verbose = 0)</code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>Note that I chose “greedy_Kmax” after some trial and error and found
+that 4 was a good setting.</p>
+<pre class="r"><code>topic_colors &lt;- c(&quot;olivedrab&quot;,&quot;dodgerblue&quot;,&quot;tomato&quot;,&quot;darkblue&quot;)
+res &lt;- ldf(fl_nmf,type = &quot;i&quot;)
+p2 &lt;- structure_plot(res$L,grouping = samples$label,topics = c(2,3,4,1),
+                     colors = topic_colors)
+p2</code></pre>
+<p><img src="figure/mcf7.Rmd/structure-plot-nmf-1.png" width="600" style="display: block; margin: auto;" /></p>
+<p>Interestingly, the NMF model applied to the shifted log count
+decomposes the samples in nearly the same way as the topic model, with
+one key difference: it also explicitly has a <em>baseline factor</em>
+(factor 1).</p>
+</div>
+<div id="further-analysis" class="section level2">
+<h2>Further analysis</h2>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
