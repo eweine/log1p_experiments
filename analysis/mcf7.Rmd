@@ -167,6 +167,4 @@ decomposes the samples in nearly the same way as the topic model, with
 one key difference: it also explicitly has a *baseline factor* (factor
 1).
 
-## Further analysis
-
 [sanford2020elife]: https://doi.org/10.7554/eLife.59388
