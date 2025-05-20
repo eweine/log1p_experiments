@@ -30,6 +30,7 @@ Load the fastTopics and flashier packages, and a few other packages
 needed to retrieve the data and create the plots.
 
 ```{r load-pkgs, message=FALSE}
+library(rsvd)
 library(fastTopics)
 library(flashier)
 library(data.table)
@@ -98,9 +99,35 @@ genes  <- genes[i,]
 counts <- counts[,i]
 ```
 
+## PCA
+
+Let's see what happens when we apply PCA to the shifted log counts.
+
+First compute the shifted log counts:
+
+```{r shifted-log-counts}
+a <- 1
+s <- rowSums(counts)
+s <- s/mean(s)
+Y <- log1p(counts/(a*s))
+```
+
+Now run PCA on the shifted log counts, and plot the first 2 PCs:
+
+```{r pca, fig.height=2, fig.width=3}
+pca <- rpca(Y,k = 4,center = TRUE,scale = FALSE)
+colnames(pca$x) <- paste0("PC",1:4)
+pdat <- data.frame(samples,pca$x)
+ggplot(pdat,aes(x = PC1,y = PC2,color = label)) +
+  geom_point() +
+  scale_color_manual(values = c("dodgerblue","tomato","darkblue",
+                                "limegreen")) + 
+  theme_cowplot(font_size = 10)
+```
+
 ## Topic model
 
-Let's first try fitting a (multinomial) topic model to these data,
+Let's now try fitting a (multinomial) topic model to these data,
 which represents an *additive model* of the transcriptional changes in
 response to the different exposures. After a bit of trial and error,
 it turns out that 4 topics are needed to get the right result:
@@ -131,15 +158,6 @@ p1
 Now let's try fitting an NMF to the shifted log counts using flashier.
 Implicitly, this model is a *multiplicative model* of the
 transcriptional changes in response to the different exposures.
-
-First compute the shifted log counts:
-
-```{r shifted-log-counts}
-a <- 1
-s <- rowSums(counts)
-s <- s/mean(s)
-Y <- log1p(counts/(a*s))
-```
 
 Next fit an NMF to the shifted log counts using flashier:
 

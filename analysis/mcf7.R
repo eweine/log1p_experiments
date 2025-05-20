@@ -1,14 +1,5 @@
-# PCA
-library(rsvd)
-pca <- rpca(Y,k = 4,center = TRUE,scale = FALSE)
-colnames(pca$x) <- paste0("PC",1:4)
-pdat <- data.frame(samples,pca$x)
-ggplot(pdat,aes(x = PC1,y = PC2,color = label)) +
-  geom_point() +
-  theme_cowplot(font_size = 10)
-  
 # GLM-PCA
-# TO DO.
+# TO DO
 
 # Additive vs. multiplicative.
 LF <- tcrossprod(fit$L,fit$F)
