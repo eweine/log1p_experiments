@@ -37,6 +37,7 @@ library(data.table)
 library(GEOquery)
 library(ggplot2)
 library(cowplot)
+library(passPCA)
 ```
 
 Set the seed for reproducibility:
@@ -150,7 +151,7 @@ topics.
 topic_colors <- c("tomato","darkblue","gold","skyblue")
 p1 <- structure_plot(fit,grouping = samples$label,topics = 1:4,
                      colors = topic_colors)
-p1
+p1$plot
 ```
 
 ## NMF of the shifted log counts
@@ -177,7 +178,7 @@ topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
 res <- ldf(fl_nmf,type = "i")
 p2 <- structure_plot(res$L,grouping = samples$label,topics = c(2,3,4,1),
                      colors = topic_colors)
-p2
+p2$plot
 ```
 
 Interestingly, the NMF model applied to the shifted log count
@@ -186,3 +187,88 @@ one key difference: it also explicitly has a *baseline factor* (factor
 1).
 
 [sanford2020elife]: https://doi.org/10.7554/eLife.59388
+
+## Log1p Fits
+
+Below I fit the log1p model for different values of c.
+
+```{r}
+cc_vec <- c(1e-3, 1)
+
+fit_list <- list()
+
+for (cc in cc_vec) {
+  
+  set.seed(1)
+  fit_list[[as.character(cc)]] <- fit_poisson_log1p_nmf(
+    Y = counts,
+    K = 4,
+    cc = cc,
+    loglik = "exact",
+    control = list(verbose = FALSE)
+  )
+  
+}
+```
+
+Here is the c = 1 structure plot, which looks very similar to flashier (though is less sparse).
+
+```{r}
+topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
+normalized_structure_plot(
+  fit = fit_list$`1`,
+  grouping = samples$label,
+  colors = topic_colors,
+  topics = c(2,3,4,1)
+)$plot
+```
+
+The c = 1e-3 structure plot is below, which looks a bit crazy.
+
+```{r}
+topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
+normalized_structure_plot(
+  fit = fit_list$`0.001`,
+  grouping = samples$label,
+  colors = topic_colors,
+  topics = c(2,3,4,1)
+)$plot
+```
+
+```{r}
+tm_rank1 <- fastTopics:::fit_pnmf_rank1(counts)
+
+init_LL <- cbind(
+  tm_rank1$L,
+  matrix(
+    data = 1e-10,
+    nrow = nrow(counts),
+    ncol = 3
+  )
+)
+rownames(init_LL) <- rownames(counts)
+
+init_FF <- cbind(
+  tm_rank1$F,
+  matrix(
+    data = 1e-10,
+    nrow = ncol(counts),
+    ncol = 3
+  )
+)
+
+rownames(init_FF) <- colnames(counts)
+fit0 <- init_poisson_nmf(X = counts, L = init_LL, F = init_FF)
+
+fit <- fit_poisson_nmf(X = counts, fit0 = fit0)
+
+```
+Finally, I also fit fasttopics with a rank-1 initialization just to make sure the differences weren't being driven by initialization.
+
+```{r}
+topic_colors <- c("tomato","darkblue","gold","skyblue")
+p1 <- structure_plot(fit,grouping = samples$label,topics = 1:4,
+                     colors = topic_colors)
+p1$plot
+```
+

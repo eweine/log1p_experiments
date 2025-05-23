@@ -14,7 +14,7 @@
 
 <title>The MCF-7 data set as possible model system for the Poisson log1p NMF model</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
@@ -33,8 +33,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -307,13 +307,13 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-05-09
+<strong>Last updated:</strong> 2025-05-23
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 1
+aria-hidden="true"></span> 2
 </p>
 <p>
 <strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
@@ -336,18 +336,21 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
@@ -446,15 +449,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree603a5aad3c0de0a582f824c727f1496738240e6ftargetblank603a5aaa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreebde6ab29de1f9a9d2311c2fd0fe618b6eb8b458btargetblankbde6ab2a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/603a5aad3c0de0a582f824c727f1496738240e6f" target="_blank">603a5aa</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/bde6ab29de1f9a9d2311c2fd0fe618b6eb8b458b" target="_blank">bde6ab2</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree603a5aad3c0de0a582f824c727f1496738240e6ftargetblank603a5aaa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreebde6ab29de1f9a9d2311c2fd0fe618b6eb8b458btargetblankbde6ab2a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -464,7 +467,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/603a5aad3c0de0a582f824c727f1496738240e6f" target="_blank">603a5aa</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/bde6ab29de1f9a9d2311c2fd0fe618b6eb8b458b" target="_blank">bde6ab2</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -478,9 +481,17 @@ depends on. Below is the status of the Git repository when the results
 were generated:
 </p>
 <pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    data/.DS_Store
+
 Untracked files:
     Untracked:  analysis/mcf7_cache/
-    Untracked:  data/pancreas.RData
+
+Unstaged changes:
+    Modified:   analysis/mcf7.Rmd
+    Modified:   data/GSE152749_family.soft.gz
 
 </code></pre>
 <p>
@@ -525,6 +536,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/bde6ab29de1f9a9d2311c2fd0fe618b6eb8b458b/analysis/mcf7.Rmd" target="_blank">bde6ab2</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-05-20
+</td>
+<td>
+Added PCA to mcf7 analysis.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/95270b1558e64b876af314217cae90a803dee621/analysis/mcf7.Rmd" target="_blank">95270b1</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-05-11
+</td>
+<td>
+Working on some additional analyses to add to mcf7.Rmd.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/99138245809314e367d6c0d6909fe698678b6616/docs/mcf7.html" target="_blank">9913824</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-05-09
+</td>
+<td>
+Ran wflow_publish("analysis/mcf7.Rmd").
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -680,12 +742,16 @@ class="math inline">\(\beta\)</span>.</p>
 <p>Note that the data were downloaded from GEO, accession GSE152749.</p>
 <p>Load the fastTopics and flashier packages, and a few other packages
 needed to retrieve the data and create the plots.</p>
-<pre class="r"><code>library(fastTopics)
+<pre class="r"><code>library(rsvd)
+library(fastTopics)
 library(flashier)
 library(data.table)
+# Warning: package &#39;data.table&#39; was built under R version 4.4.1
 library(GEOquery)
 library(ggplot2)
-library(cowplot)</code></pre>
+# Warning: package &#39;ggplot2&#39; was built under R version 4.4.1
+library(cowplot)
+library(passPCA)</code></pre>
 <p>Set the seed for reproducibility:</p>
 <pre class="r"><code>set.seed(1)</code></pre>
 <div id="prepare-the-data-for-analysis-with-fasttopics-and-flashier"
@@ -728,9 +794,29 @@ i &lt;- which(x &gt; 3)
 genes  &lt;- genes[i,]
 counts &lt;- counts[,i]</code></pre>
 </div>
+<div id="pca" class="section level2">
+<h2>PCA</h2>
+<p>Let’s see what happens when we apply PCA to the shifted log
+counts.</p>
+<p>First compute the shifted log counts:</p>
+<pre class="r"><code>a &lt;- 1
+s &lt;- rowSums(counts)
+s &lt;- s/mean(s)
+Y &lt;- log1p(counts/(a*s))</code></pre>
+<p>Now run PCA on the shifted log counts, and plot the first 2 PCs:</p>
+<pre class="r"><code>pca &lt;- rpca(Y,k = 4,center = TRUE,scale = FALSE)
+colnames(pca$x) &lt;- paste0(&quot;PC&quot;,1:4)
+pdat &lt;- data.frame(samples,pca$x)
+ggplot(pdat,aes(x = PC1,y = PC2,color = label)) +
+  geom_point() +
+  scale_color_manual(values = c(&quot;dodgerblue&quot;,&quot;tomato&quot;,&quot;darkblue&quot;,
+                                &quot;limegreen&quot;)) + 
+  theme_cowplot(font_size = 10)</code></pre>
+<p><img src="figure/mcf7.Rmd/pca-1.png" width="360" style="display: block; margin: auto;" /></p>
+</div>
 <div id="topic-model" class="section level2">
 <h2>Topic model</h2>
-<p>Let’s first try fitting a (multinomial) topic model to these data,
+<p>Let’s now try fitting a (multinomial) topic model to these data,
 which represents an <em>additive model</em> of the transcriptional
 changes in response to the different exposures. After a bit of trial and
 error, it turns out that 4 topics are needed to get the right
@@ -749,7 +835,7 @@ and TGF-<span class="math inline">\(\beta\)</span> topics.</p>
 <pre class="r"><code>topic_colors &lt;- c(&quot;tomato&quot;,&quot;darkblue&quot;,&quot;gold&quot;,&quot;skyblue&quot;)
 p1 &lt;- structure_plot(fit,grouping = samples$label,topics = 1:4,
                      colors = topic_colors)
-p1</code></pre>
+p1$plot</code></pre>
 <p><img src="figure/mcf7.Rmd/structure-plot-topic-model-1.png" width="600" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-structure-plot-topic-model-1">
@@ -794,11 +880,6 @@ Peter Carbonetto
 <p>Now let’s try fitting an NMF to the shifted log counts using
 flashier. Implicitly, this model is a <em>multiplicative model</em> of
 the transcriptional changes in response to the different exposures.</p>
-<p>First compute the shifted log counts:</p>
-<pre class="r"><code>a &lt;- 1
-s &lt;- rowSums(counts)
-s &lt;- s/mean(s)
-Y &lt;- log1p(counts/(a*s))</code></pre>
 <p>Next fit an NMF to the shifted log counts using flashier:</p>
 <pre class="r"><code>n  &lt;- nrow(counts)
 x  &lt;- rpois(1e7,1/n)
@@ -825,15 +906,123 @@ that 4 was a good setting.</p>
 res &lt;- ldf(fl_nmf,type = &quot;i&quot;)
 p2 &lt;- structure_plot(res$L,grouping = samples$label,topics = c(2,3,4,1),
                      colors = topic_colors)
-p2</code></pre>
+p2$plot</code></pre>
 <p><img src="figure/mcf7.Rmd/structure-plot-nmf-1.png" width="600" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-structure-plot-nmf-1">
+Past versions of structure-plot-nmf-1.png
+</button>
+</p>
+<div id="fig-structure-plot-nmf-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/99138245809314e367d6c0d6909fe698678b6616/docs/figure/mcf7.Rmd/structure-plot-nmf-1.png" target="_blank">9913824</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-05-09
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Interestingly, the NMF model applied to the shifted log count
 decomposes the samples in nearly the same way as the topic model, with
 one key difference: it also explicitly has a <em>baseline factor</em>
 (factor 1).</p>
 </div>
-<div id="further-analysis" class="section level2">
-<h2>Further analysis</h2>
+<div id="log1p-fits" class="section level2">
+<h2>Log1p Fits</h2>
+<p>Below I fit the log1p model for different values of c.</p>
+<pre class="r"><code>cc_vec &lt;- c(1e-3, 1)
+
+fit_list &lt;- list()
+
+for (cc in cc_vec) {
+  
+  set.seed(1)
+  fit_list[[as.character(cc)]] &lt;- fit_poisson_log1p_nmf(
+    Y = counts,
+    K = 4,
+    cc = cc,
+    loglik = &quot;exact&quot;,
+    control = list(verbose = FALSE)
+  )
+  
+}</code></pre>
+<p>Here is the c = 1 structure plot, which looks very similar to
+flashier (though is less sparse).</p>
+<pre class="r"><code>topic_colors &lt;- c(&quot;olivedrab&quot;,&quot;dodgerblue&quot;,&quot;tomato&quot;,&quot;darkblue&quot;)
+normalized_structure_plot(
+  fit = fit_list$`1`,
+  grouping = samples$label,
+  colors = topic_colors,
+  topics = c(2,3,4,1)
+)$plot</code></pre>
+<p><img src="figure/mcf7.Rmd/unnamed-chunk-2-1.png" width="840" style="display: block; margin: auto;" /></p>
+<p>The c = 1e-3 structure plot is below, which looks a bit crazy.</p>
+<pre class="r"><code>topic_colors &lt;- c(&quot;olivedrab&quot;,&quot;dodgerblue&quot;,&quot;tomato&quot;,&quot;darkblue&quot;)
+normalized_structure_plot(
+  fit = fit_list$`0.001`,
+  grouping = samples$label,
+  colors = topic_colors,
+  topics = c(2,3,4,1)
+)$plot</code></pre>
+<p><img src="figure/mcf7.Rmd/unnamed-chunk-3-1.png" width="840" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tm_rank1 &lt;- fastTopics:::fit_pnmf_rank1(counts)
+
+init_LL &lt;- cbind(
+  tm_rank1$L,
+  matrix(
+    data = 1e-10,
+    nrow = nrow(counts),
+    ncol = 3
+  )
+)
+rownames(init_LL) &lt;- rownames(counts)
+
+init_FF &lt;- cbind(
+  tm_rank1$F,
+  matrix(
+    data = 1e-10,
+    nrow = ncol(counts),
+    ncol = 3
+  )
+)
+
+rownames(init_FF) &lt;- colnames(counts)
+fit0 &lt;- init_poisson_nmf(X = counts, L = init_LL, F = init_FF)
+
+fit &lt;- fit_poisson_nmf(X = counts, fit0 = fit0)
+
+# Fitting rank-4 Poisson NMF to 41 x 26743 dense matrix.
+# Running at most 100 SCD updates, without extrapolation (fastTopics 0.7-24).</code></pre>
+<p>Finally, I also fit fasttopics with a rank-1 initialization just to
+make sure the differences weren’t being driven by initialization.</p>
+<pre class="r"><code>topic_colors &lt;- c(&quot;tomato&quot;,&quot;darkblue&quot;,&quot;gold&quot;,&quot;skyblue&quot;)
+p1 &lt;- structure_plot(fit,grouping = samples$label,topics = 1:4,
+                     colors = topic_colors)
+p1$plot</code></pre>
+<p><img src="figure/mcf7.Rmd/unnamed-chunk-5-1.png" width="840" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -843,13 +1032,13 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()
-# R version 4.3.3 (2024-02-29)
-# Platform: aarch64-apple-darwin20 (64-bit)
-# Running under: macOS 15.4.1
+# R version 4.4.0 (2024-04-24)
+# Platform: aarch64-apple-darwin20
+# Running under: macOS Ventura 13.5
 # 
 # Matrix products: default
-# BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
-# LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+# BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+# LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
 # 
 # locale:
 # [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -861,46 +1050,46 @@ Session information
 # [1] stats     graphics  grDevices utils     datasets  methods   base     
 # 
 # other attached packages:
-#  [1] cowplot_1.1.3       ggplot2_3.5.0       GEOquery_2.70.0    
-#  [4] Biobase_2.62.0      BiocGenerics_0.48.1 data.table_1.15.2  
-#  [7] flashier_1.0.55     ebnm_1.1-34         fastTopics_0.7-24  
-# [10] workflowr_1.7.1    
+#  [1] passPCA_0.1-4       cowplot_1.1.3       ggplot2_3.5.2      
+#  [4] GEOquery_2.72.0     Biobase_2.64.0      BiocGenerics_0.50.0
+#  [7] data.table_1.17.0   flashier_1.0.56     ebnm_1.1-34        
+# [10] fastTopics_0.7-24   rsvd_1.0.5         
 # 
 # loaded via a namespace (and not attached):
-#   [1] pbapply_1.7-2        rlang_1.1.5          magrittr_2.0.3      
-#   [4] git2r_0.33.0         horseshoe_0.2.0      compiler_4.3.3      
-#   [7] getPass_0.2-4        callr_3.7.5          vctrs_0.6.5         
-#  [10] reshape2_1.4.4       quadprog_1.5-8       stringr_1.5.1       
-#  [13] pkgconfig_2.0.3      crayon_1.5.2         fastmap_1.1.1       
-#  [16] labeling_0.4.3       utf8_1.2.4           promises_1.2.1      
-#  [19] rmarkdown_2.26       tzdb_0.4.0           ps_1.7.6            
-#  [22] purrr_1.0.2          xfun_0.42            cachem_1.0.8        
-#  [25] trust_0.1-8          jsonlite_1.8.8       progress_1.2.3      
-#  [28] highr_0.10           later_1.3.2          irlba_2.3.5.1       
-#  [31] parallel_4.3.3       prettyunits_1.2.0    R6_2.5.1            
-#  [34] bslib_0.6.1          stringi_1.8.3        RColorBrewer_1.1-3  
-#  [37] SQUAREM_2021.1       limma_3.58.1         jquerylib_0.1.4     
-#  [40] Rcpp_1.0.12          knitr_1.45           R.utils_2.12.3      
-#  [43] readr_2.1.5          httpuv_1.6.14        Matrix_1.6-5        
-#  [46] splines_4.3.3        tidyselect_1.2.1     rstudioapi_0.15.0   
-#  [49] yaml_2.3.8           processx_3.8.3       lattice_0.22-5      
-#  [52] tibble_3.2.1         plyr_1.8.9           withr_3.0.2         
-#  [55] evaluate_1.0.3       Rtsne_0.17           RcppParallel_5.1.7  
-#  [58] xml2_1.3.6           pillar_1.9.0         whisker_0.4.1       
-#  [61] plotly_4.10.4        softImpute_1.4-1     generics_0.1.3      
-#  [64] rprojroot_2.0.4      invgamma_1.1         truncnorm_1.0-9     
-#  [67] hms_1.1.3            munsell_0.5.0        scales_1.3.0        
-#  [70] ashr_2.2-66          gtools_3.9.5         RhpcBLASctl_0.23-42 
-#  [73] glue_1.8.0           scatterplot3d_0.3-44 lazyeval_0.2.2      
-#  [76] tools_4.3.3          fs_1.6.5             grid_4.3.3          
-#  [79] tidyr_1.3.1          colorspace_2.1-0     deconvolveR_1.2-1   
-#  [82] cli_3.6.4            Polychrome_1.5.1     fansi_1.0.6         
-#  [85] mixsqp_0.3-54        viridisLite_0.4.2    dplyr_1.1.4         
-#  [88] uwot_0.2.3           gtable_0.3.4         R.methodsS3_1.8.2   
-#  [91] sass_0.4.9           digest_0.6.34        ggrepel_0.9.5       
-#  [94] farver_2.1.1         htmlwidgets_1.6.4    R.oo_1.26.0         
-#  [97] htmltools_0.5.8.1    lifecycle_1.0.4      httr_1.4.7          
-# [100] statmod_1.5.0</code></pre>
+#   [1] distr_2.9.3          pbapply_1.7-2        rlang_1.1.6         
+#   [4] magrittr_2.0.3       git2r_0.33.0         horseshoe_0.2.0     
+#   [7] compiler_4.4.0       vctrs_0.6.5          reshape2_1.4.4      
+#  [10] quadprog_1.5-8       stringr_1.5.1        pkgconfig_2.0.3     
+#  [13] crayon_1.5.3         fastmap_1.2.0        labeling_0.4.3      
+#  [16] promises_1.3.2       rmarkdown_2.29       tzdb_0.4.0          
+#  [19] purrr_1.0.4          xfun_0.52            cachem_1.1.0        
+#  [22] trust_0.1-8          jsonlite_2.0.0       progress_1.2.3      
+#  [25] later_1.4.2          irlba_2.3.5.1        parallel_4.4.0      
+#  [28] prettyunits_1.2.0    R6_2.6.1             bslib_0.9.0         
+#  [31] stringi_1.8.7        RColorBrewer_1.1-3   SQUAREM_2021.1      
+#  [34] limma_3.60.3         jquerylib_0.1.4      MatrixExtra_0.1.15  
+#  [37] Rcpp_1.0.14          knitr_1.50           R.utils_2.12.3      
+#  [40] readr_2.1.5          httpuv_1.6.15        Matrix_1.7-0        
+#  [43] splines_4.4.0        tidyselect_1.2.1     rstudioapi_0.16.0   
+#  [46] yaml_2.3.10          lattice_0.22-6       tibble_3.2.1        
+#  [49] plyr_1.8.9           withr_3.0.2          evaluate_1.0.3      
+#  [52] Rtsne_0.17           RcppParallel_5.1.10  startupmsg_0.9.6.1  
+#  [55] xml2_1.3.6           pillar_1.10.2        whisker_0.4.1       
+#  [58] plotly_4.10.4        softImpute_1.4-1     generics_0.1.3      
+#  [61] rprojroot_2.0.4      invgamma_1.1         float_0.3-2         
+#  [64] truncnorm_1.0-9      hms_1.1.3            munsell_0.5.1       
+#  [67] scales_1.3.0         ashr_2.2-66          gtools_3.9.5        
+#  [70] RhpcBLASctl_0.23-42  glue_1.8.0           scatterplot3d_0.3-44
+#  [73] lazyeval_0.2.2       tools_4.4.0          fs_1.6.6            
+#  [76] grid_4.4.0           tidyr_1.3.1          colorspace_2.1-1    
+#  [79] sfsmisc_1.1-18       deconvolveR_1.2-1    cli_3.6.5           
+#  [82] Polychrome_1.5.4     workflowr_1.7.1      mixsqp_0.3-54       
+#  [85] viridisLite_0.4.2    dplyr_1.1.4          uwot_0.2.3          
+#  [88] gtable_0.3.6         R.methodsS3_1.8.2    sass_0.4.10         
+#  [91] digest_0.6.37        ggrepel_0.9.6        farver_2.1.2        
+#  [94] htmlwidgets_1.6.4    R.oo_1.27.0          htmltools_0.5.8.1   
+#  [97] lifecycle_1.0.4      httr_1.4.7           statmod_1.5.0       
+# [100] MASS_7.3-61</code></pre>
 </div>
 </div>
 
