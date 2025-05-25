@@ -449,15 +449,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3f1b9b5284b78ce0576c69c78b23e3a867cae059targetblank3f1b9b5a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree5b3cd036fb148cba1ed0574bbdc79bebe008a71ctargetblank5b3cd03a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/3f1b9b5284b78ce0576c69c78b23e3a867cae059" target="_blank">3f1b9b5</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/5b3cd036fb148cba1ed0574bbdc79bebe008a71c" target="_blank">5b3cd03</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3f1b9b5284b78ce0576c69c78b23e3a867cae059targetblank3f1b9b5a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree5b3cd036fb148cba1ed0574bbdc79bebe008a71ctargetblank5b3cd03a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -467,7 +467,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/3f1b9b5284b78ce0576c69c78b23e3a867cae059" target="_blank">3f1b9b5</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/5b3cd036fb148cba1ed0574bbdc79bebe008a71c" target="_blank">5b3cd03</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -488,7 +488,6 @@ Ignored files:
 
 Unstaged changes:
     Modified:   analysis/mcf7.Rmd
-    Modified:   data/GSE152749_family.soft.gz
 
 </code></pre>
 <p>
@@ -533,6 +532,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/5b3cd036fb148cba1ed0574bbdc79bebe008a71c/analysis/mcf7.Rmd" target="_blank">5b3cd03</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-05-25
+</td>
+<td>
+added NMF fit with new initialization
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/5b3cd036fb148cba1ed0574bbdc79bebe008a71c/docs/mcf7.html" target="_blank">5b3cd03</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-05-25
+</td>
+<td>
+added NMF fit with new initialization
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1268,13 +1301,88 @@ fit &lt;- fit_poisson_nmf(X = counts, fit0 = fit0)
 structure_plot(fit0, grouping = pdat$label, topics = 1:4,
                      colors = topic_colors)$plot</code></pre>
 <p><img src="figure/mcf7.Rmd/unnamed-chunk-7-1.png" width="600" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/5b3cd036fb148cba1ed0574bbdc79bebe008a71c/docs/figure/mcf7.Rmd/unnamed-chunk-7-1.png" target="_blank">5b3cd03</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-05-25
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>And here it is after optimization:</p>
 <pre class="r"><code>topic_colors &lt;- c(&quot;tomato&quot;,&quot;darkblue&quot;,&quot;gold&quot;,&quot;skyblue&quot;)
 
 structure_plot(fit, grouping = pdat$label, topics = 1:4,
                      colors = topic_colors)$plot</code></pre>
 <p><img src="figure/mcf7.Rmd/unnamed-chunk-8-1.png" width="600" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>newX &lt;- t(fit$F)
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/5b3cd036fb148cba1ed0574bbdc79bebe008a71c/docs/figure/mcf7.Rmd/unnamed-chunk-8-1.png" target="_blank">5b3cd03</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-05-25
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>mn &lt;- t(fit$F %*% diag(apply(fit$L, 2, max)))
+newX &lt;- log1p(mn)
 
 # 1) center using the training means
 #    (pca$center is a length‐p vector of column means of Y)
@@ -1285,6 +1393,27 @@ newX_cent &lt;- sweep(newX, 2, pca$center, FUN = &quot;-&quot;)
 # 3) project onto the PC loadings
 #    (pca$v is a p×k matrix of the top k loading vectors)
 scores &lt;- newX_cent %*% pca$rotation</code></pre>
+<pre class="r"><code>pd2 &lt;- data.frame(
+  pc1 = pdat$PC1,
+  pc2 = pdat$PC2,
+  label = pdat$label
+)
+
+new_pd &lt;- data.frame(
+  pc1 = scores[,1],
+  pc2 = scores[,2],
+  label = c(&quot;topic1&quot;, &quot;topic2&quot;, &quot;topic3&quot;, &quot;topic4&quot;)
+)
+
+pd2 &lt;- rbind(pd2, new_pd)
+</code></pre>
+<p>Here’s a PC plot with the fitted topics:</p>
+<pre class="r"><code>ggplot(pd2,aes(x = pc1,y = pc2,color = label)) +
+  geom_point() +
+  scale_color_manual(values = c(&quot;dodgerblue&quot;,&quot;tomato&quot;,&quot;darkblue&quot;,
+                                &quot;limegreen&quot;, &quot;orange&quot;, &quot;black&quot;, &quot;gold&quot;, &quot;maroon&quot;)) + 
+  theme_cowplot(font_size = 10)</code></pre>
+<p><img src="figure/mcf7.Rmd/unnamed-chunk-11-1.png" width="840" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

@@ -327,7 +327,8 @@ structure_plot(fit, grouping = pdat$label, topics = 1:4,
 ```
 
 ```{r}
-newX <- t(fit$F)
+mn <- t(fit$F %*% diag(apply(fit$L, 2, max)))
+newX <- log1p(mn)
 
 # 1) center using the training means
 #    (pca$center is a length‐p vector of column means of Y)
@@ -338,5 +339,32 @@ newX_cent <- sweep(newX, 2, pca$center, FUN = "-")
 # 3) project onto the PC loadings
 #    (pca$v is a p×k matrix of the top k loading vectors)
 scores <- newX_cent %*% pca$rotation
+```
+
+```{r}
+pd2 <- data.frame(
+  pc1 = pdat$PC1,
+  pc2 = pdat$PC2,
+  label = pdat$label
+)
+
+new_pd <- data.frame(
+  pc1 = scores[,1],
+  pc2 = scores[,2],
+  label = c("topic1", "topic2", "topic3", "topic4")
+)
+
+pd2 <- rbind(pd2, new_pd)
+
+```
+
+Here's a PC plot with the fitted topics:
+
+```{r}
+ggplot(pd2,aes(x = pc1,y = pc2,color = label)) +
+  geom_point() +
+  scale_color_manual(values = c("dodgerblue","tomato","darkblue",
+                                "limegreen", "orange", "black", "gold", "maroon")) + 
+  theme_cowplot(font_size = 10)
 ```
 
