@@ -272,3 +272,71 @@ p1 <- structure_plot(fit,grouping = samples$label,topics = 1:4,
 p1$plot
 ```
 
+## Topic Model with Alternative Initialization
+
+I also attempted to initialize the topic model where each sample is loaded on the mean of only the greatest L2 norm point in PC space corresponding to it's treatment group.
+
+```{r}
+pdat$l2_pc <- sqrt(
+  pdat$PC1 ^ 2 + pdat$PC2 ^ 2
+)
+
+# representative samples:
+# RA+TGFb: GSM4625622
+# RA: GSM4625634
+# EtOH: GSM4625648
+# TGFb: GSM4625621
+
+FF <- cbind(
+  counts["GSM4625622", ],
+  counts["GSM4625634", ],
+  counts["GSM4625648", ],
+  counts["GSM4625621", ]
+)
+
+rownames(FF) <- colnames(counts)
+
+LL <- cbind(
+  ifelse(pdat$label == "RA+TGFb", 1, 0),
+  ifelse(pdat$label == "RA", 1, 0),
+  ifelse(pdat$label == "EtOH", 1, 0),
+  ifelse(pdat$label == "TGFb", 1, 0)
+)
+rownames(LL) <- rownames(counts)
+
+fit0 <- init_poisson_nmf(X = counts, F = FF, L = LL)
+fit <- fit_poisson_nmf(X = counts, fit0 = fit0)
+```
+
+Here is the structure plot at initialization:
+
+```{r, fig.height=1.75, fig.width=5}
+topic_colors <- c("tomato","darkblue","gold","skyblue")
+
+structure_plot(fit0, grouping = pdat$label, topics = 1:4,
+                     colors = topic_colors)$plot
+```
+
+And here it is after optimization:
+
+```{r, fig.height=1.75, fig.width=5}
+topic_colors <- c("tomato","darkblue","gold","skyblue")
+
+structure_plot(fit, grouping = pdat$label, topics = 1:4,
+                     colors = topic_colors)$plot
+```
+
+```{r}
+newX <- t(fit$F)
+
+# 1) center using the training means
+#    (pca$center is a length‐p vector of column means of Y)
+newX_cent <- sweep(newX, 2, pca$center, FUN = "-")
+
+# 2) since you had scale = FALSE, you do NOT rescale here
+
+# 3) project onto the PC loadings
+#    (pca$v is a p×k matrix of the top k loading vectors)
+scores <- newX_cent %*% pca$rotation
+```
+
