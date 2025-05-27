@@ -31,6 +31,7 @@ needed to retrieve the data and create the plots.
 
 ```{r load-pkgs, message=FALSE}
 library(rsvd)
+library(fastglmpca)
 library(fastTopics)
 library(flashier)
 library(data.table)
@@ -126,6 +127,22 @@ ggplot(pdat,aes(x = PC1,y = PC2,color = label)) +
   theme_cowplot(font_size = 10)
 ```
 
+## fastglmpca
+
+Just for interest, let's see what happens when we compute a GLM-PCA
+reduced representation of the counts:
+
+```{r fastglmpca, fig.height=2, fig.width=3, message=FALSE}
+fit_glmpca <- init_glmpca_pois(t(counts),K = 3)
+fit_glmpca <- fit_glmpca_pois(t(counts),fit0 = fit_glmpca,verbose = FALSE)
+pdat <- data.frame(samples,fit_glmpca$V)
+ggplot(pdat,aes(x = k_1,y = k_2,color = label)) +
+  geom_point() +
+  scale_color_manual(values = c("dodgerblue","tomato","darkblue",
+                                "limegreen")) + 
+  theme_cowplot(font_size = 10)
+```
+
 ## Topic model
 
 Let's now try fitting a (multinomial) topic model to these data,
@@ -151,7 +168,7 @@ topics.
 topic_colors <- c("tomato","darkblue","gold","skyblue")
 p1 <- structure_plot(fit,grouping = samples$label,topics = 1:4,
                      colors = topic_colors)
-p1$plot
+p1
 ```
 
 ## NMF of the shifted log counts
@@ -178,7 +195,7 @@ topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
 res <- ldf(fl_nmf,type = "i")
 p2 <- structure_plot(res$L,grouping = samples$label,topics = c(2,3,4,1),
                      colors = topic_colors)
-p2$plot
+p2
 ```
 
 Interestingly, the NMF model applied to the shifted log count
@@ -192,7 +209,7 @@ one key difference: it also explicitly has a *baseline factor* (factor
 
 Below I fit the log1p model for different values of c.
 
-```{r}
+```{r, eval=FALSE}
 cc_vec <- c(1e-3, 1)
 
 fit_list <- list()
@@ -213,7 +230,7 @@ for (cc in cc_vec) {
 
 Here is the c = 1 structure plot, which looks very similar to flashier (though is less sparse).
 
-```{r}
+```{r, eval=FALSE}
 topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
 normalized_structure_plot(
   fit = fit_list$`1`,
@@ -225,7 +242,7 @@ normalized_structure_plot(
 
 The c = 1e-3 structure plot is below, which looks a bit crazy.
 
-```{r}
+```{r, eval=FALSE}
 topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
 normalized_structure_plot(
   fit = fit_list$`0.001`,
@@ -235,7 +252,7 @@ normalized_structure_plot(
 )$plot
 ```
 
-```{r}
+```{r, eval=FALSE}
 tm_rank1 <- fastTopics:::fit_pnmf_rank1(counts)
 
 init_LL <- cbind(
@@ -263,9 +280,10 @@ fit0 <- init_poisson_nmf(X = counts, L = init_LL, F = init_FF)
 fit <- fit_poisson_nmf(X = counts, fit0 = fit0)
 
 ```
+
 Finally, I also fit fasttopics with a rank-1 initialization just to make sure the differences weren't being driven by initialization.
 
-```{r}
+```{r, eval=FALSE}
 topic_colors <- c("tomato","darkblue","gold","skyblue")
 p1 <- structure_plot(fit,grouping = samples$label,topics = 1:4,
                      colors = topic_colors)
@@ -276,7 +294,7 @@ p1$plot
 
 I also attempted to initialize the topic model where each sample is loaded on the mean of only the greatest L2 norm point in PC space corresponding to it's treatment group.
 
-```{r}
+```{r, eval=FALSE}
 pdat$l2_pc <- sqrt(
   pdat$PC1 ^ 2 + pdat$PC2 ^ 2
 )
@@ -310,23 +328,22 @@ fit <- fit_poisson_nmf(X = counts, fit0 = fit0)
 
 Here is the structure plot at initialization:
 
-```{r, fig.height=1.75, fig.width=5}
+```{r, fig.height=1.75, fig.width=5, eval=FALSE}
 topic_colors <- c("tomato","darkblue","gold","skyblue")
-
 structure_plot(fit0, grouping = pdat$label, topics = 1:4,
                      colors = topic_colors)$plot
 ```
 
 And here it is after optimization:
 
-```{r, fig.height=1.75, fig.width=5}
+```{r, fig.height=1.75, fig.width=5, eval=FALSE}
 topic_colors <- c("tomato","darkblue","gold","skyblue")
 
 structure_plot(fit, grouping = pdat$label, topics = 1:4,
                      colors = topic_colors)$plot
 ```
 
-```{r}
+```{r, eval=FALSE}
 mn <- t(fit$F %*% diag(apply(fit$L, 2, max)))
 newX <- log1p(mn)
 
@@ -341,7 +358,7 @@ newX_cent <- sweep(newX, 2, pca$center, FUN = "-")
 scores <- newX_cent %*% pca$rotation
 ```
 
-```{r}
+```{r, eval=FALSE}
 pd2 <- data.frame(
   pc1 = pdat$PC1,
   pc2 = pdat$PC2,
@@ -360,7 +377,7 @@ pd2 <- rbind(pd2, new_pd)
 
 Here's a PC plot with the fitted topics:
 
-```{r}
+```{r, eval=FALSE}
 ggplot(pd2,aes(x = pc1,y = pc2,color = label)) +
   geom_point() +
   scale_color_manual(values = c("dodgerblue","tomato","darkblue",
