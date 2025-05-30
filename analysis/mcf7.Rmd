@@ -230,7 +230,7 @@ shifted log counts just for comparison with EBNMF:
 ```{r nnlm}
 library(NNLM)
 nmf <- nnmf(Y,k = 4,loss = "mse",method = "scd",
-            max.iter = 100,verbose = 2,n.threads = 8)
+            max.iter = 100,verbose = 0,n.threads = 4)
 ```
 
 It is actually quite interesting to see that the loadings on the
