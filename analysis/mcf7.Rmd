@@ -38,7 +38,7 @@ library(data.table)
 library(GEOquery)
 library(ggplot2)
 library(cowplot)
-library(passPCA)
+library(log1pNMF)
 ```
 
 Set the seed for reproducibility:
@@ -55,6 +55,10 @@ Load the gene information:
 genes <- fread("data/Human.GRCh38.p13.annot.tsv.gz",
                sep = "\t",header = TRUE,stringsAsFactors = FALSE)
 class(genes) <- "data.frame"
+genes <- genes[1:10]
+genes <- transform(genes,
+                   GeneType = factor(GeneType),
+				   Status   = factor(Status))
 ```
 
 Load the RNA-seq counts:
@@ -92,14 +96,21 @@ samples <- transform(samples,
                      label = factor(label,c("EtOH","RA","TGFb","RA+TGFb")))
 ```
 
-Remove the genes that are expressed in fewer than 4 samples:
+Remove the non-protein-coding genes, and the genes that are expressed
+in fewer than 4 samples:
 
 ```{r filter-genes}
 x <- colSums(counts > 0)
-i <- which(x > 3)
+i <- which(x > 3 &
+           genes$GeneType == "protein-coding" &
+		   genes$Status == "active")
 genes  <- genes[i,]
 counts <- counts[,i]
 ```
+
+(It turns out that there is some structure in the non-coding RNA genes
+that is is picked up by some of the methods, so to avoid this
+complication I have removed these genes from the data.)
 
 ## PCA
 
@@ -117,8 +128,8 @@ Y <- log1p(counts/(a*s))
 Now run PCA on the shifted log counts, and plot the first 2 PCs:
 
 ```{r pca, fig.height=2, fig.width=3}
-pca <- rpca(Y,k = 4,center = TRUE,scale = FALSE)
-colnames(pca$x) <- paste0("PC",1:4)
+pca <- rpca(Y,k = 2,center = TRUE,scale = FALSE)
+colnames(pca$x) <- c("PC1","PC2")
 pdat <- data.frame(samples,pca$x)
 ggplot(pdat,aes(x = PC1,y = PC2,color = label)) +
   geom_point() +
@@ -130,17 +141,25 @@ ggplot(pdat,aes(x = PC1,y = PC2,color = label)) +
 ## fastglmpca
 
 Just for interest, let's see what happens when we compute a GLM-PCA
-reduced representation of the counts:
+reduced representation of the counts.
 
 ```{r fastglmpca, fig.height=2, fig.width=3, message=FALSE}
-fit_glmpca <- init_glmpca_pois(t(counts),K = 3)
+fit_glmpca <- init_glmpca_pois(t(counts),K = 2)
 fit_glmpca <- fit_glmpca_pois(t(counts),fit0 = fit_glmpca,verbose = FALSE)
+colnames(fit_glmpca$V) <- c("k1","k2")
 pdat <- data.frame(samples,fit_glmpca$V)
-ggplot(pdat,aes(x = k_1,y = k_2,color = label)) +
+ggplot(pdat,aes(x = k1,y = k2,color = label)) +
   geom_point() +
   scale_color_manual(values = c("dodgerblue","tomato","darkblue",
                                 "limegreen")) + 
   theme_cowplot(font_size = 10)
+```
+
+The top 2 PCs from GLM-PCA are essentially identical to the top 2
+PCs from PCA applied to the shifted log counts:
+
+```{r compare-pcs}
+round(cor(pca$x,fit_glmpca$V),digits = 4)
 ```
 
 ## Topic model
@@ -151,7 +170,7 @@ response to the different exposures. After a bit of trial and error,
 it turns out that 4 topics are needed to get the right result:
 
 ```{r fit-topic-model}
-fit0 <- fit_poisson_nmf(counts,k = 4,init.method = "random",numiter = 50,
+fit0 <- fit_poisson_nmf(counts,k = 3,init.method = "random",numiter = 50,
                         verbose = "none",
                         control = list(nc = 4,extrapolate = FALSE))
 fit <- fit_poisson_nmf(counts,fit0 = fit0,numiter = 50,verbose = "none",
@@ -165,8 +184,8 @@ RA + TGF-$\beta$ is a fairly even mixture of the RA and TGF-$\beta$
 topics.
 
 ```{r structure-plot-topic-model, fig.height=1.75, fig.width=5}
-topic_colors <- c("tomato","darkblue","gold","skyblue")
-p1 <- structure_plot(fit,grouping = samples$label,topics = 1:4,
+topic_colors <- c("tomato","darkblue","skyblue")
+p1 <- structure_plot(fit,grouping = samples$label,topics = 1:3,
                      colors = topic_colors)
 p1
 ```
