@@ -446,15 +446,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3c7bd7ccbdd999bff6b78f7c0e0a3e48285d70f9targetblank3c7bd7ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedc8a6329b8905925ef1407194d1ad611ff85f639targetblankdc8a632a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/3c7bd7ccbdd999bff6b78f7c0e0a3e48285d70f9" target="_blank">3c7bd7c</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/dc8a6329b8905925ef1407194d1ad611ff85f639" target="_blank">dc8a632</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3c7bd7ccbdd999bff6b78f7c0e0a3e48285d70f9targetblank3c7bd7ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedc8a6329b8905925ef1407194d1ad611ff85f639targetblankdc8a632a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -464,7 +464,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/3c7bd7ccbdd999bff6b78f7c0e0a3e48285d70f9" target="_blank">3c7bd7c</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/dc8a6329b8905925ef1407194d1ad611ff85f639" target="_blank">dc8a632</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -478,6 +478,9 @@ depends on. Below is the status of the Git repository when the results
 were generated:
 </p>
 <pre><code>
+Ignored files:
+    Ignored:    analysis/figure/
+
 Untracked files:
     Untracked:  analysis/mcf7_cache/
     Untracked:  data/pancreas.RData
@@ -525,6 +528,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/dc8a6329b8905925ef1407194d1ad611ff85f639/analysis/mcf7.Rmd" target="_blank">dc8a632</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-02
+</td>
+<td>
+wflow_publish("analysis/mcf7.Rmd", verbose = TRUE, view = FALSE)
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/efb64e302c25b8034a5be41be347123ae0c16933/docs/mcf7.html" target="_blank">efb64e3</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1534,6 +1571,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/efb64e302c25b8034a5be41be347123ae0c16933/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c10-1.png" target="_blank">efb64e3</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-02
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/c3a9654aebea007c38527d32a7d7c0c59aef17ad/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c10-1.png" target="_blank">c3a9654</a>
 </td>
 <td>
@@ -1556,12 +1604,11 @@ fit_log1p_c0.1 &lt;-
                         control = list(maxiter = 100,
                                        verbose = FALSE))</code></pre>
 <p>Interestingly, the fit at this setting is different from all the
-previous results in one important respect: previous results in one
-important respect: the “ethanol factor” does not contribute much to the
-RA samples.</p>
+previous results in one important respect: the “ethanol factor” does not
+contribute much to the RA samples.</p>
 <pre class="r"><code>topic_colors &lt;- c(&quot;olivedrab&quot;,&quot;dodgerblue&quot;,&quot;darkblue&quot;,&quot;tomato&quot;)
 L &lt;- fit_log1p_c0.1$LL
-d &lt;- apply(L,2,quantile,probs = 0.75)
+d &lt;- apply(L,2,max)
 L &lt;- scale_cols(L,1/d)
 structure_plot(L,grouping = samples$label,topics = c(4,2,3,1),
                colors = topic_colors) +
@@ -1591,6 +1638,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/efb64e302c25b8034a5be41be347123ae0c16933/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c01-1.png" target="_blank">efb64e3</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-02
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/610296c3532207e011a6113479b59ff86924778a/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c01-1.png" target="_blank">610296c</a>
 </td>
 <td>
@@ -1617,16 +1675,18 @@ Peter Carbonetto
 </div>
 <p>It is also a bit weird that one of the samples is a combination of
 all 4 factors. This result suggests that this is quite different from
-the others, i.e., an “outlier”.</p>
+the others, i.e., an “outlier”. This needs to be investigated
+further.</p>
 <p>And, indeed, the “middle ground” setting of <span
 class="math inline">\(c = 1\)</span> produces a result somewhere in
-between the two:</p>
-<pre class="r"><code>fit_log1p_c1 &lt;- 
+between the two settings:</p>
+<pre class="r"><code>set.seed(1)
+fit_log1p_c1 &lt;- 
   fit_poisson_log1p_nmf(counts,K = 4,cc = 1,loglik = &quot;exact&quot;,
                         init_method = &quot;rank1&quot;,
                         control = list(maxiter = 100,
                                        verbose = FALSE))
-topic_colors &lt;- c(&quot;olivedrab&quot;,&quot;dodgerblue&quot;,&quot;tomato&quot;,&quot;darkblue&quot;)
+topic_colors &lt;- c(&quot;olivedrab&quot;,&quot;dodgerblue&quot;,&quot;darkblue&quot;,&quot;tomato&quot;)
 L &lt;- fit_log1p_c1$LL
 d &lt;- apply(L,2,max)
 L &lt;- scale_cols(L,1/d)
@@ -1656,6 +1716,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/efb64e302c25b8034a5be41be347123ae0c16933/docs/figure/mcf7.Rmd/log1pNMF-c1-1.png" target="_blank">efb64e3</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-02
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/eweine/log1p_experiments/blob/c3a9654aebea007c38527d32a7d7c0c59aef17ad/docs/figure/mcf7.Rmd/log1pNMF-c1-1.png" target="_blank">c3a9654</a>
