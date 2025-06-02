@@ -290,32 +290,42 @@ fit_log1p_c0.1 <-
 ```
 
 Interestingly, the fit at this setting is different from all the
-previous results in one important respect: BLAH BLAH BLAH.
+previous results in one important respect: the RA samples are modeled
+as a combination of only two factors (the 
 
 ```{r structure-plot-log1pNMF-c01, fig.height=2.25, fig.width=5}
-topic_colors <- c("olivedrab","dodgerblue","darkblue","tomato")
+topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
 L <- fit_log1p_c0.1$LL
-d <- apply(L,2,max)
+d <- apply(L,2,quantile,probs = 0.9)
 L <- scale_cols(L,1/d)
-structure_plot(L,grouping = samples$label,topics = 4:1,
+structure_plot(L,grouping = samples$label,topics = c(3,4,2,1),
                colors = topic_colors) +
   labs(y = "membership")
 ```
 
-ADD TEXT HERE.
+It is also a bit weird that two of the samples are a combination of
+all 4 factors suggesting that they are quite different from the
+others, i.e., "outliers".
 
-```{r log1pNMF-c1}
+The other thing that is a bit concerning is that the log-likelihood is
+still changing quite a bit after 200 iterations:
+
+```{r progress-plot-log1pNMF-c01, fig.height=4, fig.width=4}
+x <- fit_log1p_c0.1$objective_trace
+plot(seq(1,length(x)-1),log10(diff(x)),type = "l",lwd = 1.5,
+     xlab = "iteration",ylab = "change in log-likelihood")
+```
+
+And indeed the "middle ground" setting of $c = 1$ produces a result
+somewhere in between the two:
+
+```{r log1pNMF-c1, fig.height=2.25, fig.width=5}
 fit_log1p_c1 <- 
   fit_poisson_log1p_nmf(counts,K = 4,cc = 1,loglik = "exact",
                         init_method = "rank1",
                         control = list(maxiter = 200,
                                        verbose = FALSE))
-```
-
-ADD TEXT HERE.
-
-```{r structure-plot-log1pNMF-c1, fig.height=2.25, fig.width=5}
-topic_colors <- c("olivedrab","dodgerblue","darkblue","tomato")
+topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
 L <- fit_log1p_c1$LL
 d <- apply(L,2,max)
 L <- scale_cols(L,1/d)
@@ -323,7 +333,6 @@ structure_plot(L,grouping = samples$label,topics = 4:1,
                colors = topic_colors) +
   labs(y = "membership")
 ```
-
 
 ## Topic Model with Alternative Initialization
 
