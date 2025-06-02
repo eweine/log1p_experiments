@@ -212,7 +212,8 @@ that 4 was a good setting.
 topic_colors <- c("olivedrab","dodgerblue","darkblue","tomato")
 res <- ldf(fl_nmf,type = "i")
 structure_plot(res$L,grouping = samples$label,topics = 4:1,
-               colors = topic_colors)
+               colors = topic_colors) +
+  labs(y = "membership")
 ```
 
 Interestingly, the NMF model applied to the shifted log count
@@ -244,7 +245,8 @@ k <- ncol(W)
 d <- apply(W,2,max)
 W <- scale_cols(W,1/d)
 structure_plot(W,grouping = samples$label,topics = c(2:4,1),
-               colors = topic_colors)
+               colors = topic_colors) +
+  labs(y = "membership")
 ```
 
 ## log1p NMF
@@ -260,7 +262,7 @@ set.seed(1)
 fit_log1p_c10 <- 
   fit_poisson_log1p_nmf(counts,K = 4,cc = 10,loglik = "exact",
                         init_method = "rank1",
-                        control = list(maxiter = 100,
+                        control = list(maxiter = 200,
                                        verbose = FALSE))
 ```
 
@@ -272,9 +274,56 @@ topic_colors <- c("olivedrab","dodgerblue","darkblue","tomato")
 L <- fit_log1p_c10$LL
 d <- apply(L,2,max)
 L <- scale_cols(L,1/d)
-structure_plot(L,grouping = samples$label,
-               colors = topic_colors,topics = 4:1)
+structure_plot(L,grouping = samples$label,topics = 4:1,
+               colors = topic_colors) +
+  labs(y = "membership")
 ```
+
+Let's now try a "small" setting, $c = 0.1$:
+
+```{r log1pNMF-c01}
+fit_log1p_c0.1 <- 
+  fit_poisson_log1p_nmf(counts,K = 4,cc = 0.1,loglik = "exact",
+                        init_method = "rank1",
+                        control = list(maxiter = 200,
+                                       verbose = FALSE))
+```
+
+Interestingly, the fit at this setting is different from all the
+previous results in one important respect: BLAH BLAH BLAH.
+
+```{r structure-plot-log1pNMF-c01, fig.height=2.25, fig.width=5}
+topic_colors <- c("olivedrab","dodgerblue","darkblue","tomato")
+L <- fit_log1p_c0.1$LL
+d <- apply(L,2,max)
+L <- scale_cols(L,1/d)
+structure_plot(L,grouping = samples$label,topics = 4:1,
+               colors = topic_colors) +
+  labs(y = "membership")
+```
+
+ADD TEXT HERE.
+
+```{r log1pNMF-c1}
+fit_log1p_c1 <- 
+  fit_poisson_log1p_nmf(counts,K = 4,cc = 1,loglik = "exact",
+                        init_method = "rank1",
+                        control = list(maxiter = 200,
+                                       verbose = FALSE))
+```
+
+ADD TEXT HERE.
+
+```{r structure-plot-log1pNMF-c1, fig.height=2.25, fig.width=5}
+topic_colors <- c("olivedrab","dodgerblue","darkblue","tomato")
+L <- fit_log1p_c1$LL
+d <- apply(L,2,max)
+L <- scale_cols(L,1/d)
+structure_plot(L,grouping = samples$label,topics = 4:1,
+               colors = topic_colors) +
+  labs(y = "membership")
+```
+
 
 ## Topic Model with Alternative Initialization
 
