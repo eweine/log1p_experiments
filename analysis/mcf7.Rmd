@@ -185,9 +185,8 @@ topics.
 
 ```{r structure-plot-topic-model, fig.height=1.75, fig.width=5}
 topic_colors <- c("tomato","darkblue","dodgerblue")
-p1 <- structure_plot(fit,grouping = samples$label,topics = 1:3,
-                     colors = topic_colors)
-p1
+structure_plot(fit,grouping = samples$label,topics = 1:3,
+               colors = topic_colors)
 ```
 
 ## NMF on the shifted log counts
@@ -210,11 +209,10 @@ Note that I chose "greedy_Kmax" after some trial and error and found
 that 4 was a good setting.
 
 ```{r structure-plot-nmf, fig.height=2.25, fig.width=5}
-topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
+topic_colors <- c("olivedrab","dodgerblue","darkblue","tomato")
 res <- ldf(fl_nmf,type = "i")
-p2 <- structure_plot(res$L,grouping = samples$label,topics = c(2,3,4,1),
-                     colors = topic_colors)
-p2
+structure_plot(res$L,grouping = samples$label,topics = 4:1,
+               colors = topic_colors)
 ```
 
 Interestingly, the NMF model applied to the shifted log count
@@ -238,105 +236,51 @@ individual factors appear to be a bit "noisier", and they are also
 less sparse:
 
 ```{r structure-plot-nnlm, fig.height=2.25, fig.width=5}
+topic_colors <- c("olivedrab","tomato","darkblue","dodgerblue")
 scale_cols <- function (A, b)
   t(t(A) * b)
 W <- nmf$W
 k <- ncol(W)
 d <- apply(W,2,max)
 W <- scale_cols(W,1/d)
-p3 <- structure_plot(W,grouping = samples$label,topics = 4:1,
-                     colors = topic_colors)
-p3
+structure_plot(W,grouping = samples$label,topics = c(2:4,1),
+               colors = topic_colors)
 ```
 
-## Log1p Fits
+## log1p NMF
 
-Below I fit the log1p model for different values of c.
+Let's now compare the above NMFs—which includes the topic model since
+it is also an NMF—with the new Poisson NMF we are proposing that used
+the shifted log link (we call it "log1p NMF" for short). The shifted
+log link has a parameter, $c$, that controls the behaviour of the link
+function. Let's first try a "large" setting, $c = 10$:
 
-```{r, eval=FALSE}
-cc_vec <- c(1e-3, 1)
-
-fit_list <- list()
-
-for (cc in cc_vec) {
-  
-  set.seed(1)
-  fit_list[[as.character(cc)]] <- fit_poisson_log1p_nmf(
-    Y = counts,
-    K = 4,
-    cc = cc,
-    loglik = "exact",
-    control = list(verbose = FALSE)
-  )
-  
-}
+```{r log1pNMF-c10}
+set.seed(1)
+fit_log1p_c10 <- 
+  fit_poisson_log1p_nmf(counts,K = 4,cc = 10,loglik = "exact",
+                        init_method = "rank1",
+                        control = list(maxiter = 100,
+                                       verbose = FALSE))
 ```
 
-Here is the c = 1 structure plot, which looks very similar to flashier (though is less sparse).
+As expected, the log1p NMF model with $c = 10$ closely recovers the
+topic model (aside from the inclusion of a "baseline" factor):
 
-```{r, eval=FALSE}
-topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
-normalized_structure_plot(
-  fit = fit_list$`1`,
-  grouping = samples$label,
-  colors = topic_colors,
-  topics = c(2,3,4,1)
-)$plot
-```
-
-The c = 1e-3 structure plot is below, which looks a bit crazy.
-
-```{r, eval=FALSE}
-topic_colors <- c("olivedrab","dodgerblue","tomato","darkblue")
-normalized_structure_plot(
-  fit = fit_list$`0.001`,
-  grouping = samples$label,
-  colors = topic_colors,
-  topics = c(2,3,4,1)
-)$plot
-```
-
-```{r, eval=FALSE}
-tm_rank1 <- fastTopics:::fit_pnmf_rank1(counts)
-
-init_LL <- cbind(
-  tm_rank1$L,
-  matrix(
-    data = 1e-10,
-    nrow = nrow(counts),
-    ncol = 3
-  )
-)
-rownames(init_LL) <- rownames(counts)
-
-init_FF <- cbind(
-  tm_rank1$F,
-  matrix(
-    data = 1e-10,
-    nrow = ncol(counts),
-    ncol = 3
-  )
-)
-
-rownames(init_FF) <- colnames(counts)
-fit0 <- init_poisson_nmf(X = counts, L = init_LL, F = init_FF)
-
-fit <- fit_poisson_nmf(X = counts, fit0 = fit0)
-
-```
-
-Finally, I also fit fasttopics with a rank-1 initialization just to make sure the differences weren't being driven by initialization.
-
-```{r, eval=FALSE}
-topic_colors <- c("tomato","darkblue","gold","skyblue")
-p1 <- structure_plot(fit,grouping = samples$label,topics = 1:4,
-                     colors = topic_colors)
-p1$plot
+```{r structure-plot-log1pNMF-c10, fig.height=2.25, fig.width=5}
+topic_colors <- c("olivedrab","dodgerblue","darkblue","tomato")
+L <- fit_log1p_c10$LL
+d <- apply(L,2,max)
+L <- scale_cols(L,1/d)
+structure_plot(L,grouping = samples$label,
+               colors = topic_colors,topics = 4:1)
 ```
 
 ## Topic Model with Alternative Initialization
 
-I also attempted to initialize the topic model where each sample is loaded on the mean of only the greatest L2 norm point in PC space corresponding to it's treatment group.
+I also attempted to initialize the topic model where each sample is
+loaded on the mean of only the greatest L2 norm point in PC space
+corresponding to it's treatment group.
 
 ```{r, eval=FALSE}
 pdat$l2_pc <- sqrt(
