@@ -370,6 +370,20 @@ plot(W,L[,c(1,3,4,2)],pch = 20,xlab = "NMF",ylab = "log1pNMF, c = 1")
 abline(a = 0,b = 1,col = "magenta",lty = "dotted")
 ```
 
+Here's a plot showing the model fitting progress, specifically the
+improvement in the log-likelihood at each iteration of the algorithm:
+
+```{r plot-progress, fig.height=3.5, fig.width=3}
+x1 <- diff(fit_log1p_c10$objective_trace)
+x2 <- diff(fit_log1p_c1$objective_trace)
+x3 <- diff(fit_log1p_c0.1$objective_trace)
+plot(1:length(x1),x1,type = "l",lwd = 1.5,
+     xlab = "iteration",ylab = "change in loglik",
+     log = "y",col = "darkblue",ylim = c(10,1e8))
+lines(1:length(x2),x2,lwd = 1.5,col = "darkorange")
+lines(1:length(x3),x3,lwd = 1.5,col = "limegreen")
+```
+
 ## Topic Model with Alternative Initialization
 
 I also attempted to initialize the topic model where each sample is
