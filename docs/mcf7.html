@@ -307,7 +307,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-06-02
+<strong>Last updated:</strong> 2025-06-03
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -419,6 +419,15 @@ The following chunks had caches available:
 <li>
 flashier-nmf
 </li>
+<li>
+log1pNMF-c01
+</li>
+<li>
+log1pNMF-c1
+</li>
+<li>
+log1pNMF-c10
+</li>
 </ul>
 <p>To ensure reproducibility of the results, delete the cache directory
 <code>mcf7_cache</code> and re-run the analysis. To have workflowr
@@ -446,15 +455,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedc8a6329b8905925ef1407194d1ad611ff85f639targetblankdc8a632a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree73f3329e3729d969a5ebfb10d10523869952b49ftargetblank73f3329a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/dc8a6329b8905925ef1407194d1ad611ff85f639" target="_blank">dc8a632</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/73f3329e3729d969a5ebfb10d10523869952b49f" target="_blank">73f3329</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedc8a6329b8905925ef1407194d1ad611ff85f639targetblankdc8a632a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree73f3329e3729d969a5ebfb10d10523869952b49ftargetblank73f3329a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -464,7 +473,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/dc8a6329b8905925ef1407194d1ad611ff85f639" target="_blank">dc8a632</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/73f3329e3729d969a5ebfb10d10523869952b49f" target="_blank">73f3329</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -478,9 +487,6 @@ depends on. Below is the status of the Git repository when the results
 were generated:
 </p>
 <pre><code>
-Ignored files:
-    Ignored:    analysis/figure/
-
 Untracked files:
     Untracked:  analysis/mcf7_cache/
     Untracked:  data/pancreas.RData
@@ -528,6 +534,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/73f3329e3729d969a5ebfb10d10523869952b49f/analysis/mcf7.Rmd" target="_blank">73f3329</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+<td>
+wflow_publish("analysis/mcf7.Rmd", verbose = TRUE, view = FALSE)
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/8b182ff1b0f09f0b90bd70a7f48b67308626477c/analysis/mcf7.Rmd" target="_blank">8b182ff</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+<td>
+Made a few adjustments to the NNLM fit in the mcf7 analysis.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/0919644f7909eb2d780c74abf04afaf2120e6afd/docs/mcf7.html" target="_blank">0919644</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1455,21 +1512,32 @@ one key difference: it also explicitly has a <em>baseline factor</em>
 <div id="nmf-second-attempt" class="section level2">
 <h2>NMF (second attempt)</h2>
 <p>Out of curiosity, I also tried running a “vanilla” NMF method on the
-shifted log counts just for comparison with EBNMF:</p>
+shifted log counts just for comparison with EBNMF. Note that I
+initialized the NMF in this way to make it more similar to the flashier
+result.</p>
 <pre class="r"><code>library(NNLM)
-nmf &lt;- nnmf(Y,k = 4,loss = &quot;mse&quot;,method = &quot;scd&quot;,
-            max.iter = 100,verbose = 0,n.threads = 4)</code></pre>
+k &lt;- 4
+nmf0 &lt;- nnmf(Y,k = 1,loss = &quot;mse&quot;,method = &quot;scd&quot;,
+            max.iter = 10,verbose = 0,n.threads = 4)
+W0 &lt;- nmf0$W
+H0 &lt;- nmf0$H
+n  &lt;- nrow(Y)
+m  &lt;- ncol(Y)
+W0 &lt;- cbind(W0,matrix(runif(n*(k-1)),n,k-1))
+H0 &lt;- rbind(H0,matrix(runif(m*(k-1)),k-1,m))
+nmf &lt;- nnmf(Y,k,init = list(W = W0,H = H0),loss = &quot;mse&quot;,
+            method = &quot;scd&quot;,max.iter = 100,verbose = 0,
+            n.threads = 4)</code></pre>
 <p>It is actually quite interesting to see that the loadings on the
-individual factors appear to be a bit “noisier”, and they are also less
-sparse:</p>
-<pre class="r"><code>topic_colors &lt;- c(&quot;olivedrab&quot;,&quot;tomato&quot;,&quot;darkblue&quot;,&quot;dodgerblue&quot;)
+individual factors appear to be a bit “noisier” and less sparse:</p>
+<pre class="r"><code>topic_colors &lt;- c(&quot;olivedrab&quot;,&quot;darkblue&quot;,&quot;tomato&quot;,&quot;dodgerblue&quot;)
 scale_cols &lt;- function (A, b)
   t(t(A) * b)
 W &lt;- nmf$W
 k &lt;- ncol(W)
 d &lt;- apply(W,2,max)
 W &lt;- scale_cols(W,1/d)
-structure_plot(W,grouping = samples$label,topics = c(2:4,1),
+structure_plot(W,grouping = samples$label,topics = c(3,2,4,1),
                colors = topic_colors) +
   labs(y = &quot;membership&quot;)</code></pre>
 <p><img src="figure/mcf7.Rmd/structure-plot-nnlm-1.png" width="600" style="display: block; margin: auto;" /></p>
@@ -1534,8 +1602,22 @@ setting, <span class="math inline">\(c = 10\)</span>:</p>
 fit_log1p_c10 &lt;- 
   fit_poisson_log1p_nmf(counts,K = 4,cc = 10,loglik = &quot;exact&quot;,
                         init_method = &quot;rank1&quot;,
-                        control = list(maxiter = 100,
+                        control = list(maxiter = 1000,
                                        verbose = FALSE))</code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
 <p>As expected, the log1p NMF model with <span class="math inline">\(c =
 10\)</span> closely recovers the topic model (aside from the inclusion
 of a “baseline” factor):</p>
@@ -1601,8 +1683,22 @@ Peter Carbonetto
 fit_log1p_c0.1 &lt;- 
   fit_poisson_log1p_nmf(counts,K = 4,cc = 0.1,loglik = &quot;exact&quot;,
                         init_method = &quot;rank1&quot;,
-                        control = list(maxiter = 100,
+                        control = list(maxiter = 1000,
                                        verbose = FALSE))</code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
 <p>Interestingly, the fit at this setting is different from all the
 previous results in one important respect: the “ethanol factor” does not
 contribute much to the RA samples.</p>
@@ -1636,6 +1732,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/0919644f7909eb2d780c74abf04afaf2120e6afd/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c01-1.png" target="_blank">0919644</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-02
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/eweine/log1p_experiments/blob/efb64e302c25b8034a5be41be347123ae0c16933/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c01-1.png" target="_blank">efb64e3</a>
@@ -1684,64 +1791,30 @@ between the two settings:</p>
 fit_log1p_c1 &lt;- 
   fit_poisson_log1p_nmf(counts,K = 4,cc = 1,loglik = &quot;exact&quot;,
                         init_method = &quot;rank1&quot;,
-                        control = list(maxiter = 100,
-                                       verbose = FALSE))
-topic_colors &lt;- c(&quot;olivedrab&quot;,&quot;dodgerblue&quot;,&quot;darkblue&quot;,&quot;tomato&quot;)
+                        control = list(maxiter = 1000,
+                                       verbose = FALSE))</code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<pre class="r"><code>topic_colors &lt;- c(&quot;olivedrab&quot;,&quot;dodgerblue&quot;,&quot;darkblue&quot;,&quot;tomato&quot;)
 L &lt;- fit_log1p_c1$LL
 d &lt;- apply(L,2,max)
 L &lt;- scale_cols(L,1/d)
 structure_plot(L,grouping = samples$label,topics = 4:1,
                colors = topic_colors) +
   labs(y = &quot;membership&quot;)</code></pre>
-<p><img src="figure/mcf7.Rmd/log1pNMF-c1-1.png" width="600" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-log1pNMF-c1-1">
-Past versions of log1pNMF-c1-1.png
-</button>
-</p>
-<div id="fig-log1pNMF-c1-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/efb64e302c25b8034a5be41be347123ae0c16933/docs/figure/mcf7.Rmd/log1pNMF-c1-1.png" target="_blank">efb64e3</a>
-</td>
-<td>
-Peter Carbonetto
-</td>
-<td>
-2025-06-02
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/eweine/log1p_experiments/blob/c3a9654aebea007c38527d32a7d7c0c59aef17ad/docs/figure/mcf7.Rmd/log1pNMF-c1-1.png" target="_blank">c3a9654</a>
-</td>
-<td>
-Peter Carbonetto
-</td>
-<td>
-2025-06-02
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/mcf7.Rmd/structure-plot-log1pNMF-c1-1.png" width="600" style="display: block; margin: auto;" /></p>
 </div>
 <div id="topic-model-with-alternative-initialization"
 class="section level2">
@@ -1866,29 +1939,28 @@ Session information
 #  [31] later_1.3.2          irlba_2.3.5.1        parallel_4.3.3      
 #  [34] prettyunits_1.2.0    R6_2.5.1             bslib_0.6.1         
 #  [37] stringi_1.8.3        RColorBrewer_1.1-3   limma_3.58.1        
-#  [40] SQUAREM_2021.1       jquerylib_0.1.4      MatrixExtra_0.1.15  
-#  [43] Rcpp_1.0.12          knitr_1.45           R.utils_2.12.3      
-#  [46] readr_2.1.5          httpuv_1.6.14        Matrix_1.6-5        
-#  [49] splines_4.3.3        tidyselect_1.2.1     rstudioapi_0.15.0   
-#  [52] yaml_2.3.8           processx_3.8.3       lattice_0.22-5      
-#  [55] tibble_3.2.1         plyr_1.8.9           withr_3.0.2         
-#  [58] evaluate_1.0.3       Rtsne_0.17           RcppParallel_5.1.10 
-#  [61] xml2_1.3.6           startupmsg_0.9.6.1   pillar_1.9.0        
-#  [64] whisker_0.4.1        plotly_4.10.4        softImpute_1.4-1    
-#  [67] generics_0.1.3       rprojroot_2.0.4      invgamma_1.1        
-#  [70] float_0.3-2          truncnorm_1.0-9      hms_1.1.3           
-#  [73] munsell_0.5.0        scales_1.3.0         ashr_2.2-66         
-#  [76] gtools_3.9.5         RhpcBLASctl_0.23-42  glue_1.8.0          
-#  [79] scatterplot3d_0.3-44 lazyeval_0.2.2       tools_4.3.3         
-#  [82] fs_1.6.5             grid_4.3.3           tidyr_1.3.1         
-#  [85] colorspace_2.1-0     sfsmisc_1.1-18       deconvolveR_1.2-1   
-#  [88] cli_3.6.4            Polychrome_1.5.1     fansi_1.0.6         
-#  [91] mixsqp_0.3-54        viridisLite_0.4.2    dplyr_1.1.4         
-#  [94] uwot_0.2.3           gtable_0.3.4         R.methodsS3_1.8.2   
-#  [97] sass_0.4.9           digest_0.6.34        ggrepel_0.9.5       
-# [100] farver_2.1.1         htmlwidgets_1.6.4    R.oo_1.26.0         
-# [103] htmltools_0.5.8.1    lifecycle_1.0.4      httr_1.4.7          
-# [106] statmod_1.5.0        MASS_7.3-60.0.1</code></pre>
+#  [40] SQUAREM_2021.1       jquerylib_0.1.4      Rcpp_1.0.12         
+#  [43] knitr_1.45           R.utils_2.12.3       readr_2.1.5         
+#  [46] httpuv_1.6.14        Matrix_1.6-5         splines_4.3.3       
+#  [49] tidyselect_1.2.1     rstudioapi_0.15.0    yaml_2.3.8          
+#  [52] processx_3.8.3       lattice_0.22-5       tibble_3.2.1        
+#  [55] plyr_1.8.9           withr_3.0.2          evaluate_1.0.3      
+#  [58] Rtsne_0.17           RcppParallel_5.1.10  xml2_1.3.6          
+#  [61] startupmsg_0.9.6.1   pillar_1.9.0         whisker_0.4.1       
+#  [64] plotly_4.10.4        softImpute_1.4-1     generics_0.1.3      
+#  [67] rprojroot_2.0.4      invgamma_1.1         truncnorm_1.0-9     
+#  [70] hms_1.1.3            munsell_0.5.0        scales_1.3.0        
+#  [73] ashr_2.2-66          gtools_3.9.5         RhpcBLASctl_0.23-42 
+#  [76] glue_1.8.0           scatterplot3d_0.3-44 lazyeval_0.2.2      
+#  [79] tools_4.3.3          fs_1.6.5             grid_4.3.3          
+#  [82] tidyr_1.3.1          colorspace_2.1-0     sfsmisc_1.1-18      
+#  [85] deconvolveR_1.2-1    cli_3.6.4            Polychrome_1.5.1    
+#  [88] fansi_1.0.6          mixsqp_0.3-54        viridisLite_0.4.2   
+#  [91] dplyr_1.1.4          uwot_0.2.3           gtable_0.3.4        
+#  [94] R.methodsS3_1.8.2    sass_0.4.9           digest_0.6.34       
+#  [97] ggrepel_0.9.5        farver_2.1.1         htmlwidgets_1.6.4   
+# [100] R.oo_1.26.0          htmltools_0.5.8.1    lifecycle_1.0.4     
+# [103] httr_1.4.7           statmod_1.5.0        MASS_7.3-60.0.1</code></pre>
 </div>
 </div>
 
