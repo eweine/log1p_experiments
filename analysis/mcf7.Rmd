@@ -224,12 +224,24 @@ one key difference: it also explicitly has a *baseline factor* (factor
 ## NMF (second attempt)
 
 Out of curiosity, I also tried running a "vanilla" NMF method on the
-shifted log counts just for comparison with EBNMF:
+shifted log counts just for comparison with EBNMF. Note that I
+initialized the NMF in this way to make it more similar to the
+flashier result.
 
 ```{r nnlm}
 library(NNLM)
-nmf <- nnmf(Y,k = 4,loss = "mse",method = "scd",
-            max.iter = 100,verbose = 0,n.threads = 4)
+k <- 4
+nmf0 <- nnmf(Y,k = 1,loss = "mse",method = "scd",
+            max.iter = 10,verbose = 0,n.threads = 4)
+W0 <- nmf0$W
+H0 <- nmf0$H
+n  <- nrow(Y)
+m  <- ncol(Y)
+W0 <- cbind(W0,matrix(runif(n*(k-1)),n,k-1))
+H0 <- rbind(H0,matrix(runif(m*(k-1)),k-1,m))
+nmf <- nnmf(Y,k,init = list(W = W0,H = H0),loss = "mse",
+            method = "scd",max.iter = 20,verbose = 0,
+			n.threads = 4)
 ```
 
 It is actually quite interesting to see that the loadings on the
@@ -237,14 +249,14 @@ individual factors appear to be a bit "noisier", and they are also
 less sparse:
 
 ```{r structure-plot-nnlm, fig.height=2.25, fig.width=5}
-topic_colors <- c("olivedrab","tomato","darkblue","dodgerblue")
+topic_colors <- c("olivedrab","darkblue","tomato","dodgerblue")
 scale_cols <- function (A, b)
   t(t(A) * b)
 W <- nmf$W
 k <- ncol(W)
 d <- apply(W,2,max)
 W <- scale_cols(W,1/d)
-structure_plot(W,grouping = samples$label,topics = c(2:4,1),
+structure_plot(W,grouping = samples$label,topics = c(3,2,4,1),
                colors = topic_colors) +
   labs(y = "membership")
 ```
