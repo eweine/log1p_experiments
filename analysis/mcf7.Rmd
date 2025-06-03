@@ -292,7 +292,7 @@ structure_plot(L,grouping = samples$label,topics = 4:1,
 
 Compare log1pNMF with $c = 10$ to the topic model:
 
-```{r topic-model-vs-log1pNMF, fig.height=3, fig.width=3}
+```{r topic-model-vs-log1pNMF, fig.height=3.5, fig.width=3}
 L1 <- fit$L
 d  <- apply(L1,2,max)
 L1 <- scale_cols(L1,1/d)
@@ -358,7 +358,7 @@ structure_plot(L,grouping = samples$label,topics = 4:1,
 
 Compare log1pNMF with $c = 1$ to NMF:
 
-```{r nmf-vs-log1pNMF, fig.height=3, fig.width=3}
+```{r nmf-vs-log1pNMF, fig.height=3.5, fig.width=3}
 W <- nmf$W
 k <- ncol(W)
 d <- apply(W,2,max)
