@@ -455,15 +455,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree73f3329e3729d969a5ebfb10d10523869952b49ftargetblank73f3329a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree17ff99f2507bc5cf9fae0d5495ee54e4038d00cetargetblank17ff99fa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/73f3329e3729d969a5ebfb10d10523869952b49f" target="_blank">73f3329</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/17ff99f2507bc5cf9fae0d5495ee54e4038d00ce" target="_blank">17ff99f</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree73f3329e3729d969a5ebfb10d10523869952b49ftargetblank73f3329a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree17ff99f2507bc5cf9fae0d5495ee54e4038d00cetargetblank17ff99fa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -473,7 +473,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/73f3329e3729d969a5ebfb10d10523869952b49f" target="_blank">73f3329</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/17ff99f2507bc5cf9fae0d5495ee54e4038d00ce" target="_blank">17ff99f</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -489,6 +489,8 @@ were generated:
 <pre><code>
 Untracked files:
     Untracked:  analysis/mcf7_cache/
+    Untracked:  analysis/temp.R
+    Untracked:  analysis/temp.R~
     Untracked:  data/pancreas.RData
 
 </code></pre>
@@ -534,6 +536,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/17ff99f2507bc5cf9fae0d5495ee54e4038d00ce/analysis/mcf7.Rmd" target="_blank">17ff99f</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+<td>
+wflow_publish("analysis/mcf7.Rmd", verbose = TRUE, view = FALSE)
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/9088e7d8725b1fdb3ff97ec576cffb6e14a6a7cf/docs/mcf7.html" target="_blank">9088e7d</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+<td>
+Ran wflow_publish("analysis/mcf7.Rmd").
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1565,6 +1601,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/9088e7d8725b1fdb3ff97ec576cffb6e14a6a7cf/docs/figure/mcf7.Rmd/structure-plot-nnlm-1.png" target="_blank">9088e7d</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/c3a9654aebea007c38527d32a7d7c0c59aef17ad/docs/figure/mcf7.Rmd/structure-plot-nnlm-1.png" target="_blank">c3a9654</a>
 </td>
 <td>
@@ -1653,6 +1700,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/9088e7d8725b1fdb3ff97ec576cffb6e14a6a7cf/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c10-1.png" target="_blank">9088e7d</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/efb64e302c25b8034a5be41be347123ae0c16933/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c10-1.png" target="_blank">efb64e3</a>
 </td>
 <td>
@@ -1677,6 +1735,19 @@ Peter Carbonetto
 </table>
 </div>
 </div>
+<p>Compare log1pNMF with <span class="math inline">\(c = 10\)</span> to
+the topic model:</p>
+<pre class="r"><code>L1 &lt;- fit$L
+d  &lt;- apply(L1,2,max)
+L1 &lt;- scale_cols(L1,1/d)
+L2 &lt;- fit_log1p_c10$LL
+d  &lt;- apply(L2,2,max)
+L2 &lt;- scale_cols(L2,1/d)
+plot(L1,L2[,4:2],pch = 20,
+     xlab = &quot;topic model&quot;,
+     ylab = &quot;log1pNMF, c = 10&quot;)
+abline(a = 0,b = 1,col = &quot;magenta&quot;,lty = &quot;dotted&quot;)</code></pre>
+<p><img src="figure/mcf7.Rmd/topic-model-vs-log1pNMF-1.png" width="360" style="display: block; margin: auto;" /></p>
 <p>Let’s now try a “small” setting, <span class="math inline">\(c =
 0.1\)</span>:</p>
 <pre class="r"><code>set.seed(1)
@@ -1732,6 +1803,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/9088e7d8725b1fdb3ff97ec576cffb6e14a6a7cf/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c01-1.png" target="_blank">9088e7d</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/eweine/log1p_experiments/blob/0919644f7909eb2d780c74abf04afaf2120e6afd/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c01-1.png" target="_blank">0919644</a>
@@ -1815,6 +1897,55 @@ structure_plot(L,grouping = samples$label,topics = 4:1,
                colors = topic_colors) +
   labs(y = &quot;membership&quot;)</code></pre>
 <p><img src="figure/mcf7.Rmd/structure-plot-log1pNMF-c1-1.png" width="600" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-structure-plot-log1pNMF-c1-1">
+Past versions of structure-plot-log1pNMF-c1-1.png
+</button>
+</p>
+<div id="fig-structure-plot-log1pNMF-c1-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/9088e7d8725b1fdb3ff97ec576cffb6e14a6a7cf/docs/figure/mcf7.Rmd/structure-plot-log1pNMF-c1-1.png" target="_blank">9088e7d</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Compare log1pNMF with <span class="math inline">\(c = 1\)</span> to
+NMF:</p>
+<pre class="r"><code>W &lt;- nmf$W
+k &lt;- ncol(W)
+d &lt;- apply(W,2,max)
+W &lt;- scale_cols(W,1/d)
+L &lt;- fit_log1p_c1$LL
+d &lt;- apply(L,2,max)
+L &lt;- scale_cols(L,1/d)
+plot(W,L[,c(1,3,4,2)],pch = 20,xlab = &quot;NMF&quot;,ylab = &quot;log1pNMF, c = 1&quot;)
+abline(a = 0,b = 1,col = &quot;magenta&quot;,lty = &quot;dotted&quot;)</code></pre>
+<p><img src="figure/mcf7.Rmd/nmf-vs-log1pNMF-1.png" width="360" style="display: block; margin: auto;" /></p>
 </div>
 <div id="topic-model-with-alternative-initialization"
 class="section level2">
