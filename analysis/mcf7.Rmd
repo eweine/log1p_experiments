@@ -228,7 +228,7 @@ shifted log counts just for comparison with EBNMF. Note that I
 initialized the NMF in this way to make it more similar to the
 flashier result.
 
-```{r nnlm}
+```{r nnlm, warning=FALSE}
 library(NNLM)
 k <- 4
 nmf0 <- nnmf(Y,k = 1,loss = "mse",method = "scd",
@@ -240,13 +240,12 @@ m  <- ncol(Y)
 W0 <- cbind(W0,matrix(runif(n*(k-1)),n,k-1))
 H0 <- rbind(H0,matrix(runif(m*(k-1)),k-1,m))
 nmf <- nnmf(Y,k,init = list(W = W0,H = H0),loss = "mse",
-            method = "scd",max.iter = 20,verbose = 0,
+            method = "scd",max.iter = 100,verbose = 0,
 			n.threads = 4)
 ```
 
 It is actually quite interesting to see that the loadings on the
-individual factors appear to be a bit "noisier", and they are also
-less sparse:
+individual factors appear to be a bit "noisier" and less sparse:
 
 ```{r structure-plot-nnlm, fig.height=2.25, fig.width=5}
 topic_colors <- c("olivedrab","darkblue","tomato","dodgerblue")
@@ -269,12 +268,12 @@ the shifted log link (we call it "log1p NMF" for short). The shifted
 log link has a parameter, $c$, that controls the behaviour of the link
 function. Let's first try a "large" setting, $c = 10$:
 
-```{r log1pNMF-c10}
+```{r log1pNMF-c10, cache=TRUE}
 set.seed(1)
 fit_log1p_c10 <- 
   fit_poisson_log1p_nmf(counts,K = 4,cc = 10,loglik = "exact",
                         init_method = "rank1",
-                        control = list(maxiter = 100,
+                        control = list(maxiter = 1000,
                                        verbose = FALSE))
 ```
 
@@ -293,12 +292,12 @@ structure_plot(L,grouping = samples$label,topics = 4:1,
 
 Let's now try a "small" setting, $c = 0.1$:
 
-```{r log1pNMF-c01}
+```{r log1pNMF-c01, cache=TRUE}
 set.seed(1)
 fit_log1p_c0.1 <- 
   fit_poisson_log1p_nmf(counts,K = 4,cc = 0.1,loglik = "exact",
                         init_method = "rank1",
-                        control = list(maxiter = 100,
+                        control = list(maxiter = 1000,
                                        verbose = FALSE))
 ```
 
@@ -323,13 +322,16 @@ others, i.e., an "outlier". This needs to be investigated further.
 And, indeed, the "middle ground" setting of $c = 1$ produces a result
 somewhere in between the two settings:
 
-```{r log1pNMF-c1, fig.height=2.25, fig.width=5}
+```{r log1pNMF-c1, cache=TRUE}
 set.seed(1)
 fit_log1p_c1 <- 
   fit_poisson_log1p_nmf(counts,K = 4,cc = 1,loglik = "exact",
                         init_method = "rank1",
-                        control = list(maxiter = 100,
+                        control = list(maxiter = 1000,
                                        verbose = FALSE))
+```
+
+```{r structure-plot-log1pNMF-c1, fig.height=2.25, fig.width=5} 
 topic_colors <- c("olivedrab","dodgerblue","darkblue","tomato")
 L <- fit_log1p_c1$LL
 d <- apply(L,2,max)
