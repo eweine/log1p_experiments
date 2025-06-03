@@ -455,15 +455,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree35ebb4acd36c90f39b87cd2c9690fd72c41650d6targetblank35ebb4aa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree1c44abef7d537d5c2ae753330013b3c834df7783targetblank1c44abea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/35ebb4acd36c90f39b87cd2c9690fd72c41650d6" target="_blank">35ebb4a</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/1c44abef7d537d5c2ae753330013b3c834df7783" target="_blank">1c44abe</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree35ebb4acd36c90f39b87cd2c9690fd72c41650d6targetblank35ebb4aa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree1c44abef7d537d5c2ae753330013b3c834df7783targetblank1c44abea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -473,7 +473,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/35ebb4acd36c90f39b87cd2c9690fd72c41650d6" target="_blank">35ebb4a</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/1c44abef7d537d5c2ae753330013b3c834df7783" target="_blank">1c44abe</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -490,7 +490,6 @@ were generated:
 Untracked files:
     Untracked:  analysis/mcf7_cache/
     Untracked:  analysis/temp.R
-    Untracked:  analysis/temp.R~
     Untracked:  data/pancreas.RData
 
 </code></pre>
@@ -536,6 +535,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/1c44abef7d537d5c2ae753330013b3c834df7783/analysis/mcf7.Rmd" target="_blank">1c44abe</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+<td>
+wflow_publish("analysis/mcf7.Rmd", view = FALSE, verbose = TRUE)
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/60c3b3a30d8b3dfb4b00f2c85294a56ca1518b60/docs/mcf7.html" target="_blank">60c3b3a</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+<td>
+Added a couple scatterplots to the mcf7 analysis.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1806,6 +1839,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/60c3b3a30d8b3dfb4b00f2c85294a56ca1518b60/docs/figure/mcf7.Rmd/topic-model-vs-log1pNMF-1.png" target="_blank">60c3b3a</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/8927db288f990c7d5a4a59479ae550d705d0ccb6/docs/figure/mcf7.Rmd/topic-model-vs-log1pNMF-1.png" target="_blank">8927db2</a>
 </td>
 <td>
@@ -2041,6 +2085,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/60c3b3a30d8b3dfb4b00f2c85294a56ca1518b60/docs/figure/mcf7.Rmd/nmf-vs-log1pNMF-1.png" target="_blank">60c3b3a</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/8927db288f990c7d5a4a59479ae550d705d0ccb6/docs/figure/mcf7.Rmd/nmf-vs-log1pNMF-1.png" target="_blank">8927db2</a>
 </td>
 <td>
@@ -2054,6 +2109,18 @@ Peter Carbonetto
 </table>
 </div>
 </div>
+<p>Here’s a plot showing the model fitting progress, specifically the
+improvement in the log-likelihood at each iteration of the
+algorithm:</p>
+<pre class="r"><code>x1 &lt;- diff(fit_log1p_c10$objective_trace)
+x2 &lt;- diff(fit_log1p_c1$objective_trace)
+x3 &lt;- diff(fit_log1p_c0.1$objective_trace)
+plot(1:length(x1),x1,type = &quot;l&quot;,lwd = 1.5,
+     xlab = &quot;iteration&quot;,ylab = &quot;change in loglik&quot;,
+     log = &quot;y&quot;,col = &quot;darkblue&quot;,ylim = c(10,1e8))
+lines(1:length(x2),x2,lwd = 1.5,col = &quot;darkorange&quot;)
+lines(1:length(x3),x3,lwd = 1.5,col = &quot;limegreen&quot;)</code></pre>
+<p><img src="figure/mcf7.Rmd/plot-progress-1.png" width="360" style="display: block; margin: auto;" /></p>
 </div>
 <div id="topic-model-with-alternative-initialization"
 class="section level2">
