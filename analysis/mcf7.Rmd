@@ -290,6 +290,21 @@ structure_plot(L,grouping = samples$label,topics = 4:1,
   labs(y = "membership")
 ```
 
+Compare log1pNMF with $c = 10$ to the topic model:
+
+```{r topic-model-vs-log1pNMF, fig.height=3, fig.width=3}
+L1 <- fit$L
+d  <- apply(L1,2,max)
+L1 <- scale_cols(L1,1/d)
+L2 <- fit_log1p_c10$LL
+d  <- apply(L2,2,max)
+L2 <- scale_cols(L2,1/d)
+plot(L1,L2[,4:2],pch = 20,
+     xlab = "topic model",
+     ylab = "log1pNMF, c = 10")
+abline(a = 0,b = 1,col = "magenta",lty = "dotted")
+```
+
 Let's now try a "small" setting, $c = 0.1$:
 
 ```{r log1pNMF-c01, cache=TRUE}
@@ -339,6 +354,20 @@ L <- scale_cols(L,1/d)
 structure_plot(L,grouping = samples$label,topics = 4:1,
                colors = topic_colors) +
   labs(y = "membership")
+```
+
+Compare log1pNMF with $c = 1$ to NMF:
+
+```{r nmf-vs-log1pNMF, fig.height=3, fig.width=3}
+W <- nmf$W
+k <- ncol(W)
+d <- apply(W,2,max)
+W <- scale_cols(W,1/d)
+L <- fit_log1p_c1$LL
+d <- apply(L,2,max)
+L <- scale_cols(L,1/d)
+plot(W,L[,c(1,3,4,2)],pch = 20,xlab = "NMF",ylab = "log1pNMF, c = 1")
+abline(a = 0,b = 1,col = "magenta",lty = "dotted")
 ```
 
 ## Topic Model with Alternative Initialization
