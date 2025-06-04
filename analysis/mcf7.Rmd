@@ -386,102 +386,231 @@ lines(1:length(x2),x2,lwd = 1.5,col = "darkorange")
 lines(1:length(x3),x3,lwd = 1.5,col = "limegreen")
 ```
 
-## Topic Model with Alternative Initialization
-
-I also attempted to initialize the topic model where each sample is
-loaded on the mean of only the greatest L2 norm point in PC space
-corresponding to it's treatment group.
+Next, I wanted to try optimizing log1p NMF models for a wide range of values of $c$ for a large number of iterations. The code to do this is below:
 
 ```{r, eval=FALSE}
-pdat$l2_pc <- sqrt(
-  pdat$PC1 ^ 2 + pdat$PC2 ^ 2
+K <- 4
+cc_vec <- c(1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100, 1000, 10000)
+
+fit_list <- list()
+
+for (cc in cc_vec) {
+
+  set.seed(1)
+  fit <- fit_poisson_log1p_nmf(
+    Y = counts,
+    K = K,
+    cc = cc,
+    loglik = "exact",
+    control = list(maxiter = 2500)
+  )
+
+  fit_list[[as.character(cc)]] <- fit
+
+}
+
+# finally, fit a topic model with a rank 1 initialization here
+r1_fit <- fastTopics:::fit_pnmf_rank1(counts)
+
+init_LL <- cbind(
+  r1_fit$L,
+  matrix(
+    data = 1e-8,
+    nrow = nrow(counts),
+    ncol = K - 1
+  )
+)
+rownames(init_LL) <- rownames(counts)
+
+init_FF <- cbind(
+  r1_fit$F,
+  matrix(
+    data = 1e-8,
+    nrow = ncol(counts),
+    ncol = K - 1
+  )
+)
+rownames(init_FF) <- colnames(counts)
+
+fit0 <- init_poisson_nmf(X = counts, L = init_LL, F = init_FF)
+
+nmf_fit <- fit_poisson_nmf(
+  X = counts,
+  fit0 = fit0,
+  numiter = 2500,
+  control = list(nc = 7)
 )
 
-# representative samples:
-# RA+TGFb: GSM4625622
-# RA: GSM4625634
-# EtOH: GSM4625648
-# TGFb: GSM4625621
+fit_list[[as.character(Inf)]] <- nmf_fit
+```
 
-FF <- cbind(
-  counts["GSM4625622", ],
-  counts["GSM4625634", ],
-  counts["GSM4625648", ],
-  counts["GSM4625621", ]
+```{r, include = FALSE}
+cc_vec <- c(1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100, 1000, 10000)
+load("data/experiment_results.Rdata")
+fit_list <- res_list$mcf7
+K <- 4
+```
+
+```{r}
+hoyer_sparsity <- function(x) {
+
+  n <- length(x)
+  (1 / (sqrt(n) - 1)) * (sqrt(n) - (sum(x) / (sqrt(sum(x ^ 2)))))
+
+}
+
+for (cc in cc_vec) {
+
+  fit <- fit_list[[as.character(cc)]]
+  fit_list[[as.character(cc)]]$l_sparsity <- median(apply(
+    fit$LL, 2, hoyer_sparsity
+  ))
+  fit_list[[as.character(cc)]]$f_sparsity <- median(apply(
+    fit$FF, 2, hoyer_sparsity
+  ))
+
+  fit_list[[as.character(cc)]]$f_cor <- median(
+    abs(cor(fit$FF, method = "spearman"))[lower.tri(diag(K))]
+  )
+
+}
+
+fit <- fit_list[[as.character(Inf)]]
+
+fit_list[[as.character(Inf)]]$l_sparsity <- median(apply(
+  fit$L, 2, hoyer_sparsity
+))
+fit_list[[as.character(Inf)]]$f_sparsity <- median(apply(
+  fit$F, 2, hoyer_sparsity
+))
+
+
+fit_list[[as.character(Inf)]]$f_cor <- median(
+  abs(cor(fit$F, method = "spearman"))[lower.tri(diag(K))]
 )
 
-rownames(FF) <- colnames(counts)
+l_sparsity_vec <- unlist(lapply(fit_list, function(x) {x$l_sparsity}))
+f_sparsity_vec <- unlist(lapply(fit_list, function(x) {x$f_sparsity}))
+f_cor_vec <- unlist(lapply(fit_list, function(x) {x$f_cor}))
 
-LL <- cbind(
-  ifelse(pdat$label == "RA+TGFb", 1, 0),
-  ifelse(pdat$label == "RA", 1, 0),
-  ifelse(pdat$label == "EtOH", 1, 0),
-  ifelse(pdat$label == "TGFb", 1, 0)
-)
-rownames(LL) <- rownames(counts)
+library(dplyr)
+df_sparsity_l <- data.frame(
+  cc = as.numeric(names(l_sparsity_vec)),
+  sparsity = l_sparsity_vec
+) %>% filter(is.finite(cc))
 
-fit0 <- init_poisson_nmf(X = counts, F = FF, L = LL)
-fit <- fit_poisson_nmf(X = counts, fit0 = fit0)
+df_sparsity_f <- data.frame(
+  cc = as.numeric(names(f_sparsity_vec)),
+  sparsity = f_sparsity_vec
+) %>% filter(is.finite(cc))
 ```
 
-Here is the structure plot at initialization:
+First, we examine sparsity of $L$ and $F$ across values of $c$
 
-```{r, fig.height=1.75, fig.width=5, eval=FALSE}
-topic_colors <- c("tomato","darkblue","gold","skyblue")
-structure_plot(fit0, grouping = pdat$label, topics = 1:4,
-                     colors = topic_colors)$plot
-```
+```{r}
+hoyer_sparsity <- function(x) {
 
-And here it is after optimization:
+  n <- length(x)
+  (1 / (sqrt(n) - 1)) * (sqrt(n) - (sum(x) / (sqrt(sum(x ^ 2)))))
 
-```{r, fig.height=1.75, fig.width=5, eval=FALSE}
-topic_colors <- c("tomato","darkblue","gold","skyblue")
+}
 
-structure_plot(fit, grouping = pdat$label, topics = 1:4,
-                     colors = topic_colors)$plot
-```
+for (cc in cc_vec) {
 
-```{r, eval=FALSE}
-mn <- t(fit$F %*% diag(apply(fit$L, 2, max)))
-newX <- log1p(mn)
+  fit <- fit_list[[as.character(cc)]]
+  fit_list[[as.character(cc)]]$l_sparsity <- median(apply(
+    fit$LL, 2, hoyer_sparsity
+  ))
+  fit_list[[as.character(cc)]]$f_sparsity <- median(apply(
+    fit$FF, 2, hoyer_sparsity
+  ))
 
-# 1) center using the training means
-#    (pca$center is a length‐p vector of column means of Y)
-newX_cent <- sweep(newX, 2, pca$center, FUN = "-")
+  fit_list[[as.character(cc)]]$f_cor <- median(
+    abs(cor(fit$FF, method = "spearman"))[lower.tri(diag(K))]
+  )
 
-# 2) since you had scale = FALSE, you do NOT rescale here
+}
 
-# 3) project onto the PC loadings
-#    (pca$v is a p×k matrix of the top k loading vectors)
-scores <- newX_cent %*% pca$rotation
-```
+fit <- fit_list[[as.character(Inf)]]
 
-```{r, eval=FALSE}
-pd2 <- data.frame(
-  pc1 = pdat$PC1,
-  pc2 = pdat$PC2,
-  label = pdat$label
-)
+fit_list[[as.character(Inf)]]$l_sparsity <- median(apply(
+  fit$L, 2, hoyer_sparsity
+))
+fit_list[[as.character(Inf)]]$f_sparsity <- median(apply(
+  fit$F, 2, hoyer_sparsity
+))
 
-new_pd <- data.frame(
-  pc1 = scores[,1],
-  pc2 = scores[,2],
-  label = c("topic1", "topic2", "topic3", "topic4")
+
+fit_list[[as.character(Inf)]]$f_cor <- median(
+  abs(cor(fit$F, method = "spearman"))[lower.tri(diag(K))]
 )
 
-pd2 <- rbind(pd2, new_pd)
+l_sparsity_vec <- unlist(lapply(fit_list, function(x) {x$l_sparsity}))
+f_sparsity_vec <- unlist(lapply(fit_list, function(x) {x$f_sparsity}))
+f_cor_vec <- unlist(lapply(fit_list, function(x) {x$f_cor}))
 
-```
+library(dplyr)
+df_sparsity_l <- data.frame(
+  cc = as.numeric(names(l_sparsity_vec)),
+  sparsity = l_sparsity_vec
+) %>% filter(is.finite(cc))
 
-Here's a PC plot with the fitted topics:
+df_sparsity_f <- data.frame(
+  cc = as.numeric(names(f_sparsity_vec)),
+  sparsity = f_sparsity_vec
+) %>% filter(is.finite(cc))
 
-```{r, eval=FALSE}
-ggplot(pd2,aes(x = pc1,y = pc2,color = label)) +
+g1 <- ggplot(data = df_sparsity_l, aes(x = cc, y = sparsity)) +
   geom_point() +
-  scale_color_manual(values = c("dodgerblue","tomato","darkblue",
-                                "limegreen", "orange", "black", "gold", "maroon")) + 
-  theme_cowplot(font_size = 10)
+  geom_line() +
+  cowplot::theme_cowplot() +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_x_continuous(breaks = c(1e-4, 1e-2, 1, 1e2, 1e4), transform = "log10") +
+  xlab("c (log10 scale)") +
+  ylab("Median Loading Sparsity") +
+  geom_hline(yintercept = l_sparsity_vec["Inf"], color = "red", linetype = "dashed") +
+  ggplot2::annotate(
+    geom="text", x=0.004, y=l_sparsity_vec["Inf"] + 0.05, label="ID Link", color="red"
+  )
+
+g2 <- ggplot(data = df_sparsity_f, aes(x = cc, y = sparsity)) +
+  geom_point() +
+  geom_line() +
+  cowplot::theme_cowplot() +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_x_continuous(breaks = c(1e-4, 1e-2, 1, 1e2, 1e4), transform = "log10") +
+  xlab("c (log10 scale)") +
+  ylab("Median Factor Sparsity") +
+  geom_hline(yintercept = f_sparsity_vec["Inf"], color = "red", linetype = "dashed") +
+  ggplot2::annotate(
+    geom="text", x=0.004, y=f_sparsity_vec["Inf"] + 0.05, label="ID Link", color="red"
+  )
+
+ggpubr::ggarrange(g1, g2, nrow = 1, ncol = 2)
 ```
+
+In addition, we look at the rank correlation of $F$.
+
+```{r}
+df_cor <- data.frame(
+  cc = as.numeric(names(f_cor_vec)),
+  correlation = f_cor_vec
+) %>% filter(is.finite(cc))
+
+ggplot(data = df_cor, aes(x = cc, y = correlation)) +
+  geom_point() +
+  geom_line() +
+  cowplot::theme_cowplot() +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_x_continuous(breaks = c(1e-4, 1e-2, 1, 1e2, 1e4), transform = "log10") +
+  xlab("c (log10 scale)") +
+  ylab("Median Abs. Factor Correlation") +
+  geom_hline(yintercept = f_cor_vec["Inf"], color = "red", linetype = "dashed") +
+  ggplot2::annotate(
+    geom="text", x=0.004, y=f_cor_vec["Inf"] + 0.05, label="ID Link", color="red"
+  )
+```
+
 
 [sanford2020elife]: https://doi.org/10.7554/eLife.59388
 
