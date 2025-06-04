@@ -307,7 +307,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-06-03
+<strong>Last updated:</strong> 2025-06-04
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -455,15 +455,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree1c44abef7d537d5c2ae753330013b3c834df7783targetblank1c44abea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeee22ffa187747261b463e542373cbde149e13697targetblankee22ffaa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/1c44abef7d537d5c2ae753330013b3c834df7783" target="_blank">1c44abe</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/ee22ffa187747261b463e542373cbde149e13697" target="_blank">ee22ffa</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree1c44abef7d537d5c2ae753330013b3c834df7783targetblank1c44abea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeee22ffa187747261b463e542373cbde149e13697targetblankee22ffaa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -473,7 +473,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/1c44abef7d537d5c2ae753330013b3c834df7783" target="_blank">1c44abe</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/ee22ffa187747261b463e542373cbde149e13697" target="_blank">ee22ffa</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -535,6 +535,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/ee22ffa187747261b463e542373cbde149e13697/analysis/mcf7.Rmd" target="_blank">ee22ffa</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-04
+</td>
+<td>
+wflow_publish("analysis/mcf7.Rmd", verbose = TRUE, view = FALSE)
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/1fc03c7af2556a413a14db93e6870f2378f6c347/docs/mcf7.html" target="_blank">1fc03c7</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+<td>
+Added a ‘progress plot’ to the mcf7 analysis.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1427,7 +1461,7 @@ from PCA applied to the shifted log counts:</p>
 <p>Let’s now try fitting a (multinomial) topic model to these data,
 which represents an <em>additive model</em> of the transcriptional
 changes in response to the different exposures. After a bit of trial and
-error, it turns out that 4 topics are needed to get the right
+error, it turns out that 3 topics are needed to get the right
 result:</p>
 <pre class="r"><code>fit0 &lt;- fit_poisson_nmf(counts,k = 3,init.method = &quot;random&quot;,numiter = 50,
                         verbose = &quot;none&quot;,
@@ -1810,7 +1844,7 @@ L1 &lt;- scale_cols(L1,1/d)
 L2 &lt;- fit_log1p_c10$LL
 d  &lt;- apply(L2,2,max)
 L2 &lt;- scale_cols(L2,1/d)
-plot(L1,L2[,4:2],pch = 20,
+plot(log10(pmax(0.01,L1)),log10(pmax(0.01,L2[,4:2])),pch = 20,
      xlab = &quot;topic model&quot;,
      ylab = &quot;log1pNMF, c = 10&quot;)
 abline(a = 0,b = 1,col = &quot;magenta&quot;,lty = &quot;dotted&quot;)</code></pre>
@@ -2058,7 +2092,9 @@ W &lt;- scale_cols(W,1/d)
 L &lt;- fit_log1p_c1$LL
 d &lt;- apply(L,2,max)
 L &lt;- scale_cols(L,1/d)
-plot(W,L[,c(1,3,4,2)],pch = 20,xlab = &quot;NMF&quot;,ylab = &quot;log1pNMF, c = 1&quot;)
+plot(log10(pmax(0.01,W)),
+     log10(pmax(0.01,L[,c(1,3,4,2)])),
+     pch = 20,xlab = &quot;NMF&quot;,ylab = &quot;log1pNMF, c = 1&quot;)
 abline(a = 0,b = 1,col = &quot;magenta&quot;,lty = &quot;dotted&quot;)</code></pre>
 <p><img src="figure/mcf7.Rmd/nmf-vs-log1pNMF-1.png" width="360" style="display: block; margin: auto;" /></p>
 <p>
@@ -2121,6 +2157,43 @@ plot(1:length(x1),x1,type = &quot;l&quot;,lwd = 1.5,
 lines(1:length(x2),x2,lwd = 1.5,col = &quot;darkorange&quot;)
 lines(1:length(x3),x3,lwd = 1.5,col = &quot;limegreen&quot;)</code></pre>
 <p><img src="figure/mcf7.Rmd/plot-progress-1.png" width="360" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot-progress-1">
+Past versions of plot-progress-1.png
+</button>
+</p>
+<div id="fig-plot-progress-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/1fc03c7af2556a413a14db93e6870f2378f6c347/docs/figure/mcf7.Rmd/plot-progress-1.png" target="_blank">1fc03c7</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="topic-model-with-alternative-initialization"
 class="section level2">
@@ -2228,7 +2301,7 @@ Session information
 #  [1] NNLM_0.4.4          log1pNMF_0.1-4      cowplot_1.1.3      
 #  [4] ggplot2_3.5.0       GEOquery_2.70.0     Biobase_2.62.0     
 #  [7] BiocGenerics_0.48.1 data.table_1.15.2   flashier_1.0.55    
-# [10] ebnm_1.1-34         fastTopics_0.7-24   fastglmpca_0.1-108 
+# [10] ebnm_1.1-34         fastTopics_0.7-25   fastglmpca_0.1-108 
 # [13] rsvd_1.0.5          workflowr_1.7.1    
 # 
 # loaded via a namespace (and not attached):
