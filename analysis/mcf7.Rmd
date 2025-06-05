@@ -1,6 +1,6 @@
 ---
 title: The MCF-7 data set as possible model system for the Poisson log1p NMF model
-author: Peter Carbonetto
+author: Eric Weine and Peter Carbonetto
 output:
   workflowr::wflow_html:
     toc: no
