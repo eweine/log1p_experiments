@@ -29,7 +29,7 @@ knitr::opts_chunk$set(comment = "#",collapse = TRUE,results = "hold",
 Load the fastTopics and flashier packages, and a few other packages
 needed to retrieve the data and create the plots.
 
-```{r load-pkgs, message=FALSE}
+```{r load-pkgs, message=FALSE, warning=FALSE}
 library(rsvd)
 library(fastglmpca)
 library(fastTopics)
@@ -96,8 +96,8 @@ samples <- transform(samples,
                      label = factor(label,c("EtOH","RA","TGFb","RA+TGFb")))
 ```
 
-Remove the non-protein-coding genes, and the genes that are expressed
-in fewer than 4 samples:
+Remove the non-protein-coding genes and
+the genes that are expressed in fewer than 4 samples:
 
 ```{r filter-genes}
 x <- colSums(counts > 0)
@@ -108,9 +108,18 @@ genes  <- genes[i,]
 counts <- counts[,i]
 ```
 
-(It turns out that there is some structure in the non-coding RNA genes
-that is is picked up by some of the methods, so to avoid this
-complication I have removed these genes from the data.)
+**Notes:**
+
+1. It turns out that there is some structure in the non-coding RNA
+   genes that is is picked up by some of the methods, so to avoid this
+   complication I have removed these genes from the data.)
+
+2. Ribosomal protein genes are sometimes removed in scRNA-seq data;
+   they can be identified with `grepl("^RP[SL]",genes$Symbol)`. While
+   the ribosomal protein genes do account for a large proportion of
+   the overall expression (about 5%), removing these genes doesn't
+   seem to affect the results. See [here](https://nbisweden.github.io/workshop-scRNAseq/labs/seurat/seurat_01_qc.html) for more on filtering genes
+   in scRNA-seq data.
 
 ## PCA
 
@@ -444,7 +453,7 @@ nmf_fit <- fit_poisson_nmf(
 fit_list[[as.character(Inf)]] <- nmf_fit
 ```
 
-```{r, include = FALSE}
+```{r, include=FALSE}
 cc_vec <- c(1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100, 1000, 10000)
 load("data/experiment_results.Rdata")
 fit_list <- res_list$mcf7
@@ -639,6 +648,4 @@ ggplot(data = df_ll, aes(x = cc, y = ll)) +
   )
 ```
 
-
 [sanford2020elife]: https://doi.org/10.7554/eLife.59388
-
