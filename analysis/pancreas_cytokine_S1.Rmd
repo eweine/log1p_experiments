@@ -24,7 +24,9 @@ create the plots.
 
 ```{r load-pkgs, message=FALSE}
 library(Matrix)
+library(NNLM)
 library(fastTopics)
+library(log1pNMF)
 library(ggplot2)
 library(cowplot)
 ```
@@ -124,5 +126,36 @@ p2 <- structure_plot(L[i,],grouping = clusters[i],topics = other_topics,
 plot_grid(p1,p2,nrow = 2,ncol = 1)
 ```
 
-## Poisson log1p NMF with c = 1
+## Poisson log1p NMF, with c = 1
 
+Fit a Poisson log1p NMF model to the counts, first by running NMF on
+the shifted log counts (this seems to greatly speed up the model
+fitting):
+
+```{r fit-log1p-nmf, cache=TRUE}
+set.seed(1)
+shifted_log_counts_dense <- as.matrix(shifted_log_counts)
+nmf <- nnmf(shifted_log_counts_dense,k = 13,loss = "mse",method = "scd",
+            max.iter = 100,verbose = 0,n.threads = 8)
+rm(shifted_log_counts_dense)
+fit_log1p <- fit_poisson_log1p_nmf(counts,K = 13,cc = 1,init_LL = nmf$W,
+                                   init_FF = t(nmf$H),loglik = "exact",
+                                   control = list(maxiter=100,verbose=FALSE))
+```
+
+Compare the factors from the Poisson log1p NMF model to the clusters:
+
+```{r structure-plot-topic-model, fig.height=4.25, fig.width=6.5, results="hide", message=FALSE}
+scale_cols <- function (A, b)
+  t(t(A) * b)
+set.seed(1)
+L <- fit$LL
+d <- apply(L,2,max)
+L <- scale_cols(L,1/d)
+i <- c(sample(which(clusters == "beta"),400),
+       which(clusters != "beta"))
+i <- c(sample(which(clusters == "beta"),400),
+       which(clusters != "beta"))
+p <- structure_plot(L[i,],grouping = clusters[i],gap = 10,n = Inf)
+print(p)
+```
