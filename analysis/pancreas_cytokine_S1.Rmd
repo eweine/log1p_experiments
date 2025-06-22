@@ -1,0 +1,84 @@
+---
+title: Analysis of the "pancreas cytokine" data set (untreated mouse only) using the Poisson log1p NMF model
+author: Eric Weine and Peter Carbonetto
+output:
+  workflowr::wflow_html:
+    toc: no
+    theme: readable
+    highlight: textmate
+    lib_dir: site_libs
+    self_contained: no
+---
+
+Here we analyze the
+["pancreas cytokine" data set](pancreas_cytokine.html), focussing on
+the scRNA-seq data from untreated mouse only.
+
+```{r knitr-opts, include=FALSE}
+knitr::opts_chunk$set(comment = "#",collapse = TRUE,results = "hold",
+                      fig.align = "center",dpi = 120)
+```
+
+Load packages used to process the data, perform the analyses, and
+create the plots.
+
+```{r load-pkgs, message=FALSE}
+library(Matrix)
+library(ggplot2)
+library(cowplot)
+```
+
+Set the seed for reproducibility:
+
+```{r set-seed}
+set.seed(1)
+```
+
+Load the prepared data set:
+
+```{r load-data}
+load("data/pancreas_cytokine.RData")
+```
+
+Here we will analyze the cells from the untreated mouse only:
+
+```{r filter-cells-1}
+i       <- which(samples$mouse == "S1")
+samples <- samples[i,]
+counts  <- counts[i,]
+```
+
+Remove three cells that appear to be outliers (one of them appears to
+be an acinar cell based on Eric's analysis):
+
+```{r filter-cells-2}
+outliers <- c("TTTGTTGTCGTTAGTG-1","TTTGTTGGTAGAGCTG-1","CCCAACTCACTCATAG-1")
+i        <- which(!is.element(samples$barcode,outliers))
+samples  <- samples[i,]
+counts   <- counts[i,]
+```
+
+Remove genes that are expressed in fewer than 5 cells:
+
+```{r filter-genes}
+j      <- which(colSums(counts > 0) > 4)
+genes  <- genes[j,]
+counts <- counts[,j]
+```
+
+This is the dimension of the data set we will analyze:
+
+```{r dim-counts}
+dim(counts)
+```
+
+For the Gaussian-based analyses (later), we will need the shifted log
+counts:
+
+```{r shifted-log-counts}
+a <- 1
+s <- rowSums(counts)
+s <- s/mean(s)
+shifted_log_counts <- log1p(counts/(a*s))
+rownames(shifted_log_counts) <- NULL
+```
