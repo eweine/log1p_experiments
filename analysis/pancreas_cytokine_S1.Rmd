@@ -167,3 +167,16 @@ p2 <- structure_plot(L[i,],grouping = clusters[i],topics = other_topics,
   labs(y = "membership",fill = "")
 plot_grid(p1,p2,nrow = 2,ncol = 1)
 ```
+
+Factor 4 is clearly picking up systematic differences among the two
+replicates:
+
+```{r boxplot-replicate, fig.height=2, fig.width=2}
+pdat <- cbind(samples,L)
+ggplot(pdat,aes(x = replicate,y = k4)) +
+  geom_boxplot() +
+  theme_cowplot()
+```
+
+(Topic 6 also picks up this same batch effect, however the correlation
+with the topic 6 proportion is not as strong as the factor 4 membership.)
