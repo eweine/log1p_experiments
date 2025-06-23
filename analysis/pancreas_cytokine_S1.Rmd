@@ -145,17 +145,25 @@ fit_log1p <- fit_poisson_log1p_nmf(counts,K = 13,cc = 1,init_LL = nmf$W,
 
 Compare the factors from the Poisson log1p NMF model to the clusters:
 
-```{r structure-plot-topic-model, fig.height=4.25, fig.width=6.5, results="hide", message=FALSE}
+```{r structure-plot-log1p-nmf, fig.height=4.25, fig.width=6.5, results="hide", message=FALSE}
 scale_cols <- function (A, b)
   t(t(A) * b)
+celltype_topics <- paste0("k",c(2:3,5:6,8:12))
+other_topics <- paste0("k",c(1,4,13,7))
 set.seed(1)
-L <- fit$LL
+L <- fit_log1p$LL
 d <- apply(L,2,max)
 L <- scale_cols(L,1/d)
+colnames(L) <- paste0("k",1:13)
 i <- c(sample(which(clusters == "beta"),400),
        which(clusters != "beta"))
 i <- c(sample(which(clusters == "beta"),400),
        which(clusters != "beta"))
-p <- structure_plot(L[i,],grouping = clusters[i],gap = 10,n = Inf)
-print(p)
+p1 <- structure_plot(L[i,],grouping = clusters[i],topics = celltype_topics,
+                     gap = 10,n = Inf) +
+  labs(y = "membership",fill = "")					
+p2 <- structure_plot(L[i,],grouping = clusters[i],topics = other_topics,
+                     gap = 10,n = Inf) +
+  labs(y = "membership",fill = "")
+plot_grid(p1,p2,nrow = 2,ncol = 1)
 ```
