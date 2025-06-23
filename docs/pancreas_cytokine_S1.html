@@ -286,7 +286,7 @@ set (untreated mouse only) using the Poisson log1p NMF model</h1>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -297,8 +297,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -311,9 +311,9 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
@@ -407,16 +407,27 @@ versions is critical for reproducibility.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongdetected">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
 </p>
 </div>
-<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div id="strongCachestrongdetected" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Nice! There were no cached chunks for this analysis, so you can be
-confident that you successfully produced the results during this
-run.</p>
+The following chunks had caches available:
+<ul>
+<li>
+fit-log1p-nmf
+</li>
+<li>
+fit-topic-model
+</li>
+</ul>
+<p>To ensure reproducibility of the results, delete the cache directory
+<code>pancreas_cytokine_S1_cache</code> and re-run the analysis. To have
+workflowr automatically delete the cache directory prior to building the
+file, set <code>delete_cache = TRUE</code> when running
+<code>wflow_build()</code> or <code>wflow_publish()</code>.</p>
 </div>
 </div>
 </div>
@@ -438,15 +449,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree476aa5720ce66a12baf438cc91fb6182ae52b79atargetblank476aa57a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee280637055269466e11dcf301e35f43beb3a9ff6targetblanke280637a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/476aa5720ce66a12baf438cc91fb6182ae52b79a" target="_blank">476aa57</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/e280637055269466e11dcf301e35f43beb3a9ff6" target="_blank">e280637</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree476aa5720ce66a12baf438cc91fb6182ae52b79atargetblank476aa57a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee280637055269466e11dcf301e35f43beb3a9ff6targetblanke280637a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -456,7 +467,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/476aa5720ce66a12baf438cc91fb6182ae52b79a" target="_blank">476aa57</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/e280637055269466e11dcf301e35f43beb3a9ff6" target="_blank">e280637</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -472,6 +483,7 @@ were generated:
 <pre><code>
 Untracked files:
     Untracked:  analysis/mcf7_cache/
+    Untracked:  analysis/pancreas_cytokine_S1_cache/
     Untracked:  data/pancreas.RData
     Untracked:  data/pancreas_cytokine.RData
 
@@ -524,6 +536,74 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/e280637055269466e11dcf301e35f43beb3a9ff6/analysis/pancreas_cytokine_S1.Rmd" target="_blank">e280637</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-22
+</td>
+<td>
+wflow_publish("analysis/pancreas_cytokine_S1.Rmd", view = F,
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/6f9527ebdcdbc1e6f131313597599d83980a1d90/analysis/pancreas_cytokine_S1.Rmd" target="_blank">6f9527e</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-22
+</td>
+<td>
+Working on log1p NMF fit (c = 1) for pancreas_cytokine_S1 analysis.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/eda1ad0f67b9d77fb69e059e1e32eeb586ab03c9/analysis/pancreas_cytokine_S1.Rmd" target="_blank">eda1ad0</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-22
+</td>
+<td>
+Added topic model fit with k=13 to the pancreas_cytokine_S1 analysis.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/79c3a2d51f117a85cdecf8843f7e4ae06b03918e/docs/pancreas_cytokine_S1.html" target="_blank">79c3a2d</a>
+</td>
+<td>
+Peter Carbonetto
+</td>
+<td>
+2025-06-22
+</td>
+<td>
+First build of the pancreas_cytokine_S1 analysis.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/476aa5720ce66a12baf438cc91fb6182ae52b79a/analysis/pancreas_cytokine_S1.Rmd" target="_blank">476aa57</a>
 </td>
 <td>
@@ -549,6 +629,9 @@ mouse only.</p>
 <p>Load packages used to process the data, perform the analyses, and
 create the plots.</p>
 <pre class="r"><code>library(Matrix)
+library(NNLM)
+library(fastTopics)
+library(log1pNMF)
 library(ggplot2)
 library(cowplot)</code></pre>
 <p>Set the seed for reproducibility:</p>
@@ -579,6 +662,105 @@ s &lt;- rowSums(counts)
 s &lt;- s/mean(s)
 shifted_log_counts &lt;- log1p(counts/(a*s))
 rownames(shifted_log_counts) &lt;- NULL</code></pre>
+<div id="topic-model-fasttopics" class="section level2">
+<h2>Topic model (fastTopics)</h2>
+<p>Fit a topic model to the counts (with <span class="math inline">\(K =
+13\)</span> topics):</p>
+<pre class="r"><code>set.seed(1)
+tm &lt;- fit_poisson_nmf(counts,k = 13,init.method = &quot;random&quot;,method = &quot;em&quot;,
+                      numiter = 40,verbose = &quot;none&quot;,
+                      control = list(numiter = 4,nc = 8,extrapolate = FALSE))
+tm &lt;- fit_poisson_nmf(counts,fit0 = tm,method = &quot;scd&quot;,numiter = 40,
+                      control = list(numiter = 4,nc = 8,extrapolate = TRUE),
+                      verbose = &quot;none&quot;)</code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>Structure plots comparing the topics to the clusters (some of which
+are inferred from the topics):</p>
+<pre class="r"><code>set.seed(1)
+celltype_topics &lt;- paste0(&quot;k&quot;,c(2,3,5,7:9,13))
+other_topics &lt;- paste0(&quot;k&quot;,c(4,1,6,10:12))
+L &lt;- poisson2multinom(tm)$L
+clusters &lt;- as.character(samples$cluster)
+clusters[clusters == &quot;islet&quot;]                  &lt;- &quot;beta&quot;
+clusters[clusters == &quot;beta&quot; &amp; L[,&quot;k3&quot;] &gt; 0.25] &lt;- &quot;alpha&quot;
+clusters[clusters == &quot;beta&quot; &amp; L[,&quot;k8&quot;] &gt; 0.25] &lt;- &quot;delta+epsilon&quot;
+clusters[clusters == &quot;beta&quot; &amp; L[,&quot;k9&quot;] &gt; 0.25] &lt;- &quot;gamma&quot;
+clusters &lt;- factor(clusters,c(&quot;beta&quot;,&quot;alpha&quot;,&quot;delta+epsilon&quot;,&quot;gamma&quot;,&quot;duct&quot;,
+                              &quot;endothelial-mesenchymal&quot;,&quot;macrophage&quot;))
+i &lt;- c(sample(which(clusters == &quot;beta&quot;),400),
+       which(clusters != &quot;beta&quot;))
+p1 &lt;- structure_plot(L[i,],grouping = clusters[i],topics = celltype_topics,
+                     gap = 10,n = Inf) +
+  labs(fill = &quot;&quot;)
+p2 &lt;- structure_plot(L[i,],grouping = clusters[i],topics = other_topics,
+                     gap = 10,n = Inf) +
+  labs(fill = &quot;&quot;)
+plot_grid(p1,p2,nrow = 2,ncol = 1)</code></pre>
+<p><img src="figure/pancreas_cytokine_S1.Rmd/structure-plot-topic-model-1.png" width="780" style="display: block; margin: auto;" /></p>
+</div>
+<div id="poisson-log1p-nmf-with-c-1" class="section level2">
+<h2>Poisson log1p NMF, with c = 1</h2>
+<p>Fit a Poisson log1p NMF model to the counts, first by running NMF on
+the shifted log counts (this seems to greatly speed up the model
+fitting):</p>
+<pre class="r"><code>set.seed(1)
+shifted_log_counts_dense &lt;- as.matrix(shifted_log_counts)
+nmf &lt;- nnmf(shifted_log_counts_dense,k = 13,loss = &quot;mse&quot;,method = &quot;scd&quot;,
+            max.iter = 100,verbose = 0,n.threads = 8)
+rm(shifted_log_counts_dense)
+fit_log1p &lt;- fit_poisson_log1p_nmf(counts,K = 13,cc = 1,init_LL = nmf$W,
+                                   init_FF = t(nmf$H),loglik = &quot;exact&quot;,
+                                   control = list(maxiter=100,verbose=FALSE))</code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>Compare the factors from the Poisson log1p NMF model to the
+clusters:</p>
+<pre class="r"><code>scale_cols &lt;- function (A, b)
+  t(t(A) * b)
+celltype_topics &lt;- paste0(&quot;k&quot;,c(2:3,5:6,8:12))
+other_topics &lt;- paste0(&quot;k&quot;,c(1,4,13,7))
+set.seed(1)
+L &lt;- fit_log1p$LL
+d &lt;- apply(L,2,max)
+L &lt;- scale_cols(L,1/d)
+colnames(L) &lt;- paste0(&quot;k&quot;,1:13)
+i &lt;- c(sample(which(clusters == &quot;beta&quot;),400),
+       which(clusters != &quot;beta&quot;))
+i &lt;- c(sample(which(clusters == &quot;beta&quot;),400),
+       which(clusters != &quot;beta&quot;))
+p1 &lt;- structure_plot(L[i,],grouping = clusters[i],topics = celltype_topics,
+                     gap = 10,n = Inf) +
+  labs(y = &quot;membership&quot;,fill = &quot;&quot;)                  
+p2 &lt;- structure_plot(L[i,],grouping = clusters[i],topics = other_topics,
+                     gap = 10,n = Inf) +
+  labs(y = &quot;membership&quot;,fill = &quot;&quot;)
+plot_grid(p1,p2,nrow = 2,ncol = 1)</code></pre>
+<p><img src="figure/pancreas_cytokine_S1.Rmd/structure-plot-log1p-nmf-1.png" width="780" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -606,23 +788,41 @@ Session information
 # [1] stats     graphics  grDevices utils     datasets  methods   base     
 # 
 # other attached packages:
-# [1] cowplot_1.1.3   ggplot2_3.5.0   Matrix_1.6-5    workflowr_1.7.1
+# [1] cowplot_1.1.3     ggplot2_3.5.0     log1pNMF_0.1-6    fastTopics_0.7-25
+# [5] NNLM_0.4.4        Matrix_1.6-5      workflowr_1.7.1  
 # 
 # loaded via a namespace (and not attached):
-#  [1] sass_0.4.9        utf8_1.2.4        generics_0.1.3    stringi_1.8.3    
-#  [5] lattice_0.22-5    digest_0.6.34     magrittr_2.0.3    evaluate_1.0.3   
-#  [9] grid_4.3.3        fastmap_1.1.1     rprojroot_2.0.4   jsonlite_1.8.8   
-# [13] processx_3.8.3    whisker_0.4.1     ps_1.7.6          promises_1.2.1   
-# [17] httr_1.4.7        fansi_1.0.6       scales_1.3.0      jquerylib_0.1.4  
-# [21] cli_3.6.4         rlang_1.1.5       munsell_0.5.0     withr_3.0.2      
-# [25] cachem_1.0.8      yaml_2.3.8        tools_4.3.3       dplyr_1.1.4      
-# [29] colorspace_2.1-0  httpuv_1.6.14     vctrs_0.6.5       R6_2.5.1         
-# [33] lifecycle_1.0.4   git2r_0.33.0      stringr_1.5.1     fs_1.6.5         
-# [37] pkgconfig_2.0.3   callr_3.7.5       pillar_1.9.0      bslib_0.6.1      
-# [41] later_1.3.2       gtable_0.3.4      glue_1.8.0        Rcpp_1.0.12      
-# [45] xfun_0.42         tibble_3.2.1      tidyselect_1.2.1  rstudioapi_0.15.0
-# [49] knitr_1.45        htmltools_0.5.8.1 rmarkdown_2.26    compiler_4.3.3   
-# [53] getPass_0.2-4</code></pre>
+#  [1] tidyselect_1.2.1    viridisLite_0.4.2   farver_2.1.1       
+#  [4] dplyr_1.1.4         fastmap_1.1.1       lazyeval_0.2.2     
+#  [7] promises_1.2.1      digest_0.6.34       lifecycle_1.0.4    
+# [10] processx_3.8.3      invgamma_1.1        magrittr_2.0.3     
+# [13] compiler_4.3.3      rlang_1.1.5         sass_0.4.9         
+# [16] progress_1.2.3      tools_4.3.3         utf8_1.2.4         
+# [19] yaml_2.3.8          data.table_1.17.4   knitr_1.45         
+# [22] prettyunits_1.2.0   labeling_0.4.3      htmlwidgets_1.6.4  
+# [25] plyr_1.8.9          Rtsne_0.17          withr_3.0.2        
+# [28] purrr_1.0.2         grid_4.3.3          fansi_1.0.6        
+# [31] git2r_0.33.0        colorspace_2.1-0    scales_1.3.0       
+# [34] gtools_3.9.5        MASS_7.3-60.0.1     cli_3.6.4          
+# [37] rmarkdown_2.26      crayon_1.5.2        startupmsg_0.9.6.1 
+# [40] generics_0.1.3      RcppParallel_5.1.10 rstudioapi_0.15.0  
+# [43] httr_1.4.7          reshape2_1.4.4      pbapply_1.7-2      
+# [46] cachem_1.0.8        stringr_1.5.1       parallel_4.3.3     
+# [49] vctrs_0.6.5         jsonlite_1.8.8      callr_3.7.5        
+# [52] hms_1.1.3           mixsqp_0.3-54       ggrepel_0.9.5      
+# [55] irlba_2.3.5.1       plotly_4.10.4       jquerylib_0.1.4    
+# [58] tidyr_1.3.1         glue_1.8.0          ps_1.7.6           
+# [61] uwot_0.2.3          stringi_1.8.3       gtable_0.3.4       
+# [64] later_1.3.2         sfsmisc_1.1-18      quadprog_1.5-8     
+# [67] munsell_0.5.0       tibble_3.2.1        pillar_1.9.0       
+# [70] htmltools_0.5.8.1   truncnorm_1.0-9     R6_2.5.1           
+# [73] rprojroot_2.0.4     evaluate_1.0.3      lattice_0.22-5     
+# [76] highr_0.10          RhpcBLASctl_0.23-42 SQUAREM_2021.1     
+# [79] ashr_2.2-66         httpuv_1.6.14       bslib_0.6.1        
+# [82] Rcpp_1.0.12         distr_2.9.3         whisker_0.4.1      
+# [85] xfun_0.42           fs_1.6.5            getPass_0.2-4      
+# [88] pkgconfig_2.0.3</code></pre>
+</div>
 </div>
 
 
