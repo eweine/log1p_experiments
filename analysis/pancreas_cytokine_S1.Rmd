@@ -40,7 +40,7 @@ set.seed(1)
 Load the prepared data set:
 
 ```{r load-data}
-load("data/pancreas_cytokine.RData")
+load("~/Downloads/pancreas_cytokine.RData")
 ```
 
 Here we will analyze the cells from the untreated mouse only:
@@ -103,10 +103,10 @@ tm <- fit_poisson_nmf(counts,fit0 = tm,method = "scd",numiter = 40,
 Structure plots comparing the topics to the clusters (some of which
 are inferred from the topics):
 
-```{r structure-plot-topic-model, fig.height=4.25, fig.width=6.5, results="hide", message=FALSE}
+```{r structure-plot-topic-model, fig.height=5, fig.width=6.5, results="hide", message=FALSE}
 set.seed(1)
-celltype_topics <- paste0("k",c(2,3,5,7:9,13))
-other_topics <- paste0("k",c(4,1,6,10:12))
+celltype_topics <- paste0("k",c(2,3,4,5,7:9,11,12,13))
+other_topics <- paste0("k",c(1,6,10))
 L <- poisson2multinom(tm)$L
 clusters <- as.character(samples$cluster)
 clusters[clusters == "islet"]                  <- "beta"
@@ -145,11 +145,11 @@ fit_log1p <- fit_poisson_log1p_nmf(counts,K = 13,cc = 1,init_LL = nmf$W,
 
 Compare the factors from the Poisson log1p NMF model to the clusters:
 
-```{r structure-plot-log1p-nmf, fig.height=4.25, fig.width=6.5, results="hide", message=FALSE}
+```{r structure-plot-log1p-nmf, fig.height=5, fig.width=6.5, results="hide", message=FALSE}
 scale_cols <- function (A, b)
   t(t(A) * b)
-celltype_topics <- paste0("k",c(1:3,5:6,8:12))
-other_topics <- paste0("k",c(4,7,13))
+celltype_topics <- paste0("k",c(3,5:6,8:12))
+other_topics <- paste0("k",c(1,2,4,7,13))
 set.seed(1)
 L <- fit_log1p$LL
 d <- apply(L,2,max)
