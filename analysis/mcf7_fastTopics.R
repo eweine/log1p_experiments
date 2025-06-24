@@ -17,6 +17,14 @@ for (i in 1:n) {
   L[i,] <- s[i]/2*c(1,x)
 }
 
+# I'm saving the data and initial setup (the initial estimate of L) to
+# use used in a separate analysis which I will use to illustrate EM
+# vs. SCD for Poisson NMF.
+library(tools)
+save(list = c("samples","genes","counts","L"),
+     file = "mcf7.RData")
+resaveRdaFiles("mcf7.RData")
+
 # Fit the topic model by performing either (i) 80 EM updates or (ii)
 # 80 SCD updates. Both of the fits are first initialized by running 20
 # EM updates.
