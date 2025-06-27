@@ -395,7 +395,9 @@ lines(1:length(x2),x2,lwd = 1.5,col = "darkorange")
 lines(1:length(x3),x3,lwd = 1.5,col = "limegreen")
 ```
 
-Next, I wanted to try optimizing log1p NMF models for a wide range of values of $c$ for a large number of iterations. The code to do this is below:
+Next, I wanted to try optimizing log1p NMF models for a wide range of
+values of $c$ for a large number of iterations. The code to do this is
+below:
 
 ```{r, eval=FALSE}
 K <- 4
