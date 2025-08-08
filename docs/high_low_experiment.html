@@ -432,10 +432,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R
-Markdown file created these results, you’ll want to first commit it to
-the Git repo. If you’re still working on the analysis, you can ignore
-this warning. When you’re finished, you can run
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -528,15 +528,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2193e8c057273770ea393da858ca9a2927118bf5targetblank2193e8ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree95999d543feedf0abfa3194062f721a820e00317targetblank95999d5a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/2193e8c057273770ea393da858ca9a2927118bf5" target="_blank">2193e8c</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/95999d543feedf0abfa3194062f721a820e00317" target="_blank">95999d5</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2193e8c057273770ea393da858ca9a2927118bf5targetblank2193e8ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree95999d543feedf0abfa3194062f721a820e00317targetblank95999d5a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -546,7 +546,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/2193e8c057273770ea393da858ca9a2927118bf5" target="_blank">2193e8c</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/95999d543feedf0abfa3194062f721a820e00317" target="_blank">95999d5</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -570,8 +570,9 @@ Ignored files:
 Untracked files:
     Untracked:  Manifest.toml
     Untracked:  Project.toml
-    Untracked:  analysis/high_low_experiment.Rmd
-    Untracked:  analysis/mcf7_cache/
+
+Unstaged changes:
+    Modified:   analysis/high_low_experiment.Rmd
 
 </code></pre>
 <p>
@@ -586,10 +587,74 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/high_low_experiment.Rmd</code>)
+and HTML (<code>docs/high_low_experiment.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/788273c1ab43c463dd482e3a3b36f50100322b9b/analysis/high_low_experiment.Rmd" target="_blank">788273c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-08
+</td>
+<td>
+added high vs. low simulation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/788273c1ab43c463dd482e3a3b36f50100322b9b/docs/high_low_experiment.html" target="_blank">788273c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-08
+</td>
+<td>
+added high vs. low simulation
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -712,6 +777,43 @@ ggplot(expr_df, aes(x = gene_id, y = log1p(expr))) +
   labs(x = &quot;Gene&quot;, y = &quot;log1p(Expression)&quot;) +
   cowplot::theme_cowplot()  # Use a minimal theme for a clean look</code></pre>
 <p><img src="figure/high_low_experiment.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/788273c1ab43c463dd482e3a3b36f50100322b9b/docs/figure/high_low_experiment.Rmd/unnamed-chunk-3-1.png" target="_blank">788273c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Now, we fit both the log1p model with <span class="math inline">\(c =
 1\)</span> and the topic model with a rank-1 initialization.</p>
 <p>Below is a structure plot of the topic model (normalizing so that the
@@ -748,6 +850,43 @@ group &lt;- c(rep(&quot;A&quot;, 333), rep(&quot;B&quot;, 333), rep(&quot;C&quot
 structure_plot(log1pNMF:::normalize_bars(ft_mod$L), grouping = group, gap = 10, loadings_order = 1:n, topics = rev(1:3)) + 
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;)</code></pre>
 <p><img src="figure/high_low_experiment.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/788273c1ab43c463dd482e3a3b36f50100322b9b/docs/figure/high_low_experiment.Rmd/unnamed-chunk-4-1.png" target="_blank">788273c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>And here is the log1p model:</p>
 <pre class="r"><code>set.seed(1)
 log1p_mod &lt;- fit_poisson_log1p_nmf(
@@ -775,8 +914,45 @@ normalized_structure_plot(
   topics = rev(1:3)
   ) + 
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;)</code></pre>
-<p><img src="figure/high_low_experiment.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" />
-The structure plots are nearly identical, as expected.</p>
+<p><img src="figure/high_low_experiment.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/788273c1ab43c463dd482e3a3b36f50100322b9b/docs/figure/high_low_experiment.Rmd/unnamed-chunk-5-1.png" target="_blank">788273c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The structure plots are nearly identical, as expected.</p>
 <pre class="r"><code># NOTE: need to normalize these based on the max-1 normalization above
 max_col &lt;- apply(log1p_mod$FF, 2, max)
 log1p_FF &lt;- sweep(log1p_mod$FF, 2, max_col, FUN = &quot;*&quot;)
@@ -828,6 +1004,43 @@ factors from the topic model for visibility). Below is factor 2:</p>
   facet_wrap(~model, scales = &quot;free&quot;) +
   xlab(&quot;Factor Value&quot;)</code></pre>
 <p><img src="figure/high_low_experiment.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/788273c1ab43c463dd482e3a3b36f50100322b9b/docs/figure/high_low_experiment.Rmd/unnamed-chunk-7-1.png" target="_blank">788273c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Factor 3 looks nearly the same:</p>
 <pre class="r"><code>ggplot(k3_df, aes(x = factor_value, fill = gene_type)) +
   geom_histogram(position = &quot;identity&quot;, alpha = 0.6, bins = 60) +
@@ -835,6 +1048,43 @@ factors from the topic model for visibility). Below is factor 2:</p>
   facet_wrap(~model, scales = &quot;free&quot;) +
   xlab(&quot;Factor Value&quot;)</code></pre>
 <p><img src="figure/high_low_experiment.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/788273c1ab43c463dd482e3a3b36f50100322b9b/docs/figure/high_low_experiment.Rmd/unnamed-chunk-8-1.png" target="_blank">788273c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Essentially, what we are seeing is that in the log1p model, the genes
 that go from “off” (<span class="math inline">\(\lambda = 0\)</span>) to
 on (<span class="math inline">\(\lambda = 3\)</span>), which I term “Low
@@ -849,6 +1099,25 @@ class="math inline">\(1000\)</span> to <span
 class="math inline">\(1100\)</span> in the relevant group (“High Up”).
 In fact, likely due to noise, many of the “High Down” genes are ranked
 higher than the low on genes.</p>
+<p>Finally, I was curious what GLM-PCA would do with this dataset.</p>
+<pre class="r"><code>library(fastglmpca)
+set.seed(1)
+gpca_fit &lt;- fit_glmpca_pois(
+  Y = t(Y),
+  K = 2,
+  control = list(maxiter = 500),
+  verbose = FALSE
+)
+
+gpca_df &lt;- as.data.frame(gpca_fit$V)
+gpca_df$group &lt;- group
+
+ggplot(data = gpca_df, aes(x = k_1, y = k_2)) +
+  geom_point(aes(color = group)) +
+  xlab(&quot;PC1&quot;) + 
+  ylab(&quot;PC2&quot;) +
+  cowplot::theme_cowplot()</code></pre>
+<p><img src="figure/high_low_experiment.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -876,7 +1145,7 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] log1pNMF_0.1-6     fastTopics_0.6-192 ggplot2_3.5.2     
+[1] fastglmpca_0.1-107 log1pNMF_0.1-6     fastTopics_0.6-192 ggplot2_3.5.2     
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6        xfun_0.52           bslib_0.9.0        
@@ -889,24 +1158,25 @@ loaded via a namespace (and not attached):
 [22] stringr_1.5.1       git2r_0.33.0        progress_1.2.3     
 [25] munsell_0.5.1       RhpcBLASctl_0.23-42 httpuv_1.6.15      
 [28] htmltools_0.5.8.1   sass_0.4.10         yaml_2.3.10        
-[31] lazyeval_0.2.2      plotly_4.10.4       later_1.4.2        
-[34] pillar_1.10.2       crayon_1.5.3        jquerylib_0.1.4    
-[37] tidyr_1.3.1         MASS_7.3-61         uwot_0.2.3         
-[40] cachem_1.1.0        gtools_3.9.5        tidyselect_1.2.1   
-[43] digest_0.6.37       Rtsne_0.17          stringi_1.8.7      
-[46] dplyr_1.1.4         purrr_1.0.4         ashr_2.2-66        
-[49] labeling_0.4.3      cowplot_1.1.3       rprojroot_2.0.4    
-[52] fastmap_1.2.0       grid_4.4.0          colorspace_2.1-1   
-[55] cli_3.6.5           invgamma_1.1        magrittr_2.0.3     
-[58] withr_3.0.2         prettyunits_1.2.0   scales_1.3.0       
-[61] promises_1.3.2      float_0.3-2         MatrixExtra_0.1.15 
-[64] rmarkdown_2.29      httr_1.4.7          startupmsg_0.9.6.1 
-[67] workflowr_1.7.1     hms_1.1.3           pbapply_1.7-2      
-[70] evaluate_1.0.3      distr_2.9.3         knitr_1.50         
-[73] irlba_2.3.5.1       viridisLite_0.4.2   rlang_1.1.6        
-[76] Rcpp_1.0.14         mixsqp_0.3-54       glue_1.8.0         
-[79] rstudioapi_0.16.0   jsonlite_2.0.0      R6_2.6.1           
-[82] sfsmisc_1.1-18      fs_1.6.6           </code></pre>
+[31] lazyeval_0.2.2      daarem_0.7          plotly_4.10.4      
+[34] later_1.4.2         pillar_1.10.2       crayon_1.5.3       
+[37] jquerylib_0.1.4     whisker_0.4.1       tidyr_1.3.1        
+[40] MASS_7.3-61         uwot_0.2.3          cachem_1.1.0       
+[43] gtools_3.9.5        tidyselect_1.2.1    digest_0.6.37      
+[46] Rtsne_0.17          stringi_1.8.7       dplyr_1.1.4        
+[49] purrr_1.0.4         ashr_2.2-66         labeling_0.4.3     
+[52] cowplot_1.1.3       rprojroot_2.0.4     fastmap_1.2.0      
+[55] grid_4.4.0          colorspace_2.1-1    cli_3.6.5          
+[58] invgamma_1.1        magrittr_2.0.3      withr_3.0.2        
+[61] prettyunits_1.2.0   scales_1.3.0        promises_1.3.2     
+[64] float_0.3-2         MatrixExtra_0.1.15  rmarkdown_2.29     
+[67] httr_1.4.7          startupmsg_0.9.6.1  workflowr_1.7.1    
+[70] hms_1.1.3           pbapply_1.7-2       evaluate_1.0.3     
+[73] distr_2.9.3         knitr_1.50          irlba_2.3.5.1      
+[76] viridisLite_0.4.2   rlang_1.1.6         Rcpp_1.0.14        
+[79] mixsqp_0.3-54       glue_1.8.0          rstudioapi_0.16.0  
+[82] jsonlite_2.0.0      R6_2.6.1            sfsmisc_1.1-18     
+[85] fs_1.6.6           </code></pre>
 </div>
 </div>
 

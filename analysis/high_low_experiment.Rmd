@@ -255,3 +255,26 @@ ggplot(k3_df, aes(x = factor_value, fill = gene_type)) +
 
 Essentially, what we are seeing is that in the log1p model, the genes that go from "off" ($\lambda = 0$) to on ($\lambda = 3$), which I term "Low on", are prioritized in the factors of the log1p model. This makes sense, because on the log1p scale, going from $0$ to $3$ is a much greater change than going from $1000$ to $1100$. On the other hand, the topic model clearly prioritizes the genes that go from $1000$ to $1100$ in the relevant group ("High Up"). In fact, likely due to noise, many of the "High Down" genes are ranked higher than the low on genes. 
 
+Finally, I was curious what GLM-PCA would do with this dataset.
+
+```{r, warning=FALSE, message=FALSE}
+library(fastglmpca)
+set.seed(1)
+gpca_fit <- fit_glmpca_pois(
+  Y = t(Y),
+  K = 2,
+  control = list(maxiter = 500),
+  verbose = FALSE
+)
+
+gpca_df <- as.data.frame(gpca_fit$V)
+gpca_df$group <- group
+
+ggplot(data = gpca_df, aes(x = k_1, y = k_2)) +
+  geom_point(aes(color = group)) +
+  xlab("PC1") + 
+  ylab("PC2") +
+  cowplot::theme_cowplot()
+```
+
+
