@@ -8,3 +8,4 @@ analysis/figure
 analysis/*png
 analysis/*html
 analysis/site_libs
+analysis/mcf7_cache/*
