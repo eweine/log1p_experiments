@@ -1,0 +1,392 @@
+---
+title: "Low Counts Simulation"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+date: "2025-08-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(ggplot2)
+library(fastTopics)
+library(log1pNMF)
+library(ggh4x)
+library(ggpubr)
+```
+
+## Introduction
+
+Consistently, we have seen in real data that log1p models with small $c$ tend to have very dense, noisy looking loadings. However, we have yet to figure out why exatly this occurs. 
+
+One possiblity I will consider here is that for genes with low rates of expression, the MLE of the estimate of the loadings and factors is very large. As a simple case, consider the model
+
+\begin{align*}
+y & \sim Poisson(\lambda) \\
+\log(1 + \lambda / c) &= b.
+\end{align*}
+
+It is simple to show that $\hat{b} = \log(1 + y / c)$. Below, I have plotted the variance of $\hat{b}$ for different values of $c$.
+
+```{r, eval=FALSE}
+lambda_seq <- seq(1e-10, 25, length.out = 1000)
+i <- 1
+
+cc_vec <- c(1e-3, 1e-2, 1e-1, 1, 10, 100, 1000)
+res_list <- list()
+
+for (cc in cc_vec) {
+  
+  sd_vec <- numeric(1000)
+  i <- 1
+  
+  for (lambda in lambda_seq) {
+    
+    print(glue::glue("c = {cc}, lambda = {lambda}"))
+    y <- rpois(n = 5e6, lambda = lambda)
+    sd_vec[i] <- sd(log1p(y/cc))
+    i <- i + 1
+    
+  }
+  
+  res_list[[as.character(cc)]] <- sd_vec
+  
+}
+```
+
+```{r, echo=FALSE}
+res_list <- readr::read_rds("~/Documents/log1p_experiments/output/mle_var.rds")
+lambda_seq <- seq(1e-10, 25, length.out = 1000)
+
+res_df <- stack(res_list)
+colnames(res_df) <- c("sd", "cc")
+res_df$lambda <- rep(lambda_seq, 7)
+```
+
+```{r, fig.height=5, fig.width=6}
+ggplot(data = res_df, aes(x = lambda, y = sd ^ 2)) +
+  geom_line() +
+  facet_manual(
+    ~cc, scales = "free", 
+    design = c("
+               ABC
+               DEF
+               #G#
+               "),
+    labeller = labeller(cc = function(x) paste("c =", x))) +
+  cowplot::theme_cowplot() +
+  xlab(bquote("   " ~ lambda)) +
+  ylab(expression(Var(hat(b))))
+```
+
+The most important difference above is that for small $c$, the variance of the MLE of $b$ for $\lambda \approx 1$ is much larger than the variance of the MLE for larger values of $\lambda$. 
+
+While of course here we are hitting a much more regularized (low-rank) MLE to our count data, I believe that this variance structure may be the key to our previous observations. Below, I demonstrate through simulations that having columns with $\lambda$ near $1$ can cause log1p models with small values of $c$ to miss or obscure relatively simple structure. 
+
+## Simulations
+
+### Scenario 1: Clusters with Background
+
+In the first simualtion scenario, I simulate $5$ distinct groups, where each group expresses $20\%$ of all genes at $\lambda = 15$. All other genes are expressed at $\lambda = 1.75$. 
+
+I first fit both the topic model and the log1p model with $c = 10^{-3}$ using a random initialization. Below are the results:
+
+```{r}
+grouping <- as.factor(rep(c("A", "B", "C", "D", "E"), each = 200))
+
+n_genes <- 1000
+n_groups <- 5
+n_cells_per_group <- 200
+high_genes_per_group <- 500
+
+high_expr <- 15
+low_expr <- 1.75
+
+lambda_list <- list()
+Y_list <- list()
+
+set.seed(1)
+
+for (group in 1:n_groups) {
+  
+  lambda <- rep(low_expr, n_genes)
+  high_idx <- sample(1:n_genes, size = high_genes_per_group)
+  lambda[high_idx] <- high_expr
+  lambda_list[[group]] <- lambda
+  Lambda <- matrix(
+    data = rep(lambda, n_cells_per_group),
+    nrow = n_cells_per_group,
+    ncol = n_genes,
+    byrow = TRUE
+  )
+  
+  Y <- matrix(
+    data = rpois(n = n_cells_per_group * n_genes, lambda = as.vector(Lambda)),
+    nrow = n_cells_per_group,
+    ncol = n_genes
+  )
+  
+  Y_list[[group]] <- Y
+  
+}
+
+Y <- do.call(rbind, Y_list)
+set.seed(1)
+ft_fit <- fit_poisson_nmf(
+  X = Y, 
+  k = 5, 
+  init.method = "random", 
+  control = list(nc = 7),
+  verbose = "none"
+  )
+
+sp1 <- structure_plot(ft_fit, loadings_order = 1:1000, grouping = grouping, gap = 10) +
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("Topic Model")
+
+set.seed(1)
+log1p_mod <- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 5,
+  loglik = "exact",
+  init_method = "random",
+  control = list(maxiter = 250, verbose = FALSE),
+  cc = 0.001
+)
+
+sp2 <- normalized_structure_plot(log1p_mod, loadings_order = 1:1000, grouping = grouping, gap = 10) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model with c = 0.001")
+```
+
+```{r}
+ggarrange(sp1, sp2, nrow = 2, ncol = 1)
+```
+
+While there is a bit of noise, the topic model performs quite well here. However, the log1p model seems to be quite thrown off by the noise, leading to a loading structure that is difficult to interpret.
+
+However, when fitting the log1p model with a rank-1 initialization, the results look much better. Below are structure plots with $K = 5$ and $K = 6$ from the log1p model with $c = 10^{-3}$ where the models are initialized with the best rank-1 fit.
+
+
+```{r}
+set.seed(1)
+log1p_mod_r1_5 <- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 5,
+  loglik = "exact",
+  init_method = "rank1",
+  control = list(maxiter = 250, verbose = FALSE),
+  cc = 0.001
+)
+
+set.seed(1)
+log1p_mod_r1_6 <- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 6,
+  loglik = "exact",
+  init_method = "rank1",
+  control = list(maxiter = 250, verbose = FALSE),
+  cc = 0.001
+)
+
+sp3 <- normalized_structure_plot(log1p_mod_r1_5, loadings_order = 1:1000, grouping = grouping, gap = 10) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model with c = 0.001 and K = 5 (Rank 1 Init)")
+
+sp4 <- normalized_structure_plot(log1p_mod_r1_6, loadings_order = 1:1000, grouping = grouping, gap = 10) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model with c = 0.001 and K = 6 (Rank 1 Init)")
+```
+
+```{r}
+ggarrange(sp3, sp4, nrow = 2, ncol = 1)
+```
+
+Above, the rank 5 model looks fairly good, where the rank 6 model did not do what I would have expected (I assumed that it was going to fit a "baseline" and then 5 group specific factors). Regardless, I think this pretty clearly shows that especially for small c, a rank-1 initialization can be very important for recovering interpretable factors, because a random initialization seems very subject to fitting to noise.
+
+For reference, here are random and rank-1 initialized log1p models with $c = 1$:
+
+```{r}
+set.seed(1)
+log1p_mod_r1_c1 <- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 5,
+  loglik = "exact",
+  init_method = "random",
+  control = list(maxiter = 250, verbose = FALSE),
+  cc = 1
+)
+
+set.seed(1)
+log1p_mod_rand_c1 <- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 5,
+  loglik = "exact",
+  init_method = "rank1",
+  control = list(maxiter = 250, verbose = FALSE),
+  cc = 1
+)
+
+sp5 <- normalized_structure_plot(log1p_mod_r1_c1, loadings_order = 1:1000, grouping = grouping, gap = 10) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model with c = 1 and K = 5 (Rank 1 Init)")
+
+sp6 <- normalized_structure_plot(log1p_mod_rand_c1, loadings_order = 1:1000, grouping = grouping, gap = 10) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model with c = 1 and K = 5 (Random Init)")
+```
+
+```{r}
+ggarrange(sp5, sp6, nrow = 2, ncol = 1)
+```
+
+Both of these fits essentially look like somewhat noisier versions of the topic model.
+
+### Scenario 2: Clusters with Overlapping High / Low Expression Programs
+
+Building off of the previous simulation, I wanted to see if I could create a scenario where even a rank-1 initialization couldn't help the log1p model with small c get reasonable looking loadings.
+
+My intuition was that in the previous simulation, fitting a "baseline" made sense because all genes were expressed at least at $\lambda = 1.75$ across groups. To prevent such a natural baseline, I decided to create $4$ groups, where each group had high expression for $25\%$ of genes ($\lambda = 25$), low expression for $25\%$ of genes ($\lambda = 1$), and no expression for the remaining genes.
+
+```{r}
+n_genes <- 1000
+n_groups <- 4
+n_cells_per_group <- 250
+
+high_expr <- 25
+low_expr <- 1
+
+lambda_list <- list()
+Y_list <- list()
+
+lambda_list[[1]] <- c(
+  rep(high_expr, 250),
+  rep(0, 500),
+  rep(low_expr, 250)
+)
+
+lambda_list[[2]] <- c(
+  rep(0, 250),
+  rep(high_expr, 250),
+  rep(low_expr, 250),
+  rep(0, 250)
+)
+
+lambda_list[[3]] <- c(
+  rep(0, 250),
+  rep(low_expr, 250),
+  rep(high_expr, 250),
+  rep(0, 250)
+)
+
+lambda_list[[4]] <- c(
+  rep(low_expr, 250),
+  rep(0, 250),
+  rep(0, 250),
+  rep(high_expr, 250)
+)
+
+set.seed(1)
+
+for (group in 1:n_groups) {
+  
+  Lambda <- matrix(
+    data = rep(lambda_list[[group]], n_cells_per_group),
+    nrow = n_cells_per_group,
+    ncol = n_genes,
+    byrow = TRUE
+  )
+  
+  Y <- matrix(
+    data = rpois(n = n_cells_per_group * n_genes, lambda = as.vector(Lambda)),
+    nrow = n_cells_per_group,
+    ncol = n_genes
+  )
+  
+  Y_list[[group]] <- Y
+  
+}
+
+Y <- do.call(rbind, Y_list)
+```
+
+Below is a plot showing expression by group:
+
+```{r}
+expr_df <- data.frame(
+  group = c(
+    rep("A", 1000), rep("B", 1000), rep("C", 1000), rep("D", 1000)
+  ),
+  gene_id = c(
+    1:1000, 1:1000, 1:1000, 1:1000
+  ),
+  expr = c(
+    rep(high_expr, 250),
+    rep(0, 500),
+    rep(low_expr, 250),
+    rep(0, 250),
+    rep(high_expr, 250),
+    rep(low_expr, 250),
+    rep(0, 250),
+    rep(0, 250),
+    rep(low_expr, 250),
+    rep(high_expr, 250),
+    rep(0, 250),
+    rep(low_expr, 250),
+    rep(0, 250),
+    rep(0, 250),
+    rep(high_expr, 250)
+  )
+)
+
+ggplot(expr_df, aes(x = gene_id, y = expr)) +
+  geom_bar(stat = "identity") +  # Use bars to represent lambda values
+  facet_wrap(~ group) +          # Create a panel for each group
+  coord_trans(y = "log1p") + 
+  labs(x = "Gene", y = "Expression") +
+  cowplot::theme_cowplot()  # Use a minimal theme for a clean look
+```
+
+```{r}
+grouping <- as.factor(rep(c("A", "B", "C", "D"), each = 250))
+
+ft_fit <- fit_poisson_nmf(
+  X = Y, k = 4, init.method = "random", control = list(nc = 7),
+  verbose = "none"
+  )
+sp1 <- structure_plot(ft_fit, loadings_order = 1:1000, grouping = grouping) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("Topic Model")
+
+set.seed(1)
+log1p_mod_rand <- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 4,
+  loglik = "exact",
+  init_method = "random",
+  control = list(maxiter = 250, verbose = FALSE),
+  cc = 1e-3
+)
+
+sp2 <- normalized_structure_plot(log1p_mod_rand, loadings_order = 1:1000, grouping = grouping) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model with c = 0.001 (Random Init)")
+
+set.seed(1)
+log1p_mod <- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 4,
+  loglik = "exact",
+  init_method = "rank1",
+  control = list(maxiter = 250, verbose = FALSE),
+  cc = 1e-3
+)
+
+sp3 <- normalized_structure_plot(log1p_mod, loadings_order = 1:1000, grouping = grouping) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model with c = 0.001 (Rank 1 Init)")
+```
+
+```{r, fig.height=7}
+ggarrange(sp1, sp2, sp3, nrow = 3, ncol = 1)
+```
+
+While the topic model appears to discover the structure very nicely, neither the rank-1 initialized nor random initialized log1p model appear to capture the structure very well.
+
+## Conclusion
+
+I believe that the above simulations as well as the intuition given by the variance of the MLE help to explain what we have observed in real data for small $c$. Most of these simulations seem to argue against using very small $c$ in practice. However, moderate $c$ seems to still work reasonably well here.
