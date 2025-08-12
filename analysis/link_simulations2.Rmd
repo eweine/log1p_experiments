@@ -34,7 +34,7 @@ set.seed(5)
 n_genes <- 500
 n_cells <- 2500
 K <- 4
-library(passPCA)
+library(log1pNMF)
 FF <- matrix(
   data = 0,
   nrow = n_genes,

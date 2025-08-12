@@ -76,3 +76,5 @@ Welcome to my research website.
 
 [Small c Simulations](low_counts.html)
 
+[A Multiplicative Simulation](multiplicative_sim.html)
+
