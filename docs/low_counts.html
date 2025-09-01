@@ -394,7 +394,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-08-11
+<strong>Last updated:</strong> 2025-09-01
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -432,10 +432,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R
-Markdown file created these results, you’ll want to first commit it to
-the Git repo. If you’re still working on the analysis, you can ignore
-this warning. When you’re finished, you can run
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -554,15 +554,15 @@ output/mle_var.rds
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree0b5be521e0f7fcac37f088cb9cddde9f1a9b1217targetblank0b5be52a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree93a77c0e878eeca8684b3edf0f71044124ff838etargetblank93a77c0a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/0b5be521e0f7fcac37f088cb9cddde9f1a9b1217" target="_blank">0b5be52</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/93a77c0e878eeca8684b3edf0f71044124ff838e" target="_blank">93a77c0</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree0b5be521e0f7fcac37f088cb9cddde9f1a9b1217targetblank0b5be52a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree93a77c0e878eeca8684b3edf0f71044124ff838etargetblank93a77c0a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -572,7 +572,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/0b5be521e0f7fcac37f088cb9cddde9f1a9b1217" target="_blank">0b5be52</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/93a77c0e878eeca8684b3edf0f71044124ff838e" target="_blank">93a77c0</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -593,11 +593,8 @@ Ignored files:
     Ignored:    analysis/pancreas_cytokine_S1_cache/
     Ignored:    data/.DS_Store
 
-Untracked files:
-    Untracked:  Manifest.toml
-    Untracked:  Project.toml
-    Untracked:  analysis/low_counts.Rmd
-    Untracked:  output/mle_var.rds
+Unstaged changes:
+    Modified:   analysis/low_counts.Rmd
 
 </code></pre>
 <p>
@@ -612,10 +609,74 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/low_counts.Rmd</code>) and HTML
+(<code>docs/low_counts.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a2e68355b254e33f5ff9a8697d8752aad5f40861/analysis/low_counts.Rmd" target="_blank">a2e6835</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-11
+</td>
+<td>
+added inutition for small c case
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/a2e68355b254e33f5ff9a8697d8752aad5f40861/docs/low_counts.html" target="_blank">a2e6835</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-11
+</td>
+<td>
+added inutition for small c case
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -674,6 +735,43 @@ for (cc in cc_vec) {
   xlab(bquote(&quot;   &quot; ~ lambda)) +
   ylab(expression(Var(hat(b))))</code></pre>
 <p><img src="figure/low_counts.Rmd/unnamed-chunk-4-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a2e68355b254e33f5ff9a8697d8752aad5f40861/docs/figure/low_counts.Rmd/unnamed-chunk-4-1.png" target="_blank">a2e6835</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The most important difference above is that for small <span
 class="math inline">\(c\)</span>, the variance of the MLE of <span
 class="math inline">\(b\)</span> for <span class="math inline">\(\lambda
@@ -765,6 +863,43 @@ sp2 &lt;- normalized_structure_plot(log1p_mod, loadings_order = 1:1000, grouping
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;) + ggtitle(&quot;log1p Model with c = 0.001&quot;)</code></pre>
 <pre class="r"><code>ggarrange(sp1, sp2, nrow = 2, ncol = 1)</code></pre>
 <p><img src="figure/low_counts.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a2e68355b254e33f5ff9a8697d8752aad5f40861/docs/figure/low_counts.Rmd/unnamed-chunk-6-1.png" target="_blank">a2e6835</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>While there is a bit of noise, the topic model performs quite well
 here. However, the log1p model seems to be quite thrown off by the
 noise, leading to a loading structure that is difficult to
@@ -802,6 +937,43 @@ sp4 &lt;- normalized_structure_plot(log1p_mod_r1_6, loadings_order = 1:1000, gro
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;) + ggtitle(&quot;log1p Model with c = 0.001 and K = 6 (Rank 1 Init)&quot;)</code></pre>
 <pre class="r"><code>ggarrange(sp3, sp4, nrow = 2, ncol = 1)</code></pre>
 <p><img src="figure/low_counts.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a2e68355b254e33f5ff9a8697d8752aad5f40861/docs/figure/low_counts.Rmd/unnamed-chunk-8-1.png" target="_blank">a2e6835</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Above, the rank 5 model looks fairly good, where the rank 6 model did
 not do what I would have expected (I assumed that it was going to fit a
 “baseline” and then 5 group specific factors). Regardless, I think this
@@ -838,6 +1010,43 @@ sp6 &lt;- normalized_structure_plot(log1p_mod_rand_c1, loadings_order = 1:1000, 
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;) + ggtitle(&quot;log1p Model with c = 1 and K = 5 (Random Init)&quot;)</code></pre>
 <pre class="r"><code>ggarrange(sp5, sp6, nrow = 2, ncol = 1)</code></pre>
 <p><img src="figure/low_counts.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a2e68355b254e33f5ff9a8697d8752aad5f40861/docs/figure/low_counts.Rmd/unnamed-chunk-10-1.png" target="_blank">a2e6835</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Both of these fits essentially look like somewhat noisier versions of
 the topic model.</p>
 </div>
@@ -952,6 +1161,43 @@ ggplot(expr_df, aes(x = gene_id, y = expr)) +
   labs(x = &quot;Gene&quot;, y = &quot;Expression&quot;) +
   cowplot::theme_cowplot()  # Use a minimal theme for a clean look</code></pre>
 <p><img src="figure/low_counts.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
+Past versions of unnamed-chunk-12-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a2e68355b254e33f5ff9a8697d8752aad5f40861/docs/figure/low_counts.Rmd/unnamed-chunk-12-1.png" target="_blank">a2e6835</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>grouping &lt;- as.factor(rep(c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;), each = 250))
 
 ft_fit &lt;- fit_poisson_nmf(
@@ -988,9 +1234,253 @@ sp3 &lt;- normalized_structure_plot(log1p_mod, loadings_order = 1:1000, grouping
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;) + ggtitle(&quot;log1p Model with c = 0.001 (Rank 1 Init)&quot;)</code></pre>
 <pre class="r"><code>ggarrange(sp1, sp2, sp3, nrow = 3, ncol = 1)</code></pre>
 <p><img src="figure/low_counts.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-14-1">
+Past versions of unnamed-chunk-14-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-14-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a2e68355b254e33f5ff9a8697d8752aad5f40861/docs/figure/low_counts.Rmd/unnamed-chunk-14-1.png" target="_blank">a2e6835</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2025-08-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>While the topic model appears to discover the structure very nicely,
 neither the rank-1 initialized nor random initialized log1p model appear
 to capture the structure very well.</p>
+</div>
+<div id="scenario-3-95-ubiquitously-low-expressed-genes"
+class="section level3">
+<h3>Scenario 3: 95% Ubiquitously Low Expressed Genes</h3>
+<p>At Peter’s suggestion, I wanted to see if I could isolate the effect
+of lowly expressed genes by comparing log1p models to topic models fit
+to a matrix with vs. without many low expressed genes.</p>
+<p>To do this, I created <span class="math inline">\(4\)</span> distinct
+groups, where each group expresses the same set of <span
+class="math inline">\(960\)</span> genes with a rate of <span
+class="math inline">\(1.5\)</span>, and in the remaining <span
+class="math inline">\(40\)</span> genes, each group expressed <span
+class="math inline">\(10\)</span> genes with rate <span
+class="math inline">\(50\)</span> and did not express the other <span
+class="math inline">\(30\)</span> genes.</p>
+<pre class="r"><code>n_genes &lt;- 1000
+n_groups &lt;- 4
+n_cells_per_group &lt;- 250
+
+high_expr &lt;- 50
+low_expr &lt;- 1.5
+
+lambda_list &lt;- list()
+Y_list &lt;- list()
+
+lambda_list[[1]] &lt;- c(
+  rep(low_expr, 960),
+  rep(high_expr, 10),
+  rep(0, 30)
+)
+
+lambda_list[[2]] &lt;- c(
+  rep(low_expr, 960),
+  rep(0, 10),
+  rep(high_expr, 10),
+  rep(0, 20)
+)
+
+lambda_list[[3]] &lt;- c(
+  rep(low_expr, 960),
+  rep(0, 20),
+  rep(high_expr, 10),
+  rep(0, 10)
+)
+
+lambda_list[[4]] &lt;- c(
+  rep(low_expr, 960),
+  rep(0, 30),
+  rep(high_expr, 10)
+)
+
+set.seed(1)
+
+for (group in 1:n_groups) {
+  
+  Lambda &lt;- matrix(
+    data = rep(lambda_list[[group]], n_cells_per_group),
+    nrow = n_cells_per_group,
+    ncol = n_genes,
+    byrow = TRUE
+  )
+  
+  Y &lt;- matrix(
+    data = rpois(n = n_cells_per_group * n_genes, lambda = as.vector(Lambda)),
+    nrow = n_cells_per_group,
+    ncol = n_genes
+  )
+  
+  Y_list[[group]] &lt;- Y
+  
+}
+
+Y &lt;- do.call(rbind, Y_list)</code></pre>
+<p>The topic model is able to cleanly pickup the group structure:</p>
+<pre class="r"><code>set.seed(1)
+
+ft_fit_r1 &lt;- fastTopics:::fit_pnmf_rank1(Y)
+
+init_LL &lt;- cbind(
+  ft_fit_r1$L,
+  matrix(
+    data = 1e-5,
+    nrow = 1000,
+    ncol = 3
+  )
+)
+
+init_FF &lt;- cbind(
+  ft_fit_r1$F,
+  matrix(
+    data = 1e-5,
+    nrow = 1000,
+    ncol = 3
+  )
+)
+
+ft_fit0 &lt;- init_poisson_nmf(
+  X = Y, F = init_FF, L = init_LL
+)
+
+ft_fit &lt;- fit_poisson_nmf(
+  X = Y, fit0 = ft_fit0, control = list(nc = 7),
+  verbose = &quot;none&quot;, numiter = 500
+)
+
+structure_plot(ft_fit, loadings_order = 1:1000, grouping = rep(c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;)</code></pre>
+<p><img src="figure/low_counts.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The log1p model with <span class="math inline">\(c = 10^{-3}\)</span>
+is less able to capture the structure, likely as a result of the low
+expressed genes. Below is a plot with a random initialization:</p>
+<pre class="r"><code>set.seed(1)
+log1p_mod &lt;- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 4,
+  loglik = &quot;exact&quot;,
+  init_method = &quot;random&quot;,
+  control = list(maxiter = 1000, verbose = FALSE),
+  cc = 1e-3
+)
+
+normalized_structure_plot(log1p_mod, loadings_order = 1:1000, grouping = rep(c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;)</code></pre>
+<p><img src="figure/low_counts.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Things look better with a rank-1 initialization, but the structure
+clearly still isn’t being fully captured:</p>
+<pre class="r"><code>set.seed(1)
+log1p_mod_r1_init &lt;- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 4,
+  loglik = &quot;exact&quot;,
+  init_method = &quot;rank1&quot;,
+  control = list(maxiter = 1000, verbose = FALSE),
+  cc = 1e-3
+)
+
+normalized_structure_plot(log1p_mod_r1_init, loadings_order = 1:1000, grouping = rep(c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;)</code></pre>
+<p><img src="figure/low_counts.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>However, adding one more factor does help:</p>
+<pre class="r"><code>set.seed(1)
+log1p_mod_r1_init_k5 &lt;- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 5,
+  loglik = &quot;exact&quot;,
+  init_method = &quot;rank1&quot;,
+  control = list(maxiter = 1000, verbose = FALSE),
+  cc = 1e-3
+)
+
+normalized_structure_plot(log1p_mod_r1_init_k5, loadings_order = 1:1000, grouping = rep(c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;)</code></pre>
+<p><img src="figure/low_counts.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>So, overall it seems clear that the log1p model with small c is at
+least less efficient (as it requires more factors) in order to capture
+the structure in this case.</p>
+<p>However, removing the low expressed genes, the log1p model with small
+c captures the structure reasonably well with just 4 factors:</p>
+<pre class="r"><code>set.seed(1)
+log1p_mod_big &lt;- fit_poisson_log1p_nmf(
+  Y = Y[,951:1000],
+  K = 4,
+  loglik = &quot;exact&quot;,
+  init_method = &quot;rank1&quot;,
+  control = list(maxiter = 1000, verbose = FALSE),
+  cc = 1e-3
+)
+
+normalized_structure_plot(log1p_mod_big, loadings_order = 1:1000, grouping = rep(c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;)</code></pre>
+<p><img src="figure/low_counts.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The topic model still capture the structure with the low expressed
+genes removed:</p>
+<pre class="r"><code>set.seed(1)
+
+ft_fit_r1 &lt;- fastTopics:::fit_pnmf_rank1(Y[,951:1000])
+
+init_LL &lt;- cbind(
+  ft_fit_r1$L,
+  matrix(
+    data = 1e-5,
+    nrow = 1000,
+    ncol = 3
+  )
+)
+
+init_FF &lt;- cbind(
+  ft_fit_r1$F,
+  matrix(
+    data = 1e-5,
+    nrow = 50,
+    ncol = 3
+  )
+)
+
+ft_fit0 &lt;- init_poisson_nmf(
+  X = Y[,951:1000], F = init_FF, L = init_LL
+)
+
+ft_fit &lt;- fit_poisson_nmf(
+  X = Y[,951:1000], fit0 = ft_fit0, control = list(nc = 7),
+  verbose = &quot;none&quot;, numiter = 500
+)
+
+structure_plot(ft_fit, loadings_order = 1:1000, grouping = rep(c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab(&quot;Membership&quot;)</code></pre>
+<p><img src="figure/low_counts.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="conclusion" class="section level2">
@@ -1029,40 +1519,41 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggpubr_0.6.0       ggh4x_0.3.0        log1pNMF_0.1-6     fastTopics_0.6-192
-[5] ggplot2_3.5.2     
+[1] ggpubr_0.6.0      ggh4x_0.3.0       log1pNMF_0.1-6    fastTopics_0.7-25
+[5] ggplot2_3.5.2    
 
 loaded via a namespace (and not attached):
- [1] tidyselect_1.2.1    viridisLite_0.4.2   dplyr_1.1.4        
- [4] farver_2.1.2        fastmap_1.2.0       lazyeval_0.2.2     
+ [1] tidyselect_1.2.1    viridisLite_0.4.2   farver_2.1.2       
+ [4] dplyr_1.1.4         fastmap_1.2.0       lazyeval_0.2.2     
  [7] promises_1.3.2      digest_0.6.37       lifecycle_1.0.4    
 [10] invgamma_1.1        magrittr_2.0.3      compiler_4.4.0     
 [13] rlang_1.1.6         sass_0.4.10         progress_1.2.3     
 [16] tools_4.4.0         yaml_2.3.10         data.table_1.17.0  
-[19] knitr_1.50          ggsignif_0.6.4      prettyunits_1.2.0  
-[22] labeling_0.4.3      htmlwidgets_1.6.4   abind_1.4-5        
-[25] Rtsne_0.17          workflowr_1.7.1     withr_3.0.2        
-[28] purrr_1.0.4         grid_4.4.0          git2r_0.33.0       
-[31] colorspace_2.1-1    scales_1.3.0        gtools_3.9.5       
-[34] MASS_7.3-61         cli_3.6.5           rmarkdown_2.29     
-[37] crayon_1.5.3        startupmsg_0.9.6.1  generics_0.1.3     
-[40] RcppParallel_5.1.10 rstudioapi_0.16.0   httr_1.4.7         
-[43] tzdb_0.4.0          pbapply_1.7-2       cachem_1.1.0       
-[46] stringr_1.5.1       parallel_4.4.0      vctrs_0.6.5        
-[49] Matrix_1.7-0        jsonlite_2.0.0      carData_3.0-5      
-[52] car_3.1-2           hms_1.1.3           mixsqp_0.3-54      
-[55] ggrepel_0.9.6       rstatix_0.7.2       irlba_2.3.5.1      
-[58] plotly_4.10.4       tidyr_1.3.1         jquerylib_0.1.4    
-[61] glue_1.8.0          cowplot_1.1.3       uwot_0.2.3         
-[64] stringi_1.8.7       gtable_0.3.6        later_1.4.2        
-[67] sfsmisc_1.1-18      quadprog_1.5-8      munsell_0.5.1      
-[70] tibble_3.2.1        pillar_1.10.2       htmltools_0.5.8.1  
-[73] truncnorm_1.0-9     R6_2.6.1            rprojroot_2.0.4    
-[76] evaluate_1.0.3      lattice_0.22-6      readr_2.1.5        
-[79] backports_1.5.0     RhpcBLASctl_0.23-42 broom_1.0.6        
-[82] SQUAREM_2021.1      ashr_2.2-66         httpuv_1.6.15      
-[85] bslib_0.9.0         Rcpp_1.0.14         distr_2.9.3        
-[88] xfun_0.52           fs_1.6.6            pkgconfig_2.0.3    </code></pre>
+[19] knitr_1.50          ggsignif_0.6.4      labeling_0.4.3     
+[22] prettyunits_1.2.0   htmlwidgets_1.6.4   plyr_1.8.9         
+[25] abind_1.4-5         Rtsne_0.17          workflowr_1.7.1    
+[28] withr_3.0.2         purrr_1.0.4         grid_4.4.0         
+[31] git2r_0.33.0        colorspace_2.1-1    scales_1.3.0       
+[34] gtools_3.9.5        MASS_7.3-61         cli_3.6.5          
+[37] rmarkdown_2.29      crayon_1.5.3        startupmsg_0.9.6.1 
+[40] generics_0.1.3      RcppParallel_5.1.10 rstudioapi_0.16.0  
+[43] tzdb_0.4.0          httr_1.4.7          reshape2_1.4.4     
+[46] pbapply_1.7-2       cachem_1.1.0        stringr_1.5.1      
+[49] parallel_4.4.0      vctrs_0.6.5         Matrix_1.7-0       
+[52] jsonlite_2.0.0      carData_3.0-5       car_3.1-2          
+[55] hms_1.1.3           mixsqp_0.3-54       ggrepel_0.9.6      
+[58] rstatix_0.7.2       irlba_2.3.5.1       plotly_4.10.4      
+[61] tidyr_1.3.1         jquerylib_0.1.4     glue_1.8.0         
+[64] cowplot_1.1.3       uwot_0.2.3          stringi_1.8.7      
+[67] gtable_0.3.6        later_1.4.2         sfsmisc_1.1-18     
+[70] quadprog_1.5-8      munsell_0.5.1       tibble_3.2.1       
+[73] pillar_1.10.2       htmltools_0.5.8.1   truncnorm_1.0-9    
+[76] R6_2.6.1            rprojroot_2.0.4     evaluate_1.0.3     
+[79] lattice_0.22-6      readr_2.1.5         backports_1.5.0    
+[82] RhpcBLASctl_0.23-42 broom_1.0.6         SQUAREM_2021.1     
+[85] ashr_2.2-66         httpuv_1.6.15       bslib_0.9.0        
+[88] Rcpp_1.0.14         distr_2.9.3         whisker_0.4.1      
+[91] xfun_0.52           fs_1.6.6            pkgconfig_2.0.3    </code></pre>
 </div>
 </div>
 

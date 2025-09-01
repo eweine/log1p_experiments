@@ -387,6 +387,223 @@ ggarrange(sp1, sp2, sp3, nrow = 3, ncol = 1)
 
 While the topic model appears to discover the structure very nicely, neither the rank-1 initialized nor random initialized log1p model appear to capture the structure very well.
 
+### Scenario 3: 95% Ubiquitously Low Expressed Genes
+
+At Peter's suggestion, I wanted to see if I could isolate the effect of lowly expressed genes by comparing log1p models to topic models fit to a matrix with vs. without many low expressed genes.
+
+To do this, I created $4$ distinct groups, where each group expresses the same set of $960$ genes with a rate of $1.5$, and in the remaining $40$ genes, each group expressed $10$ genes with rate $50$ and did not express the other $30$ genes. 
+
+```{r}
+n_genes <- 1000
+n_groups <- 4
+n_cells_per_group <- 250
+
+high_expr <- 50
+low_expr <- 1.5
+
+lambda_list <- list()
+Y_list <- list()
+
+lambda_list[[1]] <- c(
+  rep(low_expr, 960),
+  rep(high_expr, 10),
+  rep(0, 30)
+)
+
+lambda_list[[2]] <- c(
+  rep(low_expr, 960),
+  rep(0, 10),
+  rep(high_expr, 10),
+  rep(0, 20)
+)
+
+lambda_list[[3]] <- c(
+  rep(low_expr, 960),
+  rep(0, 20),
+  rep(high_expr, 10),
+  rep(0, 10)
+)
+
+lambda_list[[4]] <- c(
+  rep(low_expr, 960),
+  rep(0, 30),
+  rep(high_expr, 10)
+)
+
+set.seed(1)
+
+for (group in 1:n_groups) {
+  
+  Lambda <- matrix(
+    data = rep(lambda_list[[group]], n_cells_per_group),
+    nrow = n_cells_per_group,
+    ncol = n_genes,
+    byrow = TRUE
+  )
+  
+  Y <- matrix(
+    data = rpois(n = n_cells_per_group * n_genes, lambda = as.vector(Lambda)),
+    nrow = n_cells_per_group,
+    ncol = n_genes
+  )
+  
+  Y_list[[group]] <- Y
+  
+}
+
+Y <- do.call(rbind, Y_list)
+```
+
+The topic model is able to cleanly pickup the group structure:
+
+```{r, fig.height=4}
+set.seed(1)
+
+ft_fit_r1 <- fastTopics:::fit_pnmf_rank1(Y)
+
+init_LL <- cbind(
+  ft_fit_r1$L,
+  matrix(
+    data = 1e-5,
+    nrow = 1000,
+    ncol = 3
+  )
+)
+
+init_FF <- cbind(
+  ft_fit_r1$F,
+  matrix(
+    data = 1e-5,
+    nrow = 1000,
+    ncol = 3
+  )
+)
+
+ft_fit0 <- init_poisson_nmf(
+  X = Y, F = init_FF, L = init_LL
+)
+
+ft_fit <- fit_poisson_nmf(
+  X = Y, fit0 = ft_fit0, control = list(nc = 7),
+  verbose = "none", numiter = 500
+)
+
+structure_plot(ft_fit, loadings_order = 1:1000, grouping = rep(c("A", "B", "C", "D"), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership")
+```
+
+The log1p model with $c = 10^{-3}$ is less able to capture the structure, likely as a result of the low expressed genes. Below is a plot with a random initialization:
+
+```{r, fig.height=4}
+set.seed(1)
+log1p_mod <- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 4,
+  loglik = "exact",
+  init_method = "random",
+  control = list(maxiter = 1000, verbose = FALSE),
+  cc = 1e-3
+)
+
+normalized_structure_plot(log1p_mod, loadings_order = 1:1000, grouping = rep(c("A", "B", "C", "D"), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership")
+```
+
+Things look better with a rank-1 initialization, but the structure clearly still isn't being fully captured:
+
+```{r, fig.height=4}
+set.seed(1)
+log1p_mod_r1_init <- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 4,
+  loglik = "exact",
+  init_method = "rank1",
+  control = list(maxiter = 1000, verbose = FALSE),
+  cc = 1e-3
+)
+
+normalized_structure_plot(log1p_mod_r1_init, loadings_order = 1:1000, grouping = rep(c("A", "B", "C", "D"), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership")
+
+```
+
+However, adding one more factor does help:
+
+```{r}
+set.seed(1)
+log1p_mod_r1_init_k5 <- fit_poisson_log1p_nmf(
+  Y = Y,
+  K = 5,
+  loglik = "exact",
+  init_method = "rank1",
+  control = list(maxiter = 1000, verbose = FALSE),
+  cc = 1e-3
+)
+
+normalized_structure_plot(log1p_mod_r1_init_k5, loadings_order = 1:1000, grouping = rep(c("A", "B", "C", "D"), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership")
+
+```
+
+So, overall it seems clear that the log1p model with small c is at least less efficient (as it requires more factors) in order to capture the structure in this case.
+
+However, removing the low expressed genes, the log1p model with small c captures the structure reasonably well with just 4 factors:
+
+```{r, fig.height=4}
+set.seed(1)
+log1p_mod_big <- fit_poisson_log1p_nmf(
+  Y = Y[,951:1000],
+  K = 4,
+  loglik = "exact",
+  init_method = "rank1",
+  control = list(maxiter = 1000, verbose = FALSE),
+  cc = 1e-3
+)
+
+normalized_structure_plot(log1p_mod_big, loadings_order = 1:1000, grouping = rep(c("A", "B", "C", "D"), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership")
+
+```
+
+The topic model still capture the structure with the low expressed genes removed:
+
+```{r}
+set.seed(1)
+
+ft_fit_r1 <- fastTopics:::fit_pnmf_rank1(Y[,951:1000])
+
+init_LL <- cbind(
+  ft_fit_r1$L,
+  matrix(
+    data = 1e-5,
+    nrow = 1000,
+    ncol = 3
+  )
+)
+
+init_FF <- cbind(
+  ft_fit_r1$F,
+  matrix(
+    data = 1e-5,
+    nrow = 50,
+    ncol = 3
+  )
+)
+
+ft_fit0 <- init_poisson_nmf(
+  X = Y[,951:1000], F = init_FF, L = init_LL
+)
+
+ft_fit <- fit_poisson_nmf(
+  X = Y[,951:1000], fit0 = ft_fit0, control = list(nc = 7),
+  verbose = "none", numiter = 500
+)
+
+structure_plot(ft_fit, loadings_order = 1:1000, grouping = rep(c("A", "B", "C", "D"), each = 250)) + 
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership")
+```
+
+
 ## Conclusion
 
 I believe that the above simulations as well as the intuition given by the variance of the MLE help to explain what we have observed in real data for small $c$. Most of these simulations seem to argue against using very small $c$ in practice. However, moderate $c$ seems to still work reasonably well here.
