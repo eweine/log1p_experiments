@@ -150,8 +150,6 @@ ft_r1_init <- fit_poisson_nmf(
 sp1 <- structure_plot(ft_r1_init, loadings_order = 1:n_cells, grouping = grouping, gap = 10) +
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("Topic Model")
 
-
-
 set.seed(1)
 log1p_fit <- fit_poisson_log1p_nmf(
   Y = Y, K = 6, loglik = "exact", init_method = "rank1",
@@ -161,10 +159,19 @@ log1p_fit <- fit_poisson_log1p_nmf(
 sp2 <- normalized_structure_plot(log1p_fit, loadings_order = 1:n_cells, grouping = grouping, gap = 10, topics = c(1, rev(2:6))) +
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model (c = 1)")
 
+set.seed(1)
+log1p_fit_csmall <- fit_poisson_log1p_nmf(
+  Y = Y, K = 6, loglik = "exact", init_method = "rank1",
+  control = list(maxiter = 250, verbose = FALSE), cc = 1e-3
+)
+
+sp3 <- normalized_structure_plot(log1p_fit_csmall, loadings_order = 1:n_cells, grouping = grouping, gap = 10, topics = c(1, rev(2:6))) +
+  theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model (c = 1e-3)")
+
 ```
 
 ```{r}
-ggarrange(sp1, sp2, nrow = 2, ncol = 1)
+ggarrange(sp1, sp2, sp3, nrow = 3, ncol = 1)
 ```
 
 While neither model captures the structure perfectly (which is expected because I'm not generating data from a log1p or topic model), it is clear that the log1p model is much closer. The topic model, on the other hand, just completely clusters the groups.
