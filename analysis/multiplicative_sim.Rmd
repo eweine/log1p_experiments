@@ -150,22 +150,24 @@ ft_r1_init <- fit_poisson_nmf(
 sp1 <- structure_plot(ft_r1_init, loadings_order = 1:n_cells, grouping = grouping, gap = 10) +
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("Topic Model")
 
-set.seed(1)
-log1p_fit <- fit_poisson_log1p_nmf(
-  Y = Y, K = 6, loglik = "exact", init_method = "rank1",
-  control = list(maxiter = 250, verbose = FALSE), cc = 1
-)
+log1p_fit_list <- list()
+cc_vec <- c(1e-3, 1e-2, 1e-1, 1, 10, 100, 1000)
 
-sp2 <- normalized_structure_plot(log1p_fit, loadings_order = 1:n_cells, grouping = grouping, gap = 10, topics = c(1, rev(2:6))) +
+for (cc in cc_vec) {
+  
+  set.seed(1)
+  log1p_fit_list[[as.character(cc)]] <- fit_poisson_log1p_nmf(
+    Y = Y, K = 6, loglik = "exact", init_method = "rank1",
+    control = list(maxiter = 250, verbose = FALSE), cc = cc
+  )
+  
+}
+
+
+sp2 <- normalized_structure_plot(log1p_fit_list[[as.character(1)]], loadings_order = 1:n_cells, grouping = grouping, gap = 10, topics = c(1, rev(2:6))) +
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model (c = 1)")
 
-set.seed(1)
-log1p_fit_csmall <- fit_poisson_log1p_nmf(
-  Y = Y, K = 6, loglik = "exact", init_method = "rank1",
-  control = list(maxiter = 250, verbose = FALSE), cc = 1e-3
-)
-
-sp3 <- normalized_structure_plot(log1p_fit_csmall, loadings_order = 1:n_cells, grouping = grouping, gap = 10, topics = c(1, rev(2:6))) +
+sp3 <- normalized_structure_plot(log1p_fit_list[[as.character(0.001)]], loadings_order = 1:n_cells, grouping = grouping, gap = 10, topics = c(1, rev(2:6))) +
   theme(axis.text.x = element_text(angle = 0,hjust = 0.5, size = 12)) + ylab("Membership") + ggtitle("log1p Model (c = 1e-3)")
 
 ```
@@ -173,6 +175,74 @@ sp3 <- normalized_structure_plot(log1p_fit_csmall, loadings_order = 1:n_cells, g
 ```{r}
 ggarrange(sp1, sp2, sp3, nrow = 3, ncol = 1)
 ```
+
+```{r}
+hoyer_sparsity <- function(x) {
+  
+  n <- length(x)
+  (1 / (sqrt(n) - 1)) * (sqrt(n) - (sum(x) / (sqrt(sum(x ^ 2)))))
+  
+}
+
+for (cc in cc_vec) {
+  
+  log1p_fit_list[[as.character(cc)]]$l_sparsity <- apply(
+    log1p_fit_list[[as.character(cc)]]$LL, 2, hoyer_sparsity
+  )
+  
+  log1p_fit_list[[as.character(cc)]]$f_sparsity <- apply(
+    log1p_fit_list[[as.character(cc)]]$FF, 2, hoyer_sparsity
+  )
+  
+}
+
+l_sparsity_vec <- unlist(lapply(log1p_fit_list, function(x) {mean(x$l_sparsity)}))
+
+f_sparsity_vec <- unlist(lapply(log1p_fit_list, function(x) {mean(x$f_sparsity)}))
+
+s <- Matrix::rowSums(Y)
+s <- s / mean(s)
+
+l_tm_sparsity <- mean(apply(diag(1/s) %*% ft_r1_init$L, 2, hoyer_sparsity))
+f_tm_sparsity <- mean(apply(ft_r1_init$F, 2, hoyer_sparsity))
+
+df_sparsity_l <- data.frame(
+  cc = cc_vec,
+  sparsity = l_sparsity_vec
+)
+
+ggplot(data = df_sparsity_l, aes(x = cc, y = sparsity)) +
+  geom_point() +
+  geom_line() +
+  cowplot::theme_cowplot() +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_x_continuous(breaks = c(1e-3, 1, 1e3), transform = "log10") +
+  xlab("c") +
+  ylab("Mean Loading Sparsity") +
+  geom_hline(yintercept = l_tm_sparsity, color = "red", linetype = "dashed") +
+  ggplot2::annotate(
+    geom="text", x=0.006, y=l_tm_sparsity + 0.05, label="Topic Model", color="red"
+  )
+
+df_sparsity_f <- data.frame(
+  cc = cc_vec,
+  sparsity = f_sparsity_vec
+)
+
+ggplot(data = df_sparsity_f, aes(x = cc, y = sparsity)) +
+  geom_point() +
+  geom_line() +
+  cowplot::theme_cowplot() +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_x_continuous(breaks = c(1e-3, 1, 1e3), transform = "log10") +
+  xlab("c") +
+  ylab("Mean Loading Sparsity") +
+  geom_hline(yintercept = f_tm_sparsity, color = "red", linetype = "dashed") +
+  ggplot2::annotate(
+    geom="text", x=0.006, y=f_tm_sparsity + 0.05, label="Topic Model", color="red"
+  )
+```
+
 
 While neither model captures the structure perfectly (which is expected because I'm not generating data from a log1p or topic model), it is clear that the log1p model is much closer. The topic model, on the other hand, just completely clusters the groups.
 
