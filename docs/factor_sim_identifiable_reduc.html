@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-06-03" />
+
+<title>Factor Sim</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Factor Sim</h1>
+<h4 class="date">2026-06-03</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-07-22
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedfc34dc9f3966caa48f01267f8759d9e74d67787targetblankdfc34dca">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/dfc34dc9f3966caa48f01267f8759d9e74d67787" target="_blank">dfc34dc</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedfc34dc9f3966caa48f01267f8759d9e74d67787targetblankdfc34dca"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/dfc34dc9f3966caa48f01267f8759d9e74d67787" target="_blank">dfc34dc</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Untracked files:
+    Untracked:  analysis/factor_sim_identifiable_reduc.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(ggplot2)
+library(fastTopics)
+library(log1pNMF)
+library(cowplot)
+theme_set(theme_cowplot())
+set.seed(1)</code></pre>
+<div id="model" class="section level2">
+<h2>Model</h2>
+<p>Here, we generate a <span class="math inline">\(1000 \times
+400\)</span> data matrix <span class="math inline">\(\mathbf{Y}\)</span>
+from a rank-3 Poisson NMF model. Specifically, we first define a
+“baseline” factor <span class="math inline">\(\mathbf{f}_0\)</span> and
+two sparse change factors <span
+class="math inline">\(\mathbf{f}_A\)</span> and <span
+class="math inline">\(\mathbf{f}_B\)</span>. Ordering the <span
+class="math inline">\(p = 400\)</span> features in four blocks of <span
+class="math inline">\(100\)</span>, we define these factors as</p>
+<p><span class="math display">\[\begin{align}
+\mathbf{f}_0 &amp;= \big(\underbrace{2, \ldots, 2}_{100},\
+\underbrace{1000, \ldots, 1000}_{100},\ \underbrace{2, \ldots,
+2}_{100},\ \underbrace{1000, \ldots, 1000}_{100}\big), \\
+\mathbf{f}_A &amp;= \big(\underbrace{18, \ldots, 18}_{100},\
+\underbrace{100, \ldots, 100}_{100},\ \underbrace{0, \ldots, 0}_{100},\
+\underbrace{0, \ldots, 0}_{100}\big), \\
+\mathbf{f}_B &amp;= \big(\underbrace{0, \ldots, 0}_{100},\
+\underbrace{0, \ldots, 0}_{100},\ \underbrace{18, \ldots, 18}_{100},\
+\underbrace{100, \ldots, 100}_{100}\big).
+\end{align}\]</span></p>
+<p>Then, we define four groups of samples based on their loadings on
+these factors. Specifically, we define loadings as</p>
+<p><span class="math display">\[\begin{equation}
+\mathbf{l}_i =
+\begin{cases}
+(1, 0, 0) &amp; \text{if } 1 \leq i \leq 250 \\
+(1, 1, 0)  &amp; \text{if } 250 &lt; i \leq 500 \\
+(1, 0, 1)  &amp; \text{if } 500 &lt; i \leq 750 \\
+(1, 1, 1)  &amp; \text{if } 750 &lt; i \leq 1000
+\end{cases}
+\end{equation}\]</span></p>
+<p>where each loading is ordered <span class="math inline">\((l_{i0},
+l_{iA}, l_{iB})\)</span>. For each sample <span
+class="math inline">\(i\)</span> we define <span
+class="math inline">\(\boldsymbol{\lambda}_i = l_{i0} \mathbf{f}_0 +
+l_{iA} \mathbf{f}_A + l_{iB} \mathbf{f}_B\)</span>, and draw <span
+class="math inline">\(y_{ij} \sim
+\textrm{Poisson}(\lambda_{ij})\)</span> independently across <span
+class="math inline">\(i\)</span> and <span
+class="math inline">\(j\)</span>.</p>
+<p>We designed the change factors so that each one acts on two kinds of
+features, distinguished by their baseline rate. The two kinds respond
+very differently when their change factor turns on:</p>
+<table>
+<colgroup>
+<col width="15%" />
+<col width="33%" />
+<col width="18%" />
+<col width="13%" />
+<col width="17%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Feature type</th>
+<th align="center">Baseline rate (<span
+class="math inline">\(\mathbf{f}_0\)</span>)</th>
+<th align="center">Rate when active</th>
+<th align="center">Fold change</th>
+<th align="center">Absolute change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">High-baseline</td>
+<td align="center"><span class="math inline">\(1000\)</span></td>
+<td align="center"><span class="math inline">\(1100\)</span></td>
+<td align="center"><span class="math inline">\(1.1\times\)</span></td>
+<td align="center"><span class="math inline">\(+100\)</span></td>
+</tr>
+<tr class="even">
+<td align="left">Low-baseline</td>
+<td align="center"><span class="math inline">\(2\)</span></td>
+<td align="center"><span class="math inline">\(20\)</span></td>
+<td align="center"><span class="math inline">\(10\times\)</span></td>
+<td align="center"><span class="math inline">\(+18\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>That is, high-baseline features undergo a large <em>absolute</em>
+change but a small <em>relative</em> (fold) change, whereas low-baseline
+features undergo a large <em>relative</em> change but a small
+<em>absolute</em> change.</p>
+<p>We note that while we have written this model using an additive link,
+we could equivalently describe it as a log1p NMF model with any value of
+<span class="math inline">\(c\)</span>. To do this for a given value of
+<span class="math inline">\(c\)</span>, we can keep the loadings <span
+class="math inline">\(\mathbf{l}_i\)</span> unchanged and replace the
+factors as follows:</p>
+<p><span class="math display">\[\begin{align}
+\mathbf{f}_0^{(c)} &amp;= \alpha_c \log\!\left(1 +
+\tfrac{1}{c}\,\mathbf{f}_0\right), \\
+\mathbf{f}_A^{(c)} &amp;= \alpha_c \left[\log\!\left(1 +
+\tfrac{1}{c}(\mathbf{f}_0 + \mathbf{f}_A)\right) - \log\!\left(1 +
+\tfrac{1}{c}\,\mathbf{f}_0\right)\right], \\
+\mathbf{f}_B^{(c)} &amp;= \alpha_c \left[\log\!\left(1 +
+\tfrac{1}{c}(\mathbf{f}_0 + \mathbf{f}_B)\right) - \log\!\left(1 +
+\tfrac{1}{c}\,\mathbf{f}_0\right)\right],
+\end{align}\]</span></p>
+<p>where <span class="math inline">\(\log(\cdot)\)</span> is applied
+elementwise. With these factors, <span class="math inline">\(\alpha_c
+\log(1 + \lambda_{ij} / c) = l_{i0} f^{(c)}_{0j} + l_{iA} f^{(c)}_{Aj} +
+l_{iB} f^{(c)}_{Bj}\)</span> holds exactly for every sample <span
+class="math inline">\(i\)</span> and feature <span
+class="math inline">\(j\)</span>. Such a construction exists for any
+<span class="math inline">\(c\)</span> only because factors <span
+class="math inline">\(A\)</span> and <span
+class="math inline">\(B\)</span> have disjoint support, in the sense
+that no feature is non-zero in both change factors, so the nonlinear
+link never has to represent an interaction between them.</p>
+<pre class="r"><code>nP &lt;- 100                         # genes per program panel
+p  &lt;- 4 * nP
+
+off_rel &lt;- 2;    on_rel &lt;- 20     # relative-change genes (10x fold, +18)
+off_abs &lt;- 1000; on_abs &lt;- 1100   # absolute-change genes (1.1x fold, +100)
+
+panel &lt;- factor(rep(c(&quot;A-rel&quot;, &quot;A-abs&quot;, &quot;B-rel&quot;, &quot;B-abs&quot;),
+                    c(nP, nP, nP, nP)),
+                levels = c(&quot;A-rel&quot;, &quot;A-abs&quot;, &quot;B-rel&quot;, &quot;B-abs&quot;))
+
+# the three true factors: baseline + two additive, up-regulating programs
+baseP &lt;- c(rep(off_rel, nP), rep(off_abs, nP), rep(off_rel, nP), rep(off_abs, nP))
+devA  &lt;- c(rep(on_rel - off_rel, nP), rep(on_abs - off_abs, nP),
+           rep(0, nP), rep(0, nP))
+devB  &lt;- c(rep(0, nP), rep(0, nP),
+           rep(on_rel - off_rel, nP), rep(on_abs - off_abs, nP))</code></pre>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<p>We simulate the four groups of samples, then fit two models: a topic
+model (the log1p model in the limit <span class="math inline">\(c \to
+\infty\)</span>) and the log1p model at <span class="math inline">\(c =
+1\)</span>. As we did in the paper, both models are initialized by first
+fitting a rank-1 model, and then other factors are initialized
+randomly.</p>
+<p>Below are the results. It’s clear that both the log1pNMF model with
+<span class="math inline">\(c = 1\)</span> and the <span
+class="math inline">\(c = \infty\)</span> recover almost exactly the
+same loading structure. However, they differ greatly in the relative
+ordering of the features in the factors. In the <span
+class="math inline">\(c = \infty\)</span> fit, the most highly ranked
+features are those with greatest absolute changes due to that factor,
+whereas in the <span class="math inline">\(c = 1\)</span> fit the most
+highly ranked features are those with the greatest relative changes.</p>
+<pre class="r"><code>npop    &lt;- 250                     # samples per group
+La      &lt;- c(0, 1, 0, 1)           # program-A indicator per group
+Lb      &lt;- c(0, 0, 1, 1)           # program-B indicator per group
+groupname &lt;- c(&quot;Group 1 (Baseline)&quot;, &quot;Group 2 (Baseline + A)&quot;,
+               &quot;Group 3 (Baseline + B)&quot;, &quot;Group 4 (Baseline + A + B)&quot;)
+
+prof   &lt;- sapply(1:4, function(i) baseP + La[i] * devA + Lb[i] * devB)  # p x 4
+Lambda &lt;- t(prof[, rep(1:4, each = npop)])                             # n x p
+n      &lt;- nrow(Lambda)
+
+Y &lt;- matrix(rpois(n * p, as.vector(t(Lambda))), nrow = n, ncol = p, byrow = TRUE)
+rownames(Y) &lt;- paste0(&quot;cell&quot;, 1:n)
+colnames(Y) &lt;- paste0(&quot;gene&quot;, 1:p)
+
+# true loadings: baseline on in all samples, programs on per group
+Ltrue &lt;- cbind(Baseline = 1, A = La[rep(1:4, each = npop)],
+                             B = Lb[rep(1:4, each = npop)])</code></pre>
+<pre class="r"><code># topic model (= log1p as c -&gt; Inf): rank-1 init has to be built manually
+r1 &lt;- fastTopics:::fit_pnmf_rank1(Y)
+init_LL &lt;- cbind(r1$L, matrix(1e-3, n, 2)); rownames(init_LL) &lt;- rownames(Y)
+init_FF &lt;- cbind(r1$F, matrix(1e-3, p, 2)); rownames(init_FF) &lt;- colnames(Y)
+tm &lt;- fit_poisson_nmf(Y, fit0 = init_poisson_nmf(Y, F = init_FF, L = init_LL),
+                      verbose = &quot;none&quot;)
+
+# log1p model at c = 1 (rank-1 is the default init_method)
+set.seed(1)
+lp &lt;- fit_poisson_log1p_nmf(Y, K = 3, loglik = &quot;exact&quot;, init_method = &quot;rank1&quot;,
+                            control = list(maxiter = 200, verbose = FALSE))
+
+# --- helpers: put fitted factors in (Baseline, A, B) order so all plots agree ---
+ord_of &lt;- function(L) {
+  cc &lt;- function(t) suppressWarnings(apply(L, 2, function(x) cor(x, t)))
+  jA &lt;- which.max(cc(Ltrue[, &quot;A&quot;])); jB &lt;- which.max(cc(Ltrue[, &quot;B&quot;]))
+  c(setdiff(seq_len(ncol(L)), c(jA, jB)), jA, jB)
+}
+relabel &lt;- function(L) {
+  M &lt;- L[, ord_of(L), drop = FALSE]; colnames(M) &lt;- c(&quot;Baseline&quot;, &quot;A&quot;, &quot;B&quot;); M
+}
+
+# shared factor colors, and a role palette kept clear of the A/B (red/teal) hues:
+# amber = high-baseline features, purple = low-baseline; darker = up, lighter = flat.
+# The role palette is validated colorblind-safe (adjacent CVD dE &gt;= 8, all four in
+# the L 0.43-0.77 band with real chroma); the legend supplies the labels the
+# lighter fills need for contrast relief.
+FACCOL  &lt;- c(&quot;Baseline&quot; = &quot;grey60&quot;, &quot;A&quot; = &quot;#AE2012&quot;, &quot;B&quot; = &quot;#005F73&quot;)
+ROLECOL &lt;- c(&quot;High Rate, Up&quot;   = &quot;#B36A00&quot;, &quot;High Rate, Flat&quot; = &quot;#E0A81E&quot;,
+             &quot;Low Rate, Up&quot;     = &quot;#574494&quot;, &quot;Low Rate, Flat&quot;  = &quot;#9B7FD4&quot;)</code></pre>
+<pre class="r"><code>## ---------------- Panel A: ground-truth rates by group ----------------
+# split each group&#39;s rate into a grey baseline plus an additive, colored cap for
+# each active program; geom_rect with data-space ymin/ymax keeps the segment
+# boundaries at the true rates under the log1p axis
+seg1 &lt;- function(k) {
+  out &lt;- data.frame(gene = 1:p, ymin = 0, ymax = baseP, factor = &quot;Baseline&quot;)
+  if (La[k] == 1) out &lt;- rbind(out, data.frame(gene = 1:p, ymin = baseP,
+      ymax = baseP + devA, factor = &quot;A&quot;)[devA &gt; 0, ])
+  if (Lb[k] == 1) out &lt;- rbind(out, data.frame(gene = 1:p, ymin = baseP,
+      ymax = baseP + devB, factor = &quot;B&quot;)[devB &gt; 0, ])
+  out$factor &lt;- factor(out$factor, levels = c(&quot;Baseline&quot;, &quot;A&quot;, &quot;B&quot;)); out
+}
+# a single faceted plot so the four groups have EQUAL panel widths and share one
+# scale; facet_wrap then shows the y-axis only on the leftmost panel
+segA &lt;- do.call(rbind, lapply(1:4, function(k)
+  transform(seg1(k), group = factor(groupname[k], levels = groupname))))
+
+# one shared &quot;Factor&quot; legend, placed left of Panel A and right of Panel B
+leg_factor &lt;- get_legend(
+  ggplot(data.frame(x = 1, f = factor(c(&quot;Baseline&quot;, &quot;A&quot;, &quot;B&quot;),
+                                      levels = c(&quot;Baseline&quot;, &quot;A&quot;, &quot;B&quot;))),
+         aes(x, 1, fill = f)) + geom_col() +
+    scale_fill_manual(values = FACCOL, name = &quot;Factor&quot;) +
+    theme(legend.position = &quot;right&quot;))
+
+panelA &lt;- ggplot(segA, aes(xmin = gene - 0.5, xmax = gene + 0.5,
+                           ymin = ymin, ymax = ymax, fill = factor)) +
+  geom_rect() +
+  facet_wrap(~ group, nrow = 1) +
+  scale_fill_manual(values = FACCOL, name = &quot;Factor&quot;, drop = FALSE) +
+  scale_y_continuous(trans = &quot;log1p&quot;, breaks = c(0, 2, 20, 1000), limits = c(0, 1100)) +
+  labs(x = &quot;Feature&quot;, y = &quot;True rate&quot;) +
+  theme(legend.position = &quot;none&quot;, strip.background = element_blank(),
+        strip.text = element_text(size = 11, face = &quot;bold&quot;))
+
+## ---------------- Panel B: structure plots (baseline on the bottom) ----------------
+grp &lt;- factor(rep(1:4, each = npop))            # numeric group per sample
+SP &lt;- function(L, title, ylab = FALSE) {
+  g &lt;- structure_plot(log1pNMF:::normalize_bars(pmax(L, 0)),
+                      loadings_order = seq_len(nrow(L)), grouping = grp, gap = 24,
+                      topics = c(&quot;B&quot;, &quot;A&quot;, &quot;Baseline&quot;), colors = FACCOL) +
+    ggtitle(title) + labs(x = &quot;Group&quot;, y = if (ylab) &quot;Membership&quot; else NULL) +
+    theme(plot.title = element_text(size = 11, hjust = 0.5), legend.position = &quot;none&quot;,
+          axis.title.y = element_text(size = 14),
+          axis.text.x = element_text(angle = 0, hjust = 0.5))
+  if (!ylab) g &lt;- g + theme(axis.text.y = element_blank(),
+                            axis.ticks.y = element_blank())
+  g
+}
+panelB &lt;- plot_grid(SP(Ltrue, &quot;True Sample Scores&quot;, ylab = TRUE),
+                    SP(relabel(tm$L),  &quot;c = ∞ Sample Scores&quot;),
+                    SP(relabel(lp$LL), &quot;c = 1 Sample Scores&quot;), nrow = 1)
+
+## ---------------- Panel C: factor-value histograms by gene role ----------------
+role_for &lt;- function(prog) {
+  other &lt;- setdiff(c(&quot;A&quot;, &quot;B&quot;), prog)
+  factor(ifelse(panel == paste0(prog,  &quot;-abs&quot;), &quot;High Rate, Up&quot;,
+         ifelse(panel == paste0(other, &quot;-abs&quot;), &quot;High Rate, Flat&quot;,
+         ifelse(panel == paste0(prog,  &quot;-rel&quot;), &quot;Low Rate, Up&quot;,
+                                                &quot;Low Rate, Flat&quot;))),
+         levels = c(&quot;High Rate, Up&quot;, &quot;High Rate, Flat&quot;,
+                    &quot;Low Rate, Up&quot;,  &quot;Low Rate, Flat&quot;))
+}
+fac_df &lt;- function(F, L, model) {
+  Fo &lt;- F[, ord_of(L)]                              # (Baseline, A, B)
+  rbind(data.frame(value = Fo[, 2] / max(Fo[, 2]), role = role_for(&quot;A&quot;),
+                   factor = &quot;Factor A&quot;, model = model),
+        data.frame(value = Fo[, 3] / max(Fo[, 3]), role = role_for(&quot;B&quot;),
+                   factor = &quot;Factor B&quot;, model = model))
+}
+facC &lt;- rbind(fac_df(tm$F, tm$L, &quot;c = ∞&quot;), fac_df(lp$FF, lp$LL, &quot;c = 1&quot;))
+facC$model &lt;- factor(facC$model, levels = c(&quot;c = ∞&quot;, &quot;c = 1&quot;))
+
+panelC &lt;- ggplot(facC, aes(value, fill = role)) +
+  geom_histogram(position = &quot;identity&quot;, alpha = 0.85, bins = 60) +
+  facet_grid(model ~ factor) +
+  scale_fill_manual(values = ROLECOL, name = &quot;Feature Type&quot;) +
+  labs(x = &quot;Factor Value (Normalized to Max 1)&quot;, y = &quot;Count&quot;) +
+  theme(strip.background = element_blank(), strip.text = element_text(face = &quot;bold&quot;),
+        strip.text.y = element_text(angle = 0),
+        panel.border = element_rect(colour = &quot;black&quot;, fill = NA, linewidth = 0.7))
+
+## ---------------- assemble: A over B share one legend (right, centered); C centered below ----------------
+AB  &lt;- plot_grid(panelA, panelB, ncol = 1, labels = c(&quot;A&quot;, &quot;B&quot;), rel_heights = c(1, 1))
+top &lt;- plot_grid(AB, leg_factor, ncol = 2, rel_widths = c(1, 0.10))
+Crow &lt;- plot_grid(NULL, panelC, NULL, ncol = 3, rel_widths = c(0.12, 1, 0.12),
+                  labels = c(&quot;&quot;, &quot;C&quot;, &quot;&quot;))
+plot_grid(top, Crow, ncol = 1, rel_heights = c(2, 1.05))</code></pre>
+<p><img src="figure/factor_sim_identifiable_reduc.Rmd/big-figure-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/New_York
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] cowplot_1.2.0     log1pNMF_0.1-6    fastTopics_0.7-38 ggplot2_4.0.3    
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.6          xfun_0.57             bslib_0.10.0         
+ [4] htmlwidgets_1.6.4     ggrepel_0.9.8         lattice_0.22-9       
+ [7] quadprog_1.5-8        vctrs_0.7.3           tools_4.5.2          
+[10] generics_0.1.4        parallel_4.5.2        tibble_3.3.1         
+[13] pkgconfig_2.0.3       Matrix_1.7-5          data.table_1.18.2.1  
+[16] SQUAREM_2026.1        RColorBrewer_1.1-3    S7_0.2.2             
+[19] RcppParallel_5.1.11-2 lifecycle_1.0.5       truncnorm_1.0-9      
+[22] compiler_4.5.2        farver_2.1.2          stringr_1.6.0        
+[25] git2r_0.36.2          progress_1.2.3        RhpcBLASctl_0.23-42  
+[28] httpuv_1.6.17         htmltools_0.5.9       sass_0.4.10          
+[31] yaml_2.3.12           lazyeval_0.2.3        plotly_4.12.0        
+[34] crayon_1.5.3          later_1.4.8           pillar_1.11.1        
+[37] jquerylib_0.1.4       tidyr_1.3.2           MASS_7.3-65          
+[40] uwot_0.2.4            cachem_1.1.0          gtools_3.9.5         
+[43] tidyselect_1.2.1      digest_0.6.39         Rtsne_0.17           
+[46] stringi_1.8.7         reshape2_1.4.5        dplyr_1.2.1          
+[49] purrr_1.2.2           ashr_2.2-63           labeling_0.4.3       
+[52] rprojroot_2.1.1       fastmap_1.2.0         grid_4.5.2           
+[55] cli_3.6.6             invgamma_1.2          magrittr_2.0.5       
+[58] dichromat_2.0-0.1     withr_3.0.2           prettyunits_1.2.0    
+[61] scales_1.4.0          promises_1.5.0        rmarkdown_2.31       
+[64] httr_1.4.8            startupmsg_1.0.0      otel_0.2.0           
+[67] workflowr_1.7.2       hms_1.1.4             pbapply_1.7-4        
+[70] evaluate_1.0.5        distr_2.9.7           knitr_1.51           
+[73] irlba_2.3.7           viridisLite_0.4.3     rlang_1.2.0          
+[76] Rcpp_1.1.1-1.1        mixsqp_0.3-54         glue_1.8.1           
+[79] rstudioapi_0.18.0     jsonlite_2.0.0        plyr_1.8.9           
+[82] R6_2.6.1              sfsmisc_1.1-23        fs_2.1.0             </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

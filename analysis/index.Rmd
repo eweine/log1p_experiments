@@ -78,3 +78,5 @@ Welcome to my research website.
 
 [A Multiplicative Simulation](multiplicative_sim.html)
 
+[A Simulation Showing Differences in Factors between log1pNMF and fastTopics](factor_sim_identifiable_reduc.html)
+
