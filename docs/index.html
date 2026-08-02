@@ -283,7 +283,7 @@ $(document).ready(function () {
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+workflowr <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -294,8 +294,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> </a>
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -304,13 +304,13 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-07-22
+<strong>Last updated:</strong> 2026-08-02
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 1
+aria-hidden="true"></span> 0
 </p>
 <p>
 <strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
@@ -333,36 +333,33 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
-<span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
-changes </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguncommittedchanges"
+<div id="strongRMarkdownfilestronguptodate"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
-<code>wflow_publish</code> to commit the R Markdown file and build the
-HTML.</p>
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedfc34dc9f3966caa48f01267f8759d9e74d67787targetblankdfc34dca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea85bccf8fd34780a806e8cd7349b35ae4663a7d9targetblanka85bccfa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/dfc34dc9f3966caa48f01267f8759d9e74d67787" target="_blank">dfc34dc</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/a85bccf8fd34780a806e8cd7349b35ae4663a7d9" target="_blank">a85bccf</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreedfc34dc9f3966caa48f01267f8759d9e74d67787targetblankdfc34dca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea85bccf8fd34780a806e8cd7349b35ae4663a7d9targetblanka85bccfa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -372,7 +369,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/dfc34dc9f3966caa48f01267f8759d9e74d67787" target="_blank">dfc34dc</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/a85bccf8fd34780a806e8cd7349b35ae4663a7d9" target="_blank">a85bccf</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -386,11 +383,9 @@ depends on. Below is the status of the Git repository when the results
 were generated:
 </p>
 <pre><code>
-Untracked files:
-    Untracked:  analysis/factor_sim_identifiable_reduc.Rmd
-
-Unstaged changes:
-    Modified:   analysis/index.Rmd
+Ignored files:
+    Ignored:    analysis/c_grid_sim_cache/
+    Ignored:    analysis/log1p_identifiability_cache/
 
 </code></pre>
 <p>
@@ -405,6 +400,7 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
 These are the previous versions of the repository in which changes were
 made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML
@@ -434,6 +430,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a85bccf8fd34780a806e8cd7349b35ae4663a7d9/analysis/index.Rmd" target="_blank">a85bccf</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Add c-grid simulation results and the identifiability analysis
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/244c532303bed2c0bd79fcc1e19058ae10ce4311/analysis/index.Rmd" target="_blank">244c532</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-07-22
+</td>
+<td>
+added new simulation study with figure
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/244c532303bed2c0bd79fcc1e19058ae10ce4311/docs/index.html" target="_blank">244c532</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-07-22
+</td>
+<td>
+added new simulation study with figure
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1655,11 +1702,10 @@ Analysis</a></p>
 <p><a href="multiplicative_sim.html">A Multiplicative Simulation</a></p>
 <p><a href="factor_sim_identifiable_reduc.html">A Simulation Showing
 Differences in Factors between log1pNMF and fastTopics</a></p>
-</div>
-</div>
-</div>
-</div>
-</div>
+<p><a href="c_grid_sim.html">Fitting the log1p model at the wrong
+c</a></p>
+<p><a href="log1p_identifiability.html">Non-identifiability of the log1p
+factorization, and how c controls it</a></p>
 </div>
 
 

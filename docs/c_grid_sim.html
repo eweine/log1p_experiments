@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-08-02" />
+
+<title>Fitting the log1p model at the wrong c</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Fitting the log1p model at the wrong c</h1>
+<h4 class="date">2026-08-02</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-08-02
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongdetected">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
+</p>
+</div>
+<div id="strongCachestrongdetected" class="panel-collapse collapse">
+<div class="panel-body">
+The following chunks had caches available:
+<ul>
+<li>
+data-summary
+</li>
+<li>
+floor-vs-freedom
+</li>
+</ul>
+<p>To ensure reproducibility of the results, delete the cache directory
+<code>c_grid_sim_cache</code> and re-run the analysis. To have workflowr
+automatically delete the cache directory prior to building the file, set
+<code>delete_cache = TRUE</code> when running <code>wflow_build()</code>
+or <code>wflow_publish()</code>.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea85bccf8fd34780a806e8cd7349b35ae4663a7d9targetblanka85bccfa">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/a85bccf8fd34780a806e8cd7349b35ae4663a7d9" target="_blank">a85bccf</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea85bccf8fd34780a806e8cd7349b35ae4663a7d9targetblanka85bccfa"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/a85bccf8fd34780a806e8cd7349b35ae4663a7d9" target="_blank">a85bccf</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    analysis/c_grid_sim_cache/
+    Ignored:    analysis/figure/
+    Ignored:    analysis/log1p_identifiability_cache/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/c_grid_sim.Rmd</code>) and HTML
+(<code>docs/c_grid_sim.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a85bccf8fd34780a806e8cd7349b35ae4663a7d9/analysis/c_grid_sim.Rmd" target="_blank">a85bccf</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Add c-grid simulation results and the identifiability analysis
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(ggplot2)
+library(cowplot)
+library(fastTopics)
+library(log1pNMF)
+theme_set(theme_cowplot(font_size = 11))</code></pre>
+<pre class="r"><code>## Where the simulation code and its outputs live. The generative functions are
+## sourced rather than restated, so the description below cannot drift from what
+## actually produced the data.
+repo_dir  &lt;- &quot;~/Documents/log1pNMF/inst/paper_figures/experiments&quot;
+exp_dir   &lt;- path.expand(repo_dir)
+cells_dir &lt;- file.path(exp_dir, &quot;c_grid_sim&quot;)            # 640 per-cell .rds
+metrics   &lt;- file.path(exp_dir, &quot;c_grid_sim_metrics.rds&quot;)
+
+stopifnot(dir.exists(exp_dir), file.exists(metrics), dir.exists(cells_dir))
+source(file.path(exp_dir, &quot;c_grid_sim_common.R&quot;))</code></pre>
+<div id="the-question" class="section level1">
+<h1>The question</h1>
+<p>The log1p model has a link parameter <span
+class="math inline">\(c\)</span>:</p>
+<p><span class="math display">\[
+y_{ij} \sim \text{Poisson}(\lambda_{ij}), \qquad
+\log\!\left(1 + \frac{\lambda_{ij}}{c}\right) =
+\sum_{k=1}^{K}\ell_{ik}f_{jk} =: \theta_{ij}
+\]</span></p>
+<p>so <span class="math inline">\(\lambda_{ij} = c\,(e^{\theta_{ij}} -
+1)\)</span>. As <span class="math inline">\(c \to \infty\)</span> the
+link becomes linear and the model is ordinary Poisson NMF (the topic
+model); as <span class="math inline">\(c \to 0\)</span> it becomes
+additive on the log scale. <span class="math inline">\(c\)</span>
+therefore decides whether the factors describe <strong>absolute</strong>
+or <strong>relative</strong> changes.</p>
+<p>This page asks: <strong>if the data really were generated at some
+<span class="math inline">\(c_{\text{true}}\)</span>, what happens when
+we fit at a different <span
+class="math inline">\(c_{\text{fit}}\)</span>?</strong> We simulate at
+eight values of <span class="math inline">\(c\)</span> and fit at all
+eight, over ten seeds — a full <span class="math inline">\(8 \times
+8\)</span> cross.</p>
+</div>
+<div id="how-the-data-were-generated" class="section level1">
+<h1>How the data were generated</h1>
+<div id="generative-model" class="section level2">
+<h2>Generative model</h2>
+<p>For each seed we draw one truth and reuse it at every <span
+class="math inline">\(c_{\text{true}}\)</span>:</p>
+<ul>
+<li><strong><span class="math inline">\(L\)</span></strong> (<span
+class="math inline">\(n \times K\)</span>): rows drawn from a <span
+class="math inline">\(\text{Dirichlet}(a\mathbf{1}_K)\)</span> with
+<span class="math inline">\(a = 0.3\)</span>. Because <span
+class="math inline">\(a &lt; 1\)</span> the rows are peaked toward the
+pure states, so most samples are dominated by a single factor. Rows sum
+to one, which matters for the offset trick below.</li>
+<li><strong><span class="math inline">\(F_0\)</span></strong> (<span
+class="math inline">\(p \times K\)</span>): each entry is exactly zero
+with probability <span class="math inline">\(0.5\)</span>, and otherwise
+<strong>log-uniform</strong> over a range of <span
+class="math inline">\(1000\)</span>.</li>
+</ul>
+<p>Then <span class="math inline">\(\theta_0 = LF_0&#39;\)</span>, and
+the realized truth at a given <span class="math inline">\(c\)</span>
+is</p>
+<p><span class="math display">\[
+\theta = \alpha_c\,\theta_0 + \beta_c, \qquad
+\lambda = c\,\text{expm1}(\theta) \quad (\text{or } \lambda = \theta
+\text{ when } c = \infty),
+\qquad y_{ij}\sim\text{Poisson}(\lambda_{ij}).
+\]</span></p>
+<p>Since <span class="math inline">\(\sum_k \ell_{ik} = 1\)</span>,
+adding <span class="math inline">\(\beta_c\)</span> to <em>every</em>
+entry of <span class="math inline">\(F\)</span> shifts <span
+class="math inline">\(\theta\)</span> by exactly that constant. So <span
+class="math inline">\(\theta = \alpha_c\theta_0 + \beta_c\)</span> is
+still <span class="math inline">\(L F_c&#39;\)</span> with <span
+class="math inline">\(F_c = \alpha_c F_0 + \beta_c\)</span> — the offset
+costs no rank. Note <span class="math inline">\(F_c\)</span> is
+therefore <strong>not</strong> sparse: it has a floor of <span
+class="math inline">\(\beta_c\)</span> under every entry. The sparse
+object is <span class="math inline">\(F_0\)</span>.</p>
+<pre class="r"><code>sim_truth</code></pre>
+<pre><code>function (seed, n = N_ROWS, p = N_COLS, K = K_TRUE) 
+{
+    set.seed(seed)
+    G &lt;- matrix(stats::rgamma(n * K, shape = A_SIG), n, K)
+    L &lt;- G/rowSums(G)
+    lr &lt;- log(F_RANGE)/2
+    F0 &lt;- matrix(0, p, K)
+    for (k in seq_len(K)) {
+        nz &lt;- stats::runif(p) &gt; PI0
+        F0[nz, k] &lt;- exp(stats::runif(sum(nz), -lr, lr))
+    }
+    colnames(L) &lt;- colnames(F0) &lt;- paste0(&quot;k&quot;, seq_len(K))
+    rownames(L) &lt;- paste0(&quot;i&quot;, seq_len(n))
+    rownames(F0) &lt;- paste0(&quot;j&quot;, seq_len(p))
+    list(L = L, F0 = F0, theta0 = L %*% t(F0))
+}</code></pre>
+</div>
+<div id="why-the-magnitudes-are-log-uniform-and-bounded"
+class="section level2">
+<h2>Why the magnitudes are log-uniform and bounded</h2>
+<p>At small <span class="math inline">\(c\)</span> the link is
+exponential, so any right tail in <span
+class="math inline">\(\theta_0\)</span> gets exponentiated. An earlier
+version drew lognormal magnitudes and the <span class="math inline">\(c
+= 10^{-3}\)</span> datasets came out with <span
+class="math inline">\(\max(Y) \approx 10^{16}\)</span> while the <span
+class="math inline">\(c = \infty\)</span> ones had <span
+class="math inline">\(\max(Y) \approx 90\)</span>. Bounding the
+magnitudes is what makes the datasets comparable across the grid at
+all.</p>
+</div>
+<div id="calibrating-each-c-to-a-common-target" class="section level2">
+<h2>Calibrating each c to a common target</h2>
+<p>A single scale on <span class="math inline">\(F\)</span> cannot make
+these datasets comparable: at small <span
+class="math inline">\(c\)</span> a fixed spread in <span
+class="math inline">\(\theta\)</span> becomes a <em>multiplicative</em>
+spread in <span class="math inline">\(\lambda\)</span> and the maximum
+explodes, while at large <span class="math inline">\(c\)</span> the link
+is linear and the spread stays proportional. So there are
+<strong>two</strong> knobs per <span class="math inline">\(c\)</span>,
+solved numerically so that every dataset hits the same two targets:</p>
+<ul>
+<li>the fraction of zeros in <span class="math inline">\(Y\)</span> is
+<span class="math inline">\(0.5\)</span>, and</li>
+<li>the <span class="math inline">\(0.999\)</span> quantile of <span
+class="math inline">\(\lambda\)</span> is <span
+class="math inline">\(20\)</span>.</li>
+</ul>
+<p>The solve is two nested <code>uniroot</code> calls and is monotone in
+each direction: the zero-fraction decreases in <span
+class="math inline">\(\beta\)</span> at fixed <span
+class="math inline">\(\alpha\)</span>, and the upper quantile increases
+in <span class="math inline">\(\alpha\)</span> once <span
+class="math inline">\(\beta\)</span> has been re-solved.</p>
+<pre class="r"><code>calibrate</code></pre>
+<pre><code>function (theta0, cc, target_zero = TARGET_ZERO, target_q = TARGET_Q, 
+    qprob = QPROB) 
+{
+    th_of_lam &lt;- function(l) if (is.infinite(cc)) 
+        l
+    else log1p(l/cc)
+    lam_mid &lt;- -log(target_zero)
+    th_hi &lt;- th_of_lam(target_q)
+    th_mid &lt;- th_of_lam(lam_mid)
+    beta_hi &lt;- th_of_lam(1e+06)
+    beta_for &lt;- function(alpha) {
+        f &lt;- function(b) zero_frac(lambda_of(theta0, alpha, b, 
+            cc)) - target_zero
+        if (f(0) &lt;= 0) 
+            return(0)
+        stats::uniroot(f, c(0, beta_hi), tol = 1e-12)$root
+    }
+    g &lt;- function(la) {
+        alpha &lt;- exp(la)
+        lam &lt;- lambda_of(theta0, alpha, beta_for(alpha), cc)
+        as.numeric(stats::quantile(lam, qprob)) - target_q
+    }
+    la_hi &lt;- log(200/max(theta0))
+    alpha &lt;- exp(stats::uniroot(g, c(la_hi - 30, la_hi), tol = 1e-10)$root)
+    list(alpha = alpha, beta = beta_for(alpha))
+}</code></pre>
+</div>
+<div id="do-the-datasets-actually-come-out-comparable"
+class="section level2">
+<h2>Do the datasets actually come out comparable?</h2>
+<pre class="r"><code>summ &lt;- do.call(rbind, lapply(1:N_SEEDS, function(sd) {
+  tr &lt;- sim_truth(sd)
+  do.call(rbind, lapply(C_GRID, function(cc) data_summary(sim_dataset(sd, cc, tr))))
+}))
+knitr::kable(
+  data.frame(
+    quantity = c(&quot;zero fraction of Y&quot;, &quot;max(Y)&quot;, &quot;mean(Y)&quot;,
+                 &quot;q99.9 of lambda&quot;, &quot;gene mean q90/q10&quot;),
+    min = c(min(summ$zero_frac), min(summ$max_Y), min(summ$mean_Y),
+            min(summ$q999_lam), min(summ$gene_mean_q90 / summ$gene_mean_q10)),
+    max = c(max(summ$zero_frac), max(summ$max_Y), max(summ$mean_Y),
+            max(summ$q999_lam), max(summ$gene_mean_q90 / summ$gene_mean_q10))),
+  digits = 3, caption = &quot;Across all 80 datasets (10 seeds x 8 values of c).&quot;)</code></pre>
+<table>
+<caption>Across all 80 datasets (10 seeds x 8 values of c).</caption>
+<thead>
+<tr class="header">
+<th align="left">quantity</th>
+<th align="right">min</th>
+<th align="right">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">zero fraction of Y</td>
+<td align="right">0.496</td>
+<td align="right">0.505</td>
+</tr>
+<tr class="even">
+<td align="left">max(Y)</td>
+<td align="right">31.000</td>
+<td align="right">44.000</td>
+</tr>
+<tr class="odd">
+<td align="left">mean(Y)</td>
+<td align="right">0.935</td>
+<td align="right">1.982</td>
+</tr>
+<tr class="even">
+<td align="left">q99.9 of lambda</td>
+<td align="right">20.000</td>
+<td align="right">20.000</td>
+</tr>
+<tr class="odd">
+<td align="left">gene mean q90/q10</td>
+<td align="right">3.207</td>
+<td align="right">27.184</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>The two calibrated targets are hit exactly, and <code>max(Y)</code>
+and <code>mean(Y)</code> stay in a narrow band. The one quantity that is
+<em>not</em> constant is the gene-level dynamic range, and that is
+unavoidable: matching <span class="math inline">\(\lambda\)</span>’s
+distribution means matching <span class="math inline">\(\theta\)</span>
+up to a <strong>shift</strong> at small <span
+class="math inline">\(c\)</span> but up to a <strong>scale</strong> at
+large <span class="math inline">\(c\)</span>, and no single
+reparameterization does both.</p>
+</div>
+<div id="fitting" class="section level2">
+<h2>Fitting</h2>
+<p>10 seeds <span class="math inline">\(\times\)</span> 8 values of
+<span class="math inline">\(c_{\text{true}}\)</span> <span
+class="math inline">\(\times\)</span> 8 values of <span
+class="math inline">\(c_{\text{fit}}\)</span> = 640 cells, each fit from
+<strong>both</strong> a rank-1 and a random start (1280 fits). Every fit
+ran to convergence — an absolute log-likelihood change below 10^{-6}
+between iterations — with 100,000 iterations as the only other cap and
+no time limit. <span class="math inline">\(n = p = 300\)</span>, <span
+class="math inline">\(K = 3\)</span> throughout, and <span
+class="math inline">\(c_{\text{fit}} = \infty\)</span> is fit with
+<code>fastTopics::fit_poisson_nmf</code> since no finite <code>cc</code>
+represents that limit.</p>
+<pre class="r"><code>d &lt;- readRDS(metrics)
+
+## Best init per cell. The two agree to within 0.008 log-likelihood on all 640
+## cells, so for the LIKELIHOOD figures this choice is immaterial. It is not
+## immaterial for sparsity -- see that section.
+key &lt;- paste(d$seed, d$c_true, d$c_fit)
+b   &lt;- d[order(key, -d$loglik), ]
+b   &lt;- b[!duplicated(paste(b$seed, b$c_true, b$c_fit)), ]
+b$subopt &lt;- ave(b$loglik, paste(b$seed, b$c_true), FUN = max) - b$loglik
+
+CLEV &lt;- sort(unique(b$c_fit))
+CLAB &lt;- ifelse(is.infinite(CLEV), &quot;∞&quot;,
+               format(CLEV, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))
+fc &lt;- function(x) factor(x, levels = CLEV, labels = CLAB)
+b$cf     &lt;- fc(b$c_fit)
+b$cf_lab &lt;- fc(b$c_true)
+b$ct     &lt;- factor(paste(&quot;simulated at c =&quot;, fc(b$c_true)),
+                   levels = paste(&quot;simulated at c =&quot;, CLAB))
+c(cells = nrow(b), fits = nrow(d), converged = sum(d$converged))</code></pre>
+<pre><code>    cells      fits converged 
+      640      1280      1280 </code></pre>
+</div>
+</div>
+<div id="which-c-fits-best" class="section level1">
+<h1>Which c fits best?</h1>
+<p>Comparing log-likelihoods across <span
+class="math inline">\(c_{\text{fit}}\)</span> is legitimate: all eight
+are Poisson models for the <em>same</em> <span
+class="math inline">\(y\)</span> under the same dominating measure with
+constants included, so no Jacobian enters.</p>
+<pre class="r"><code>win &lt;- do.call(rbind, lapply(split(b, paste(b$seed, b$c_true)), function(x)
+  x[which.max(x$loglik), c(&quot;seed&quot;, &quot;c_true&quot;, &quot;c_fit&quot;)]))
+cnt &lt;- as.data.frame(table(ct = fc(win$c_true), cf = fc(win$c_fit)), responseName = &quot;n&quot;)
+cnt$lab &lt;- ifelse(cnt$n == 0, &quot;&quot;, cnt$n)
+
+ggplot(cnt, aes(cf, ct)) +
+  geom_tile(aes(fill = n), colour = &quot;white&quot;, linewidth = 0.6) +
+  geom_tile(data = data.frame(ct = CLAB, cf = CLAB), fill = NA,
+            colour = &quot;#C2410C&quot;, linewidth = 0.9) +
+  geom_text(aes(label = lab, colour = n &gt; 5), size = 4, show.legend = FALSE) +
+  scale_fill_gradient(low = &quot;#F2F6F7&quot;, high = &quot;#0E5C6B&quot;, name = &quot;seeds\nwon&quot;,
+                      limits = c(0, 10), breaks = c(0, 5, 10)) +
+  scale_colour_manual(values = c(&quot;FALSE&quot; = &quot;grey15&quot;, &quot;TRUE&quot; = &quot;white&quot;)) +
+  scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) +
+  labs(x = &quot;c used for fitting&quot;, y = &quot;c used to simulate&quot;,
+       title = &quot;Which c achieves the highest log-likelihood&quot;,
+       subtitle = &quot;counts over 10 seeds; outlined cells are c_fit = c_true&quot;) +
+  coord_fixed() +
+  theme(plot.title = element_text(size = 13, face = &quot;plain&quot;),
+        plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
+        panel.border = element_rect(colour = &quot;grey70&quot;, fill = NA))</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/winner-matrix-1.png" alt="" width="770" style="display: block; margin: auto;" /></p>
+<p>The likelihood recovers <span class="math inline">\(c\)</span>
+<strong>in the middle of the range and nowhere else</strong>. At <span
+class="math inline">\(c_{\text{true}} = 1\)</span> and <span
+class="math inline">\(10\)</span> the correct value wins all ten seeds.
+But the winners scatter across <span class="math inline">\(\{10^{-3},
+10^{-2}, 10^{-1}\}\)</span> at the small end and across <span
+class="math inline">\(\{100, 1000, \infty\}\)</span> at the large
+end.</p>
+<p>This is exactly what the theory predicts. The score for <span
+class="math inline">\(c\)</span> points in the direction <span
+class="math inline">\(\Phi_{ij} =
+\lambda_{ij}/(\lambda_{ij}+c)\)</span>, which collapses to <span
+class="math inline">\(\theta\)</span> when <span
+class="math inline">\(\lambda \ll c\)</span> and to a constant when
+<span class="math inline">\(\lambda \gg c\)</span> — and both of those
+are absorbed by the factorization itself. So the profile likelihood is
+flat at both ends and only the elbow carries information about <span
+class="math inline">\(c\)</span>.</p>
+<pre class="r"><code>## Shared layout for the by-c_true panels: all 10 seeds as thin lines plus their
+## mean, with the matching c_fit circled. Keeping the seeds visible shows whether
+## a flat region is flat for every seed or only on average.
+panels &lt;- function(dat, yvar, ylab, title, subtitle, ref = NULL, ...) {
+  dat$.y &lt;- dat[[yvar]]
+  avg &lt;- aggregate(.y ~ ct + cf, data = dat, FUN = mean)
+  dg  &lt;- merge(unique(dat[as.character(dat$cf) == as.character(dat$cf_lab),
+                          c(&quot;ct&quot;, &quot;cf&quot;)]), avg, by = c(&quot;ct&quot;, &quot;cf&quot;))
+  p &lt;- ggplot(dat, aes(cf, .y)) +
+    geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;, linewidth = 0.35, alpha = 0.8)
+  if (!is.null(ref)) {
+    rf &lt;- aggregate(stats::as.formula(paste(ref, &quot;~ ct&quot;)), data = dat, FUN = mean)
+    names(rf)[2] &lt;- &quot;.ref&quot;
+    p &lt;- p + geom_hline(data = rf, aes(yintercept = .ref), linetype = &quot;dashed&quot;,
+                        colour = &quot;#C2410C&quot;, linewidth = 0.5)
+  }
+  p + geom_line(data = avg, aes(group = 1), colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+    geom_point(data = avg, colour = &quot;#0E5C6B&quot;, size = 1.6) +
+    geom_point(data = dg, shape = 21, size = 3.6, stroke = 1.1, fill = NA,
+               colour = &quot;#C2410C&quot;) +
+    facet_wrap(~ ct, nrow = 2) +
+    scale_y_continuous(...) +
+    labs(x = &quot;c used for fitting&quot;, y = ylab, title = title, subtitle = subtitle) +
+    theme(strip.background = element_blank(),
+          strip.text = element_text(face = &quot;bold&quot;, size = 10),
+          plot.title = element_text(size = 13, face = &quot;plain&quot;),
+          plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
+          panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA),
+          axis.text.x = element_text(size = 8))
+}
+SUB     &lt;- &quot;thin lines: 10 individual seeds;  thick line: mean;  circled: c_fit = c_true&quot;
+SUB_REF &lt;- paste(SUB, &quot;\ndashed: the true value for that simulation&quot;)</code></pre>
+<pre class="r"><code>panels(b, &quot;subopt&quot;,
+       ylab  = &quot;log-likelihood shortfall from that seed&#39;s best c  (0 = best)&quot;,
+       title = &quot;Cost of fitting at the wrong c&quot;, subtitle = SUB,
+       trans = &quot;log1p&quot;, breaks = c(0, 1, 10, 100, 1000),
+       labels = c(&quot;0&quot;, &quot;1&quot;, &quot;10&quot;, &quot;100&quot;, &quot;1000&quot;))</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/loglik-panels-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p><span class="math inline">\(y\)</span> is measured <strong>down from
+each seed’s own best</strong> <span class="math inline">\(c\)</span>,
+because raw log-likelihoods cannot be overlaid across seeds — each seed
+is a different dataset, so the curves would be offset by dataset-level
+constants of a few hundred and the shape would be unreadable. It is on a
+<code>log1p</code> scale because the shortfall is exactly <span
+class="math inline">\(0\)</span> at the winner, which a log scale could
+not show.</p>
+<p>Panels share a <span class="math inline">\(y\)</span> scale
+deliberately: the penalty for being in the wrong <strong>regime</strong>
+($<span class="math inline">\(1000) dwarfs the penalty within a regime
+(\)</span><span class="math inline">\(1), and a free\)</span>y$ would
+rescale each panel and hide that.</p>
+</div>
+<div id="sparsity-and-factor-separation" class="section level1">
+<h1>Sparsity and factor separation</h1>
+<p><strong>These metrics must fix the initialization</strong>, unlike
+the likelihood ones. The two inits agree to within 0.008 log-likelihood
+everywhere, so selecting on log-likelihood is effectively a coin flip —
+but the resulting fits are not equivalent: 29% of cells differ by more
+than 0.01 in Hoyer sparsity, and at <span
+class="math inline">\(c_{\text{fit}} = 10^{-3}\)</span> the rank-1 start
+gives about twice the factor sparsity of the random start. Random also
+wins the tie in all 80 cells at that <span
+class="math inline">\(c_{\text{fit}}\)</span>, so “best of both” would
+silently report the random answer at the small-<span
+class="math inline">\(c\)</span> end and a mixture elsewhere.</p>
+<pre class="r"><code>w &lt;- reshape(d[, c(&quot;seed&quot;,&quot;c_true&quot;,&quot;c_fit&quot;,&quot;init&quot;,&quot;hoyer_L&quot;,&quot;hoyer_F&quot;,&quot;rankcor_F&quot;)],
+             idvar = c(&quot;seed&quot;,&quot;c_true&quot;,&quot;c_fit&quot;), timevar = &quot;init&quot;, direction = &quot;wide&quot;)
+knitr::kable(data.frame(
+  metric = c(&quot;hoyer_L&quot;, &quot;hoyer_F&quot;, &quot;rankcor_F&quot;),
+  `cells differing by &gt; 0.01` = sapply(c(&quot;hoyer_L&quot;,&quot;hoyer_F&quot;,&quot;rankcor_F&quot;), function(m)
+    sum(abs(w[[paste0(m, &quot;.rank1&quot;)]] - w[[paste0(m, &quot;.random&quot;)]]) &gt; 0.01)),
+  check.names = FALSE, row.names = NULL),
+  caption = &quot;Out of 640 cells, despite log-likelihoods agreeing to 0.008.&quot;)</code></pre>
+<table>
+<caption>Out of 640 cells, despite log-likelihoods agreeing to
+0.008.</caption>
+<thead>
+<tr class="header">
+<th align="left">metric</th>
+<th align="right">cells differing by &gt; 0.01</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">hoyer_L</td>
+<td align="right">185</td>
+</tr>
+<tr class="even">
+<td align="left">hoyer_F</td>
+<td align="right">189</td>
+</tr>
+<tr class="odd">
+<td align="left">rankcor_F</td>
+<td align="right">186</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>mk &lt;- function(ini) {
+  x &lt;- d[d$init == ini, ]
+  x$cf     &lt;- fc(x$c_fit)
+  x$cf_lab &lt;- fc(x$c_true)
+  x$ct     &lt;- factor(paste(&quot;simulated at c =&quot;, fc(x$c_true)),
+                     levels = paste(&quot;simulated at c =&quot;, CLAB))
+  x
+}
+b_rank1  &lt;- mk(&quot;rank1&quot;)
+b_random &lt;- mk(&quot;random&quot;)</code></pre>
+<p>Hoyer sparsity of a length-<span class="math inline">\(n\)</span>
+column is <span class="math inline">\((\sqrt{n} -
+\|x\|_1/\|x\|_2)/(\sqrt{n}-1)\)</span>: <span
+class="math inline">\(0\)</span> when every entry is equal, <span
+class="math inline">\(1\)</span> when a single entry carries everything.
+We average it over the <span class="math inline">\(K\)</span>
+columns.</p>
+<div id="sparsity-of-the-loadings" class="section level2">
+<h2>Sparsity of the loadings</h2>
+<pre class="r"><code>panels(b_rank1, &quot;hoyer_L&quot;, ref = &quot;hoyer_L_true&quot;,
+       ylab = &quot;mean Hoyer sparsity of loadings&quot;,
+       title = &quot;Sparsity of the recovered loadings — rank-1 initialization&quot;,
+       subtitle = SUB_REF)</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/hoyer-L-rank1-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>panels(b_random, &quot;hoyer_L&quot;, ref = &quot;hoyer_L_true&quot;,
+       ylab = &quot;mean Hoyer sparsity of loadings&quot;,
+       title = &quot;Sparsity of the recovered loadings — random initialization&quot;,
+       subtitle = SUB_REF)</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/hoyer-L-random-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p>The dashed reference is identical in every panel, as it must be:
+<span class="math inline">\(L\)</span> is drawn once per seed and shared
+across all <span class="math inline">\(c_{\text{true}}\)</span>.</p>
+</div>
+<div id="sparsity-of-the-factors" class="section level2">
+<h2>Sparsity of the factors</h2>
+<pre class="r"><code>panels(b_rank1, &quot;hoyer_F&quot;, ref = &quot;hoyer_F_true&quot;,
+       ylab = &quot;mean Hoyer sparsity of factors&quot;,
+       title = &quot;Sparsity of the recovered factors — rank-1 initialization&quot;,
+       subtitle = SUB_REF)</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/hoyer-F-rank1-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>panels(b_random, &quot;hoyer_F&quot;, ref = &quot;hoyer_F_true&quot;,
+       ylab = &quot;mean Hoyer sparsity of factors&quot;,
+       title = &quot;Sparsity of the recovered factors — random initialization&quot;,
+       subtitle = SUB_REF)</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/hoyer-F-random-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p>The reference here is the sparsity of the <strong>realized</strong>
+truth <span class="math inline">\(F_c = \alpha_c F_0 + \beta_c\)</span>,
+which is what the fit estimates. It rises with <span
+class="math inline">\(c_{\text{true}}\)</span> and sits near zero at the
+small-<span class="math inline">\(c\)</span> end, because <span
+class="math inline">\(\beta_c\)</span> puts a floor under every entry
+even though <span class="math inline">\(F_0\)</span> is 50% exact zeros.
+(<code>hoyer_F0_true</code> in the metrics table holds the sparsity of
+<span class="math inline">\(F_0\)</span> itself if that is the
+comparison you want.)</p>
+<p>Across both sparsity figures the striking feature is that <strong>the
+curves barely depend on which panel you are in</strong>: sparsity is
+close to a pure function of <span
+class="math inline">\(c_{\text{fit}}\)</span>, largely regardless of
+what generated the data. Fitting at a larger <span
+class="math inline">\(c\)</span> gives a sparser answer whether or not
+that is true of the truth.</p>
+</div>
+<div id="are-the-recovered-factors-distinct" class="section level2">
+<h2>Are the recovered factors distinct?</h2>
+<pre class="r"><code>panels(b_rank1, &quot;rankcor_F&quot;, ref = &quot;rankcor_F_true&quot;,
+       ylab = &quot;mean rank correlation between factors&quot;,
+       title = &quot;Rank correlation between recovered factors — rank-1 initialization&quot;,
+       subtitle = SUB_REF)</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/rankcor-rank1-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>panels(b_random, &quot;rankcor_F&quot;, ref = &quot;rankcor_F_true&quot;,
+       ylab = &quot;mean rank correlation between factors&quot;,
+       title = &quot;Rank correlation between recovered factors — random initialization&quot;,
+       subtitle = SUB_REF)</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/rankcor-random-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p>Mean Spearman correlation over the <span
+class="math inline">\(K(K-1)/2\)</span> distinct factor pairs. The
+dashed reference is again identical across panels — Spearman correlation
+is invariant to the positive affine map <span class="math inline">\(F_c
+= \alpha_c F_0 + \beta_c\)</span>, so the truth’s value is the same at
+every <span class="math inline">\(c_{\text{true}}\)</span>.</p>
+</div>
+</div>
+<div id="loadings-across-c-for-three-simulations"
+class="section level1">
+<h1>Loadings across c, for three simulations</h1>
+<p>Structure plots of the fitted <span class="math inline">\(L\)</span>
+at every <span class="math inline">\(c_{\text{fit}}\)</span>, with the
+truth shown first, for three simulated datasets: the smallest <span
+class="math inline">\(c_{\text{true}}\)</span> on the grid, <span
+class="math inline">\(c_{\text{true}} = 1\)</span>, and <span
+class="math inline">\(c_{\text{true}} = \infty\)</span>. Together they
+span the log-additive end, the elbow, and the linear (topic-model)
+end.</p>
+<p>Normalization is the paper convention and nothing else: each loading
+column is divided by its maximum so every factor peaks at one. There is
+no row normalization, so bars vary in total height —
+<code>structure_plot</code> row-normalizes only when handed a fit
+object, not a matrix.</p>
+<p>That height is worth reading rather than ignoring. After column
+normalization, a tall bar means the sample carries substantial weight on
+several factors at once, and a short one means its weight is
+concentrated. The panels at small <span
+class="math inline">\(c_{\text{fit}}\)</span> are visibly taller than
+those at large <span class="math inline">\(c_{\text{fit}}\)</span>,
+which is the same finding as the Hoyer figures above, seen sample by
+sample. All nine panels within a figure therefore share one <span
+class="math inline">\(y\)</span> limit; letting each rescale itself
+would erase exactly that comparison.</p>
+<p>The fitted factors are permuted to the truth by the rule the metrics
+use — the column permutation maximizing total correlation with the true
+<span class="math inline">\(L\)</span>. Without it each panel would
+differ from the truth by an arbitrary relabelling and every fit would
+look wrong.</p>
+<p><strong>Edit <code>pick_seed</code> and <code>pick_init</code> and
+re-run to walk around the grid.</strong> Note the true <span
+class="math inline">\(L\)</span> is drawn once per seed and shared
+across every <span class="math inline">\(c_{\text{true}}\)</span>, so
+the “TRUE L” panel is the same in all three figures; only the fitted
+panels move.</p>
+<pre class="r"><code>pick_seed &lt;- 1
+pick_init &lt;- &quot;rank1&quot;     # &quot;rank1&quot; or &quot;random&quot;</code></pre>
+<pre class="r"><code>fmtc &lt;- function(x) format(x, scientific = FALSE, trim = TRUE)
+
+cell_file &lt;- function(seed, c_true, c_fit)
+  file.path(cells_dir,
+            paste0(tag_of(list(seed = seed, c_true = c_true, c_fit = c_fit)), &quot;.rds&quot;))
+
+## L is drawn once per seed, so the truth and the cell ordering are shared by all
+## three figures below
+Lt   &lt;- readRDS(cell_file(pick_seed, C_GRID[1], C_GRID[1]))$L_true
+dom  &lt;- max.col(Lt)
+ord  &lt;- order(dom, -Lt[cbind(seq_along(dom), dom)])
+grp  &lt;- factor(dom[ord])
+TOP  &lt;- paste0(&quot;k&quot;, seq_len(ncol(Lt)))
+FCOL &lt;- setNames(c(&quot;#0E8FA8&quot;, &quot;#C2410C&quot;, &quot;#6D3FC4&quot;)[seq_along(TOP)], TOP)
+
+norm_bars &lt;- function(M) {                       # column max -&gt; 1, and nothing else
+  M &lt;- pmax(M[ord, , drop = FALSE], 0)
+  sweep(M, 2, apply(M, 2, max), &quot;/&quot;)
+}
+
+leg &lt;- get_legend(
+  ggplot(data.frame(x = 1, f = factor(TOP, levels = TOP)), aes(x, 1, fill = f)) +
+    geom_col() + scale_fill_manual(values = FCOL, name = &quot;factor&quot;) +
+    theme_cowplot() + theme(legend.position = &quot;right&quot;))
+
+#&#39; One 3 x 3 grid: true L, then the fit at each c_fit, for a given c_true.
+structure_grid &lt;- function(c_true, seed = pick_seed, init = pick_init) {
+
+  fits &lt;- lapply(C_GRID, function(cf) {
+    x  &lt;- readRDS(cell_file(seed, c_true, cf))
+    Lf &lt;- x$fits[[init]]$LL
+    list(L   = Lf[, match_factors(Lt, Lf), drop = FALSE],
+         lab = sprintf(&quot;c_fit = %s   (L cor %.3f)&quot;, fmtc(cf),
+                       x$rows$L_cor_mean[x$rows$init == init]))
+  })
+
+  ## Without row normalization the bars do not all reach the same height, so a
+  ## per-panel y scale would rescale each panel and make the columns look more
+  ## alike than they are. One shared limit within a figure keeps them comparable.
+  ymax &lt;- max(vapply(c(list(Lt), lapply(fits, `[[`, &quot;L&quot;)),
+                     function(M) max(rowSums(norm_bars(M))), numeric(1)))
+
+  sp &lt;- function(M, title) {
+    Mn &lt;- norm_bars(M); colnames(Mn) &lt;- TOP
+    structure_plot(Mn, loadings_order = seq_len(nrow(Mn)), grouping = grp,
+                   gap = 6, topics = TOP, colors = FCOL) +
+      coord_cartesian(ylim = c(0, ymax)) +
+      labs(x = NULL, y = &quot;scaled loading&quot;, title = title) +
+      theme(plot.title = element_text(size = 10, face = &quot;bold&quot;),
+            axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+            legend.position = &quot;none&quot;)
+  }
+
+  plots &lt;- c(list(sp(Lt, &quot;TRUE L&quot;)),
+             lapply(fits, function(z) sp(z$L, z$lab)))
+
+  ttl &lt;- ggdraw() + draw_label(
+    sprintf(&quot;seed %d, simulated at c = %s, %s init — cells ordered by true dominant factor&quot;,
+            seed, fmtc(c_true), init), x = 0.01, hjust = 0, size = 12)
+
+  plot_grid(ttl,
+            plot_grid(plot_grid(plotlist = plots, ncol = 3), leg,
+                      ncol = 2, rel_widths = c(1, 0.08)),
+            ncol = 1, rel_heights = c(0.04, 1))
+}</code></pre>
+<div id="simulated-at-the-smallest-c" class="section level2">
+<h2>Simulated at the smallest c</h2>
+<pre class="r"><code>structure_grid(min(C_GRID))</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/structure-small-1.png" alt="" width="1430" style="display: block; margin: auto;" /></p>
+</div>
+<div id="simulated-at-c-1" class="section level2">
+<h2>Simulated at c = 1</h2>
+<pre class="r"><code>structure_grid(1)</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/structure-one-1.png" alt="" width="1430" style="display: block; margin: auto;" /></p>
+</div>
+<div id="simulated-at-c-inf" class="section level2">
+<h2>Simulated at c = Inf</h2>
+<pre class="r"><code>structure_grid(Inf)</code></pre>
+<p><img src="figure/c_grid_sim.Rmd/structure-inf-1.png" alt="" width="1430" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="why-are-the-small-c-fits-so-much-less-sparse-than-the-truth"
+class="section level1">
+<h1>Why are the small-c fits so much less sparse than the truth?</h1>
+<p>The sparsity figures show something odd: when the data are generated
+at <span class="math inline">\(c = 10^{-3}\)</span> and fitted at <span
+class="math inline">\(c = 10^{-3}\)</span> — the fit that also achieves
+the best log-likelihood — the recovered loadings are far <em>less</em>
+sparse than the true loadings (Hoyer <span class="math inline">\(\approx
+0.13\)</span> against a truth of <span
+class="math inline">\(0.32\)</span>). At large <span
+class="math inline">\(c\)</span> the same comparison is nearly exact.
+Why?</p>
+<div
+id="the-likelihood-constrains-only-the-product-so-sparsity-can-move-between-l-and-f"
+class="section level2">
+<h2>The likelihood constrains only the product, so sparsity can move
+between L and F</h2>
+<p>An NMF is only ever determined up to an invertible <span
+class="math inline">\(T\)</span>:</p>
+<p><span class="math display">\[
+LF&#39; = (LT)(FT^{-\top})&#39;,
+\]</span></p>
+<p>so <strong>any</strong> <span class="math inline">\(T\)</span> for
+which both <span class="math inline">\(LT \ge 0\)</span> and <span
+class="math inline">\(FT^{-\top} \ge 0\)</span> gives a different
+parameter value with an <em>identical</em> likelihood. That is the whole
+ambiguity; the question is only how large the set of admissible <span
+class="math inline">\(T\)</span> is.</p>
+<p>A convenient one-parameter slice through it blends each factor
+slightly into the others:</p>
+<p><span class="math display">\[
+T_t = (1-t)\,I + \frac{t}{K}\mathbf{1}\mathbf{1}&#39;,
+\qquad
+T_t^{-1} = \frac{1}{1-t}\left(I -
+\frac{t}{K}\mathbf{1}\mathbf{1}&#39;\right).
+\]</span></p>
+<p>Here <strong><span class="math inline">\(t\)</span> is a mixing
+fraction, not Euler’s number</strong> — it is how much of each factor
+gets blended into the others. <span class="math inline">\(t = 0\)</span>
+is the identity and changes nothing; <span class="math inline">\(t \to
+1\)</span> drives all <span class="math inline">\(K\)</span> factors
+toward being identical. Written out, the two sides move in opposite
+directions:</p>
+<p><span class="math display">\[
+L \;\mapsto\; LT_t \quad\text{(blends the loading columns together)},
+\qquad
+F \;\mapsto\; FT_t^{-1} = \frac{1}{1-t}\Bigl(F -
+\tfrac{t}{K}\,\text{rowSums}(F)\,\mathbf{1}&#39;\Bigr)
+\quad\text{(subtracts a per-feature constant)}.
+\]</span></p>
+<p>So raising <span class="math inline">\(t\)</span> makes <span
+class="math inline">\(L\)</span> <strong>denser</strong> and <span
+class="math inline">\(F\)</span> <strong>sparser</strong> at the same
+time. Nothing here is special to <span class="math inline">\(L\)</span>:
+sparsity is simply being moved from one side to the other, and the
+likelihood is indifferent to where it sits.</p>
+<pre class="r"><code>hoy &lt;- function(v) { v &lt;- abs(v); n &lt;- length(v)
+                     (sqrt(n) - sum(v)/sqrt(sum(v^2))) / (sqrt(n) - 1) }
+mh  &lt;- function(M) mean(apply(M, 2, hoy))
+
+dsm &lt;- sim_dataset(1, min(C_GRID))
+L0  &lt;- dsm$truth$L; F0c &lt;- dsm$FF_true; KK &lt;- ncol(L0)
+
+knitr::kable(do.call(rbind, lapply(c(-0.3, -0.1, 0, 0.1, 0.3, 0.5, 0.7), function(t) {
+  Tm &lt;- (1 - t) * diag(KK) + (t / KK) * matrix(1, KK, KK)
+  Li &lt;- L0 %*% Tm; Fi &lt;- F0c %*% t(solve(Tm))
+  data.frame(t = t,
+             `both nonneg` = min(Li) &gt;= -1e-9 &amp;&amp; min(Fi) &gt;= -1e-9,
+             `Hoyer of L` = mh(Li),
+             `Hoyer of F` = mh(Fi),
+             `max |change in theta|` = max(abs(tcrossprod(Li, Fi) -
+                                               tcrossprod(L0, F0c))),
+             check.names = FALSE)
+})), digits = 3,
+caption = &quot;Truth at c = 0.001 under the mixing family. t = 0 is the truth itself.&quot;)</code></pre>
+<table>
+<caption>Truth at c = 0.001 under the mixing family. t = 0 is the truth
+itself.</caption>
+<colgroup>
+<col width="7%" />
+<col width="16%" />
+<col width="15%" />
+<col width="15%" />
+<col width="45%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">t</th>
+<th align="left">both nonneg</th>
+<th align="right">Hoyer of L</th>
+<th align="right">Hoyer of F</th>
+<th align="right">max |change in theta|</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">-0.3</td>
+<td align="left">FALSE</td>
+<td align="right">0.318</td>
+<td align="right">0.005</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">-0.1</td>
+<td align="left">FALSE</td>
+<td align="right">0.331</td>
+<td align="right">0.005</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">0.0</td>
+<td align="left">TRUE</td>
+<td align="right">0.324</td>
+<td align="right">0.006</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">0.1</td>
+<td align="left">TRUE</td>
+<td align="right">0.285</td>
+<td align="right">0.007</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">0.3</td>
+<td align="left">TRUE</td>
+<td align="right">0.202</td>
+<td align="right">0.010</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">0.5</td>
+<td align="left">TRUE</td>
+<td align="right">0.119</td>
+<td align="right">0.018</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">0.7</td>
+<td align="left">TRUE</td>
+<td align="right">0.048</td>
+<td align="right">0.043</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math inline">\(\theta\)</span> is unchanged to machine
+precision throughout, so every admissible row of that table has
+<strong>exactly</strong> the same likelihood as the truth. Yet the
+sparsity of <span class="math inline">\(L\)</span> ranges over an order
+of magnitude, and <span class="math inline">\(F\)</span> moves the other
+way. The truth’s particular split is one arbitrary point on a continuum;
+no amount of data can single it out.</p>
+<p>Note the freedom is one-sided here: <span class="math inline">\(t
+&lt; 0\)</span> (which would make <span class="math inline">\(L\)</span>
+sparser and <span class="math inline">\(F\)</span> denser) is
+infeasible. Since <span class="math inline">\(\text{rowSums}(L) =
+1\)</span>, <span class="math inline">\(LT_t\)</span> at <span
+class="math inline">\(t&lt;0\)</span> equals <span
+class="math inline">\((1+|t|)L -
+\tfrac{|t|}{K}\mathbf{1}\mathbf{1}&#39;\)</span>, and the many tiny
+<span class="math inline">\(\text{Dirichlet}(0.3)\)</span> entries of
+<span class="math inline">\(L\)</span> go negative immediately.</p>
+</div>
+<div id="what-limits-the-trade-is-zeros-and-small-c-has-none"
+class="section level2">
+<h2>What limits the trade is zeros — and small c has none</h2>
+<p>Mixing can continue only until some entry of <span
+class="math inline">\(LT_t\)</span> or <span
+class="math inline">\(FT_t^{-1}\)</span> reaches zero. Nonnegativity is
+the <em>only</em> thing pinning an NMF down, so the size of the
+admissible set is governed by how close the factors come to zero. And
+that is exactly what <span class="math inline">\(c\)</span> controls,
+because the calibrated truth is <span class="math inline">\(F_c =
+\alpha_c F_0 + \beta_c\)</span> — a floor of <span
+class="math inline">\(\beta_c\)</span> under <strong>every</strong>
+entry.</p>
+<pre class="r"><code>tr0 &lt;- sim_truth(1)
+
+## largest mixing fraction t that keeps both factors nonnegative
+max_mix &lt;- function(L, F) {
+  feas &lt;- function(t) { Tm &lt;- (1-t)*diag(KK) + (t/KK)*matrix(1, KK, KK)
+    min(L %*% Tm) &gt;= -1e-9 &amp;&amp; min(F %*% t(solve(Tm))) &gt;= -1e-9 }
+  if (!feas(1e-6)) return(0)
+  lo &lt;- 0; hi &lt;- 1
+  for (i in 1:40) { mid &lt;- (lo + hi)/2; if (feas(mid)) lo &lt;- mid else hi &lt;- mid }
+  lo
+}
+
+free &lt;- do.call(rbind, lapply(C_GRID, function(cc) {
+  dd &lt;- sim_dataset(1, cc, tr0)
+  th &lt;- dd$alpha * tr0$theta0 + dd$beta
+  t  &lt;- max_mix(tr0$L, dd$FF_true)
+  Tm &lt;- (1 - t) * diag(KK) + (t / KK) * matrix(1, KK, KK)
+  sub &lt;- d$c_true == cc &amp; d$c_fit == cc &amp; d$init == &quot;rank1&quot;
+  data.frame(c_true = cc,
+             `floor / mean theta`   = dd$beta / mean(th),
+             `largest feasible t`   = t,
+             `Hoyer L at that t`    = mh(tr0$L %*% Tm),
+             `Hoyer L fitted`       = mean(d$hoyer_L[sub]),
+             `Hoyer L true`         = mh(tr0$L),
+             `Hoyer F at that t`    = mh(dd$FF_true %*% t(solve(Tm))),
+             `Hoyer F fitted`       = mean(d$hoyer_F[sub]),
+             `Hoyer F true`         = mh(dd$FF_true),
+             check.names = FALSE)
+}))
+knitr::kable(free, digits = 3, row.names = FALSE)</code></pre>
+<table>
+<colgroup>
+<col width="5%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="10%" />
+<col width="9%" />
+<col width="13%" />
+<col width="10%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">c_true</th>
+<th align="right">floor / mean theta</th>
+<th align="right">largest feasible t</th>
+<th align="right">Hoyer L at that t</th>
+<th align="right">Hoyer L fitted</th>
+<th align="right">Hoyer L true</th>
+<th align="right">Hoyer F at that t</th>
+<th align="right">Hoyer F fitted</th>
+<th align="right">Hoyer F true</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1e-03</td>
+<td align="right">0.955</td>
+<td align="right">0.743</td>
+<td align="right">0.036</td>
+<td align="right">0.129</td>
+<td align="right">0.324</td>
+<td align="right">0.057</td>
+<td align="right">0.051</td>
+<td align="right">0.006</td>
+</tr>
+<tr class="even">
+<td align="right">1e-02</td>
+<td align="right">0.932</td>
+<td align="right">0.649</td>
+<td align="right">0.064</td>
+<td align="right">0.134</td>
+<td align="right">0.324</td>
+<td align="right">0.072</td>
+<td align="right">0.065</td>
+<td align="right">0.014</td>
+</tr>
+<tr class="odd">
+<td align="right">1e-01</td>
+<td align="right">0.866</td>
+<td align="right">0.470</td>
+<td align="right">0.131</td>
+<td align="right">0.160</td>
+<td align="right">0.324</td>
+<td align="right">0.120</td>
+<td align="right">0.117</td>
+<td align="right">0.051</td>
+</tr>
+<tr class="even">
+<td align="right">1e+00</td>
+<td align="right">0.641</td>
+<td align="right">0.201</td>
+<td align="right">0.244</td>
+<td align="right">0.240</td>
+<td align="right">0.324</td>
+<td align="right">0.313</td>
+<td align="right">0.321</td>
+<td align="right">0.257</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+01</td>
+<td align="right">0.283</td>
+<td align="right">0.059</td>
+<td align="right">0.301</td>
+<td align="right">0.299</td>
+<td align="right">0.324</td>
+<td align="right">0.544</td>
+<td align="right">0.551</td>
+<td align="right">0.528</td>
+</tr>
+<tr class="even">
+<td align="right">1e+02</td>
+<td align="right">0.158</td>
+<td align="right">0.029</td>
+<td align="right">0.313</td>
+<td align="right">0.311</td>
+<td align="right">0.324</td>
+<td align="right">0.598</td>
+<td align="right">0.605</td>
+<td align="right">0.591</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+03</td>
+<td align="right">0.141</td>
+<td align="right">0.026</td>
+<td align="right">0.314</td>
+<td align="right">0.313</td>
+<td align="right">0.324</td>
+<td align="right">0.605</td>
+<td align="right">0.612</td>
+<td align="right">0.598</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">0.139</td>
+<td align="right">0.025</td>
+<td align="right">0.315</td>
+<td align="right">0.313</td>
+<td align="right">0.324</td>
+<td align="right">0.605</td>
+<td align="right">0.613</td>
+<td align="right">0.599</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>At <span class="math inline">\(c = 10^{-3}\)</span> the constant
+floor is 96% of <span class="math inline">\(\theta\)</span>: no entry of
+<span class="math inline">\(F_c\)</span> is anywhere near zero, no
+nonnegativity constraint is active, and the trade can run all the way to
+<span class="math inline">\(t = 0.74\)</span>. At <span
+class="math inline">\(c = \infty\)</span> the floor is 14% — <span
+class="math inline">\(F_c\)</span> keeps the near-zeros inherited from
+<span class="math inline">\(F_0\)</span>’s 50% exact zeros, the
+constraints bite, and only <span class="math inline">\(t =
+0.025\)</span> is available.</p>
+<pre class="r"><code>gap &lt;- free[[&quot;Hoyer L true&quot;]] - free[[&quot;Hoyer L fitted&quot;]]
+c(`cor(floor fraction, L sparsity gap)`  = cor(free[[2]], gap),
+  `cor(largest feasible t, L gap)`       = cor(free[[3]], gap))</code></pre>
+<pre><code>cor(floor fraction, L sparsity gap)      cor(largest feasible t, L gap) 
+                          0.9858721                           0.9852302 </code></pre>
+<p>Compare the “Hoyer L at that t” and “Hoyer L fitted” columns for
+<span class="math inline">\(c \ge 1\)</span>: the optimizer lands
+essentially <strong>exactly</strong> at the densest admissible point. It
+takes all the slack the constraints allow, and coordinate descent from
+either start spreads mass across factors with nothing pulling it
+back.</p>
+</div>
+<div id="the-fit-is-not-finding-better-structure"
+class="section level2">
+<h2>The fit is not finding better structure</h2>
+<p>Worth checking that the dense solution is not somehow a genuinely
+better explanation. It does beat the true parameters on the training
+data, but by about the amount generic overfitting predicts:</p>
+<pre class="r"><code>dsm1 &lt;- sim_dataset(1, min(C_GRID))
+xx   &lt;- readRDS(cell_file(1, min(C_GRID), min(C_GRID)))
+Lf   &lt;- xx$fits$rank1$LL; Ff &lt;- xx$fits$rank1$FF
+pll  &lt;- function(lam) sum(dsm1$Y * log(pmax(lam, 1e-300)) - lam - lgamma(dsm1$Y + 1))
+lam_fit &lt;- min(C_GRID) * expm1(tcrossprod(Lf, Ff) / max(1, min(C_GRID)))
+c(fitted            = pll(lam_fit),
+  `true parameters` = pll(dsm1$lambda),
+  advantage         = pll(lam_fit) - pll(dsm1$lambda),
+  `free parameters / 2` = (K_TRUE * (N_ROWS + N_COLS) - K_TRUE^2) / 2)</code></pre>
+<pre><code>             fitted     true parameters           advantage free parameters / 2 
+        -99864.0074        -100789.7686            925.7613            895.5000 </code></pre>
+</div>
+<div id="caveat-how-much-of-this-is-the-simulation-design"
+class="section level2">
+<h2>Caveat: how much of this is the simulation design?</h2>
+<p>Some of it is. The <span class="math inline">\(\beta_c\)</span>
+offset exists so the datasets are comparable across <span
+class="math inline">\(c\)</span>, and it is precisely what strips the
+zeros out of <span class="math inline">\(F_c\)</span> at small <span
+class="math inline">\(c\)</span>. Without it, <span
+class="math inline">\(\theta\)</span> would inherit <span
+class="math inline">\(\theta_0\)</span>’s exact zeros — 50% of <span
+class="math inline">\(F_0\)</span> — and the small-<span
+class="math inline">\(c\)</span> fits would be far better pinned.</p>
+<p>The mechanism is still real rather than purely an artifact: <span
+class="math inline">\(\theta = \log(1 +
+\lambda/c)\)</span> is uniformly large when <span
+class="math inline">\(c\)</span> is small relative to the rates, so
+near-zeros in <span class="math inline">\(\theta\)</span> are
+intrinsically scarce there, whatever the simulation. But the
+<em>magnitude</em> seen above is amplified by the calibration, and the
+honest reading is:</p>
+<blockquote>
+<p>At small <span class="math inline">\(c\)</span> the log1p
+factorization is weakly identified in a specific way: the likelihood
+pins down <span class="math inline">\(LF&#39;\)</span> but says little
+about how sparsity is divided between <span
+class="math inline">\(L\)</span> and <span
+class="math inline">\(F\)</span>. The sparsity of a small-<span
+class="math inline">\(c\)</span> fit is therefore a property of the
+optimizer and the initialization as much as of the data — consistent
+with the two initializations reaching the same log-likelihood to within
+0.008 while differing by up to 0.09 in Hoyer sparsity.</p>
+</blockquote>
+<p>The mixing family above is only one convenient one-parameter slice
+through the admissible set of <span class="math inline">\(T\)</span>;
+the full set is larger, so these numbers are a lower bound on how much
+the split can move.</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Chicago
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] log1pNMF_0.1-6    fastTopics_0.7-38 cowplot_1.2.0     ggplot2_4.0.3    
+[5] workflowr_1.7.2  
+
+loaded via a namespace (and not attached):
+ [1] tidyselect_1.2.1      viridisLite_0.4.3     dplyr_1.2.1          
+ [4] farver_2.1.2          S7_0.2.2              fastmap_1.2.0        
+ [7] lazyeval_0.2.3        promises_1.5.0        digest_0.6.39        
+[10] lifecycle_1.0.5       processx_3.9.0        invgamma_1.2         
+[13] magrittr_2.0.5        compiler_4.5.2        rlang_1.2.0          
+[16] sass_0.4.10           progress_1.2.3        tools_4.5.2          
+[19] yaml_2.3.12           data.table_1.18.2.1   knitr_1.51           
+[22] labeling_0.4.3        prettyunits_1.2.0     htmlwidgets_1.6.4    
+[25] plyr_1.8.9            RColorBrewer_1.1-3    Rtsne_0.17           
+[28] withr_3.0.2           purrr_1.2.2           grid_4.5.2           
+[31] git2r_0.36.2          scales_1.4.0          gtools_3.9.5         
+[34] MASS_7.3-65           dichromat_2.0-0.1     cli_3.6.6            
+[37] rmarkdown_2.31        crayon_1.5.3          startupmsg_1.0.0     
+[40] generics_0.1.4        otel_0.2.0            RcppParallel_5.1.11-2
+[43] rstudioapi_0.18.0     httr_1.4.8            reshape2_1.4.5       
+[46] pbapply_1.7-4         cachem_1.1.0          stringr_1.6.0        
+[49] parallel_4.5.2        vctrs_0.7.3           Matrix_1.7-5         
+[52] jsonlite_2.0.0        callr_3.7.6           hms_1.1.4            
+[55] mixsqp_0.3-54         ggrepel_0.9.8         irlba_2.3.7          
+[58] plotly_4.12.0         jquerylib_0.1.4       tidyr_1.3.2          
+[61] glue_1.8.1            uwot_0.2.4            stringi_1.8.7        
+[64] gtable_0.3.6          later_1.4.8           sfsmisc_1.1-23       
+[67] quadprog_1.5-8        tibble_3.3.1          pillar_1.11.1        
+[70] htmltools_0.5.9       truncnorm_1.0-9       R6_2.6.1             
+[73] rprojroot_2.1.1       evaluate_1.0.5        lattice_0.22-9       
+[76] RhpcBLASctl_0.23-42   SQUAREM_2026.1        ashr_2.2-63          
+[79] httpuv_1.6.17         bslib_0.10.0          Rcpp_1.1.1-1.1       
+[82] distr_2.9.7           whisker_0.4.1         xfun_0.57            
+[85] fs_2.1.0              getPass_0.2-4         pkgconfig_2.0.3      </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Chicago
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] log1pNMF_0.1-6    fastTopics_0.7-38 cowplot_1.2.0     ggplot2_4.0.3    
+[5] workflowr_1.7.2  
+
+loaded via a namespace (and not attached):
+ [1] tidyselect_1.2.1      viridisLite_0.4.3     dplyr_1.2.1          
+ [4] farver_2.1.2          S7_0.2.2              fastmap_1.2.0        
+ [7] lazyeval_0.2.3        promises_1.5.0        digest_0.6.39        
+[10] lifecycle_1.0.5       processx_3.9.0        invgamma_1.2         
+[13] magrittr_2.0.5        compiler_4.5.2        rlang_1.2.0          
+[16] sass_0.4.10           progress_1.2.3        tools_4.5.2          
+[19] yaml_2.3.12           data.table_1.18.2.1   knitr_1.51           
+[22] labeling_0.4.3        prettyunits_1.2.0     htmlwidgets_1.6.4    
+[25] plyr_1.8.9            RColorBrewer_1.1-3    Rtsne_0.17           
+[28] withr_3.0.2           purrr_1.2.2           grid_4.5.2           
+[31] git2r_0.36.2          scales_1.4.0          gtools_3.9.5         
+[34] MASS_7.3-65           dichromat_2.0-0.1     cli_3.6.6            
+[37] rmarkdown_2.31        crayon_1.5.3          startupmsg_1.0.0     
+[40] generics_0.1.4        otel_0.2.0            RcppParallel_5.1.11-2
+[43] rstudioapi_0.18.0     httr_1.4.8            reshape2_1.4.5       
+[46] pbapply_1.7-4         cachem_1.1.0          stringr_1.6.0        
+[49] parallel_4.5.2        vctrs_0.7.3           Matrix_1.7-5         
+[52] jsonlite_2.0.0        callr_3.7.6           hms_1.1.4            
+[55] mixsqp_0.3-54         ggrepel_0.9.8         irlba_2.3.7          
+[58] plotly_4.12.0         jquerylib_0.1.4       tidyr_1.3.2          
+[61] glue_1.8.1            uwot_0.2.4            stringi_1.8.7        
+[64] gtable_0.3.6          later_1.4.8           sfsmisc_1.1-23       
+[67] quadprog_1.5-8        tibble_3.3.1          pillar_1.11.1        
+[70] htmltools_0.5.9       truncnorm_1.0-9       R6_2.6.1             
+[73] rprojroot_2.1.1       evaluate_1.0.5        lattice_0.22-9       
+[76] RhpcBLASctl_0.23-42   SQUAREM_2026.1        ashr_2.2-63          
+[79] httpuv_1.6.17         bslib_0.10.0          Rcpp_1.1.1-1.1       
+[82] distr_2.9.7           whisker_0.4.1         xfun_0.57            
+[85] fs_2.1.0              getPass_0.2-4         pkgconfig_2.0.3      </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

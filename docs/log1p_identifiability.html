@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-08-02" />
+
+<title>Non-identifiability of the log1p factorization, and how c controls it</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Non-identifiability of the log1p
+factorization, and how c controls it</h1>
+<h4 class="date">2026-08-02</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-08-02
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongdetected">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
+</p>
+</div>
+<div id="strongCachestrongdetected" class="panel-collapse collapse">
+<div class="panel-body">
+The following chunks had caches available:
+<ul>
+<li>
+full-search
+</li>
+<li>
+sweep
+</li>
+</ul>
+<p>To ensure reproducibility of the results, delete the cache directory
+<code>log1p_identifiability_cache</code> and re-run the analysis. To
+have workflowr automatically delete the cache directory prior to
+building the file, set <code>delete_cache = TRUE</code> when running
+<code>wflow_build()</code> or <code>wflow_publish()</code>.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea85bccf8fd34780a806e8cd7349b35ae4663a7d9targetblanka85bccfa">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/a85bccf8fd34780a806e8cd7349b35ae4663a7d9" target="_blank">a85bccf</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea85bccf8fd34780a806e8cd7349b35ae4663a7d9targetblanka85bccfa"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/a85bccf8fd34780a806e8cd7349b35ae4663a7d9" target="_blank">a85bccf</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    analysis/c_grid_sim_cache/
+    Ignored:    analysis/log1p_identifiability_cache/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/log1p_identifiability.Rmd</code>)
+and HTML (<code>docs/log1p_identifiability.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a85bccf8fd34780a806e8cd7349b35ae4663a7d9/analysis/log1p_identifiability.Rmd" target="_blank">a85bccf</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Add c-grid simulation results and the identifiability analysis
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(ggplot2)
+library(cowplot)
+library(log1pNMF)
+theme_set(theme_cowplot(font_size = 11))</code></pre>
+<pre class="r"><code>exp_dir &lt;- path.expand(&quot;~/Documents/log1pNMF/inst/paper_figures/experiments&quot;)
+source(file.path(exp_dir, &quot;c_grid_sim_common.R&quot;))   # generator, for the examples
+
+hoyer &lt;- function(v) { v &lt;- abs(v); n &lt;- length(v)
+                       (sqrt(n) - sum(v)/sqrt(sum(v^2))) / (sqrt(n) - 1) }
+mean_hoyer &lt;- function(M) mean(apply(M, 2, hoyer))</code></pre>
+<p>Fitting the log1p model at different <span
+class="math inline">\(c\)</span> gives factorizations whose sparsity
+differs a lot, even when the log-likelihoods are indistinguishable. This
+page works out why, in general rather than for one simulation: what
+exactly is unidentified, how much freedom there is, and how <span
+class="math inline">\(c\)</span> controls that freedom.</p>
+<p>The short version, stated up front:</p>
+<blockquote>
+<p>The likelihood sees only <span class="math inline">\(\theta =
+LF&#39;\)</span>. For a <strong>fixed</strong> <span
+class="math inline">\(\theta\)</span>, <span
+class="math inline">\(c\)</span> has no effect on identifiability
+whatsoever. What <span class="math inline">\(c\)</span> changes is
+<em>which</em> <span class="math inline">\(\theta\)</span> is needed to
+represent data with given rates — and as <span class="math inline">\(c
+\to 0\)</span> that <span class="math inline">\(\theta\)</span> becomes
+a large constant plus a bounded perturbation, which is precisely the
+shape with the largest ambiguity.</p>
+</blockquote>
+<div id="what-the-likelihood-can-and-cannot-see" class="section level1">
+<h1>What the likelihood can and cannot see</h1>
+<p>The model is</p>
+<p><span class="math display">\[
+y_{ij}\sim\text{Poisson}(\lambda_{ij}), \qquad
+\lambda_{ij} = c\left(e^{\theta_{ij}}-1\right), \qquad
+\theta = LF&#39;, \quad L\in\mathbb{R}^{n\times K}_{\ge 0},\
+F\in\mathbb{R}^{p\times K}_{\ge 0}.
+\]</span></p>
+<p>The map <span class="math inline">\(\theta \mapsto \lambda\)</span>
+is a fixed, strictly monotone, elementwise transform once <span
+class="math inline">\(c\)</span> is chosen. So the log-likelihood is a
+function of <span class="math inline">\(\theta\)</span> alone:
+<strong>any two parameter values with the same product <span
+class="math inline">\(LF&#39;\)</span> have exactly the same likelihood,
+for every <span class="math inline">\(c\)</span>.</strong> Whatever is
+not determined by <span class="math inline">\(\theta\)</span> is not
+determined by the data, no matter how much data there is.</p>
+</div>
+<div id="the-ambiguity-group" class="section level1">
+<h1>The ambiguity group</h1>
+<p>Suppose <span class="math inline">\(\theta\)</span> has rank <span
+class="math inline">\(K\)</span> and admits a nonnegative rank-<span
+class="math inline">\(K\)</span> factorization <span
+class="math inline">\(\theta = LF&#39;\)</span>. If <span
+class="math inline">\(\tilde L\tilde F&#39; = LF&#39;\)</span> is
+another one, the two share a column space, so <span
+class="math inline">\(\tilde L = LA\)</span> for some invertible <span
+class="math inline">\(A\)</span>, and then <span
+class="math inline">\(\tilde F&#39; = A^{-1}F&#39;\)</span>. Hence
+<strong>every</strong> alternative factorization has the form</p>
+<p><span class="math display">\[
+(L, F) \;\longmapsto\; \bigl(LA,\; FA^{-\top}\bigr),
+\qquad A \in \mathcal{A}(L,F) := \bigl\{A \ \text{invertible} \ K\times
+K : LA \ge 0,\; FA^{-\top} \ge 0\bigr\}.
+\]</span></p>
+<p>Invertibility is all that is asked of <span
+class="math inline">\(A\)</span> itself, and it is forced by the
+construction, since <span class="math inline">\(A^{-1}\)</span> has to
+exist. In particular <span class="math inline">\(A\)</span> is
+<strong>not</strong> required to be nonnegative — only the two
+<em>products</em> <span class="math inline">\(LA\)</span> and <span
+class="math inline">\(FA^{-\top}\)</span> are. That is where the whole
+ambiguity lives: if <span class="math inline">\(A\)</span> and <span
+class="math inline">\(A^{-1}\)</span> were both forced nonnegative,
+<span class="math inline">\(A\)</span> would have to be monomial and
+there would be nothing to discuss.</p>
+<p><span class="math inline">\(\mathcal{A}\)</span> always contains the
+<strong>monomial</strong> matrices — a permutation times a positive
+diagonal — which merely relabel and rescale the factors. That part is
+harmless. Non-identifiability in the sense that matters is <span
+class="math inline">\(\mathcal{A}\)</span> containing anything else.</p>
+<div id="a-geometric-reading" class="section level2">
+<h2>A geometric reading</h2>
+<p>Write <span class="math inline">\(a_k\)</span> for the <span
+class="math inline">\(k\)</span>th column of <span
+class="math inline">\(A\)</span> and <span class="math inline">\(\tilde
+a_k\)</span> for the <span class="math inline">\(k\)</span>th
+<em>row</em> of <span class="math inline">\(A^{-1}\)</span>. Then</p>
+<p><span class="math display">\[
+(LA)_{ik} = \langle \ell_i, a_k\rangle, \qquad
+(FA^{-\top})_{jk} = \langle f_j, \tilde a_k\rangle,
+\]</span></p>
+<p>so the constraints are</p>
+<p><span class="math display">\[
+a_k \in \mathcal{C}_L^{*} \ \ \forall k,
+\qquad
+\tilde a_k \in \mathcal{C}_F^{*} \ \ \forall k,
+\]</span></p>
+<p>where <span class="math inline">\(\mathcal{C}_L\)</span> is the cone
+generated by the rows of <span class="math inline">\(L\)</span> and
+<span class="math inline">\(\mathcal{C}_L^{*} = \{y : \langle \ell_i,
+y\rangle \ge 0\ \forall i\}\)</span> is its dual, and likewise for <span
+class="math inline">\(F\)</span>.</p>
+<p>This makes the picture concrete. Since <span class="math inline">\(L
+\ge 0\)</span>, the cone <span
+class="math inline">\(\mathcal{C}_L\)</span> sits inside the nonnegative
+orthant, so its dual <em>contains</em> the orthant. The more <span
+class="math inline">\(\mathcal{C}_L\)</span> fills the orthant, the
+tighter its dual, and the less room <span
+class="math inline">\(A\)</span> has.</p>
+<p><strong>Uniqueness by separability.</strong> If <span
+class="math inline">\(L\)</span> has a <em>pure</em> row for each factor
+— a sample loading on one factor only — then <span
+class="math inline">\(\mathcal{C}_L\)</span> is the whole orthant, so
+<span class="math inline">\(\mathcal{C}_L^{*}\)</span> is the orthant
+and <span class="math inline">\(A \ge 0\)</span>. If <span
+class="math inline">\(F\)</span> likewise has a pure row per factor,
+then <span class="math inline">\(A^{-1} \ge 0\)</span>. A nonnegative
+matrix with a nonnegative inverse is monomial, so the factorization is
+unique up to relabelling. Pure rows — equivalently, <em>zeros in the
+right places</em> — are what pin an NMF down.</p>
+</div>
+</div>
+<div id="where-c-enters" class="section level1">
+<h1>Where c enters</h1>
+<p>Nothing above mentions <span class="math inline">\(c\)</span>. For a
+fixed <span class="math inline">\(\theta\)</span> the ambiguity set
+<span class="math inline">\(\mathcal{A}\)</span> is fixed, so
+<strong><span class="math inline">\(c\)</span> cannot affect
+identifiability directly</strong>. It enters one step earlier: to model
+data whose rates are <span class="math inline">\(\lambda\)</span>, the
+required linear predictor is</p>
+<p><span class="math display">\[
+\theta_c = \log\!\left(1 + \frac{\lambda}{c}\right),
+\]</span></p>
+<p>and the <em>shape</em> of <span
+class="math inline">\(\theta_c\)</span> — hence the geometry above —
+depends strongly on <span class="math inline">\(c\)</span>. Two limits
+make this sharp. Let <span class="math inline">\(\lambda_{\min}\)</span>
+and <span class="math inline">\(\lambda_{\max}\)</span> be the smallest
+and largest rates.</p>
+<p><strong>Large <span class="math inline">\(c\)</span>.</strong> <span
+class="math inline">\(\theta_c \approx \lambda/c\)</span>. The shape of
+<span class="math inline">\(\theta\)</span> is the shape of <span
+class="math inline">\(\lambda\)</span>, exactly. Any zeros or near-zeros
+in <span class="math inline">\(\lambda\)</span> survive into <span
+class="math inline">\(\theta\)</span>, and with them the pure rows that
+pin the factorization.</p>
+<p><strong>Small <span class="math inline">\(c\)</span>, with <span
+class="math inline">\(\lambda_{\min} &gt; 0\)</span>.</strong></p>
+<p><span class="math display">\[
+\theta_{\min} = \log\!\left(1+\frac{\lambda_{\min}}{c}\right)
+\xrightarrow[c\to 0]{} \infty,
+\qquad
+\theta_{\max}-\theta_{\min}
+= \log\frac{c+\lambda_{\max}}{c+\lambda_{\min}}
+\xrightarrow[c\to 0]{} \log\frac{\lambda_{\max}}{\lambda_{\min}},
+\]</span></p>
+<p>which is <strong>finite</strong>. The level of <span
+class="math inline">\(\theta\)</span> diverges while its spread stays
+bounded, so <span class="math inline">\(\theta / \theta_{\min} \to
+\mathbf{1}\mathbf{1}&#39;\)</span>. As <span class="math inline">\(c\to
+0\)</span> the linear predictor becomes a huge constant plus a bounded
+perturbation.</p>
+<p>A constant matrix is the <em>least</em> identifiable thing a
+nonnegative factorization can be asked to represent: with <span
+class="math inline">\(\theta \approx
+\kappa\,\mathbf{1}\mathbf{1}&#39;\)</span> every row of <span
+class="math inline">\(L\)</span> points at the centre of the simplex,
+<span class="math inline">\(\mathcal{C}_L\)</span> collapses to a ray
+far from the orthant boundary, and <span
+class="math inline">\(\mathcal{C}_L^{*}\)</span> becomes enormous.</p>
+<p>The one escape is <span class="math inline">\(\lambda_{\min} =
+0\)</span>: exact zeros in the rates give <span
+class="math inline">\(\theta_{ij}=0\)</span> for <strong>every</strong>
+<span class="math inline">\(c\)</span>, since <span
+class="math inline">\(\log(1+0/c) = 0\)</span>. Exact zeros are
+preserved by the link; it is <em>near</em>-zeros that get washed
+out.</p>
+<pre class="r"><code>## the two limits, on the rates from one simulated dataset
+lam &lt;- sim_dataset(1, 1)$lambda
+lam &lt;- lam[lam &gt; 0]
+shape &lt;- function(cc) { th &lt;- log1p(lam / cc)
+  c(level = min(th), spread = max(th) - min(th),
+    `spread / level` = (max(th) - min(th)) / min(th)) }
+knitr::kable(t(sapply(c(1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100, 1e3), shape)) |&gt;
+             `rownames&lt;-`(format(c(1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100, 1e3))),
+             digits = 3,
+             caption = &quot;theta = log1p(lambda/c) for one fixed set of rates. The spread saturates at log(lambda_max/lambda_min) while the level grows without bound.&quot;)</code></pre>
+<table>
+<caption>theta = log1p(lambda/c) for one fixed set of rates. The spread
+saturates at log(lambda_max/lambda_min) while the level grows without
+bound.</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">level</th>
+<th align="right">spread</th>
+<th align="right">spread / level</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1e-04</td>
+<td align="right">8.456</td>
+<td align="right">3.849</td>
+<td align="right">0.455</td>
+</tr>
+<tr class="even">
+<td align="left">1e-03</td>
+<td align="right">6.156</td>
+<td align="right">3.847</td>
+<td align="right">0.625</td>
+</tr>
+<tr class="odd">
+<td align="left">1e-02</td>
+<td align="right">3.872</td>
+<td align="right">3.829</td>
+<td align="right">0.989</td>
+</tr>
+<tr class="even">
+<td align="left">1e-01</td>
+<td align="right">1.741</td>
+<td align="right">3.661</td>
+<td align="right">2.103</td>
+</tr>
+<tr class="odd">
+<td align="left">1e+00</td>
+<td align="right">0.386</td>
+<td align="right">2.754</td>
+<td align="right">7.143</td>
+</tr>
+<tr class="even">
+<td align="left">1e+01</td>
+<td align="right">0.046</td>
+<td align="right">1.120</td>
+<td align="right">24.364</td>
+</tr>
+<tr class="odd">
+<td align="left">1e+02</td>
+<td align="right">0.005</td>
+<td align="right">0.195</td>
+<td align="right">41.528</td>
+</tr>
+<tr class="even">
+<td align="left">1e+03</td>
+<td align="right">0.000</td>
+<td align="right">0.021</td>
+<td align="right">45.458</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="how-much-freedom-concretely" class="section level1">
+<h1>How much freedom, concretely</h1>
+<p>The full set <span class="math inline">\(\mathcal{A}\)</span> is
+awkward — it constrains <span class="math inline">\(A\)</span> and <span
+class="math inline">\(A^{-1}\)</span> simultaneously, so it is not
+convex. A one-parameter slice through it is enough to get closed forms
+and the right intuition. Let <span class="math inline">\(J =
+\mathbf{1}\mathbf{1}&#39;\)</span> and</p>
+<p><span class="math display">\[
+B_t \;=\; (1-t)\,I \;+\; \frac{t}{K}J,
+\qquad
+B_t^{-1} \;=\; \frac{1}{1-t}\left(I - \frac{t}{K}J\right).
+\]</span></p>
+<p><span class="math inline">\(t\)</span> is a <strong>mixing
+fraction</strong>: <span class="math inline">\(t=0\)</span> is the
+identity, and <span class="math inline">\(t\to 1\)</span> blends all
+<span class="math inline">\(K\)</span> factors into one. Writing the two
+sides out, with <span class="math inline">\(r_i = \sum_k
+\ell_{ik}\)</span> and <span class="math inline">\(s_j = \sum_k
+f_{jk}\)</span>,</p>
+<p><span class="math display">\[
+(LB_t)_{ik} = (1-t)\,\ell_{ik} + \frac{t}{K}\,r_i,
+\qquad
+(FB_t^{-1})_{jk} = \frac{1}{1-t}\left(f_{jk} - \frac{t}{K}\,s_j\right).
+\]</span></p>
+<p>So increasing <span class="math inline">\(t\)</span> pulls each row
+of <span class="math inline">\(L\)</span> toward its own mean —
+<strong>denser</strong> — while subtracting a per-feature constant from
+<span class="math inline">\(F\)</span> — <strong>sparser</strong>. This
+is the essential point: sparsity is not lost, it is <em>moved between
+the two factors</em>. Nothing here is specific to <span
+class="math inline">\(L\)</span>.</p>
+<div id="the-feasible-interval-in-closed-form" class="section level2">
+<h2>The feasible interval, in closed form</h2>
+<p>Both expressions are linear in <span
+class="math inline">\(t\)</span>, so the constraints resolve exactly.
+Define the smallest normalized share on each side,</p>
+<p><span class="math display">\[
+q_L = K\min_{i,k}\frac{\ell_{ik}}{r_i}\in[0,1],
+\qquad
+q_F = K\min_{j,k}\frac{f_{jk}}{s_j}\in[0,1].
+\]</span></p>
+<p>For <span class="math inline">\(t \ge 0\)</span> the <span
+class="math inline">\(L\)</span> constraint is automatic (both terms are
+nonnegative), and the <span class="math inline">\(F\)</span> constraint
+is <span class="math inline">\(f_{jk}\ge \tfrac{t}{K}s_j\)</span> for
+all <span class="math inline">\(j,k\)</span>. For <span
+class="math inline">\(t&lt;0\)</span> the roles swap. Hence</p>
+<p><span class="math display">\[
+\boxed{\;-\frac{q_L}{1-q_L} \;\le\; t \;\le\; q_F\;}
+\]</span></p>
+<p><span class="math inline">\(q_F\)</span> is exactly <em>how far <span
+class="math inline">\(F\)</span> is from having a zero</em>: it is <span
+class="math inline">\(0\)</span> as soon as any single <span
+class="math inline">\(f_{jk}=0\)</span>, and <span
+class="math inline">\(1\)</span> only if every feature loads equally on
+all factors. The same reading applies to <span
+class="math inline">\(q_L\)</span> on the other side. <strong>A single
+exact zero in <span class="math inline">\(F\)</span> removes the entire
+positive branch of this family.</strong></p>
+<pre class="r"><code>d0 &lt;- sim_dataset(1, 1e-3)
+L0 &lt;- d0$truth$L; F0c &lt;- d0$FF_true; KK &lt;- ncol(L0)
+
+qL &lt;- KK * min(L0  / rowSums(L0))
+qF &lt;- KK * min(F0c / rowSums(F0c))
+
+feasible &lt;- function(t) {
+  B &lt;- (1 - t) * diag(KK) + (t / KK) * matrix(1, KK, KK)
+  min(L0 %*% B) &gt;= -1e-12 &amp;&amp; min(F0c %*% t(solve(B))) &gt;= -1e-12
+}
+bisect &lt;- function(sgn) { lo &lt;- 0; hi &lt;- 1
+  for (i in 1:60) { m &lt;- (lo + hi)/2; if (feasible(sgn*m)) lo &lt;- m else hi &lt;- m }; sgn*lo }
+
+knitr::kable(data.frame(
+  bound   = c(&quot;t_min&quot;, &quot;t_max&quot;),
+  formula = c(-qL/(1 - qL), qF),
+  numeric = c(bisect(-1), bisect(+1))),
+  digits = 8, caption = &quot;Closed form against bisection, at c = 0.001.&quot;)</code></pre>
+<table>
+<caption>Closed form against bisection, at c = 0.001.</caption>
+<thead>
+<tr class="header">
+<th align="left">bound</th>
+<th align="right">formula</th>
+<th align="right">numeric</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">t_min</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr class="even">
+<td align="left">t_max</td>
+<td align="right">0.743069</td>
+<td align="right">0.743069</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="asymptotics-in-c" class="section level2">
+<h2>Asymptotics in c</h2>
+<p>Under the small-<span class="math inline">\(c\)</span> limit above,
+<span class="math inline">\(\theta \approx
+\kappa\mathbf{1}\mathbf{1}&#39; +
+\theta^{*}\)</span> with <span class="math inline">\(\kappa =
+\theta_{\min}\to\infty\)</span>. Normalizing <span
+class="math inline">\(L\)</span> so that <span class="math inline">\(r_i
+= 1\)</span>, the constant is carried by <span
+class="math inline">\(F\)</span>: <span class="math inline">\(f_{jk} =
+f^{*}_{jk} + \kappa\)</span>. Then</p>
+<p><span class="math display">\[
+q_F = K\min_j \frac{\min_k f^{*}_{jk} + \kappa}{S^{*}_j + K\kappa}
+\;\xrightarrow[\kappa\to\infty]{}\; 1,
+\qquad
+1 - q_F \;\approx\; \frac{\max_j\bigl(S^{*}_j - K\min_k
+f^{*}_{jk}\bigr)}{K\kappa},
+\]</span></p>
+<p>with <span class="math inline">\(S^{*}_j = \sum_k
+f^{*}_{jk}\)</span>. So the freedom approaches <em>total</em> as <span
+class="math inline">\(c\to0\)</span>, and it does so at rate <span
+class="math inline">\(1/\kappa = 1/\log(1/c)\)</span> — slowly, but
+without bound. Conversely <span class="math inline">\(\kappa \to
+0\)</span> recovers <span class="math inline">\(q_F =
+K\min_{j,k}f^{*}_{jk}/S^{*}_j\)</span>, which is zero the moment <span
+class="math inline">\(F^{*}\)</span> has a zero.</p>
+<p>The offset is not a modelling artifact: it is pinned by the smallest
+rate,</p>
+<p><span class="math display">\[
+\kappa = \theta_{\min} = \log\!\left(1 +
+\frac{\lambda_{\min}}{c}\right).
+\]</span></p>
+</div>
+</div>
+<div id="numerical-illustration" class="section level1">
+<h1>Numerical illustration</h1>
+<p>Using the calibrated generator (see the <a
+href="c_grid_sim.html">c-grid page</a>), which builds a truth at each
+<span class="math inline">\(c\)</span> with matched marginals, we can
+read off the feasible interval and the sparsity it buys.</p>
+<pre class="r"><code>tr &lt;- sim_truth(1)
+sweep_c &lt;- do.call(rbind, lapply(C_GRID, function(cc) {
+  dd &lt;- sim_dataset(1, cc, tr)
+  L &lt;- dd$truth$L; Fm &lt;- dd$FF_true
+  th &lt;- dd$alpha * tr$theta0 + dd$beta
+  qF &lt;- KK * min(Fm / rowSums(Fm))
+  B  &lt;- (1 - qF) * diag(KK) + (qF / KK) * matrix(1, KK, KK)
+  data.frame(c = cc,
+             `theta level / spread` = min(th) / (max(th) - min(th)),
+             q_F = qF,
+             `Hoyer L: truth`   = mean_hoyer(L),
+             `Hoyer L: at t_max`= mean_hoyer(L %*% B),
+             `Hoyer F: truth`   = mean_hoyer(Fm),
+             `Hoyer F: at t_max`= mean_hoyer(Fm %*% t(solve(B))),
+             check.names = FALSE)
+}))
+knitr::kable(sweep_c, digits = 3, row.names = FALSE)</code></pre>
+<table>
+<colgroup>
+<col width="6%" />
+<col width="21%" />
+<col width="6%" />
+<col width="15%" />
+<col width="18%" />
+<col width="15%" />
+<col width="18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">c</th>
+<th align="right">theta level / spread</th>
+<th align="right">q_F</th>
+<th align="right">Hoyer L: truth</th>
+<th align="right">Hoyer L: at t_max</th>
+<th align="right">Hoyer F: truth</th>
+<th align="right">Hoyer F: at t_max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1e-03</td>
+<td align="right">1.671</td>
+<td align="right">0.743</td>
+<td align="right">0.324</td>
+<td align="right">0.036</td>
+<td align="right">0.006</td>
+<td align="right">0.057</td>
+</tr>
+<tr class="even">
+<td align="right">1e-02</td>
+<td align="right">1.066</td>
+<td align="right">0.649</td>
+<td align="right">0.324</td>
+<td align="right">0.064</td>
+<td align="right">0.014</td>
+<td align="right">0.072</td>
+</tr>
+<tr class="odd">
+<td align="right">1e-01</td>
+<td align="right">0.508</td>
+<td align="right">0.470</td>
+<td align="right">0.324</td>
+<td align="right">0.131</td>
+<td align="right">0.051</td>
+<td align="right">0.120</td>
+</tr>
+<tr class="even">
+<td align="right">1e+00</td>
+<td align="right">0.140</td>
+<td align="right">0.201</td>
+<td align="right">0.324</td>
+<td align="right">0.244</td>
+<td align="right">0.257</td>
+<td align="right">0.313</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+01</td>
+<td align="right">0.031</td>
+<td align="right">0.059</td>
+<td align="right">0.324</td>
+<td align="right">0.301</td>
+<td align="right">0.528</td>
+<td align="right">0.544</td>
+</tr>
+<tr class="even">
+<td align="right">1e+02</td>
+<td align="right">0.015</td>
+<td align="right">0.029</td>
+<td align="right">0.324</td>
+<td align="right">0.313</td>
+<td align="right">0.591</td>
+<td align="right">0.598</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+03</td>
+<td align="right">0.013</td>
+<td align="right">0.026</td>
+<td align="right">0.324</td>
+<td align="right">0.314</td>
+<td align="right">0.598</td>
+<td align="right">0.605</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">0.013</td>
+<td align="right">0.025</td>
+<td align="right">0.324</td>
+<td align="right">0.315</td>
+<td align="right">0.599</td>
+<td align="right">0.605</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<pre class="r"><code>lab &lt;- ifelse(is.infinite(sweep_c$c), &quot;∞&quot;,
+              format(sweep_c$c, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))
+sweep_c$cf &lt;- factor(lab, levels = lab)
+
+p1 &lt;- ggplot(sweep_c, aes(cf, q_F, group = 1)) +
+  geom_line(colour = &quot;#0E5C6B&quot;, linewidth = 1) + geom_point(colour = &quot;#0E5C6B&quot;, size = 2) +
+  ylim(0, 1) +
+  labs(x = &quot;c&quot;, y = expression(q[F]),
+       title = &quot;Freedom in the mixing family&quot;,
+       subtitle = &quot;0 = pinned, 1 = the factors can be blended completely&quot;)
+
+rng &lt;- rbind(
+  data.frame(cf = sweep_c$cf, side = &quot;L&quot;, lo = sweep_c$`Hoyer L: at t_max`,
+             hi = sweep_c$`Hoyer L: truth`),
+  data.frame(cf = sweep_c$cf, side = &quot;F&quot;, lo = pmin(sweep_c$`Hoyer F: truth`, sweep_c$`Hoyer F: at t_max`),
+             hi = pmax(sweep_c$`Hoyer F: truth`, sweep_c$`Hoyer F: at t_max`)))
+
+p2 &lt;- ggplot(rng, aes(cf, ymin = lo, ymax = hi, colour = side)) +
+  geom_linerange(linewidth = 2.2, alpha = 0.85,
+                 position = position_dodge(width = 0.35)) +
+  scale_colour_manual(values = c(L = &quot;#0E8FA8&quot;, F = &quot;#C2410C&quot;), name = NULL) +
+  labs(x = &quot;c&quot;, y = &quot;achievable mean Hoyer sparsity&quot;,
+       title = &quot;Sparsity is not determined by the data&quot;,
+       subtitle = &quot;range spanned without changing the likelihood at all&quot;)
+
+plot_grid(p1, p2, nrow = 1, rel_widths = c(1, 1.15))</code></pre>
+<p><img src="figure/log1p_identifiability.Rmd/sweep-plot-1.png" alt="" width="990" style="display: block; margin: auto;" /></p>
+<p>At <span class="math inline">\(c=\infty\)</span> the interval is a
+point: the factorization is effectively pinned. At <span
+class="math inline">\(c=10^{-3}\)</span> the sparsity of <span
+class="math inline">\(L\)</span> can be driven from the truth’s value
+down by roughly an order of magnitude, with <span
+class="math inline">\(F\)</span> moving the other way, and the
+likelihood does not change by so much as a rounding error.</p>
+<div id="the-slice-is-a-lower-bound" class="section level2">
+<h2>The slice is a lower bound</h2>
+<p><span class="math inline">\(B_t\)</span> is one line through <span
+class="math inline">\(\mathcal{A}\)</span>. Searching over all of <span
+class="math inline">\(A\in\mathbb{R}^{K
+\times K}\)</span> gives a slightly wider range, so the closed forms
+above understate the true freedom.</p>
+<pre class="r"><code>explore &lt;- function(L, Fm, sgn, nstart = 25, seed = 1) {
+  K &lt;- ncol(L); set.seed(seed)
+  obj &lt;- function(v) {
+    A &lt;- matrix(v, K, K); dt &lt;- det(A)
+    if (!is.finite(dt) || abs(dt) &lt; 1e-8) return(1e6)
+    LA &lt;- L %*% A; FA &lt;- Fm %*% t(solve(A))
+    pen &lt;- sum(pmin(LA, 0)^2) + sum(pmin(FA, 0)^2)
+    if (pen &gt; 0) return(1e3 + 1e6 * pen)
+    -sgn * mean_hoyer(LA)
+  }
+  best &lt;- NULL; bv &lt;- Inf
+  for (s in 1:nstart) {
+    o &lt;- try(optim(as.vector(diag(K) + matrix(rnorm(K*K, 0, .15), K, K)), obj,
+                   control = list(maxit = 3000, reltol = 1e-10)), silent = TRUE)
+    if (!inherits(o, &quot;try-error&quot;) &amp;&amp; o$value &lt; bv) { bv &lt;- o$value; best &lt;- o$par }
+  }
+  mean_hoyer(L %*% matrix(best, K, K))
+}
+
+knitr::kable(do.call(rbind, lapply(c(1e-3, 1, Inf), function(cc) {
+  dd &lt;- sim_dataset(1, cc, tr); L &lt;- dd$truth$L; Fm &lt;- dd$FF_true
+  qF &lt;- KK * min(Fm / rowSums(Fm))
+  B  &lt;- (1 - qF) * diag(KK) + (qF / KK) * matrix(1, KK, KK)
+  data.frame(c = cc, `truth` = mean_hoyer(L),
+             `mixing slice, lowest` = mean_hoyer(L %*% B),
+             `full search, lowest`  = explore(L, Fm, -1),
+             check.names = FALSE)
+})), digits = 3, row.names = FALSE, caption = &quot;Mean Hoyer sparsity of L.&quot;)</code></pre>
+<table>
+<caption>Mean Hoyer sparsity of L.</caption>
+<thead>
+<tr class="header">
+<th align="right">c</th>
+<th align="right">truth</th>
+<th align="right">mixing slice, lowest</th>
+<th align="right">full search, lowest</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.001</td>
+<td align="right">0.324</td>
+<td align="right">0.036</td>
+<td align="right">0.026</td>
+</tr>
+<tr class="even">
+<td align="right">1.000</td>
+<td align="right">0.324</td>
+<td align="right">0.244</td>
+<td align="right">0.227</td>
+</tr>
+<tr class="odd">
+<td align="right">Inf</td>
+<td align="right">0.324</td>
+<td align="right">0.315</td>
+<td align="right">0.315</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+</div>
+</div>
+<div id="what-to-take-from-this" class="section level1">
+<h1>What to take from this</h1>
+<ol style="list-style-type: decimal">
+<li><p><strong>The likelihood determines <span
+class="math inline">\(LF&#39;\)</span>, not <span
+class="math inline">\(L\)</span> and <span
+class="math inline">\(F\)</span> separately.</strong> Any reported
+sparsity, or any statement that one factor is “cleaner” than another, is
+a statement about the point in <span
+class="math inline">\(\mathcal{A}\)</span> your optimizer happened to
+reach.</p></li>
+<li><p><strong>Sparsity trades between the two factors.</strong> The
+mixing family makes <span class="math inline">\(L\)</span> denser and
+<span class="math inline">\(F\)</span> sparser simultaneously. Reporting
+sparsity for one without the other can be actively misleading.</p></li>
+<li><p><strong>Zeros are what buy identifiability</strong>, and they
+must be <em>exact</em> or nearly so. <span
+class="math inline">\(q_F\)</span> is zero as soon as one <span
+class="math inline">\(f_{jk}\)</span> is, and grows smoothly as <span
+class="math inline">\(F\)</span> retreats from the boundary.</p></li>
+<li><p><strong><span class="math inline">\(c\)</span> controls this
+through the level of <span
+class="math inline">\(\theta\)</span>.</strong> Small <span
+class="math inline">\(c\)</span> forces <span
+class="math inline">\(\theta_{\min} = \log(1+\lambda_{\min}/c)\)</span>
+up while the spread saturates at <span
+class="math inline">\(\log(\lambda_{\max}/\lambda_{\min})\)</span>, so
+<span class="math inline">\(\theta\)</span> tends to a constant and the
+ambiguity tends to total. The exception is exact zeros in <span
+class="math inline">\(\lambda\)</span>, which survive every <span
+class="math inline">\(c\)</span>.</p></li>
+<li><p><strong>Practical consequence.</strong> At small <span
+class="math inline">\(c\)</span>, prefer conclusions that depend on
+<span class="math inline">\(LF&#39;\)</span> (fitted rates, held-out
+likelihood, which samples resemble which) over conclusions that depend
+on the split (how sparse the factors are, how many features a factor
+“uses”). If the split matters, it has to be pinned by something outside
+the likelihood — a sparsity penalty, a prior, or an anchor
+assumption.</p></li>
+</ol>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Chicago
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] log1pNMF_0.1-6  cowplot_1.2.0   ggplot2_4.0.3   workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      lattice_0.22-9    
+ [5] startupmsg_1.0.0   digest_0.6.39      magrittr_2.0.5     evaluate_1.0.5    
+ [9] grid_4.5.2         RColorBrewer_1.1-3 fastmap_1.2.0      sfsmisc_1.1-23    
+[13] rprojroot_2.1.1    jsonlite_2.0.0     Matrix_1.7-5       processx_3.9.0    
+[17] whisker_0.4.1      promises_1.5.0     httr_1.4.8         scales_1.4.0      
+[21] codetools_0.2-20   jquerylib_0.1.4    cli_3.6.6          rlang_1.2.0       
+[25] withr_3.0.2        cachem_1.1.0       yaml_2.3.12        otel_0.2.0        
+[29] parallel_4.5.2     tools_4.5.2        dplyr_1.2.1        httpuv_1.6.17     
+[33] distr_2.9.7        vctrs_0.7.3        R6_2.6.1           lifecycle_1.0.5   
+[37] git2r_0.36.2       stringr_1.6.0      fs_2.1.0           MASS_7.3-65       
+[41] pkgconfig_2.0.3    callr_3.7.6        pillar_1.11.1      bslib_0.10.0      
+[45] later_1.4.8        gtable_0.3.6       glue_1.8.1         Rcpp_1.1.1-1.1    
+[49] xfun_0.57          tibble_3.3.1       tidyselect_1.2.1   rstudioapi_0.18.0 
+[53] knitr_1.51         dichromat_2.0-0.1  farver_2.1.2       htmltools_0.5.9   
+[57] labeling_0.4.3     rmarkdown_2.31     compiler_4.5.2     getPass_0.2-4     
+[61] S7_0.2.2          </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Chicago
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] log1pNMF_0.1-6  cowplot_1.2.0   ggplot2_4.0.3   workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      lattice_0.22-9    
+ [5] startupmsg_1.0.0   digest_0.6.39      magrittr_2.0.5     evaluate_1.0.5    
+ [9] grid_4.5.2         RColorBrewer_1.1-3 fastmap_1.2.0      sfsmisc_1.1-23    
+[13] rprojroot_2.1.1    jsonlite_2.0.0     Matrix_1.7-5       processx_3.9.0    
+[17] whisker_0.4.1      promises_1.5.0     httr_1.4.8         scales_1.4.0      
+[21] codetools_0.2-20   jquerylib_0.1.4    cli_3.6.6          rlang_1.2.0       
+[25] withr_3.0.2        cachem_1.1.0       yaml_2.3.12        otel_0.2.0        
+[29] parallel_4.5.2     tools_4.5.2        dplyr_1.2.1        httpuv_1.6.17     
+[33] distr_2.9.7        vctrs_0.7.3        R6_2.6.1           lifecycle_1.0.5   
+[37] git2r_0.36.2       stringr_1.6.0      fs_2.1.0           MASS_7.3-65       
+[41] pkgconfig_2.0.3    callr_3.7.6        pillar_1.11.1      bslib_0.10.0      
+[45] later_1.4.8        gtable_0.3.6       glue_1.8.1         Rcpp_1.1.1-1.1    
+[49] xfun_0.57          tibble_3.3.1       tidyselect_1.2.1   rstudioapi_0.18.0 
+[53] knitr_1.51         dichromat_2.0-0.1  farver_2.1.2       htmltools_0.5.9   
+[57] labeling_0.4.3     rmarkdown_2.31     compiler_4.5.2     getPass_0.2-4     
+[61] S7_0.2.2          </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
