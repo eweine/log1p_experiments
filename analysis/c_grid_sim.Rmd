@@ -1,0 +1,672 @@
+---
+title: "Fitting the log1p model at the wrong c"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+    toc_float: true
+date: "2026-08-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.align = "center", dpi = 110)
+```
+
+```{r load-pkgs}
+library(ggplot2)
+library(cowplot)
+library(fastTopics)
+library(log1pNMF)
+theme_set(theme_cowplot(font_size = 11))
+```
+
+```{r paths}
+## Where the simulation code and its outputs live. The generative functions are
+## sourced rather than restated, so the description below cannot drift from what
+## actually produced the data.
+repo_dir  <- "~/Documents/log1pNMF/inst/paper_figures/experiments"
+exp_dir   <- path.expand(repo_dir)
+cells_dir <- file.path(exp_dir, "c_grid_sim")            # 640 per-cell .rds
+metrics   <- file.path(exp_dir, "c_grid_sim_metrics.rds")
+
+stopifnot(dir.exists(exp_dir), file.exists(metrics), dir.exists(cells_dir))
+source(file.path(exp_dir, "c_grid_sim_common.R"))
+```
+
+# The question
+
+The log1p model has a link parameter $c$:
+
+$$
+y_{ij} \sim \text{Poisson}(\lambda_{ij}), \qquad
+\log\!\left(1 + \frac{\lambda_{ij}}{c}\right) = \sum_{k=1}^{K}\ell_{ik}f_{jk} =: \theta_{ij}
+$$
+
+so $\lambda_{ij} = c\,(e^{\theta_{ij}} - 1)$. As $c \to \infty$ the link becomes
+linear and the model is ordinary Poisson NMF (the topic model); as $c \to 0$ it
+becomes additive on the log scale. $c$ therefore decides whether the factors
+describe **absolute** or **relative** changes.
+
+This page asks: **if the data really were generated at some $c_{\text{true}}$,
+what happens when we fit at a different $c_{\text{fit}}$?** We simulate at eight
+values of $c$ and fit at all eight, over ten seeds — a full $8 \times 8$ cross.
+
+# How the data were generated
+
+## Generative model
+
+For each seed we draw one truth and reuse it at every $c_{\text{true}}$:
+
+- **$L$** ($n \times K$): rows drawn from a $\text{Dirichlet}(a\mathbf{1}_K)$ with
+  $a = `r A_SIG`$. Because $a < 1$ the rows are peaked toward the pure states, so
+  most samples are dominated by a single factor. Rows sum to one, which matters
+  for the offset trick below.
+- **$F_0$** ($p \times K$): each entry is exactly zero with probability
+  $`r PI0`$, and otherwise **log-uniform** over a range of $`r format(F_RANGE, scientific = FALSE)`$.
+
+Then $\theta_0 = LF_0'$, and the realized truth at a given $c$ is
+
+$$
+\theta = \alpha_c\,\theta_0 + \beta_c, \qquad
+\lambda = c\,\text{expm1}(\theta) \quad (\text{or } \lambda = \theta \text{ when } c = \infty),
+\qquad y_{ij}\sim\text{Poisson}(\lambda_{ij}).
+$$
+
+Since $\sum_k \ell_{ik} = 1$, adding $\beta_c$ to *every* entry of $F$ shifts
+$\theta$ by exactly that constant. So $\theta = \alpha_c\theta_0 + \beta_c$ is
+still $L F_c'$ with $F_c = \alpha_c F_0 + \beta_c$ — the offset costs no rank.
+Note $F_c$ is therefore **not** sparse: it has a floor of $\beta_c$ under every
+entry. The sparse object is $F_0$.
+
+```{r show-truth}
+sim_truth
+```
+
+## Why the magnitudes are log-uniform and bounded
+
+At small $c$ the link is exponential, so any right tail in $\theta_0$ gets
+exponentiated. An earlier version drew lognormal magnitudes and the
+$c = 10^{-3}$ datasets came out with $\max(Y) \approx 10^{16}$ while the
+$c = \infty$ ones had $\max(Y) \approx 90$. Bounding the magnitudes is what makes
+the datasets comparable across the grid at all.
+
+## Calibrating each c to a common target
+
+A single scale on $F$ cannot make these datasets comparable: at small $c$ a fixed
+spread in $\theta$ becomes a *multiplicative* spread in $\lambda$ and the maximum
+explodes, while at large $c$ the link is linear and the spread stays
+proportional. So there are **two** knobs per $c$, solved numerically so that
+every dataset hits the same two targets:
+
+- the fraction of zeros in $Y$ is $`r TARGET_ZERO`$, and
+- the $`r QPROB`$ quantile of $\lambda$ is $`r TARGET_Q`$.
+
+The solve is two nested `uniroot` calls and is monotone in each direction: the
+zero-fraction decreases in $\beta$ at fixed $\alpha$, and the upper quantile
+increases in $\alpha$ once $\beta$ has been re-solved.
+
+```{r show-calibrate}
+calibrate
+```
+
+## Do the datasets actually come out comparable?
+
+```{r data-summary, cache=TRUE}
+summ <- do.call(rbind, lapply(1:N_SEEDS, function(sd) {
+  tr <- sim_truth(sd)
+  do.call(rbind, lapply(C_GRID, function(cc) data_summary(sim_dataset(sd, cc, tr))))
+}))
+knitr::kable(
+  data.frame(
+    quantity = c("zero fraction of Y", "max(Y)", "mean(Y)",
+                 "q99.9 of lambda", "gene mean q90/q10"),
+    min = c(min(summ$zero_frac), min(summ$max_Y), min(summ$mean_Y),
+            min(summ$q999_lam), min(summ$gene_mean_q90 / summ$gene_mean_q10)),
+    max = c(max(summ$zero_frac), max(summ$max_Y), max(summ$mean_Y),
+            max(summ$q999_lam), max(summ$gene_mean_q90 / summ$gene_mean_q10))),
+  digits = 3, caption = "Across all 80 datasets (10 seeds x 8 values of c).")
+```
+
+The two calibrated targets are hit exactly, and `max(Y)` and `mean(Y)` stay in a
+narrow band. The one quantity that is *not* constant is the gene-level dynamic
+range, and that is unavoidable: matching $\lambda$'s distribution means matching
+$\theta$ up to a **shift** at small $c$ but up to a **scale** at large $c$, and
+no single reparameterization does both.
+
+## Fitting
+
+`r N_SEEDS` seeds $\times$ `r length(C_GRID)` values of $c_{\text{true}}$
+$\times$ `r length(C_GRID)` values of $c_{\text{fit}}$ = `r N_TASKS` cells, each
+fit from **both** a rank-1 and a random start (`r N_TASKS * length(INITS)` fits).
+Every fit ran to convergence — an absolute log-likelihood change below
+`r TOL` between iterations — with `r format(MAXITER, big.mark = ",")` iterations
+as the only other cap and no time limit. $n = p = `r N_ROWS`$, $K = `r K_TRUE`$
+throughout, and $c_{\text{fit}} = \infty$ is fit with `fastTopics::fit_poisson_nmf`
+since no finite `cc` represents that limit.
+
+```{r load-metrics}
+d <- readRDS(metrics)
+
+## Best init per cell. The two agree to within 0.008 log-likelihood on all 640
+## cells, so for the LIKELIHOOD figures this choice is immaterial. It is not
+## immaterial for sparsity -- see that section.
+key <- paste(d$seed, d$c_true, d$c_fit)
+b   <- d[order(key, -d$loglik), ]
+b   <- b[!duplicated(paste(b$seed, b$c_true, b$c_fit)), ]
+b$subopt <- ave(b$loglik, paste(b$seed, b$c_true), FUN = max) - b$loglik
+
+CLEV <- sort(unique(b$c_fit))
+CLAB <- ifelse(is.infinite(CLEV), "∞",
+               format(CLEV, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))
+fc <- function(x) factor(x, levels = CLEV, labels = CLAB)
+b$cf     <- fc(b$c_fit)
+b$cf_lab <- fc(b$c_true)
+b$ct     <- factor(paste("simulated at c =", fc(b$c_true)),
+                   levels = paste("simulated at c =", CLAB))
+c(cells = nrow(b), fits = nrow(d), converged = sum(d$converged))
+```
+
+# Which c fits best?
+
+Comparing log-likelihoods across $c_{\text{fit}}$ is legitimate: all eight are
+Poisson models for the *same* $y$ under the same dominating measure with
+constants included, so no Jacobian enters.
+
+```{r winner-matrix, fig.width=7, fig.height=6}
+win <- do.call(rbind, lapply(split(b, paste(b$seed, b$c_true)), function(x)
+  x[which.max(x$loglik), c("seed", "c_true", "c_fit")]))
+cnt <- as.data.frame(table(ct = fc(win$c_true), cf = fc(win$c_fit)), responseName = "n")
+cnt$lab <- ifelse(cnt$n == 0, "", cnt$n)
+
+ggplot(cnt, aes(cf, ct)) +
+  geom_tile(aes(fill = n), colour = "white", linewidth = 0.6) +
+  geom_tile(data = data.frame(ct = CLAB, cf = CLAB), fill = NA,
+            colour = "#C2410C", linewidth = 0.9) +
+  geom_text(aes(label = lab, colour = n > 5), size = 4, show.legend = FALSE) +
+  scale_fill_gradient(low = "#F2F6F7", high = "#0E5C6B", name = "seeds\nwon",
+                      limits = c(0, 10), breaks = c(0, 5, 10)) +
+  scale_colour_manual(values = c("FALSE" = "grey15", "TRUE" = "white")) +
+  scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) +
+  labs(x = "c used for fitting", y = "c used to simulate",
+       title = "Which c achieves the highest log-likelihood",
+       subtitle = "counts over 10 seeds; outlined cells are c_fit = c_true") +
+  coord_fixed() +
+  theme(plot.title = element_text(size = 13, face = "plain"),
+        plot.subtitle = element_text(size = 10, colour = "grey35"),
+        panel.border = element_rect(colour = "grey70", fill = NA))
+```
+
+The likelihood recovers $c$ **in the middle of the range and nowhere else**. At
+$c_{\text{true}} = 1$ and $10$ the correct value wins all ten seeds. But the
+winners scatter across $\{10^{-3}, 10^{-2}, 10^{-1}\}$ at the small end and
+across $\{100, 1000, \infty\}$ at the large end.
+
+This is exactly what the theory predicts. The score for $c$ points in the
+direction $\Phi_{ij} = \lambda_{ij}/(\lambda_{ij}+c)$, which collapses to
+$\theta$ when $\lambda \ll c$ and to a constant when $\lambda \gg c$ — and both
+of those are absorbed by the factorization itself. So the profile likelihood is
+flat at both ends and only the elbow carries information about $c$.
+
+```{r panel-helper}
+## Shared layout for the by-c_true panels: all 10 seeds as thin lines plus their
+## mean, with the matching c_fit circled. Keeping the seeds visible shows whether
+## a flat region is flat for every seed or only on average.
+panels <- function(dat, yvar, ylab, title, subtitle, ref = NULL, ...) {
+  dat$.y <- dat[[yvar]]
+  avg <- aggregate(.y ~ ct + cf, data = dat, FUN = mean)
+  dg  <- merge(unique(dat[as.character(dat$cf) == as.character(dat$cf_lab),
+                          c("ct", "cf")]), avg, by = c("ct", "cf"))
+  p <- ggplot(dat, aes(cf, .y)) +
+    geom_line(aes(group = seed), colour = "#9BB7BD", linewidth = 0.35, alpha = 0.8)
+  if (!is.null(ref)) {
+    rf <- aggregate(stats::as.formula(paste(ref, "~ ct")), data = dat, FUN = mean)
+    names(rf)[2] <- ".ref"
+    p <- p + geom_hline(data = rf, aes(yintercept = .ref), linetype = "dashed",
+                        colour = "#C2410C", linewidth = 0.5)
+  }
+  p + geom_line(data = avg, aes(group = 1), colour = "#0E5C6B", linewidth = 1) +
+    geom_point(data = avg, colour = "#0E5C6B", size = 1.6) +
+    geom_point(data = dg, shape = 21, size = 3.6, stroke = 1.1, fill = NA,
+               colour = "#C2410C") +
+    facet_wrap(~ ct, nrow = 2) +
+    scale_y_continuous(...) +
+    labs(x = "c used for fitting", y = ylab, title = title, subtitle = subtitle) +
+    theme(strip.background = element_blank(),
+          strip.text = element_text(face = "bold", size = 10),
+          plot.title = element_text(size = 13, face = "plain"),
+          plot.subtitle = element_text(size = 10, colour = "grey35"),
+          panel.border = element_rect(colour = "grey80", fill = NA),
+          axis.text.x = element_text(size = 8))
+}
+SUB     <- "thin lines: 10 individual seeds;  thick line: mean;  circled: c_fit = c_true"
+SUB_REF <- paste(SUB, "\ndashed: the true value for that simulation")
+```
+
+```{r loglik-panels, fig.width=12, fig.height=6.4}
+panels(b, "subopt",
+       ylab  = "log-likelihood shortfall from that seed's best c  (0 = best)",
+       title = "Cost of fitting at the wrong c", subtitle = SUB,
+       trans = "log1p", breaks = c(0, 1, 10, 100, 1000),
+       labels = c("0", "1", "10", "100", "1000"))
+```
+
+$y$ is measured **down from each seed's own best** $c$, because raw
+log-likelihoods cannot be overlaid across seeds — each seed is a different
+dataset, so the curves would be offset by dataset-level constants of a few
+hundred and the shape would be unreadable. It is on a `log1p` scale because the
+shortfall is exactly $0$ at the winner, which a log scale could not show.
+
+Panels share a $y$ scale deliberately: the penalty for being in the wrong
+**regime** ($\sim$1000) dwarfs the penalty within a regime ($\sim$1), and a free
+$y$ would rescale each panel and hide that.
+
+# Sparsity and factor separation
+
+**These metrics must fix the initialization**, unlike the likelihood ones. The
+two inits agree to within 0.008 log-likelihood everywhere, so selecting on
+log-likelihood is effectively a coin flip — but the resulting fits are not
+equivalent: 29% of cells differ by more than 0.01 in Hoyer sparsity, and at
+$c_{\text{fit}} = 10^{-3}$ the rank-1 start gives about twice the factor sparsity
+of the random start. Random also wins the tie in all 80 cells at that
+$c_{\text{fit}}$, so "best of both" would silently report the random answer at the
+small-$c$ end and a mixture elsewhere.
+
+```{r init-check}
+w <- reshape(d[, c("seed","c_true","c_fit","init","hoyer_L","hoyer_F","rankcor_F")],
+             idvar = c("seed","c_true","c_fit"), timevar = "init", direction = "wide")
+knitr::kable(data.frame(
+  metric = c("hoyer_L", "hoyer_F", "rankcor_F"),
+  `cells differing by > 0.01` = sapply(c("hoyer_L","hoyer_F","rankcor_F"), function(m)
+    sum(abs(w[[paste0(m, ".rank1")]] - w[[paste0(m, ".random")]]) > 0.01)),
+  check.names = FALSE, row.names = NULL),
+  caption = "Out of 640 cells, despite log-likelihoods agreeing to 0.008.")
+```
+
+```{r split-by-init}
+mk <- function(ini) {
+  x <- d[d$init == ini, ]
+  x$cf     <- fc(x$c_fit)
+  x$cf_lab <- fc(x$c_true)
+  x$ct     <- factor(paste("simulated at c =", fc(x$c_true)),
+                     levels = paste("simulated at c =", CLAB))
+  x
+}
+b_rank1  <- mk("rank1")
+b_random <- mk("random")
+```
+
+Hoyer sparsity of a length-$n$ column is
+$(\sqrt{n} - \|x\|_1/\|x\|_2)/(\sqrt{n}-1)$: $0$ when every entry is equal, $1$
+when a single entry carries everything. We average it over the $K$ columns.
+
+## Sparsity of the loadings
+
+```{r hoyer-L-rank1, fig.width=12, fig.height=6.4}
+panels(b_rank1, "hoyer_L", ref = "hoyer_L_true",
+       ylab = "mean Hoyer sparsity of loadings",
+       title = "Sparsity of the recovered loadings — rank-1 initialization",
+       subtitle = SUB_REF)
+```
+
+```{r hoyer-L-random, fig.width=12, fig.height=6.4}
+panels(b_random, "hoyer_L", ref = "hoyer_L_true",
+       ylab = "mean Hoyer sparsity of loadings",
+       title = "Sparsity of the recovered loadings — random initialization",
+       subtitle = SUB_REF)
+```
+
+The dashed reference is identical in every panel, as it must be: $L$ is drawn
+once per seed and shared across all $c_{\text{true}}$.
+
+## Sparsity of the factors
+
+```{r hoyer-F-rank1, fig.width=12, fig.height=6.4}
+panels(b_rank1, "hoyer_F", ref = "hoyer_F_true",
+       ylab = "mean Hoyer sparsity of factors",
+       title = "Sparsity of the recovered factors — rank-1 initialization",
+       subtitle = SUB_REF)
+```
+
+```{r hoyer-F-random, fig.width=12, fig.height=6.4}
+panels(b_random, "hoyer_F", ref = "hoyer_F_true",
+       ylab = "mean Hoyer sparsity of factors",
+       title = "Sparsity of the recovered factors — random initialization",
+       subtitle = SUB_REF)
+```
+
+The reference here is the sparsity of the **realized** truth
+$F_c = \alpha_c F_0 + \beta_c$, which is what the fit estimates. It rises with
+$c_{\text{true}}$ and sits near zero at the small-$c$ end, because $\beta_c$ puts
+a floor under every entry even though $F_0$ is 50% exact zeros. (`hoyer_F0_true`
+in the metrics table holds the sparsity of $F_0$ itself if that is the comparison
+you want.)
+
+Across both sparsity figures the striking feature is that **the curves barely
+depend on which panel you are in**: sparsity is close to a pure function of
+$c_{\text{fit}}$, largely regardless of what generated the data. Fitting at a
+larger $c$ gives a sparser answer whether or not that is true of the truth.
+
+## Are the recovered factors distinct?
+
+```{r rankcor-rank1, fig.width=12, fig.height=6.4}
+panels(b_rank1, "rankcor_F", ref = "rankcor_F_true",
+       ylab = "mean rank correlation between factors",
+       title = "Rank correlation between recovered factors — rank-1 initialization",
+       subtitle = SUB_REF)
+```
+
+```{r rankcor-random, fig.width=12, fig.height=6.4}
+panels(b_random, "rankcor_F", ref = "rankcor_F_true",
+       ylab = "mean rank correlation between factors",
+       title = "Rank correlation between recovered factors — random initialization",
+       subtitle = SUB_REF)
+```
+
+Mean Spearman correlation over the $K(K-1)/2$ distinct factor pairs. The dashed
+reference is again identical across panels — Spearman correlation is invariant to
+the positive affine map $F_c = \alpha_c F_0 + \beta_c$, so the truth's value is
+the same at every $c_{\text{true}}$.
+
+# Loadings across c, for three simulations
+
+Structure plots of the fitted $L$ at every $c_{\text{fit}}$, with the truth shown
+first, for three simulated datasets: the smallest $c_{\text{true}}$ on the grid,
+$c_{\text{true}} = 1$, and $c_{\text{true}} = \infty$. Together they span the
+log-additive end, the elbow, and the linear (topic-model) end.
+
+Normalization is the paper convention and nothing else: each loading column is
+divided by its maximum so every factor peaks at one. There is no row
+normalization, so bars vary in total height — `structure_plot` row-normalizes
+only when handed a fit object, not a matrix.
+
+That height is worth reading rather than ignoring. After column normalization, a
+tall bar means the sample carries substantial weight on several factors at once,
+and a short one means its weight is concentrated. The panels at small
+$c_{\text{fit}}$ are visibly taller than those at large $c_{\text{fit}}$, which
+is the same finding as the Hoyer figures above, seen sample by sample. All nine
+panels within a figure therefore share one $y$ limit; letting each rescale itself
+would erase exactly that comparison.
+
+The fitted factors are permuted to the truth by the rule the metrics use — the
+column permutation maximizing total correlation with the true $L$. Without it
+each panel would differ from the truth by an arbitrary relabelling and every fit
+would look wrong.
+
+**Edit `pick_seed` and `pick_init` and re-run to walk around the grid.** Note the
+true $L$ is drawn once per seed and shared across every $c_{\text{true}}$, so the
+"TRUE L" panel is the same in all three figures; only the fitted panels move.
+
+```{r pick-cell}
+pick_seed <- 1
+pick_init <- "rank1"     # "rank1" or "random"
+```
+
+```{r structure-fn}
+fmtc <- function(x) format(x, scientific = FALSE, trim = TRUE)
+
+cell_file <- function(seed, c_true, c_fit)
+  file.path(cells_dir,
+            paste0(tag_of(list(seed = seed, c_true = c_true, c_fit = c_fit)), ".rds"))
+
+## L is drawn once per seed, so the truth and the cell ordering are shared by all
+## three figures below
+Lt   <- readRDS(cell_file(pick_seed, C_GRID[1], C_GRID[1]))$L_true
+dom  <- max.col(Lt)
+ord  <- order(dom, -Lt[cbind(seq_along(dom), dom)])
+grp  <- factor(dom[ord])
+TOP  <- paste0("k", seq_len(ncol(Lt)))
+FCOL <- setNames(c("#0E8FA8", "#C2410C", "#6D3FC4")[seq_along(TOP)], TOP)
+
+norm_bars <- function(M) {                       # column max -> 1, and nothing else
+  M <- pmax(M[ord, , drop = FALSE], 0)
+  sweep(M, 2, apply(M, 2, max), "/")
+}
+
+leg <- get_legend(
+  ggplot(data.frame(x = 1, f = factor(TOP, levels = TOP)), aes(x, 1, fill = f)) +
+    geom_col() + scale_fill_manual(values = FCOL, name = "factor") +
+    theme_cowplot() + theme(legend.position = "right"))
+
+#' One 3 x 3 grid: true L, then the fit at each c_fit, for a given c_true.
+structure_grid <- function(c_true, seed = pick_seed, init = pick_init) {
+
+  fits <- lapply(C_GRID, function(cf) {
+    x  <- readRDS(cell_file(seed, c_true, cf))
+    Lf <- x$fits[[init]]$LL
+    list(L   = Lf[, match_factors(Lt, Lf), drop = FALSE],
+         lab = sprintf("c_fit = %s   (L cor %.3f)", fmtc(cf),
+                       x$rows$L_cor_mean[x$rows$init == init]))
+  })
+
+  ## Without row normalization the bars do not all reach the same height, so a
+  ## per-panel y scale would rescale each panel and make the columns look more
+  ## alike than they are. One shared limit within a figure keeps them comparable.
+  ymax <- max(vapply(c(list(Lt), lapply(fits, `[[`, "L")),
+                     function(M) max(rowSums(norm_bars(M))), numeric(1)))
+
+  sp <- function(M, title) {
+    Mn <- norm_bars(M); colnames(Mn) <- TOP
+    structure_plot(Mn, loadings_order = seq_len(nrow(Mn)), grouping = grp,
+                   gap = 6, topics = TOP, colors = FCOL) +
+      coord_cartesian(ylim = c(0, ymax)) +
+      labs(x = NULL, y = "scaled loading", title = title) +
+      theme(plot.title = element_text(size = 10, face = "bold"),
+            axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+            legend.position = "none")
+  }
+
+  plots <- c(list(sp(Lt, "TRUE L")),
+             lapply(fits, function(z) sp(z$L, z$lab)))
+
+  ttl <- ggdraw() + draw_label(
+    sprintf("seed %d, simulated at c = %s, %s init — cells ordered by true dominant factor",
+            seed, fmtc(c_true), init), x = 0.01, hjust = 0, size = 12)
+
+  plot_grid(ttl,
+            plot_grid(plot_grid(plotlist = plots, ncol = 3), leg,
+                      ncol = 2, rel_widths = c(1, 0.08)),
+            ncol = 1, rel_heights = c(0.04, 1))
+}
+```
+
+## Simulated at the smallest c
+
+```{r structure-small, fig.width=13, fig.height=11}
+structure_grid(min(C_GRID))
+```
+
+## Simulated at c = 1
+
+```{r structure-one, fig.width=13, fig.height=11}
+structure_grid(1)
+```
+
+## Simulated at c = Inf
+
+```{r structure-inf, fig.width=13, fig.height=11}
+structure_grid(Inf)
+```
+
+# Why are the small-c fits so much less sparse than the truth?
+
+The sparsity figures show something odd: when the data are generated at
+$c = 10^{-3}$ and fitted at $c = 10^{-3}$ — the fit that also achieves the best
+log-likelihood — the recovered loadings are far *less* sparse than the true
+loadings (Hoyer $\approx 0.13$ against a truth of $0.32$). At large $c$ the same
+comparison is nearly exact. Why?
+
+## The likelihood constrains only the product, so sparsity can move between L and F
+
+An NMF is only ever determined up to an invertible $T$:
+
+$$
+LF' = (LT)(FT^{-\top})',
+$$
+
+so **any** $T$ for which both $LT \ge 0$ and $FT^{-\top} \ge 0$ gives a different
+parameter value with an *identical* likelihood. That is the whole ambiguity; the
+question is only how large the set of admissible $T$ is.
+
+A convenient one-parameter slice through it blends each factor slightly into the
+others:
+
+$$
+T_t = (1-t)\,I + \frac{t}{K}\mathbf{1}\mathbf{1}',
+\qquad
+T_t^{-1} = \frac{1}{1-t}\left(I - \frac{t}{K}\mathbf{1}\mathbf{1}'\right).
+$$
+
+Here **$t$ is a mixing fraction, not Euler's number** — it is how much of each
+factor gets blended into the others. $t = 0$ is the identity and changes nothing;
+$t \to 1$ drives all $K$ factors toward being identical. Written out, the two
+sides move in opposite directions:
+
+$$
+L \;\mapsto\; LT_t \quad\text{(blends the loading columns together)},
+\qquad
+F \;\mapsto\; FT_t^{-1} = \frac{1}{1-t}\Bigl(F - \tfrac{t}{K}\,\text{rowSums}(F)\,\mathbf{1}'\Bigr)
+\quad\text{(subtracts a per-feature constant)}.
+$$
+
+So raising $t$ makes $L$ **denser** and $F$ **sparser** at the same time. Nothing
+here is special to $L$: sparsity is simply being moved from one side to the
+other, and the likelihood is indifferent to where it sits.
+
+```{r mixing-test}
+hoy <- function(v) { v <- abs(v); n <- length(v)
+                     (sqrt(n) - sum(v)/sqrt(sum(v^2))) / (sqrt(n) - 1) }
+mh  <- function(M) mean(apply(M, 2, hoy))
+
+dsm <- sim_dataset(1, min(C_GRID))
+L0  <- dsm$truth$L; F0c <- dsm$FF_true; KK <- ncol(L0)
+
+knitr::kable(do.call(rbind, lapply(c(-0.3, -0.1, 0, 0.1, 0.3, 0.5, 0.7), function(t) {
+  Tm <- (1 - t) * diag(KK) + (t / KK) * matrix(1, KK, KK)
+  Li <- L0 %*% Tm; Fi <- F0c %*% t(solve(Tm))
+  data.frame(t = t,
+             `both nonneg` = min(Li) >= -1e-9 && min(Fi) >= -1e-9,
+             `Hoyer of L` = mh(Li),
+             `Hoyer of F` = mh(Fi),
+             `max |change in theta|` = max(abs(tcrossprod(Li, Fi) -
+                                               tcrossprod(L0, F0c))),
+             check.names = FALSE)
+})), digits = 3,
+caption = "Truth at c = 0.001 under the mixing family. t = 0 is the truth itself.")
+```
+
+$\theta$ is unchanged to machine precision throughout, so every admissible row of
+that table has **exactly** the same likelihood as the truth. Yet the sparsity of
+$L$ ranges over an order of magnitude, and $F$ moves the other way. The truth's
+particular split is one arbitrary point on a continuum; no amount of data can
+single it out.
+
+Note the freedom is one-sided here: $t < 0$ (which would make $L$ sparser and $F$
+denser) is infeasible. Since $\text{rowSums}(L) = 1$, $LT_t$ at $t<0$ equals
+$(1+|t|)L - \tfrac{|t|}{K}\mathbf{1}\mathbf{1}'$, and the many tiny
+$\text{Dirichlet}(0.3)$ entries of $L$ go negative immediately.
+
+## What limits the trade is zeros — and small c has none
+
+Mixing can continue only until some entry of $LT_t$ or $FT_t^{-1}$ reaches zero.
+Nonnegativity is the *only* thing pinning an NMF down, so the size of the
+admissible set is governed by how close the factors come to zero. And that is
+exactly what $c$ controls, because the calibrated truth is
+$F_c = \alpha_c F_0 + \beta_c$ — a floor of $\beta_c$ under **every** entry.
+
+```{r floor-vs-freedom, cache=TRUE}
+tr0 <- sim_truth(1)
+
+## largest mixing fraction t that keeps both factors nonnegative
+max_mix <- function(L, F) {
+  feas <- function(t) { Tm <- (1-t)*diag(KK) + (t/KK)*matrix(1, KK, KK)
+    min(L %*% Tm) >= -1e-9 && min(F %*% t(solve(Tm))) >= -1e-9 }
+  if (!feas(1e-6)) return(0)
+  lo <- 0; hi <- 1
+  for (i in 1:40) { mid <- (lo + hi)/2; if (feas(mid)) lo <- mid else hi <- mid }
+  lo
+}
+
+free <- do.call(rbind, lapply(C_GRID, function(cc) {
+  dd <- sim_dataset(1, cc, tr0)
+  th <- dd$alpha * tr0$theta0 + dd$beta
+  t  <- max_mix(tr0$L, dd$FF_true)
+  Tm <- (1 - t) * diag(KK) + (t / KK) * matrix(1, KK, KK)
+  sub <- d$c_true == cc & d$c_fit == cc & d$init == "rank1"
+  data.frame(c_true = cc,
+             `floor / mean theta`   = dd$beta / mean(th),
+             `largest feasible t`   = t,
+             `Hoyer L at that t`    = mh(tr0$L %*% Tm),
+             `Hoyer L fitted`       = mean(d$hoyer_L[sub]),
+             `Hoyer L true`         = mh(tr0$L),
+             `Hoyer F at that t`    = mh(dd$FF_true %*% t(solve(Tm))),
+             `Hoyer F fitted`       = mean(d$hoyer_F[sub]),
+             `Hoyer F true`         = mh(dd$FF_true),
+             check.names = FALSE)
+}))
+knitr::kable(free, digits = 3, row.names = FALSE)
+```
+
+At $c = 10^{-3}$ the constant floor is `r round(100*free[[2]][1])`% of $\theta$:
+no entry of $F_c$ is anywhere near zero, no nonnegativity constraint is active,
+and the trade can run all the way to $t = `r round(free[[3]][1], 2)`$. At
+$c = \infty$ the floor is `r round(100*tail(free[[2]],1))`% — $F_c$ keeps the
+near-zeros inherited from $F_0$'s `r 100*PI0`% exact zeros, the constraints bite,
+and only $t = `r round(tail(free[[3]],1), 3)`$ is available.
+
+```{r floor-corr}
+gap <- free[["Hoyer L true"]] - free[["Hoyer L fitted"]]
+c(`cor(floor fraction, L sparsity gap)`  = cor(free[[2]], gap),
+  `cor(largest feasible t, L gap)`       = cor(free[[3]], gap))
+```
+
+Compare the "Hoyer L at that t" and "Hoyer L fitted" columns for $c \ge 1$: the
+optimizer lands essentially **exactly** at the densest admissible point. It takes
+all the slack the constraints allow, and coordinate descent from either start
+spreads mass across factors with nothing pulling it back.
+
+## The fit is not finding better structure
+
+Worth checking that the dense solution is not somehow a genuinely better
+explanation. It does beat the true parameters on the training data, but by about
+the amount generic overfitting predicts:
+
+```{r overfit-check}
+dsm1 <- sim_dataset(1, min(C_GRID))
+xx   <- readRDS(cell_file(1, min(C_GRID), min(C_GRID)))
+Lf   <- xx$fits$rank1$LL; Ff <- xx$fits$rank1$FF
+pll  <- function(lam) sum(dsm1$Y * log(pmax(lam, 1e-300)) - lam - lgamma(dsm1$Y + 1))
+lam_fit <- min(C_GRID) * expm1(tcrossprod(Lf, Ff) / max(1, min(C_GRID)))
+c(fitted            = pll(lam_fit),
+  `true parameters` = pll(dsm1$lambda),
+  advantage         = pll(lam_fit) - pll(dsm1$lambda),
+  `free parameters / 2` = (K_TRUE * (N_ROWS + N_COLS) - K_TRUE^2) / 2)
+```
+
+## Caveat: how much of this is the simulation design?
+
+Some of it is. The $\beta_c$ offset exists so the datasets are comparable across
+$c$, and it is precisely what strips the zeros out of $F_c$ at small $c$. Without
+it, $\theta$ would inherit $\theta_0$'s exact zeros — `r 100*PI0`% of $F_0$ — and
+the small-$c$ fits would be far better pinned.
+
+The mechanism is still real rather than purely an artifact: $\theta = \log(1 +
+\lambda/c)$ is uniformly large when $c$ is small relative to the rates, so
+near-zeros in $\theta$ are intrinsically scarce there, whatever the simulation.
+But the *magnitude* seen above is amplified by the calibration, and the honest
+reading is:
+
+> At small $c$ the log1p factorization is weakly identified in a specific way:
+> the likelihood pins down $LF'$ but says little about how sparsity is divided
+> between $L$ and $F$. The sparsity of a small-$c$ fit is therefore a property of
+> the optimizer and the initialization as much as of the data — consistent with
+> the two initializations reaching the same log-likelihood to within 0.008 while
+> differing by up to 0.09 in Hoyer sparsity.
+
+The mixing family above is only one convenient one-parameter slice through the
+admissible set of $T$; the full set is larger, so these numbers are a lower bound
+on how much the split can move.
+
+```{r session}
+sessionInfo()
+```

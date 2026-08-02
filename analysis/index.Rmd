@@ -80,3 +80,7 @@ Welcome to my research website.
 
 [A Simulation Showing Differences in Factors between log1pNMF and fastTopics](factor_sim_identifiable_reduc.html)
 
+[Fitting the log1p model at the wrong c](c_grid_sim.html)
+
+[Non-identifiability of the log1p factorization, and how c controls it](log1p_identifiability.html)
+
