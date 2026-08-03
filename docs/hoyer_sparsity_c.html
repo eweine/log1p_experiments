@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-08-02" />
+
+<title>Why the sparsity of a log1p fit is decided by Y and c</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Why the sparsity of a log1p fit is decided
+by Y and c</h1>
+<h4 class="date">2026-08-02</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-08-02
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongdetected">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
+</p>
+</div>
+<div id="strongCachestrongdetected" class="panel-collapse collapse">
+<div class="panel-body">
+The following chunks had caches available:
+<ul>
+<li>
+verify
+</li>
+</ul>
+<p>To ensure reproducibility of the results, delete the cache directory
+<code>hoyer_sparsity_c_cache</code> and re-run the analysis. To have
+workflowr automatically delete the cache directory prior to building the
+file, set <code>delete_cache = TRUE</code> when running
+<code>wflow_build()</code> or <code>wflow_publish()</code>.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3167a7f52e9425b59cade978a1106e6d991a9459targetblank3167a7fa">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/3167a7f52e9425b59cade978a1106e6d991a9459" target="_blank">3167a7f</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3167a7f52e9425b59cade978a1106e6d991a9459targetblank3167a7fa"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/3167a7f52e9425b59cade978a1106e6d991a9459" target="_blank">3167a7f</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    analysis/c_grid_sim_cache/
+    Ignored:    analysis/figure/
+    Ignored:    analysis/hoyer_sparsity_c_cache/
+    Ignored:    analysis/log1p_identifiability_cache/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/hoyer_sparsity_c.Rmd</code>) and
+HTML (<code>docs/hoyer_sparsity_c.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/3167a7f52e9425b59cade978a1106e6d991a9459/analysis/hoyer_sparsity_c.Rmd" target="_blank">3167a7f</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Add a page on Hoyer sparsity as a function of Y and c
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(ggplot2); library(cowplot); library(log1pNMF)
+theme_set(theme_cowplot(font_size = 11))
+exp_dir   &lt;- path.expand(&quot;~/Documents/log1pNMF/inst/paper_figures/experiments&quot;)
+cells_dir &lt;- file.path(exp_dir, &quot;c_grid_sim&quot;)
+source(file.path(exp_dir, &quot;c_grid_sim_common.R&quot;))
+
+hoyer &lt;- function(x) { x &lt;- abs(x); n &lt;- length(x)
+  (sqrt(n) - sum(x)/sqrt(sum(x^2))) / (sqrt(n) - 1) }
+p2m &lt;- function(x) max(x) / mean(x)          # peak-to-mean ratio</code></pre>
+<div id="the-question" class="section level1">
+<h1>The question</h1>
+<p>You have a count matrix <span class="math inline">\(Y\)</span>. You
+fit the log1p model at several values of <span
+class="math inline">\(c\)</span>. The factors come out visibly more or
+less sparse depending on which <span class="math inline">\(c\)</span>
+you used, even though nothing about the data changed. What decides
+that?</p>
+<p>This page answers exactly that, and nothing else. It is about
+<strong>Hoyer</strong> sparsity — a continuous measure that does not
+require any exact zeros — expressed purely in terms of <span
+class="math inline">\(Y\)</span> and <span
+class="math inline">\(c\)</span>.</p>
+<p><strong>The answer in one sentence.</strong> The Hoyer sparsity that
+<span class="math inline">\(L\)</span> and <span
+class="math inline">\(F\)</span> can achieve is jointly capped by the
+<em>peak-to-mean ratio</em> of <span class="math inline">\(\theta =
+\log(1+\lambda/c)\)</span>; the rates <span
+class="math inline">\(\lambda\)</span> are fixed by <span
+class="math inline">\(Y\)</span>; and <span
+class="math inline">\(c\)</span> alone slides that ratio between <span
+class="math inline">\(1\)</span> and <span
+class="math inline">\(\lambda\)</span>’s own peak-to-mean.</p>
+<p>The rest of the page is that sentence in four steps.</p>
+</div>
+<div id="step-a-hoyer-sparsity-is-peak-to-mean-in-disguise"
+class="section level1">
+<h1>Step A: Hoyer sparsity is peak-to-mean in disguise</h1>
+<p>For a nonnegative vector <span class="math inline">\(x\)</span> of
+length <span class="math inline">\(n\)</span>,</p>
+<p><span class="math display">\[
+H(x) = \frac{\sqrt{n} - \|x\|_1/\|x\|_2}{\sqrt{n}-1},
+\qquad\text{and write}\qquad
+P(x) = \frac{x_{\max}}{\bar{x}} .
+\]</span></p>
+<p><span class="math inline">\(P\)</span> asks a simple question: how
+big is the largest entry compared with a typical one? Now use <span
+class="math inline">\(\|x\|_2^2 = \sum x_i^2 \le x_{\max}\sum x_i =
+\|x\|_\infty\|x\|_1\)</span>:</p>
+<p><span class="math display">\[
+\frac{\|x\|_1}{\|x\|_2} \;\ge\;
+\frac{\|x\|_1}{\sqrt{\|x\|_\infty\|x\|_1}}
+\;=\; \sqrt{\frac{\|x\|_1}{\|x\|_\infty}} \;=\; \sqrt{\frac{n}{P}},
+\]</span></p>
+<p>and therefore</p>
+<p><span class="math display">\[
+\boxed{\;H(x) \;\le\; \frac{\sqrt{n}-\sqrt{n/P}}{\sqrt{n}-1} \;\approx\;
+1 - \frac{1}{\sqrt{P}}\;}
+\]</span></p>
+<p>This is the whole of Step A, and it is worth reading in words:
+<strong>a vector can only be Hoyer-sparse if some of its entries stick
+far above its mean.</strong> If <span class="math inline">\(P =
+1\)</span> every entry equals the mean, the vector is constant, and
+<span class="math inline">\(H = 0\)</span> — no matter how many entries
+there are and regardless of whether any are zero. Sparsity requires
+<em>range</em>, not zeros.</p>
+<pre class="r"><code>set.seed(1); n &lt;- 500
+sim &lt;- do.call(rbind, lapply(seq(0, 1, length.out = 60), function(a) {
+  do.call(rbind, lapply(1:8, function(r) {
+    x &lt;- (1 - a) + a * rexp(n)^2          # dial from constant to heavy-tailed
+    data.frame(P = p2m(x), H = hoyer(x)) }) ) }))
+curve &lt;- data.frame(P = seq(1, max(sim$P), length.out = 300))
+curve$bound &lt;- 1 - 1/sqrt(curve$P)
+
+ggplot(sim, aes(P, H)) +
+  geom_point(colour = &quot;#0E8FA8&quot;, alpha = 0.5, size = 1.2) +
+  geom_line(data = curve, aes(P, bound), colour = &quot;#C2410C&quot;, linewidth = 1) +
+  scale_x_log10() +
+  labs(x = &quot;peak-to-mean  P = max / mean&quot;, y = &quot;Hoyer sparsity&quot;,
+       title = &quot;Sparsity is bounded by peak-to-mean&quot;,
+       subtitle = &quot;points: random nonnegative vectors.  line: 1 - 1/sqrt(P)&quot;)</code></pre>
+<p><img src="figure/hoyer_sparsity_c.Rmd/stepA-1.png" alt="" width="770" style="display: block; margin: auto;" /></p>
+</div>
+<div id="step-b-l-and-f-share-a-single-budget" class="section level1">
+<h1>Step B: L and F share a single budget</h1>
+<p>The fit gives <span class="math inline">\(\theta = LF&#39;\)</span>
+with <span class="math inline">\(L, F \ge 0\)</span>. Fix a factor <span
+class="math inline">\(k\)</span>, and let <span
+class="math inline">\(i^\star\)</span> be the sample with the largest
+loading on it and <span class="math inline">\(j^\star\)</span> the
+feature with the largest weight on it. Because <strong>every term in the
+sum is nonnegative</strong> we may throw all the others away:</p>
+<p><span class="math display">\[
+\theta_{\max} \;\ge\; \theta_{i^\star j^\star}
+= \sum_{m}\ell_{i^\star m}f_{j^\star m}
+\;\ge\; \ell^{\max}_k\, f^{\max}_k .
+\]</span></p>
+<p>The mean is <span class="math inline">\(\bar\theta = \sum_m
+\bar\ell_m\bar f_m\)</span>. Let <span class="math inline">\(w_k =
+\bar\ell_k\bar f_k/\bar\theta \in (0,1)\)</span> be the share of <span
+class="math inline">\(\bar\theta\)</span> contributed by factor <span
+class="math inline">\(k\)</span>. Dividing the display by <span
+class="math inline">\(\bar\theta\)</span> and inserting <span
+class="math inline">\(\bar\ell_k\bar f_k\)</span> top and bottom,</p>
+<p><span class="math display">\[
+\boxed{\;P_L(k)\;\cdot\;P_F(k)\;\cdot\;w_k \;\;\le\;\; P_\theta\;}
+\qquad
+P_\theta=\frac{\theta_{\max}}{\bar\theta},\quad
+P_L(k)=\frac{\ell^{\max}_k}{\bar\ell_k},\quad
+P_F(k)=\frac{f^{\max}_k}{\bar f_k}.
+\]</span></p>
+<p>Read it as a <strong>budget</strong>. <span
+class="math inline">\(P_\theta\)</span> is how much peak-to-mean the
+fitted <span class="math inline">\(\theta\)</span> has to spend. The two
+factors’ peakedness multiply against it, so:</p>
+<ul>
+<li>they <strong>trade</strong>: at fixed <span
+class="math inline">\(P_\theta\)</span>, making <span
+class="math inline">\(L\)</span> more peaked forces <span
+class="math inline">\(F\)</span> flatter;</li>
+<li>they are <strong>jointly capped</strong>: neither can be peaked at
+all if <span class="math inline">\(P_\theta\)</span> is near <span
+class="math inline">\(1\)</span>, because the product cannot exceed
+it.</li>
+</ul>
+<p>Combining with Step A, if <span class="math inline">\(\theta\)</span>
+has no range then neither factor can be Hoyer-sparse, and no choice of
+optimizer or initialization can change that.</p>
+<p>This is also why the two things you may have noticed are not in
+conflict. Holding the data and <span class="math inline">\(c\)</span>
+fixed and moving between equally-good factorizations slides along the
+budget line — a trade. Changing <span class="math inline">\(c\)</span>
+moves the budget line itself — so both can rise together.</p>
+</div>
+<div id="step-c-c-is-what-sets-the-budget" class="section level1">
+<h1>Step C: c is what sets the budget</h1>
+<p>Here is the crux. <span class="math inline">\(\theta\)</span> is not
+free: it is the rates seen through the link,</p>
+<p><span class="math display">\[
+\theta = \log\!\left(1+\frac{\lambda}{c}\right).
+\]</span></p>
+<p>Take five rates and never change them. Look at what <span
+class="math inline">\(c\)</span> does to their peak-to-mean:</p>
+<pre class="r"><code>lam &lt;- c(0.1, 0.5, 1, 5, 20)
+cs  &lt;- c(1e-3, 1e-2, 1e-1, 1, 10, 100, 1e3, Inf)
+knitr::kable(do.call(rbind, lapply(cs, function(cc) {
+  th &lt;- if (is.infinite(cc)) lam else log1p(lam/cc)
+  data.frame(c = format(cc),
+             theta = paste(sprintf(&quot;%.3g&quot;, th), collapse = &quot;  &quot;),
+             P_theta = p2m(th), `sparsity cap` = 1 - 1/sqrt(p2m(th)),
+             check.names = FALSE) })),
+  digits = 3, row.names = FALSE,
+  caption = &quot;The same five rates throughout. Only c changes.&quot;)</code></pre>
+<table>
+<caption>The same five rates throughout. Only c changes.</caption>
+<thead>
+<tr class="header">
+<th align="left">c</th>
+<th align="left">theta</th>
+<th align="right">P_theta</th>
+<th align="right">sparsity cap</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0.001</td>
+<td align="left">4.62 6.22 6.91 8.52 9.9</td>
+<td align="right">1.369</td>
+<td align="right">0.145</td>
+</tr>
+<tr class="even">
+<td align="left">0.01</td>
+<td align="left">2.4 3.93 4.62 6.22 7.6</td>
+<td align="right">1.535</td>
+<td align="right">0.193</td>
+</tr>
+<tr class="odd">
+<td align="left">0.1</td>
+<td align="left">0.693 1.79 2.4 3.93 5.3</td>
+<td align="right">1.878</td>
+<td align="right">0.270</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">0.0953 0.405 0.693 1.79 3.04</td>
+<td align="right">2.524</td>
+<td align="right">0.371</td>
+</tr>
+<tr class="odd">
+<td align="left">10</td>
+<td align="left">0.00995 0.0488 0.0953 0.405 1.1</td>
+<td align="right">3.313</td>
+<td align="right">0.451</td>
+</tr>
+<tr class="even">
+<td align="left">100</td>
+<td align="left">0.001 0.00499 0.00995 0.0488 0.182</td>
+<td align="right">3.690</td>
+<td align="right">0.479</td>
+</tr>
+<tr class="odd">
+<td align="left">1000</td>
+<td align="left">0.0001 0.0005 0.001 0.00499 0.0198</td>
+<td align="right">3.752</td>
+<td align="right">0.484</td>
+</tr>
+<tr class="even">
+<td align="left">Inf</td>
+<td align="left">0.1 0.5 1 5 20</td>
+<td align="right">3.759</td>
+<td align="right">0.484</td>
+</tr>
+</tbody>
+</table>
+<p>The rates never move. Their own peak-to-mean is 3.76. But the budget
+the fit actually gets runs from about 1.37 at <span
+class="math inline">\(c=10^{-3}\)</span> up to 3.76 at <span
+class="math inline">\(c=\infty\)</span>, and with it the sparsity cap
+roughly triples.</p>
+<p><strong>Why.</strong> For <span class="math inline">\(c\)</span> much
+smaller than the rates, <span
+class="math inline">\(\log(1+\lambda/c)\approx \log(1/c) +
+\log\lambda\)</span>: every entry acquires the same large constant <span
+class="math inline">\(\log(1/c)\)</span>, and a shared additive constant
+is exactly what destroys peak-to-mean. For <span
+class="math inline">\(c\)</span> much larger than the rates, <span
+class="math inline">\(\log(1+\lambda/c)\approx\lambda/c\)</span>, a pure
+rescaling, which preserves peak-to-mean exactly. Formally</p>
+<p><span class="math display">\[
+P_\theta(c)\;\xrightarrow[c\to 0]{}\;1,
+\qquad
+P_\theta(c) - 1 \;\approx\;
+\frac{\log\lambda_{\max}-\overline{\log\lambda}}{\log(1/c)},
+\qquad
+P_\theta(c)\;\xrightarrow[c\to\infty]{}\;\frac{\lambda_{\max}}{\bar\lambda}.
+\]</span></p>
+<pre class="r"><code>grid &lt;- 10^seq(-4, 4, length.out = 200)
+d &lt;- data.frame(c = grid,
+                P = sapply(grid, function(cc) p2m(log1p(lam/cc))))
+ggplot(d, aes(c, P)) +
+  geom_hline(yintercept = p2m(lam), linetype = &quot;dashed&quot;, colour = &quot;#C2410C&quot;) +
+  geom_hline(yintercept = 1, linetype = &quot;dotted&quot;, colour = &quot;grey50&quot;) +
+  geom_line(colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+  scale_x_log10() +
+  annotate(&quot;text&quot;, x = 1e3, y = p2m(lam), vjust = -0.7, size = 3.2,
+           colour = &quot;#C2410C&quot;, label = &quot;max/mean of the rates&quot;) +
+  annotate(&quot;text&quot;, x = 1e-4, y = 1, vjust = -0.7, hjust = 0, size = 3.2,
+           colour = &quot;grey35&quot;, label = &quot;no range left&quot;) +
+  labs(x = &quot;c&quot;, y = expression(P[theta]),
+       title = &quot;The sparsity budget, as a function of c&quot;,
+       subtitle = &quot;same rates throughout; only the link changes&quot;)</code></pre>
+<p><img src="figure/hoyer_sparsity_c.Rmd/stepC-plot-1.png" alt="" width="715" style="display: block; margin: auto;" /></p>
+</div>
+<div id="step-d-the-rates-come-from-y-not-from-c"
+class="section level1">
+<h1>Step D: the rates come from Y, not from c</h1>
+<p>The last link is why we may treat <span
+class="math inline">\(\lambda\)</span> as given. The Poisson
+log-likelihood is</p>
+<p><span class="math display">\[
+\ell(\lambda) = \sum_{ij}\bigl[y_{ij}\log\lambda_{ij}-\lambda_{ij}\bigr]
+- \sum_{ij}\log y_{ij}!,
+\]</span></p>
+<p>which contains <strong>no <span class="math inline">\(c\)</span>
+anywhere</strong>. <span class="math inline">\(c\)</span> appears only
+in the feasible set — which rate matrices are reachable, namely those
+with <span class="math inline">\(\log(1+\lambda/c)\)</span> of
+nonnegative rank <span class="math inline">\(K\)</span>. So <span
+class="math inline">\(c\)</span> does not change what a good set of
+rates is; the fitted rates are governed by <span
+class="math inline">\(Y\)</span>.</p>
+<p>That means <span class="math inline">\(\lambda\)</span> can be
+estimated from <span class="math inline">\(Y\)</span> before fitting
+anything. The crudest estimate suffices for this purpose — the rank-1
+independence model</p>
+<p><span class="math display">\[
+m_{ij} = \frac{y_{i\cdot}\,y_{\cdot j}}{y_{\cdot\cdot}} .
+\]</span></p>
+</div>
+<div id="the-recipe" class="section level1">
+<h1>The recipe</h1>
+<p>Given <span class="math inline">\(Y\)</span> and a candidate <span
+class="math inline">\(c\)</span>, with no model fitted:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(m_{ij} = y_{i\cdot}y_{\cdot
+j}/y_{\cdot\cdot}\)</span></li>
+<li><span class="math inline">\(P_\theta(c) = \max_{ij}\log(1+m_{ij}/c)
+\big/ \overline{\log(1+m/c)}\)</span></li>
+<li>sparsity cap <span class="math inline">\(\approx 1 -
+1/\sqrt{P_\theta(c)}\)</span>, shared between <span
+class="math inline">\(L\)</span> and <span
+class="math inline">\(F\)</span></li>
+</ol>
+<p>If <span class="math inline">\(P_\theta(c)\)</span> is near 1, sparse
+factors are unobtainable at that <span class="math inline">\(c\)</span>
+and any sparsity you do see is an artifact of the optimizer’s path.</p>
+<pre class="r"><code>sparsity_budget &lt;- function(Y, c) {
+  m  &lt;- outer(rowSums(Y), colSums(Y)) / sum(Y)
+  th &lt;- if (is.infinite(c)) m else log1p(m / c)
+  P  &lt;- max(th) / mean(th)
+  c(P_theta = P, cap = 1 - 1/sqrt(P))
+}
+Y &lt;- sim_dataset(1, 1)$Y                       # any count matrix
+round(t(sapply(C_GRID, function(cc) c(c = cc, sparsity_budget(Y, cc)))), 3)</code></pre>
+<pre><code>         c P_theta   cap
+[1,] 1e-03   1.413 0.159
+[2,] 1e-02   1.625 0.215
+[3,] 1e-01   2.185 0.324
+[4,] 1e+00   4.029 0.502
+[5,] 1e+01   8.115 0.649
+[6,] 1e+02  10.775 0.695
+[7,] 1e+03  11.244 0.702
+[8,]   Inf  11.301 0.703</code></pre>
+</div>
+<div id="does-it-hold-on-real-fits" class="section level1">
+<h1>Does it hold on real fits?</h1>
+<p>Against the 640 fits from the <a href="c_grid_sim.html">c-grid
+simulation</a>: the budget inequality of Step B should never be
+violated, and if the argument is right it should be roughly
+<em>tight</em> — the optimizer should spend what it is given.</p>
+<pre class="r"><code>ver &lt;- do.call(rbind, lapply(C_GRID, function(cf) {
+  r &lt;- do.call(rbind, lapply(1:10, function(sd) {
+    Yd &lt;- sim_dataset(sd, 1)$Y
+    x  &lt;- readRDS(file.path(cells_dir, paste0(
+            tag_of(list(seed = sd, c_true = 1, c_fit = cf)), &quot;.rds&quot;)))
+    L &lt;- x$fits$rank1$LL; Fm &lt;- x$fits$rank1$FF
+    th &lt;- tcrossprod(L, Fm) / max(1, if (is.infinite(cf)) 1 else cf)
+    w  &lt;- colMeans(L) * colMeans(Fm); w &lt;- w / sum(w)
+    PL &lt;- apply(L, 2, p2m); PF &lt;- apply(Fm, 2, p2m)
+    c(`predicted P (from Y,c)` = unname(sparsity_budget(Yd, cf)[&quot;P_theta&quot;]),
+      `actual P of theta-hat`  = p2m(th),
+      `P_L P_F w`              = max(PL * PF * w),
+      `Hoyer L`                = mean(apply(L,  2, hoyer)),
+      `Hoyer F`                = mean(apply(Fm, 2, hoyer)),
+      violations               = sum(PL * PF * w &gt; p2m(th) * (1 + 1e-8)))
+  }))
+  as.data.frame(t(c(c_fit = cf, colMeans(r))))
+}))
+knitr::kable(ver, digits = c(3, 2, 2, 2, 3, 3, 0), row.names = FALSE)</code></pre>
+<table>
+<colgroup>
+<col width="6%" />
+<col width="26%" />
+<col width="25%" />
+<col width="11%" />
+<col width="9%" />
+<col width="9%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">c_fit</th>
+<th align="right">predicted P (from Y,c)</th>
+<th align="right">actual P of theta-hat</th>
+<th align="right">P_L P_F w</th>
+<th align="right">Hoyer L</th>
+<th align="right">Hoyer F</th>
+<th align="right">violations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1e-03</td>
+<td align="right">1.40</td>
+<td align="right">1.56</td>
+<td align="right">1.54</td>
+<td align="right">0.124</td>
+<td align="right">0.074</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">1e-02</td>
+<td align="right">1.60</td>
+<td align="right">1.85</td>
+<td align="right">1.82</td>
+<td align="right">0.133</td>
+<td align="right">0.090</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1e-01</td>
+<td align="right">2.14</td>
+<td align="right">2.66</td>
+<td align="right">2.56</td>
+<td align="right">0.159</td>
+<td align="right">0.144</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">1e+00</td>
+<td align="right">3.90</td>
+<td align="right">5.59</td>
+<td align="right">5.54</td>
+<td align="right">0.240</td>
+<td align="right">0.321</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+01</td>
+<td align="right">7.67</td>
+<td align="right">13.01</td>
+<td align="right">12.93</td>
+<td align="right">0.326</td>
+<td align="right">0.503</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">1e+02</td>
+<td align="right">10.04</td>
+<td align="right">18.30</td>
+<td align="right">18.22</td>
+<td align="right">0.350</td>
+<td align="right">0.562</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+03</td>
+<td align="right">10.45</td>
+<td align="right">19.26</td>
+<td align="right">19.18</td>
+<td align="right">0.353</td>
+<td align="right">0.570</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">10.50</td>
+<td align="right">19.38</td>
+<td align="right">19.30</td>
+<td align="right">0.354</td>
+<td align="right">0.571</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>Three things to check in that table.</p>
+<p><strong>The inequality is never violated</strong> — as it must not
+be, being an identity plus nonnegativity.</p>
+<p><strong>It is tight.</strong> <code>P_L P_F w</code> sits just under
+<code>actual P of theta-hat</code> in every row. The fits use their
+whole budget, which is what makes the bound explanatory rather than
+merely true: at small <span class="math inline">\(c\)</span> the
+optimizer is not failing to find sparse factors, there are none to
+find.</p>
+<p><strong>The budget predicted from <span
+class="math inline">\(Y\)</span> and <span
+class="math inline">\(c\)</span> alone tracks the realized one</strong>,
+so the whole chain can be evaluated before fitting.</p>
+<pre class="r"><code>lab &lt;- ifelse(is.infinite(ver$c_fit), &quot;∞&quot;,
+              format(ver$c_fit, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))
+ver$cf &lt;- factor(lab, levels = lab)
+long &lt;- rbind(
+  data.frame(cf = ver$cf, what = &quot;budget P (theta)&quot;, v = ver$`actual P of theta-hat`),
+  data.frame(cf = ver$cf, what = &quot;spent  P_L P_F w&quot;, v = ver$`P_L P_F w`))
+p1 &lt;- ggplot(long, aes(cf, v, colour = what, group = what)) +
+  geom_line(linewidth = 1) + geom_point(size = 2) +
+  scale_colour_manual(values = c(&quot;#0E5C6B&quot;, &quot;#C2410C&quot;), name = NULL) +
+  labs(x = &quot;c used for fitting&quot;, y = &quot;peak-to-mean&quot;,
+       title = &quot;The budget, and what the fit spends&quot;) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+p2 &lt;- ggplot(ver, aes(`actual P of theta-hat`)) +
+  geom_line(aes(y = `Hoyer L`, colour = &quot;L&quot;), linewidth = 1) +
+  geom_line(aes(y = `Hoyer F`, colour = &quot;F&quot;), linewidth = 1) +
+  geom_line(aes(y = 1 - 1/sqrt(`actual P of theta-hat`), colour = &quot;cap&quot;),
+            linetype = &quot;dashed&quot;, linewidth = 0.8) +
+  scale_colour_manual(values = c(L = &quot;#0E8FA8&quot;, F = &quot;#C2410C&quot;, cap = &quot;grey40&quot;),
+                      name = NULL) +
+  scale_x_log10() +
+  labs(x = expression(P[theta]), y = &quot;mean Hoyer sparsity&quot;,
+       title = &quot;Both factors rise with the budget&quot;)
+plot_grid(p1, p2, nrow = 1)</code></pre>
+<p><img src="figure/hoyer_sparsity_c.Rmd/verify-plot-1.png" alt="" width="880" style="display: block; margin: auto;" /></p>
+</div>
+<div id="what-to-do-with-this" class="section level1">
+<h1>What to do with this</h1>
+<ul>
+<li><strong>Compute <code>sparsity_budget(Y, c)</code> before you
+fit.</strong> It costs nothing and tells you whether sparse factors are
+even available at that <span class="math inline">\(c\)</span>.</li>
+<li><strong>Do not compare sparsity across <span
+class="math inline">\(c\)</span>.</strong> “The <span
+class="math inline">\(c=0.01\)</span> factors are denser than the <span
+class="math inline">\(c=10\)</span> factors” is a statement about <span
+class="math inline">\(\log(1+\cdot/c)\)</span>, not about the data. The
+budgets differ, so the comparison is meaningless.</li>
+<li><strong>Do compare things that depend on <span
+class="math inline">\(LF&#39;\)</span></strong> — fitted rates, held-out
+log-likelihood, which samples resemble which. Those do not depend on how
+the budget was split.</li>
+<li><strong>If sparsity is scientifically important, impose it.</strong>
+The likelihood will not choose it for you; only a penalty, a prior, or
+an anchor assumption will.</li>
+</ul>
+<p>A companion page, <a
+href="log1p_identifiability.html">Non-identifiability of the log1p
+factorization</a>, covers the other half of the story: for a
+<em>fixed</em> budget, exactly which factorizations are equally likely
+and how sparsity moves between <span class="math inline">\(L\)</span>
+and <span class="math inline">\(F\)</span> along that constraint.</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Chicago
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] log1pNMF_0.1-6  cowplot_1.2.0   ggplot2_4.0.3   workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      lattice_0.22-9    
+ [5] startupmsg_1.0.0   digest_0.6.39      magrittr_2.0.5     evaluate_1.0.5    
+ [9] grid_4.5.2         RColorBrewer_1.1-3 fastmap_1.2.0      sfsmisc_1.1-23    
+[13] rprojroot_2.1.1    jsonlite_2.0.0     Matrix_1.7-5       processx_3.9.0    
+[17] whisker_0.4.1      promises_1.5.0     httr_1.4.8         scales_1.4.0      
+[21] codetools_0.2-20   jquerylib_0.1.4    cli_3.6.6          rlang_1.2.0       
+[25] withr_3.0.2        cachem_1.1.0       yaml_2.3.12        otel_0.2.0        
+[29] parallel_4.5.2     tools_4.5.2        dplyr_1.2.1        httpuv_1.6.17     
+[33] distr_2.9.7        vctrs_0.7.3        R6_2.6.1           lifecycle_1.0.5   
+[37] git2r_0.36.2       stringr_1.6.0      fs_2.1.0           MASS_7.3-65       
+[41] pkgconfig_2.0.3    callr_3.7.6        pillar_1.11.1      bslib_0.10.0      
+[45] later_1.4.8        gtable_0.3.6       glue_1.8.1         Rcpp_1.1.1-1.1    
+[49] xfun_0.57          tibble_3.3.1       tidyselect_1.2.1   rstudioapi_0.18.0 
+[53] knitr_1.51         dichromat_2.0-0.1  farver_2.1.2       htmltools_0.5.9   
+[57] labeling_0.4.3     rmarkdown_2.31     compiler_4.5.2     getPass_0.2-4     
+[61] S7_0.2.2          </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Chicago
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] log1pNMF_0.1-6  cowplot_1.2.0   ggplot2_4.0.3   workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      lattice_0.22-9    
+ [5] startupmsg_1.0.0   digest_0.6.39      magrittr_2.0.5     evaluate_1.0.5    
+ [9] grid_4.5.2         RColorBrewer_1.1-3 fastmap_1.2.0      sfsmisc_1.1-23    
+[13] rprojroot_2.1.1    jsonlite_2.0.0     Matrix_1.7-5       processx_3.9.0    
+[17] whisker_0.4.1      promises_1.5.0     httr_1.4.8         scales_1.4.0      
+[21] codetools_0.2-20   jquerylib_0.1.4    cli_3.6.6          rlang_1.2.0       
+[25] withr_3.0.2        cachem_1.1.0       yaml_2.3.12        otel_0.2.0        
+[29] parallel_4.5.2     tools_4.5.2        dplyr_1.2.1        httpuv_1.6.17     
+[33] distr_2.9.7        vctrs_0.7.3        R6_2.6.1           lifecycle_1.0.5   
+[37] git2r_0.36.2       stringr_1.6.0      fs_2.1.0           MASS_7.3-65       
+[41] pkgconfig_2.0.3    callr_3.7.6        pillar_1.11.1      bslib_0.10.0      
+[45] later_1.4.8        gtable_0.3.6       glue_1.8.1         Rcpp_1.1.1-1.1    
+[49] xfun_0.57          tibble_3.3.1       tidyselect_1.2.1   rstudioapi_0.18.0 
+[53] knitr_1.51         dichromat_2.0-0.1  farver_2.1.2       htmltools_0.5.9   
+[57] labeling_0.4.3     rmarkdown_2.31     compiler_4.5.2     getPass_0.2-4     
+[61] S7_0.2.2          </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
