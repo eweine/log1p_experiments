@@ -84,3 +84,5 @@ Welcome to my research website.
 
 [Non-identifiability of the log1p factorization, and how c controls it](log1p_identifiability.html)
 
+[Why the sparsity of a log1p fit is decided by Y and c](hoyer_sparsity_c.html)
+
