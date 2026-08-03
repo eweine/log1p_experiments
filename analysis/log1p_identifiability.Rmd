@@ -21,8 +21,10 @@ theme_set(theme_cowplot(font_size = 11))
 ```
 
 ```{r paths}
-exp_dir <- path.expand("~/Documents/log1pNMF/inst/paper_figures/experiments")
+exp_dir   <- path.expand("~/Documents/log1pNMF/inst/paper_figures/experiments")
+cells_dir <- file.path(exp_dir, "c_grid_sim")       # the 640 per-cell fits
 source(file.path(exp_dir, "c_grid_sim_common.R"))   # generator, for the examples
+stopifnot(dir.exists(cells_dir))
 
 hoyer <- function(v) { v <- abs(v); n <- length(v)
                        (sqrt(n) - sum(v)/sqrt(sum(v^2))) / (sqrt(n) - 1) }
@@ -401,6 +403,119 @@ nonnegative factors at all — regardless of $c$, regardless of the optimizer.
 Conversely, **each zero of $\theta$ relaxes exactly one of these
 cross-intersection requirements**, buying sparsity on both sides at once.
 
+This argument is about *exact* zeros, and so it speaks directly to exact
+sparsity. Hoyer sparsity is a continuous measure of concentration, and a vector
+with no zeros at all can still be very sparse in the Hoyer sense. The next
+subsection gives the continuous analogue, which turns out to be about the
+**range of values in $\theta$** rather than its zeros.
+
+## The continuous version: a peak-to-mean budget
+
+Hoyer sparsity does not require zeros, so the exact-support argument is not the
+whole story. The continuous statement is about range, and it comes in three
+pieces.
+
+**Piece 1: Hoyer is controlled by peak-to-mean.** For a nonnegative vector $x$ of
+length $n$, write $P(x) = x_{\max}/\bar{x}$. Since
+$\|x\|_2^2 \le \|x\|_\infty\|x\|_1$,
+
+$$
+\frac{\|x\|_1}{\|x\|_2} \;\ge\; \frac{\|x\|_1}{\sqrt{\|x\|_\infty \|x\|_1}}
+= \sqrt{\frac{\|x\|_1}{\|x\|_\infty}} = \sqrt{\frac{n}{P(x)}},
+\qquad\text{so}\qquad
+H(x) \;\le\; \frac{\sqrt{n}-\sqrt{n/P}}{\sqrt{n}-1} \;\approx\; 1 - \frac{1}{\sqrt{P}} .
+$$
+
+A vector can only be Hoyer-sparse if some entries stick far above the mean. If
+$P = 1$ the vector is constant and $H = 0$.
+
+Relatedly, if the entries are confined to a band $[b, M]$ with $\rho = M/b$, the
+most concentrated arrangement puts a fraction $u^\star = 1/(\rho+1)$ of entries at
+$M$ and the rest at $b$, giving
+
+$$
+H_{\max}(\rho) = 1 - \frac{2\sqrt{\rho}}{\rho+1} = \frac{(\sqrt{\rho}-1)^2}{\rho+1}.
+$$
+
+So $\rho = 1 \Rightarrow H_{\max} = 0$: no range, no sparsity, zeros or not.
+
+**Piece 2: $\theta$'s range is a budget that $L$ and $F$ must share.** Fix a
+factor $k$ and let $i^\star = \arg\max_i \ell_{ik}$, $j^\star = \arg\max_j f_{jk}$.
+Because every term is nonnegative we may drop all but the $k$th,
+
+$$
+\theta_{\max} \;\ge\; \theta_{i^\star j^\star} = \sum_m \ell_{i^\star m} f_{j^\star m}
+\;\ge\; \ell^{\max}_k f^{\max}_k .
+$$
+
+Meanwhile $\bar\theta = \sum_m \bar\ell_m \bar f_m$. Writing
+$w_k = \bar\ell_k \bar f_k / \bar\theta$ for factor $k$'s share of the mean and
+dividing,
+
+$$
+\boxed{\;P_L(k)\cdot P_F(k)\cdot w_k \;\le\; P_\theta \;}
+\qquad
+P_\theta = \frac{\theta_{\max}}{\bar\theta},\quad
+P_L(k) = \frac{\ell^{\max}_k}{\bar\ell_k},\quad
+P_F(k) = \frac{f^{\max}_k}{\bar f_k}.
+$$
+
+This is exact, needs no zeros, and is the continuous counterpart of the support
+argument. The peakedness of $L$ and of $F$ enter **multiplicatively** against a
+single budget $P_\theta$. Combined with Piece 1 it caps both Hoyer values at once:
+neither factor can concentrate unless $\theta$ has range to spend.
+
+It also reconciles the two observations that motivated all of this. At fixed
+$\theta$ the budget is fixed, so pushing $P_L$ up must push $P_F$ down — that is
+the mixing family, a movement *along* the constraint. Changing $c$ changes
+$P_\theta$ itself, moving the constraint surface, which lets both rise together.
+
+**Piece 3: $c$ sets $P_\theta$.** With $\theta = \log(1+\lambda/c)$,
+
+$$
+P_\theta(c) = \frac{\log(1+\lambda_{\max}/c)}{\overline{\log(1+\lambda/c)}} .
+$$
+
+As $c \to \infty$ the logs linearize and $P_\theta \to \lambda_{\max}/\bar\lambda$,
+the rates' own peak-to-mean. As $c \to 0$ every term behaves like
+$\log(1/c) + \log\lambda$, the shared divergent part dominates, and
+
+$$
+P_\theta(c) \;\longrightarrow\; 1,
+\qquad
+P_\theta(c) - 1 \;\approx\; \frac{\log\lambda_{\max} - \overline{\log\lambda}}{\log(1/c)} .
+$$
+
+**Small $c$ compresses $\theta$ toward a constant, which drives the budget to
+1, which forces both factors flat.** The rates never changed; only how far apart
+the link places them did.
+
+```{r p2m-check, cache=TRUE}
+p2m <- function(v) max(v) / mean(v)
+knitr::kable(do.call(rbind, lapply(C_GRID, function(cf) {
+  r <- do.call(rbind, lapply(1:10, function(sd) {
+    x  <- readRDS(file.path(cells_dir, paste0(
+            tag_of(list(seed = sd, c_true = 1, c_fit = cf)), ".rds")))
+    L <- x$fits$rank1$LL; Fm <- x$fits$rank1$FF
+    th <- tcrossprod(L, Fm) / max(1, if (is.infinite(cf)) 1 else cf)
+    w  <- colMeans(L) * colMeans(Fm); w <- w / sum(w)
+    PL <- apply(L, 2, p2m); PF <- apply(Fm, 2, p2m)
+    c(P_theta = p2m(th), P_L = mean(PL), P_F = mean(PF),
+      `P_L P_F w` = max(PL * PF * w),
+      `Hoyer L` = mean(apply(L, 2, hoyer)),
+      `Hoyer F` = mean(apply(Fm, 2, hoyer)),
+      violations = sum(PL * PF * w > p2m(th) * (1 + 1e-8)))
+  }))
+  as.data.frame(t(c(c_fit = cf, colMeans(r))))
+})), digits = c(3, 2, 2, 2, 2, 3, 3, 0), row.names = FALSE,
+caption = "The bound is exact (no violations in 80 fits x 3 factors) and essentially tight: the fits spend the whole budget.")
+```
+
+The budget $P_\theta$ climbs from 1.6 to 19.4 across the grid, $P_L$ and $P_F$
+climb with it, and the product sits right against the bound in every row. That
+tightness is the point: the optimizer is not leaving sparsity on the table at
+small $c$ — there is none to take.
+
 ## Where c comes in, again
 
 $\theta_{ij} = 0$ if and only if $\lambda_{ij} = 0$, at *every* $c$ — the link
@@ -428,7 +543,6 @@ $\hat\theta = \hat L\hat F'$ at each $c_{\text{fit}}$ and measure how much of it
 is an irreducible constant.
 
 ```{r fitted-floor}
-cells_dir <- file.path(exp_dir, "c_grid_sim")
 knitr::kable(do.call(rbind, lapply(C_GRID, function(cf) {
   x  <- readRDS(file.path(cells_dir, paste0(
           tag_of(list(seed = 1, c_true = 1, c_fit = cf)), ".rds")))
@@ -781,11 +895,15 @@ data's rate floor on the log1p curve. So:
    denser and $F$ sparser simultaneously. Reporting sparsity for one without the
    other can be actively misleading.
 
-   But the *joint level* is a separate question, fixed by a different mechanism:
-   $\theta_{ij} > 0$ requires $\operatorname{supp}(\ell_i)$ and
-   $\operatorname{supp}(f_j)$ to intersect, so a $\theta$ bounded away from
-   zero cannot be built from two sparse factors at all. Zeros in $\theta$ relax
-   those requirements and buy sparsity on both sides at once.
+   But the *joint level* is a separate question with its own mechanism. For
+   exact sparsity it is support intersection: $\theta_{ij} > 0$ requires
+   $\operatorname{supp}(\ell_i)$ and $\operatorname{supp}(f_j)$ to meet, so a
+   $\theta$ bounded away from zero cannot be built from two sparse factors.
+   For **Hoyer** sparsity, which needs no zeros, the continuous analogue is a
+   multiplicative budget on peak-to-mean ratios,
+   $P_L(k)P_F(k)w_k \le P_\theta$, together with $H(x)\lesssim 1-1/\sqrt{P(x)}$.
+   Both factors can only be peaked if $\theta$ has range to spend, and that
+   bound is essentially tight in practice.
 
 3. **Zeros are what buy identifiability**, and they must be *exact* or nearly so.
    $q_F$ is zero as soon as one $f_{jk}$ is, and grows smoothly as $F$ retreats
