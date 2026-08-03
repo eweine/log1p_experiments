@@ -510,6 +510,12 @@ full-search
 <li>
 sweep
 </li>
+<li>
+zeros-fit
+</li>
+<li>
+zeros-setup
+</li>
 </ul>
 <p>To ensure reproducibility of the results, delete the cache directory
 <code>log1p_identifiability_cache</code> and re-run the analysis. To
@@ -537,15 +543,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea85bccf8fd34780a806e8cd7349b35ae4663a7d9targetblanka85bccfa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee3f8c8cdb891dd9cb8fb42538a09cf96f4bf4f9dtargetblanke3f8c8ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/a85bccf8fd34780a806e8cd7349b35ae4663a7d9" target="_blank">a85bccf</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/e3f8c8cdb891dd9cb8fb42538a09cf96f4bf4f9d" target="_blank">e3f8c8c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea85bccf8fd34780a806e8cd7349b35ae4663a7d9targetblanka85bccfa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee3f8c8cdb891dd9cb8fb42538a09cf96f4bf4f9dtargetblanke3f8c8ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -555,7 +561,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/a85bccf8fd34780a806e8cd7349b35ae4663a7d9" target="_blank">a85bccf</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/e3f8c8cdb891dd9cb8fb42538a09cf96f4bf4f9d" target="_blank">e3f8c8c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -570,7 +576,9 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
+    Ignored:    .DS_Store
     Ignored:    analysis/c_grid_sim_cache/
+    Ignored:    analysis/figure/
     Ignored:    analysis/log1p_identifiability_cache/
 
 </code></pre>
@@ -617,6 +625,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/e3f8c8cdb891dd9cb8fb42538a09cf96f4bf4f9d/analysis/log1p_identifiability.Rmd" target="_blank">e3f8c8c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Explain what sets the joint level of sparsity, not just its split
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/log1p_identifiability.html" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1189,6 +1231,43 @@ p2 &lt;- ggplot(rng, aes(cf, ymin = lo, ymax = hi, colour = side)) +
 
 plot_grid(p1, p2, nrow = 1, rel_widths = c(1, 1.15))</code></pre>
 <p><img src="figure/log1p_identifiability.Rmd/sweep-plot-1.png" alt="" width="990" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-sweep-plot-1">
+Past versions of sweep-plot-1.png
+</button>
+</p>
+<div id="fig-sweep-plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/log1p_identifiability.Rmd/sweep-plot-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>At <span class="math inline">\(c=\infty\)</span> the interval is a
 point: the factorization is effectively pinned. At <span
 class="math inline">\(c=10^{-3}\)</span> the sparsity of <span
@@ -1278,6 +1357,455 @@ remove this warning. See the
 </div>
 </div>
 </div>
+<div id="what-sets-the-joint-level-of-sparsity" class="section level1">
+<h1>What sets the joint level of sparsity?</h1>
+<p>Everything above is about <em>where sparsity sits</em>: the mixing
+family moves it from <span class="math inline">\(L\)</span> to <span
+class="math inline">\(F\)</span> and back, leaving the likelihood
+untouched. That cannot explain a common observation in practice — that
+fitting at larger <span class="math inline">\(c\)</span> makes
+<strong>both</strong> <span class="math inline">\(L\)</span> and <span
+class="math inline">\(F\)</span> sparser. A trade cannot raise both.
+Something else fixes the level.</p>
+<div id="support-intersection" class="section level2">
+<h2>Support intersection</h2>
+<p>The constraint is combinatorial. Write <span
+class="math inline">\(S_i = \operatorname{supp}(\ell_i)\)</span> for the
+set of factors sample <span class="math inline">\(i\)</span> uses, and
+<span class="math inline">\(T_j = \operatorname{supp}(f_j)\)</span> for
+feature <span class="math inline">\(j\)</span>. Since <span
+class="math inline">\(L, F \ge 0\)</span> there is no cancellation,
+so</p>
+<p><span class="math display">\[
+\theta_{ij} = \langle \ell_i, f_j\rangle &gt; 0
+\iff
+S_i \cap T_j \neq \emptyset .
+\]</span></p>
+<p>If <span class="math inline">\(\theta\)</span> is <strong>strictly
+positive everywhere</strong>, then <em>every</em> <span
+class="math inline">\(S_i\)</span> must meet <em>every</em> <span
+class="math inline">\(T_j\)</span> — the two families must be
+cross-intersecting. That is a strong joint requirement, and it has an
+immediate consequence:</p>
+<blockquote>
+<p>If any sample uses a single factor, <span class="math inline">\(S_i =
+\{k\}\)</span>, then every <span class="math inline">\(T_j\)</span> must
+contain <span class="math inline">\(k\)</span>: <strong>column <span
+class="math inline">\(k\)</span> of <span
+class="math inline">\(F\)</span> is completely dense.</strong></p>
+</blockquote>
+<p>and symmetrically with the roles swapped. Sparsity on one side is
+paid for by density on the other, <em>and it is the strictly positive
+<span class="math inline">\(\theta\)</span> that sends the bill</em>. A
+crude but useful sufficient condition is <span
+class="math inline">\(|S_i| + |T_j| &gt; K\)</span>, which guarantees
+intersection by pigeonhole; at <span class="math inline">\(K =
+3\)</span> two samples and features each using two of the three factors
+always overlap, whereas two singletons need not.</p>
+<p>So a <span class="math inline">\(\theta\)</span> bounded away from
+zero cannot be represented by two sparse nonnegative factors at all —
+regardless of <span class="math inline">\(c\)</span>, regardless of the
+optimizer. Conversely, <strong>each zero of <span
+class="math inline">\(\theta\)</span> relaxes exactly one of these
+cross-intersection requirements</strong>, buying sparsity on both sides
+at once.</p>
+</div>
+<div id="where-c-comes-in-again" class="section level2">
+<h2>Where c comes in, again</h2>
+<p><span class="math inline">\(\theta_{ij} = 0\)</span> if and only if
+<span class="math inline">\(\lambda_{ij} = 0\)</span>, at <em>every</em>
+<span class="math inline">\(c\)</span> — the link maps zero to zero.
+What <span class="math inline">\(c\)</span> controls is the
+<strong>floor</strong> under the nonzero entries,</p>
+<p><span class="math display">\[
+\theta_{\min} = \log\!\left(1 + \frac{\lambda_{\min}}{c}\right),
+\]</span></p>
+<p>so the useful comparison is not <span
+class="math inline">\(c\)</span> in the abstract but <span
+class="math inline">\(c\)</span> against the smallest rate in the
+data:</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>regime</th>
+<th><span class="math inline">\(\theta_{\min}\)</span></th>
+<th>consequence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(c \gg \lambda_{\min}\)</span></td>
+<td><span class="math inline">\(\approx \lambda_{\min}/c \approx
+0\)</span></td>
+<td>no floor; both factors free to be sparse</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(c \ll \lambda_{\min}\)</span></td>
+<td><span class="math inline">\(\approx \log(\lambda_{\min}/c)\)</span>,
+large</td>
+<td>floor; both factors forced dense</td>
+</tr>
+</tbody>
+</table>
+<p>The mechanism is a property of the model. Whether it bites is a
+property of the data.</p>
+</div>
+<div id="the-floor-and-the-joint-sparsity-move-together"
+class="section level2">
+<h2>The floor and the joint sparsity move together</h2>
+<p>First, in the fits from the <a href="c_grid_sim.html">c-grid
+page</a>: reconstruct <span class="math inline">\(\hat\theta = \hat
+L\hat F&#39;\)</span> at each <span
+class="math inline">\(c_{\text{fit}}\)</span> and measure how much of it
+is an irreducible constant.</p>
+<pre class="r"><code>cells_dir &lt;- file.path(exp_dir, &quot;c_grid_sim&quot;)
+knitr::kable(do.call(rbind, lapply(C_GRID, function(cf) {
+  x  &lt;- readRDS(file.path(cells_dir, paste0(
+          tag_of(list(seed = 1, c_true = 1, c_fit = cf)), &quot;.rds&quot;)))
+  Lh &lt;- x$fits$rank1$LL; Fh &lt;- x$fits$rank1$FF
+  th &lt;- tcrossprod(Lh, Fh) / max(1, if (is.infinite(cf)) 1 else cf)
+  data.frame(c_fit = cf, `min theta-hat` = min(th),
+             `floor share` = min(th)/mean(th),
+             `Hoyer L` = mean_hoyer(Lh), `Hoyer F` = mean_hoyer(Fh),
+             check.names = FALSE)
+})), digits = 3, row.names = FALSE,
+caption = &quot;One dataset (seed 1, simulated at c = 1), fitted at each c. &#39;floor share&#39; is min(theta)/mean(theta).&quot;)</code></pre>
+<table>
+<caption>One dataset (seed 1, simulated at c = 1), fitted at each
+c. ‘floor share’ is min(theta)/mean(theta).</caption>
+<thead>
+<tr class="header">
+<th align="right">c_fit</th>
+<th align="right">min theta-hat</th>
+<th align="right">floor share</th>
+<th align="right">Hoyer L</th>
+<th align="right">Hoyer F</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1e-03</td>
+<td align="right">5.321</td>
+<td align="right">0.810</td>
+<td align="right">0.131</td>
+<td align="right">0.067</td>
+</tr>
+<tr class="even">
+<td align="right">1e-02</td>
+<td align="right">3.063</td>
+<td align="right">0.715</td>
+<td align="right">0.138</td>
+<td align="right">0.086</td>
+</tr>
+<tr class="odd">
+<td align="right">1e-01</td>
+<td align="right">1.065</td>
+<td align="right">0.503</td>
+<td align="right">0.157</td>
+<td align="right">0.147</td>
+</tr>
+<tr class="even">
+<td align="right">1e+00</td>
+<td align="right">0.075</td>
+<td align="right">0.126</td>
+<td align="right">0.246</td>
+<td align="right">0.315</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+01</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.326</td>
+<td align="right">0.499</td>
+</tr>
+<tr class="even">
+<td align="right">1e+02</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.350</td>
+<td align="right">0.559</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+03</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.353</td>
+<td align="right">0.567</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.353</td>
+<td align="right">0.568</td>
+</tr>
+</tbody>
+</table>
+<p>The floor share falls from 0.81 to 0 and both sparsities rise with
+it. At <span class="math inline">\(c_{\text{fit}} \ge 10\)</span> the
+fit puts <em>exact</em> zeros into <span
+class="math inline">\(\hat\theta\)</span> (minimum around <span
+class="math inline">\(10^{-13}\)</span>) and sparsity reaches its
+maximum.</p>
+</div>
+<div id="the-decisive-test-give-the-rates-exact-zeros"
+class="section level2">
+<h2>The decisive test: give the rates exact zeros</h2>
+<p>Correlation is not mechanism. If the floor is really the cause, then
+data whose rates contain exact zeros should show <strong>no</strong>
+systematic sparsity trend in <span class="math inline">\(c\)</span>,
+because those zeros survive every <span
+class="math inline">\(c\)</span>.</p>
+<p>Build two datasets from one truth with sparse supports on both sides,
+calibrated to the <em>same</em> 60% zero fraction in <span
+class="math inline">\(Y\)</span>, differing only in whether an offset is
+allowed:</p>
+<pre class="r"><code>suppressMessages(library(fastTopics))
+nn &lt;- 300; pp &lt;- 300; Kz &lt;- 3
+set.seed(11)
+Lz &lt;- matrix(0, nn, Kz)
+for (i in 1:nn) { S &lt;- sample(Kz, sample(1:2, 1)); w &lt;- rgamma(length(S), .5)
+                  Lz[i, S] &lt;- w / sum(w) }
+Fz &lt;- matrix(0, pp, Kz)
+for (j in 1:pp) { S &lt;- sample(Kz, sample(1:2, 1))
+                  Fz[j, S] &lt;- exp(runif(length(S), -3.5, 3.5)) }
+th0z &lt;- Lz %*% t(Fz)
+
+zfrac  &lt;- function(lam) mean(exp(-lam))
+lam_of &lt;- function(a, b, cc) { th &lt;- a*th0z + b
+  if (is.infinite(cc)) th else cc*expm1(pmin(th, 700)) }
+
+## zeros arm: offset forced to 0, one knob for the zero fraction
+cal_zero &lt;- function(cc, tz = 0.6)
+  exp(uniroot(function(la) zfrac(lam_of(exp(la), 0, cc)) - tz,
+              c(-14, 10), extendInt = &quot;downX&quot;)$root)
+
+## floored arm: two knobs, same zero fraction plus an upper-quantile target
+cal_floor &lt;- function(cc, tz = 0.6, tq = 20, qp = 0.999) {
+  bmax &lt;- if (is.infinite(cc)) 1e6 else log1p(1e6/cc)
+  bfor &lt;- function(a) { f &lt;- function(b) zfrac(lam_of(a, b, cc)) - tz
+    if (f(0) &lt;= 0) return(0); uniroot(f, c(0, bmax), tol = 1e-12)$root }
+  g  &lt;- function(la) { a &lt;- exp(la)
+    as.numeric(quantile(lam_of(a, bfor(a), cc), qp)) - tq }
+  hi &lt;- log(200 / max(th0z)); a &lt;- exp(uniroot(g, c(hi - 30, hi), tol = 1e-10)$root)
+  c(a = a, b = bfor(a))
+}
+c(`theta0 exact zeros` = mean(th0z == 0),
+  `true Hoyer L` = mean_hoyer(Lz), `true Hoyer F` = mean_hoyer(Fz))</code></pre>
+<pre><code>theta0 exact zeros       true Hoyer L       true Hoyer F 
+         0.3438111          0.4059545          0.6729524 </code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<pre class="r"><code>fit_one &lt;- function(Y, cf) {
+  set.seed(7)
+  if (is.infinite(cf)) {
+    f &lt;- fit_poisson_nmf(as(Y, &quot;CsparseMatrix&quot;), k = Kz, numiter = 3000,
+           method = &quot;scd&quot;, control = list(nc = 2, min.delta.loglik = 1e-6),
+           verbose = &quot;none&quot;)
+    list(L = f$L, F = f$F)
+  } else {
+    f &lt;- fit_poisson_log1p_nmf(Y, K = Kz, cc = cf, s = FALSE, loglik = &quot;exact&quot;,
+           init_method = &quot;rank1&quot;,
+           control = list(maxiter = 4000, tol = 1e-6, verbose = FALSE, threads = 2))
+    list(L = f$LL, F = f$FF)
+  }
+}
+
+CZ &lt;- c(1e-3, 1e-1, 1, 10, Inf)
+zres &lt;- do.call(rbind, lapply(c(&quot;zeros&quot;, &quot;floored&quot;), function(arm) {
+  do.call(rbind, lapply(CZ, function(cf) {
+    ab  &lt;- if (arm == &quot;zeros&quot;) c(a = cal_zero(cf), b = 0) else cal_floor(cf)
+    lam &lt;- lam_of(ab[[&quot;a&quot;]], ab[[&quot;b&quot;]], cf)
+    set.seed(5); Y &lt;- matrix(rpois(length(lam), lam), nn, pp)
+    Y &lt;- Y[rowSums(Y) &gt; 0, colSums(Y) &gt; 0, drop = FALSE]
+    z &lt;- fit_one(Y, cf)
+    data.frame(arm = arm, c_fit = cf,
+               `min lambda` = min(lam), `zeros in Y` = mean(Y == 0),
+               `Hoyer L` = mean_hoyer(z$L), `Hoyer F` = mean_hoyer(z$F),
+               check.names = FALSE)
+  }))
+}))</code></pre>
+<pre><code>Stopping condition is met at iteration 9: change in NMF loglik &lt; 1.00e-06
+Stopping condition is met at iteration 31: change in NMF loglik &lt; 1.00e-06</code></pre>
+<pre class="r"><code>knitr::kable(zres, digits = 3, row.names = FALSE,
+  caption = paste(&quot;Same truth, matched zero fraction. True Hoyer:&quot;,
+                  sprintf(&quot;L %.3f, F %.3f.&quot;, mean_hoyer(Lz), mean_hoyer(Fz))))</code></pre>
+<table>
+<caption>Same truth, matched zero fraction. True Hoyer: L 0.406, F
+0.673.</caption>
+<thead>
+<tr class="header">
+<th align="left">arm</th>
+<th align="right">c_fit</th>
+<th align="right">min lambda</th>
+<th align="right">zeros in Y</th>
+<th align="right">Hoyer L</th>
+<th align="right">Hoyer F</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">zeros</td>
+<td align="right">1e-03</td>
+<td align="right">0.000</td>
+<td align="right">0.565</td>
+<td align="right">0.266</td>
+<td align="right">0.671</td>
+</tr>
+<tr class="even">
+<td align="left">zeros</td>
+<td align="right">1e-01</td>
+<td align="right">0.000</td>
+<td align="right">0.600</td>
+<td align="right">0.581</td>
+<td align="right">0.509</td>
+</tr>
+<tr class="odd">
+<td align="left">zeros</td>
+<td align="right">1e+00</td>
+<td align="right">0.000</td>
+<td align="right">0.601</td>
+<td align="right">0.674</td>
+<td align="right">0.712</td>
+</tr>
+<tr class="even">
+<td align="left">zeros</td>
+<td align="right">1e+01</td>
+<td align="right">0.000</td>
+<td align="right">0.601</td>
+<td align="right">0.406</td>
+<td align="right">0.673</td>
+</tr>
+<tr class="odd">
+<td align="left">zeros</td>
+<td align="right">Inf</td>
+<td align="right">0.000</td>
+<td align="right">0.601</td>
+<td align="right">0.406</td>
+<td align="right">0.673</td>
+</tr>
+<tr class="even">
+<td align="left">floored</td>
+<td align="right">1e-03</td>
+<td align="right">0.401</td>
+<td align="right">0.602</td>
+<td align="right">0.109</td>
+<td align="right">0.054</td>
+</tr>
+<tr class="odd">
+<td align="left">floored</td>
+<td align="right">1e-01</td>
+<td align="right">0.393</td>
+<td align="right">0.603</td>
+<td align="right">0.205</td>
+<td align="right">0.120</td>
+</tr>
+<tr class="even">
+<td align="left">floored</td>
+<td align="right">1e+00</td>
+<td align="right">0.348</td>
+<td align="right">0.603</td>
+<td align="right">0.321</td>
+<td align="right">0.344</td>
+</tr>
+<tr class="odd">
+<td align="left">floored</td>
+<td align="right">1e+01</td>
+<td align="right">0.244</td>
+<td align="right">0.601</td>
+<td align="right">0.383</td>
+<td align="right">0.576</td>
+</tr>
+<tr class="even">
+<td align="left">floored</td>
+<td align="right">Inf</td>
+<td align="right">0.170</td>
+<td align="right">0.601</td>
+<td align="right">0.396</td>
+<td align="right">0.634</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>## long form: the two Hoyer columns have different names, so build it explicitly
+zl &lt;- rbind(
+  data.frame(arm = zres$arm, c_fit = zres$c_fit, side = &quot;L&quot;, h = zres[[&quot;Hoyer L&quot;]]),
+  data.frame(arm = zres$arm, c_fit = zres$c_fit, side = &quot;F&quot;, h = zres[[&quot;Hoyer F&quot;]]))
+zl$side &lt;- factor(zl$side, levels = c(&quot;L&quot;, &quot;F&quot;))
+zl$cf &lt;- factor(ifelse(is.infinite(zl$c_fit), &quot;∞&quot;,
+                       format(zl$c_fit, scientific = FALSE, trim = TRUE,
+                              drop0trailing = TRUE)),
+                levels = c(&quot;0.001&quot;, &quot;0.1&quot;, &quot;1&quot;, &quot;10&quot;, &quot;∞&quot;))
+truth &lt;- data.frame(side = c(&quot;L&quot;, &quot;F&quot;),
+                    h = c(mean_hoyer(Lz), mean_hoyer(Fz)))
+
+ggplot(zl, aes(cf, h, colour = arm, group = arm)) +
+  geom_hline(data = truth, aes(yintercept = h), linetype = &quot;dashed&quot;,
+             colour = &quot;grey50&quot;) +
+  geom_line(linewidth = 1) + geom_point(size = 2) +
+  facet_wrap(~ side) +
+  scale_colour_manual(values = c(zeros = &quot;#0E8FA8&quot;, floored = &quot;#C2410C&quot;),
+                      name = NULL) +
+  labs(x = &quot;c used for fitting&quot;, y = &quot;mean Hoyer sparsity&quot;,
+       title = &quot;The sparsity trend in c needs a floor to exist&quot;,
+       subtitle = &quot;dashed: the truth. With exact zeros in lambda the trend disappears.&quot;)</code></pre>
+<p><img src="figure/log1p_identifiability.Rmd/zeros-plot-1.png" alt="" width="880" style="display: block; margin: auto;" /></p>
+<p>With exact zeros the trend is gone: at <span
+class="math inline">\(c_{\text{fit}} = 10\)</span> and <span
+class="math inline">\(\infty\)</span> both factors are recovered
+essentially exactly, and small <span class="math inline">\(c\)</span> no
+longer collapses them. With a floor the familiar monotone climb
+returns.</p>
+<p>A residual effect does survive at the smallest <span
+class="math inline">\(c\)</span> in the zeros arm — <span
+class="math inline">\(L\)</span> comes out somewhat denser than the
+truth while <span class="math inline">\(F\)</span> does not. Exact zeros
+are preserved at every <span class="math inline">\(c\)</span>, but the
+<em>nonzero</em> entries of <span class="math inline">\(\theta\)</span>
+are still compressed toward a common large value as <span
+class="math inline">\(c \to 0\)</span>, so near-purity degrades even
+when exact purity does not. The effect is far weaker than with a floor,
+and it does not hit both factors at once.</p>
+</div>
+<div id="how-realistic-is-the-floor" class="section level2">
+<h2>How realistic is the floor?</h2>
+<p>In the calibrated generator used on the <a
+href="c_grid_sim.html">c-grid page</a>, the offset makes <span
+class="math inline">\(\lambda_{\min} =
+c\,\text{expm1}(\beta_c)\)</span>, which lands at about <span
+class="math inline">\(0.47\)</span> against a median rate near <span
+class="math inline">\(0.52\)</span> — a floor at roughly 90% of the
+median. That is far higher than real count data, where the
+least-expressed feature in the shallowest sample sits orders of
+magnitude below the median. With a realistic <span
+class="math inline">\(\lambda_{\min}\)</span>, <span
+class="math inline">\(c = 1\)</span> is comfortably in the <span
+class="math inline">\(c \gg \lambda_{\min}\)</span> regime and sparsity
+is not suppressed at all; the effect only appears when fitting with a
+<span class="math inline">\(c\)</span> below the smallest rate
+present.</p>
+<p>So the mechanism generalizes, but <strong>the magnitude in that
+simulation is inflated by its own calibration</strong>, which is the
+price paid for making the datasets comparable across <span
+class="math inline">\(c\)</span>.</p>
+</div>
+</div>
 <div id="what-to-take-from-this" class="section level1">
 <h1>What to take from this</h1>
 <ol style="list-style-type: decimal">
@@ -1292,23 +1820,39 @@ reach.</p></li>
 <li><p><strong>Sparsity trades between the two factors.</strong> The
 mixing family makes <span class="math inline">\(L\)</span> denser and
 <span class="math inline">\(F\)</span> sparser simultaneously. Reporting
-sparsity for one without the other can be actively misleading.</p></li>
+sparsity for one without the other can be actively misleading.</p>
+<p>But the <em>joint level</em> is a separate question, fixed by a
+different mechanism: <span class="math inline">\(\theta_{ij} &gt;
+0\)</span> requires <span
+class="math inline">\(\operatorname{supp}(\ell_i)\)</span> and <span
+class="math inline">\(\operatorname{supp}(f_j)\)</span> to intersect, so
+a <span class="math inline">\(\theta\)</span> bounded away from zero
+cannot be built from two sparse factors at all. Zeros in <span
+class="math inline">\(\theta\)</span> relax those requirements and buy
+sparsity on both sides at once.</p></li>
 <li><p><strong>Zeros are what buy identifiability</strong>, and they
 must be <em>exact</em> or nearly so. <span
 class="math inline">\(q_F\)</span> is zero as soon as one <span
 class="math inline">\(f_{jk}\)</span> is, and grows smoothly as <span
 class="math inline">\(F\)</span> retreats from the boundary.</p></li>
-<li><p><strong><span class="math inline">\(c\)</span> controls this
-through the level of <span
+<li><p><strong><span class="math inline">\(c\)</span> controls both
+effects through the level of <span
 class="math inline">\(\theta\)</span>.</strong> Small <span
 class="math inline">\(c\)</span> forces <span
 class="math inline">\(\theta_{\min} = \log(1+\lambda_{\min}/c)\)</span>
 up while the spread saturates at <span
 class="math inline">\(\log(\lambda_{\max}/\lambda_{\min})\)</span>, so
-<span class="math inline">\(\theta\)</span> tends to a constant and the
-ambiguity tends to total. The exception is exact zeros in <span
+<span class="math inline">\(\theta\)</span> tends to a constant: the
+ambiguity tends to total <em>and</em> the floor forbids joint sparsity.
+The right comparison is <span class="math inline">\(c\)</span> against
+<span class="math inline">\(\lambda_{\min}\)</span>, not <span
+class="math inline">\(c\)</span> on its own.</p>
+<p>The exception is exact zeros in <span
 class="math inline">\(\lambda\)</span>, which survive every <span
-class="math inline">\(c\)</span>.</p></li>
+class="math inline">\(c\)</span> since the link maps zero to zero. Given
+them, the sparsity trend in <span class="math inline">\(c\)</span>
+disappears entirely — which is the test that separates “inherent to the
+model” from “a property of this data”.</p></li>
 <li><p><strong>Practical consequence.</strong> At small <span
 class="math inline">\(c\)</span>, prefer conclusions that depend on
 <span class="math inline">\(LF&#39;\)</span> (fitted rates, held-out
@@ -1337,25 +1881,40 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] log1pNMF_0.1-6  cowplot_1.2.0   ggplot2_4.0.3   workflowr_1.7.2
+[1] fastTopics_0.7-38 log1pNMF_0.1-6    cowplot_1.2.0     ggplot2_4.0.3    
+[5] workflowr_1.7.2  
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      lattice_0.22-9    
- [5] startupmsg_1.0.0   digest_0.6.39      magrittr_2.0.5     evaluate_1.0.5    
- [9] grid_4.5.2         RColorBrewer_1.1-3 fastmap_1.2.0      sfsmisc_1.1-23    
-[13] rprojroot_2.1.1    jsonlite_2.0.0     Matrix_1.7-5       processx_3.9.0    
-[17] whisker_0.4.1      promises_1.5.0     httr_1.4.8         scales_1.4.0      
-[21] codetools_0.2-20   jquerylib_0.1.4    cli_3.6.6          rlang_1.2.0       
-[25] withr_3.0.2        cachem_1.1.0       yaml_2.3.12        otel_0.2.0        
-[29] parallel_4.5.2     tools_4.5.2        dplyr_1.2.1        httpuv_1.6.17     
-[33] distr_2.9.7        vctrs_0.7.3        R6_2.6.1           lifecycle_1.0.5   
-[37] git2r_0.36.2       stringr_1.6.0      fs_2.1.0           MASS_7.3-65       
-[41] pkgconfig_2.0.3    callr_3.7.6        pillar_1.11.1      bslib_0.10.0      
-[45] later_1.4.8        gtable_0.3.6       glue_1.8.1         Rcpp_1.1.1-1.1    
-[49] xfun_0.57          tibble_3.3.1       tidyselect_1.2.1   rstudioapi_0.18.0 
-[53] knitr_1.51         dichromat_2.0-0.1  farver_2.1.2       htmltools_0.5.9   
-[57] labeling_0.4.3     rmarkdown_2.31     compiler_4.5.2     getPass_0.2-4     
-[61] S7_0.2.2          </code></pre>
+ [1] tidyselect_1.2.1      viridisLite_0.4.3     dplyr_1.2.1          
+ [4] farver_2.1.2          S7_0.2.2              fastmap_1.2.0        
+ [7] lazyeval_0.2.3        promises_1.5.0        digest_0.6.39        
+[10] lifecycle_1.0.5       processx_3.9.0        invgamma_1.2         
+[13] magrittr_2.0.5        compiler_4.5.2        rlang_1.2.0          
+[16] sass_0.4.10           progress_1.2.3        tools_4.5.2          
+[19] yaml_2.3.12           data.table_1.18.2.1   knitr_1.51           
+[22] labeling_0.4.3        prettyunits_1.2.0     htmlwidgets_1.6.4    
+[25] plyr_1.8.9            RColorBrewer_1.1-3    Rtsne_0.17           
+[28] withr_3.0.2           purrr_1.2.2           grid_4.5.2           
+[31] git2r_0.36.2          scales_1.4.0          gtools_3.9.5         
+[34] MASS_7.3-65           dichromat_2.0-0.1     cli_3.6.6            
+[37] rmarkdown_2.31        crayon_1.5.3          startupmsg_1.0.0     
+[40] generics_0.1.4        otel_0.2.0            RcppParallel_5.1.11-2
+[43] rstudioapi_0.18.0     httr_1.4.8            reshape2_1.4.5       
+[46] pbapply_1.7-4         cachem_1.1.0          stringr_1.6.0        
+[49] parallel_4.5.2        vctrs_0.7.3           Matrix_1.7-5         
+[52] jsonlite_2.0.0        callr_3.7.6           hms_1.1.4            
+[55] mixsqp_0.3-54         ggrepel_0.9.8         irlba_2.3.7          
+[58] plotly_4.12.0         jquerylib_0.1.4       tidyr_1.3.2          
+[61] glue_1.8.1            codetools_0.2-20      uwot_0.2.4           
+[64] stringi_1.8.7         gtable_0.3.6          later_1.4.8          
+[67] sfsmisc_1.1-23        quadprog_1.5-8        tibble_3.3.1         
+[70] pillar_1.11.1         htmltools_0.5.9       truncnorm_1.0-9      
+[73] R6_2.6.1              rprojroot_2.1.1       evaluate_1.0.5       
+[76] lattice_0.22-9        RhpcBLASctl_0.23-42   SQUAREM_2026.1       
+[79] ashr_2.2-63           httpuv_1.6.17         bslib_0.10.0         
+[82] Rcpp_1.1.1-1.1        distr_2.9.7           whisker_0.4.1        
+[85] xfun_0.57             fs_2.1.0              getPass_0.2-4        
+[88] pkgconfig_2.0.3      </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1383,25 +1942,40 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] log1pNMF_0.1-6  cowplot_1.2.0   ggplot2_4.0.3   workflowr_1.7.2
+[1] fastTopics_0.7-38 log1pNMF_0.1-6    cowplot_1.2.0     ggplot2_4.0.3    
+[5] workflowr_1.7.2  
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      lattice_0.22-9    
- [5] startupmsg_1.0.0   digest_0.6.39      magrittr_2.0.5     evaluate_1.0.5    
- [9] grid_4.5.2         RColorBrewer_1.1-3 fastmap_1.2.0      sfsmisc_1.1-23    
-[13] rprojroot_2.1.1    jsonlite_2.0.0     Matrix_1.7-5       processx_3.9.0    
-[17] whisker_0.4.1      promises_1.5.0     httr_1.4.8         scales_1.4.0      
-[21] codetools_0.2-20   jquerylib_0.1.4    cli_3.6.6          rlang_1.2.0       
-[25] withr_3.0.2        cachem_1.1.0       yaml_2.3.12        otel_0.2.0        
-[29] parallel_4.5.2     tools_4.5.2        dplyr_1.2.1        httpuv_1.6.17     
-[33] distr_2.9.7        vctrs_0.7.3        R6_2.6.1           lifecycle_1.0.5   
-[37] git2r_0.36.2       stringr_1.6.0      fs_2.1.0           MASS_7.3-65       
-[41] pkgconfig_2.0.3    callr_3.7.6        pillar_1.11.1      bslib_0.10.0      
-[45] later_1.4.8        gtable_0.3.6       glue_1.8.1         Rcpp_1.1.1-1.1    
-[49] xfun_0.57          tibble_3.3.1       tidyselect_1.2.1   rstudioapi_0.18.0 
-[53] knitr_1.51         dichromat_2.0-0.1  farver_2.1.2       htmltools_0.5.9   
-[57] labeling_0.4.3     rmarkdown_2.31     compiler_4.5.2     getPass_0.2-4     
-[61] S7_0.2.2          </code></pre>
+ [1] tidyselect_1.2.1      viridisLite_0.4.3     dplyr_1.2.1          
+ [4] farver_2.1.2          S7_0.2.2              fastmap_1.2.0        
+ [7] lazyeval_0.2.3        promises_1.5.0        digest_0.6.39        
+[10] lifecycle_1.0.5       processx_3.9.0        invgamma_1.2         
+[13] magrittr_2.0.5        compiler_4.5.2        rlang_1.2.0          
+[16] sass_0.4.10           progress_1.2.3        tools_4.5.2          
+[19] yaml_2.3.12           data.table_1.18.2.1   knitr_1.51           
+[22] labeling_0.4.3        prettyunits_1.2.0     htmlwidgets_1.6.4    
+[25] plyr_1.8.9            RColorBrewer_1.1-3    Rtsne_0.17           
+[28] withr_3.0.2           purrr_1.2.2           grid_4.5.2           
+[31] git2r_0.36.2          scales_1.4.0          gtools_3.9.5         
+[34] MASS_7.3-65           dichromat_2.0-0.1     cli_3.6.6            
+[37] rmarkdown_2.31        crayon_1.5.3          startupmsg_1.0.0     
+[40] generics_0.1.4        otel_0.2.0            RcppParallel_5.1.11-2
+[43] rstudioapi_0.18.0     httr_1.4.8            reshape2_1.4.5       
+[46] pbapply_1.7-4         cachem_1.1.0          stringr_1.6.0        
+[49] parallel_4.5.2        vctrs_0.7.3           Matrix_1.7-5         
+[52] jsonlite_2.0.0        callr_3.7.6           hms_1.1.4            
+[55] mixsqp_0.3-54         ggrepel_0.9.8         irlba_2.3.7          
+[58] plotly_4.12.0         jquerylib_0.1.4       tidyr_1.3.2          
+[61] glue_1.8.1            codetools_0.2-20      uwot_0.2.4           
+[64] stringi_1.8.7         gtable_0.3.6          later_1.4.8          
+[67] sfsmisc_1.1-23        quadprog_1.5-8        tibble_3.3.1         
+[70] pillar_1.11.1         htmltools_0.5.9       truncnorm_1.0-9      
+[73] R6_2.6.1              rprojroot_2.1.1       evaluate_1.0.5       
+[76] lattice_0.22-9        RhpcBLASctl_0.23-42   SQUAREM_2026.1       
+[79] ashr_2.2-63           httpuv_1.6.17         bslib_0.10.0         
+[82] Rcpp_1.1.1-1.1        distr_2.9.7           whisker_0.4.1        
+[85] xfun_0.57             fs_2.1.0              getPass_0.2-4        
+[88] pkgconfig_2.0.3      </code></pre>
 </div>
 </div>
 
