@@ -364,6 +364,219 @@ knitr::kable(do.call(rbind, lapply(c(1e-3, 1, Inf), function(cc) {
 })), digits = 3, row.names = FALSE, caption = "Mean Hoyer sparsity of L.")
 ```
 
+# What sets the joint level of sparsity?
+
+Everything above is about *where sparsity sits*: the mixing family moves it from
+$L$ to $F$ and back, leaving the likelihood untouched. That cannot explain a
+common observation in practice — that fitting at larger $c$ makes **both** $L$
+and $F$ sparser. A trade cannot raise both. Something else fixes the level.
+
+## Support intersection
+
+The constraint is combinatorial. Write $S_i = \operatorname{supp}(\ell_i)$ for the
+set of factors sample $i$ uses, and $T_j = \operatorname{supp}(f_j)$ for feature
+$j$. Since $L, F \ge 0$ there is no cancellation, so
+
+$$
+\theta_{ij} = \langle \ell_i, f_j\rangle > 0
+\iff
+S_i \cap T_j \neq \emptyset .
+$$
+
+If $\theta$ is **strictly positive everywhere**, then *every* $S_i$ must meet
+*every* $T_j$ — the two families must be cross-intersecting. That is a strong
+joint requirement, and it has an immediate consequence:
+
+> If any sample uses a single factor, $S_i = \{k\}$, then every $T_j$ must
+> contain $k$: **column $k$ of $F$ is completely dense.**
+
+and symmetrically with the roles swapped. Sparsity on one side is paid for by
+density on the other, *and it is the strictly positive $\theta$ that sends the
+bill*. A crude but useful sufficient condition is $|S_i| + |T_j| > K$, which
+guarantees intersection by pigeonhole; at $K = 3$ two samples and features each
+using two of the three factors always overlap, whereas two singletons need not.
+
+So a $\theta$ bounded away from zero cannot be represented by two sparse
+nonnegative factors at all — regardless of $c$, regardless of the optimizer.
+Conversely, **each zero of $\theta$ relaxes exactly one of these
+cross-intersection requirements**, buying sparsity on both sides at once.
+
+## Where c comes in, again
+
+$\theta_{ij} = 0$ if and only if $\lambda_{ij} = 0$, at *every* $c$ — the link
+maps zero to zero. What $c$ controls is the **floor** under the nonzero entries,
+
+$$
+\theta_{\min} = \log\!\left(1 + \frac{\lambda_{\min}}{c}\right),
+$$
+
+so the useful comparison is not $c$ in the abstract but $c$ against the smallest
+rate in the data:
+
+| regime | $\theta_{\min}$ | consequence |
+|---|---|---|
+| $c \gg \lambda_{\min}$ | $\approx \lambda_{\min}/c \approx 0$ | no floor; both factors free to be sparse |
+| $c \ll \lambda_{\min}$ | $\approx \log(\lambda_{\min}/c)$, large | floor; both factors forced dense |
+
+The mechanism is a property of the model. Whether it bites is a property of the
+data.
+
+## The floor and the joint sparsity move together
+
+First, in the fits from the [c-grid page](c_grid_sim.html): reconstruct
+$\hat\theta = \hat L\hat F'$ at each $c_{\text{fit}}$ and measure how much of it
+is an irreducible constant.
+
+```{r fitted-floor}
+cells_dir <- file.path(exp_dir, "c_grid_sim")
+knitr::kable(do.call(rbind, lapply(C_GRID, function(cf) {
+  x  <- readRDS(file.path(cells_dir, paste0(
+          tag_of(list(seed = 1, c_true = 1, c_fit = cf)), ".rds")))
+  Lh <- x$fits$rank1$LL; Fh <- x$fits$rank1$FF
+  th <- tcrossprod(Lh, Fh) / max(1, if (is.infinite(cf)) 1 else cf)
+  data.frame(c_fit = cf, `min theta-hat` = min(th),
+             `floor share` = min(th)/mean(th),
+             `Hoyer L` = mean_hoyer(Lh), `Hoyer F` = mean_hoyer(Fh),
+             check.names = FALSE)
+})), digits = 3, row.names = FALSE,
+caption = "One dataset (seed 1, simulated at c = 1), fitted at each c. 'floor share' is min(theta)/mean(theta).")
+```
+
+The floor share falls from 0.81 to 0 and both sparsities rise with it. At
+$c_{\text{fit}} \ge 10$ the fit puts *exact* zeros into $\hat\theta$ (minimum
+around $10^{-13}$) and sparsity reaches its maximum.
+
+## The decisive test: give the rates exact zeros
+
+Correlation is not mechanism. If the floor is really the cause, then data whose
+rates contain exact zeros should show **no** systematic sparsity trend in $c$,
+because those zeros survive every $c$.
+
+Build two datasets from one truth with sparse supports on both sides, calibrated
+to the *same* 60% zero fraction in $Y$, differing only in whether an offset is
+allowed:
+
+```{r zeros-setup, cache=TRUE}
+suppressMessages(library(fastTopics))
+nn <- 300; pp <- 300; Kz <- 3
+set.seed(11)
+Lz <- matrix(0, nn, Kz)
+for (i in 1:nn) { S <- sample(Kz, sample(1:2, 1)); w <- rgamma(length(S), .5)
+                  Lz[i, S] <- w / sum(w) }
+Fz <- matrix(0, pp, Kz)
+for (j in 1:pp) { S <- sample(Kz, sample(1:2, 1))
+                  Fz[j, S] <- exp(runif(length(S), -3.5, 3.5)) }
+th0z <- Lz %*% t(Fz)
+
+zfrac  <- function(lam) mean(exp(-lam))
+lam_of <- function(a, b, cc) { th <- a*th0z + b
+  if (is.infinite(cc)) th else cc*expm1(pmin(th, 700)) }
+
+## zeros arm: offset forced to 0, one knob for the zero fraction
+cal_zero <- function(cc, tz = 0.6)
+  exp(uniroot(function(la) zfrac(lam_of(exp(la), 0, cc)) - tz,
+              c(-14, 10), extendInt = "downX")$root)
+
+## floored arm: two knobs, same zero fraction plus an upper-quantile target
+cal_floor <- function(cc, tz = 0.6, tq = 20, qp = 0.999) {
+  bmax <- if (is.infinite(cc)) 1e6 else log1p(1e6/cc)
+  bfor <- function(a) { f <- function(b) zfrac(lam_of(a, b, cc)) - tz
+    if (f(0) <= 0) return(0); uniroot(f, c(0, bmax), tol = 1e-12)$root }
+  g  <- function(la) { a <- exp(la)
+    as.numeric(quantile(lam_of(a, bfor(a), cc), qp)) - tq }
+  hi <- log(200 / max(th0z)); a <- exp(uniroot(g, c(hi - 30, hi), tol = 1e-10)$root)
+  c(a = a, b = bfor(a))
+}
+c(`theta0 exact zeros` = mean(th0z == 0),
+  `true Hoyer L` = mean_hoyer(Lz), `true Hoyer F` = mean_hoyer(Fz))
+```
+
+```{r zeros-fit, cache=TRUE, dependson="zeros-setup"}
+fit_one <- function(Y, cf) {
+  set.seed(7)
+  if (is.infinite(cf)) {
+    f <- fit_poisson_nmf(as(Y, "CsparseMatrix"), k = Kz, numiter = 3000,
+           method = "scd", control = list(nc = 2, min.delta.loglik = 1e-6),
+           verbose = "none")
+    list(L = f$L, F = f$F)
+  } else {
+    f <- fit_poisson_log1p_nmf(Y, K = Kz, cc = cf, s = FALSE, loglik = "exact",
+           init_method = "rank1",
+           control = list(maxiter = 4000, tol = 1e-6, verbose = FALSE, threads = 2))
+    list(L = f$LL, F = f$FF)
+  }
+}
+
+CZ <- c(1e-3, 1e-1, 1, 10, Inf)
+zres <- do.call(rbind, lapply(c("zeros", "floored"), function(arm) {
+  do.call(rbind, lapply(CZ, function(cf) {
+    ab  <- if (arm == "zeros") c(a = cal_zero(cf), b = 0) else cal_floor(cf)
+    lam <- lam_of(ab[["a"]], ab[["b"]], cf)
+    set.seed(5); Y <- matrix(rpois(length(lam), lam), nn, pp)
+    Y <- Y[rowSums(Y) > 0, colSums(Y) > 0, drop = FALSE]
+    z <- fit_one(Y, cf)
+    data.frame(arm = arm, c_fit = cf,
+               `min lambda` = min(lam), `zeros in Y` = mean(Y == 0),
+               `Hoyer L` = mean_hoyer(z$L), `Hoyer F` = mean_hoyer(z$F),
+               check.names = FALSE)
+  }))
+}))
+knitr::kable(zres, digits = 3, row.names = FALSE,
+  caption = paste("Same truth, matched zero fraction. True Hoyer:",
+                  sprintf("L %.3f, F %.3f.", mean_hoyer(Lz), mean_hoyer(Fz))))
+```
+
+```{r zeros-plot, fig.width=8, fig.height=3.6}
+## long form: the two Hoyer columns have different names, so build it explicitly
+zl <- rbind(
+  data.frame(arm = zres$arm, c_fit = zres$c_fit, side = "L", h = zres[["Hoyer L"]]),
+  data.frame(arm = zres$arm, c_fit = zres$c_fit, side = "F", h = zres[["Hoyer F"]]))
+zl$side <- factor(zl$side, levels = c("L", "F"))
+zl$cf <- factor(ifelse(is.infinite(zl$c_fit), "∞",
+                       format(zl$c_fit, scientific = FALSE, trim = TRUE,
+                              drop0trailing = TRUE)),
+                levels = c("0.001", "0.1", "1", "10", "∞"))
+truth <- data.frame(side = c("L", "F"),
+                    h = c(mean_hoyer(Lz), mean_hoyer(Fz)))
+
+ggplot(zl, aes(cf, h, colour = arm, group = arm)) +
+  geom_hline(data = truth, aes(yintercept = h), linetype = "dashed",
+             colour = "grey50") +
+  geom_line(linewidth = 1) + geom_point(size = 2) +
+  facet_wrap(~ side) +
+  scale_colour_manual(values = c(zeros = "#0E8FA8", floored = "#C2410C"),
+                      name = NULL) +
+  labs(x = "c used for fitting", y = "mean Hoyer sparsity",
+       title = "The sparsity trend in c needs a floor to exist",
+       subtitle = "dashed: the truth. With exact zeros in lambda the trend disappears.")
+```
+
+With exact zeros the trend is gone: at $c_{\text{fit}} = 10$ and $\infty$ both
+factors are recovered essentially exactly, and small $c$ no longer collapses
+them. With a floor the familiar monotone climb returns.
+
+A residual effect does survive at the smallest $c$ in the zeros arm — $L$ comes
+out somewhat denser than the truth while $F$ does not. Exact zeros are preserved
+at every $c$, but the *nonzero* entries of $\theta$ are still compressed toward a
+common large value as $c \to 0$, so near-purity degrades even when exact purity
+does not. The effect is far weaker than with a floor, and it does not hit both
+factors at once.
+
+## How realistic is the floor?
+
+In the calibrated generator used on the [c-grid page](c_grid_sim.html), the
+offset makes $\lambda_{\min} = c\,\text{expm1}(\beta_c)$, which lands at about
+$0.47$ against a median rate near $0.52$ — a floor at roughly 90% of the median.
+That is far higher than real count data, where the least-expressed feature in the
+shallowest sample sits orders of magnitude below the median. With a realistic
+$\lambda_{\min}$, $c = 1$ is comfortably in the $c \gg \lambda_{\min}$ regime and
+sparsity is not suppressed at all; the effect only appears when fitting with a
+$c$ below the smallest rate present.
+
+So the mechanism generalizes, but **the magnitude in that simulation is inflated
+by its own calibration**, which is the price paid for making the datasets
+comparable across $c$.
+
 # What to take from this
 
 1. **The likelihood determines $LF'$, not $L$ and $F$ separately.** Any reported
@@ -374,15 +587,26 @@ knitr::kable(do.call(rbind, lapply(c(1e-3, 1, Inf), function(cc) {
    denser and $F$ sparser simultaneously. Reporting sparsity for one without the
    other can be actively misleading.
 
+   But the *joint level* is a separate question, fixed by a different mechanism:
+   $\theta_{ij} > 0$ requires $\operatorname{supp}(\ell_i)$ and
+   $\operatorname{supp}(f_j)$ to intersect, so a $\theta$ bounded away from
+   zero cannot be built from two sparse factors at all. Zeros in $\theta$ relax
+   those requirements and buy sparsity on both sides at once.
+
 3. **Zeros are what buy identifiability**, and they must be *exact* or nearly so.
    $q_F$ is zero as soon as one $f_{jk}$ is, and grows smoothly as $F$ retreats
    from the boundary.
 
-4. **$c$ controls this through the level of $\theta$.** Small $c$ forces
+4. **$c$ controls both effects through the level of $\theta$.** Small $c$ forces
    $\theta_{\min} = \log(1+\lambda_{\min}/c)$ up while the spread saturates at
-   $\log(\lambda_{\max}/\lambda_{\min})$, so $\theta$ tends to a constant and the
-   ambiguity tends to total. The exception is exact zeros in $\lambda$, which
-   survive every $c$.
+   $\log(\lambda_{\max}/\lambda_{\min})$, so $\theta$ tends to a constant: the
+   ambiguity tends to total *and* the floor forbids joint sparsity. The right
+   comparison is $c$ against $\lambda_{\min}$, not $c$ on its own.
+
+   The exception is exact zeros in $\lambda$, which survive every $c$ since the
+   link maps zero to zero. Given them, the sparsity trend in $c$ disappears
+   entirely — which is the test that separates "inherent to the model" from
+   "a property of this data".
 
 5. **Practical consequence.** At small $c$, prefer conclusions that depend on
    $LF'$ (fitted rates, held-out likelihood, which samples resemble which) over
