@@ -577,6 +577,200 @@ So the mechanism generalizes, but **the magnitude in that simulation is inflated
 by its own calibration**, which is the price paid for making the datasets
 comparable across $c$.
 
+# In practice: you never see the rates
+
+Everything so far conditions on the true $\lambda$, which you never have. In
+practice you hold $Y$, you fit at several $c$, and most of those $c$ are
+misspecified. Saying "the floor of $\hat\theta$ controls the sparsity" is then
+circular, because $\hat\theta$ *is* the fit. This section removes the circularity
+by tracing the floor back to quantities fixed by $Y$ and $K$ alone.
+
+## Step 1: the objective does not contain c
+
+The Poisson log-likelihood is
+
+$$
+\ell(\lambda) = \sum_{ij}\bigl[y_{ij}\log\lambda_{ij} - \lambda_{ij}\bigr] - \sum_{ij}\log y_{ij}!,
+$$
+
+a function of the **rates** and the data only. $c$ appears nowhere in it. Where
+$c$ does appear is the feasible set,
+
+$$
+\mathcal{M}_c(K) = \Bigl\{\lambda \ge 0 \;:\; \log\!\left(1+\tfrac{\lambda}{c}\right) = LF',\ \ L,F\ge 0,\ \text{rank } K\Bigr\},
+$$
+
+and the fit is $\hat\lambda = \arg\max_{\lambda\in\mathcal{M}_c(K)}\ell(\lambda)$.
+So $c$ never changes *what a good set of rates is*. It changes only *which rate
+matrices are reachable*. That is the wedge that breaks the circle: if we can pin
+down properties of $\hat\lambda$ without reference to $c$, the rest follows
+mechanically.
+
+## Step 2: the zero pattern of any fit is a union of K rectangles
+
+Let $R_k = \{i : \ell_{ik} > 0\}$ and $C_k = \{j : f_{jk} > 0\}$ be the sets of
+samples and features that use factor $k$. Because $L, F \ge 0$ there is no
+cancellation, so $\theta_{ij} = \sum_k \ell_{ik}f_{jk} > 0$ exactly when some $k$
+has $i \in R_k$ and $j \in C_k$. Therefore
+
+$$
+\operatorname{supp}(\theta) \;=\; \bigcup_{k=1}^{K} R_k \times C_k ,
+$$
+
+a union of $K$ combinatorial rectangles — and since $\lambda_{ij} = 0$ iff
+$\theta_{ij}=0$, **the zero set of any fitted rate matrix is the complement of a
+union of $K$ rectangles, at every $c$.**
+
+Now add the data. If $y_{ij} > 0$ and $\hat\lambda_{ij}=0$ the log-likelihood is
+$-\infty$, so a feasible fit must satisfy
+
+$$
+\{(i,j) : y_{ij} > 0\} \;\subseteq\; \bigcup_{k=1}^{K} R_k \times C_k .
+$$
+
+**The nonzero pattern of $Y$ must be covered by $K$ rectangles.** For count data
+whose nonzeros are scattered — which is what Poisson sampling produces, since
+$y_{ij}=0$ occurs independently with probability $e^{-\lambda_{ij}}$ — no small
+collection of rectangles can cover the nonzeros while leaving much uncovered.
+The rectangles are forced to be nearly the full matrix, so the fit's zero set is
+nearly empty and $\hat\lambda > 0$ essentially everywhere.
+
+This is the crucial step and it is **completely free of $c$**: it depends only on
+$Y$'s nonzero pattern and on $K$. A rank-$K$ model cannot represent scattered
+sampling zeros as structural zeros, so it smooths across them and returns a
+strictly positive low-rank rate surface with some positive low end
+$\lambda_{\text{low}}$ — a property of the data and the rank, not of the link.
+
+## Step 3: c maps that floor into theta, deterministically
+
+Given a low end $\lambda_{\text{low}}$ fixed by Step 2, the low end of $\theta$
+follows with no further modelling:
+
+$$
+\theta_{\text{low}} \;=\; \log\!\left(1+\frac{\lambda_{\text{low}}}{c}\right),
+\qquad
+\frac{\theta_{\text{low}}}{\overline{\theta}}
+\;=\;
+\frac{\log(1+\lambda_{\text{low}}/c)}{\overline{\log(1+\hat\lambda/c)}} .
+$$
+
+The two limits are immediate. For $c \gg \lambda_{\text{low}}$ both numerator and
+denominator linearize and the floor share tends to
+$\lambda_{\text{low}}/\overline{\lambda}$ — small whenever the rates are spread
+out. For $c \ll \lambda_{\text{low}}$ both behave like $\log(1/c)$ and the ratio
+tends to **1**: θ becomes all floor.
+
+So the same data, with the same fitted rates, produces a θ whose floor share runs
+from $\lambda_{\text{low}}/\overline{\lambda}$ up to $1$ purely as a function of
+$c$. Nothing about the fit changed; only the transform did.
+
+## Step 4: a floor in theta forbids joint sparsity
+
+This is the support-intersection argument from the previous section. A θ bounded
+away from zero requires every $S_i$ to meet every $T_j$, and a single-factor
+sample forces a fully dense factor. Combining the four steps:
+
+$$
+\underbrace{Y,\,K}_{\text{fix }\lambda_{\text{low}}}
+\;\longrightarrow\;
+\underbrace{\theta_{\text{low}} = \log(1+\lambda_{\text{low}}/c)}_{\text{deterministic in } c}
+\;\longrightarrow\;
+\underbrace{\text{support intersection}}_{\text{combinatorial}}
+\;\longrightarrow\;
+\text{joint density of } L \text{ and } F .
+$$
+
+Only the middle arrow involves $c$, and it involves nothing else.
+
+## Testing it: predict identifiability before fitting
+
+If the chain is right, the floor is predictable from $Y$ and $c$ with no model
+fitted at all. Estimate the rates by the rank-1 independence model —
+row totals times column totals over the grand total — and push them through the
+link:
+
+$$
+m_{ij} = \frac{y_{i\cdot}\,y_{\cdot j}}{y_{\cdot\cdot}},
+\qquad
+\widehat{\text{floor share}} = \frac{q_\alpha\bigl(\log(1+m/c)\bigr)}{\overline{\log(1+m/c)}} .
+$$
+
+```{r fitfree, cache=TRUE}
+QA <- 0.01     # a low quantile, not the minimum -- see the caveat below
+pred_obs <- do.call(rbind, lapply(C_GRID, function(cf) {
+  r <- do.call(rbind, lapply(1:10, function(sd) {
+    Y <- sim_dataset(sd, 1)$Y
+    m  <- outer(rowSums(Y), colSums(Y)) / sum(Y)        # fit-free rate estimate
+    tg <- if (is.infinite(cf)) m else log1p(m / cf)
+
+    x <- readRDS(file.path(cells_dir, paste0(
+           tag_of(list(seed = sd, c_true = 1, c_fit = cf)), ".rds")))
+    g <- lapply(c("rank1", "random"), function(i) {
+      L <- x$fits[[i]]$LL; Fm <- x$fits[[i]]$FF
+      th <- tcrossprod(L, Fm) / max(1, if (is.infinite(cf)) 1 else cf)
+      c(fl = as.numeric(quantile(th, QA)) / mean(th), h = mean_hoyer(L)) })
+
+    c(min_m = min(m),
+      predicted = as.numeric(quantile(tg, QA)) / mean(tg),
+      observed  = g[[1]]["fl"],
+      init_disagreement = abs(g[[1]]["h"] - g[[2]]["h"]))
+  }))
+  as.data.frame(t(c(c_fit = cf, colMeans(r))))
+}))
+knitr::kable(pred_obs, digits = c(3, 4, 3, 3, 6), row.names = FALSE,
+  caption = "min_m and 'predicted' use only Y and c. Nothing is fitted to produce them.")
+```
+
+```{r fitfree-cor}
+lg <- function(x) log10(pmax(x, 1e-12))
+c(`cor(predicted, observed)`             = cor(pred_obs$predicted, pred_obs$observed),
+  `cor(predicted, log10 disagreement)`   = cor(pred_obs$predicted, lg(pred_obs$init_disagreement)),
+  `cor(observed,  log10 disagreement)`   = cor(pred_obs$observed,  lg(pred_obs$init_disagreement)))
+```
+
+Two things to read here. The prediction tracks the realized floor essentially
+exactly, and it also tracks **initialization disagreement** — how far apart two
+starts land in Hoyer sparsity at the same $c$. That disagreement is a purely
+empirical fingerprint of non-identifiability: same data, log-likelihoods equal to
+within 0.008, different answer. Being able to forecast it from $Y$ and $c$ before
+fitting is the sense in which the explanation is not circular.
+
+Note also that `min_m` is *identical at every $c$* — it is a property of $Y$
+alone. All of the variation in the predicted floor comes from the link.
+
+## Two things that do not work
+
+**Minimum-based statistics are fragile.** Using $\min\hat\theta$ rather than a low
+quantile, the floor reads as $0$ for $c \ge 10$ because coordinate descent drives
+a single coordinate to around $10^{-13}$, while the bulk of the low end sits near
+$0.28$. One entry out of $90{,}000$ flips the diagnostic. The $1\%$ quantile is
+stable and tracks the prediction with correlation $1.000$.
+
+**$q_F$ computed on a fit is useless for the same reason.** The closed form
+$q_F = K\min_{j,k} f_{jk}/s_j$ is exactly right for the *truth*, but evaluated on
+fitted factors it returns $\sim 10^{-12}$ at every $c$ — one numerically-zero
+coordinate destroys the minimum, reporting "no freedom" for factorizations that
+are visibly loose. Replacing the minimum with a $5\%$ quantile restores it
+(correlation $0.96$ with initialization disagreement); at a $25\%$ quantile it is
+dead again, so the information really does live near the boundary.
+
+## What this means for comparing fits across c
+
+The fitted rates are pinned by the data; the split of sparsity between $L$ and
+$F$ is not; and the *joint level* of sparsity is set by where $c$ places the
+data's rate floor on the log1p curve. So:
+
+- **Sparsity is not comparable across $c$.** "The $c = 0.01$ factors are denser
+  than the $c = 10$ factors" is a statement about the link, not the data.
+- **Quantities that depend on $LF'$ are comparable** — fitted rates, held-out
+  log-likelihood, which samples resemble which. Use those for model comparison.
+- **Report the floor share alongside any sparsity claim**, and fit from at least
+  two initializations. If the floor is high and the two starts disagree, the
+  sparsity being reported is a property of $c$.
+- If the split genuinely matters for the science, it has to be pinned by
+  something outside the likelihood: a sparsity penalty, a prior, or an anchor
+  assumption.
+
 # What to take from this
 
 1. **The likelihood determines $LF'$, not $L$ and $F$ separately.** Any reported
@@ -608,12 +802,22 @@ comparable across $c$.
    entirely — which is the test that separates "inherent to the model" from
    "a property of this data".
 
-5. **Practical consequence.** At small $c$, prefer conclusions that depend on
+5. **None of this needs the truth.** The likelihood objective contains no $c$;
+   $c$ only restricts the feasible set. A rank-$K$ model cannot represent
+   scattered sampling zeros as structural zeros -- its zero set is always the
+   complement of a union of $K$ rectangles -- so it returns a strictly positive
+   rate surface whose low end is fixed by $Y$ and $K$. $c$ then decides where
+   that floor lands on the log1p curve, and the floor is what forbids joint
+   sparsity. Every link is checkable on your own data: a rank-1 estimate of the
+   rates pushed through the link predicts the realized floor, and predicts
+   initialization disagreement, before any model is fitted.
+
+6. **Practical consequence.** At small $c$, prefer conclusions that depend on
    $LF'$ (fitted rates, held-out likelihood, which samples resemble which) over
    conclusions that depend on the split (how sparse the factors are, how many
-   features a factor "uses"). If the split matters, it has to be pinned by
-   something outside the likelihood — a sparsity penalty, a prior, or an anchor
-   assumption.
+   features a factor "uses"). Sparsity is not comparable across $c$. If the split
+   matters, it has to be pinned by something outside the likelihood -- a sparsity
+   penalty, a prior, or an anchor assumption.
 
 ```{r session}
 sessionInfo()
