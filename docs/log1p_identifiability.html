@@ -505,6 +505,9 @@ aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
 The following chunks had caches available:
 <ul>
 <li>
+fitfree
+</li>
+<li>
 full-search
 </li>
 <li>
@@ -543,15 +546,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee3f8c8cdb891dd9cb8fb42538a09cf96f4bf4f9dtargetblanke3f8c8ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree273420eb8885a97ba26a1d78f035631a81506a91targetblank273420ea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/e3f8c8cdb891dd9cb8fb42538a09cf96f4bf4f9d" target="_blank">e3f8c8c</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/273420eb8885a97ba26a1d78f035631a81506a91" target="_blank">273420e</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee3f8c8cdb891dd9cb8fb42538a09cf96f4bf4f9dtargetblanke3f8c8ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree273420eb8885a97ba26a1d78f035631a81506a91targetblank273420ea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -561,7 +564,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/e3f8c8cdb891dd9cb8fb42538a09cf96f4bf4f9d" target="_blank">e3f8c8c</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/273420eb8885a97ba26a1d78f035631a81506a91" target="_blank">273420e</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -625,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/273420eb8885a97ba26a1d78f035631a81506a91/analysis/log1p_identifiability.Rmd" target="_blank">273420e</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Trace the sparsity mechanism back to Y and K, removing the circularity
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/f37586b6101456256874ae882dd45fcd82abf937/docs/log1p_identifiability.html" target="_blank">f37586b</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1766,6 +1803,43 @@ ggplot(zl, aes(cf, h, colour = arm, group = arm)) +
        title = &quot;The sparsity trend in c needs a floor to exist&quot;,
        subtitle = &quot;dashed: the truth. With exact zeros in lambda the trend disappears.&quot;)</code></pre>
 <p><img src="figure/log1p_identifiability.Rmd/zeros-plot-1.png" alt="" width="880" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-zeros-plot-1">
+Past versions of zeros-plot-1.png
+</button>
+</p>
+<div id="fig-zeros-plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/f37586b6101456256874ae882dd45fcd82abf937/docs/figure/log1p_identifiability.Rmd/zeros-plot-1.png" target="_blank">f37586b</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>With exact zeros the trend is gone: at <span
 class="math inline">\(c_{\text{fit}} = 10\)</span> and <span
 class="math inline">\(\infty\)</span> both factors are recovered
@@ -1804,6 +1878,345 @@ present.</p>
 simulation is inflated by its own calibration</strong>, which is the
 price paid for making the datasets comparable across <span
 class="math inline">\(c\)</span>.</p>
+</div>
+</div>
+<div id="in-practice-you-never-see-the-rates" class="section level1">
+<h1>In practice: you never see the rates</h1>
+<p>Everything so far conditions on the true <span
+class="math inline">\(\lambda\)</span>, which you never have. In
+practice you hold <span class="math inline">\(Y\)</span>, you fit at
+several <span class="math inline">\(c\)</span>, and most of those <span
+class="math inline">\(c\)</span> are misspecified. Saying “the floor of
+<span class="math inline">\(\hat\theta\)</span> controls the sparsity”
+is then circular, because <span
+class="math inline">\(\hat\theta\)</span> <em>is</em> the fit. This
+section removes the circularity by tracing the floor back to quantities
+fixed by <span class="math inline">\(Y\)</span> and <span
+class="math inline">\(K\)</span> alone.</p>
+<div id="step-1-the-objective-does-not-contain-c"
+class="section level2">
+<h2>Step 1: the objective does not contain c</h2>
+<p>The Poisson log-likelihood is</p>
+<p><span class="math display">\[
+\ell(\lambda) = \sum_{ij}\bigl[y_{ij}\log\lambda_{ij} -
+\lambda_{ij}\bigr] - \sum_{ij}\log y_{ij}!,
+\]</span></p>
+<p>a function of the <strong>rates</strong> and the data only. <span
+class="math inline">\(c\)</span> appears nowhere in it. Where <span
+class="math inline">\(c\)</span> does appear is the feasible set,</p>
+<p><span class="math display">\[
+\mathcal{M}_c(K) = \Bigl\{\lambda \ge 0 \;:\;
+\log\!\left(1+\tfrac{\lambda}{c}\right) = LF&#39;,\ \ L,F\ge 0,\
+\text{rank } K\Bigr\},
+\]</span></p>
+<p>and the fit is <span class="math inline">\(\hat\lambda =
+\arg\max_{\lambda\in\mathcal{M}_c(K)}\ell(\lambda)\)</span>. So <span
+class="math inline">\(c\)</span> never changes <em>what a good set of
+rates is</em>. It changes only <em>which rate matrices are
+reachable</em>. That is the wedge that breaks the circle: if we can pin
+down properties of <span class="math inline">\(\hat\lambda\)</span>
+without reference to <span class="math inline">\(c\)</span>, the rest
+follows mechanically.</p>
+</div>
+<div id="step-2-the-zero-pattern-of-any-fit-is-a-union-of-k-rectangles"
+class="section level2">
+<h2>Step 2: the zero pattern of any fit is a union of K rectangles</h2>
+<p>Let <span class="math inline">\(R_k = \{i : \ell_{ik} &gt;
+0\}\)</span> and <span class="math inline">\(C_k = \{j : f_{jk} &gt;
+0\}\)</span> be the sets of samples and features that use factor <span
+class="math inline">\(k\)</span>. Because <span class="math inline">\(L,
+F \ge 0\)</span> there is no cancellation, so <span
+class="math inline">\(\theta_{ij} = \sum_k \ell_{ik}f_{jk} &gt;
+0\)</span> exactly when some <span class="math inline">\(k\)</span> has
+<span class="math inline">\(i \in R_k\)</span> and <span
+class="math inline">\(j \in C_k\)</span>. Therefore</p>
+<p><span class="math display">\[
+\operatorname{supp}(\theta) \;=\; \bigcup_{k=1}^{K} R_k \times C_k ,
+\]</span></p>
+<p>a union of <span class="math inline">\(K\)</span> combinatorial
+rectangles — and since <span class="math inline">\(\lambda_{ij} =
+0\)</span> iff <span class="math inline">\(\theta_{ij}=0\)</span>,
+<strong>the zero set of any fitted rate matrix is the complement of a
+union of <span class="math inline">\(K\)</span> rectangles, at every
+<span class="math inline">\(c\)</span>.</strong></p>
+<p>Now add the data. If <span class="math inline">\(y_{ij} &gt;
+0\)</span> and <span class="math inline">\(\hat\lambda_{ij}=0\)</span>
+the log-likelihood is <span class="math inline">\(-\infty\)</span>, so a
+feasible fit must satisfy</p>
+<p><span class="math display">\[
+\{(i,j) : y_{ij} &gt; 0\} \;\subseteq\; \bigcup_{k=1}^{K} R_k \times C_k
+.
+\]</span></p>
+<p><strong>The nonzero pattern of <span class="math inline">\(Y\)</span>
+must be covered by <span class="math inline">\(K\)</span>
+rectangles.</strong> For count data whose nonzeros are scattered — which
+is what Poisson sampling produces, since <span
+class="math inline">\(y_{ij}=0\)</span> occurs independently with
+probability <span class="math inline">\(e^{-\lambda_{ij}}\)</span> — no
+small collection of rectangles can cover the nonzeros while leaving much
+uncovered. The rectangles are forced to be nearly the full matrix, so
+the fit’s zero set is nearly empty and <span
+class="math inline">\(\hat\lambda &gt; 0\)</span> essentially
+everywhere.</p>
+<p>This is the crucial step and it is <strong>completely free of <span
+class="math inline">\(c\)</span></strong>: it depends only on <span
+class="math inline">\(Y\)</span>’s nonzero pattern and on <span
+class="math inline">\(K\)</span>. A rank-<span
+class="math inline">\(K\)</span> model cannot represent scattered
+sampling zeros as structural zeros, so it smooths across them and
+returns a strictly positive low-rank rate surface with some positive low
+end <span class="math inline">\(\lambda_{\text{low}}\)</span> — a
+property of the data and the rank, not of the link.</p>
+</div>
+<div id="step-3-c-maps-that-floor-into-theta-deterministically"
+class="section level2">
+<h2>Step 3: c maps that floor into theta, deterministically</h2>
+<p>Given a low end <span
+class="math inline">\(\lambda_{\text{low}}\)</span> fixed by Step 2, the
+low end of <span class="math inline">\(\theta\)</span> follows with no
+further modelling:</p>
+<p><span class="math display">\[
+\theta_{\text{low}} \;=\;
+\log\!\left(1+\frac{\lambda_{\text{low}}}{c}\right),
+\qquad
+\frac{\theta_{\text{low}}}{\overline{\theta}}
+\;=\;
+\frac{\log(1+\lambda_{\text{low}}/c)}{\overline{\log(1+\hat\lambda/c)}}
+.
+\]</span></p>
+<p>The two limits are immediate. For <span class="math inline">\(c \gg
+\lambda_{\text{low}}\)</span> both numerator and denominator linearize
+and the floor share tends to <span
+class="math inline">\(\lambda_{\text{low}}/\overline{\lambda}\)</span> —
+small whenever the rates are spread out. For <span
+class="math inline">\(c \ll \lambda_{\text{low}}\)</span> both behave
+like <span class="math inline">\(\log(1/c)\)</span> and the ratio tends
+to <strong>1</strong>: θ becomes all floor.</p>
+<p>So the same data, with the same fitted rates, produces a θ whose
+floor share runs from <span
+class="math inline">\(\lambda_{\text{low}}/\overline{\lambda}\)</span>
+up to <span class="math inline">\(1\)</span> purely as a function of
+<span class="math inline">\(c\)</span>. Nothing about the fit changed;
+only the transform did.</p>
+</div>
+<div id="step-4-a-floor-in-theta-forbids-joint-sparsity"
+class="section level2">
+<h2>Step 4: a floor in theta forbids joint sparsity</h2>
+<p>This is the support-intersection argument from the previous section.
+A θ bounded away from zero requires every <span
+class="math inline">\(S_i\)</span> to meet every <span
+class="math inline">\(T_j\)</span>, and a single-factor sample forces a
+fully dense factor. Combining the four steps:</p>
+<p><span class="math display">\[
+\underbrace{Y,\,K}_{\text{fix }\lambda_{\text{low}}}
+\;\longrightarrow\;
+\underbrace{\theta_{\text{low}} =
+\log(1+\lambda_{\text{low}}/c)}_{\text{deterministic in } c}
+\;\longrightarrow\;
+\underbrace{\text{support intersection}}_{\text{combinatorial}}
+\;\longrightarrow\;
+\text{joint density of } L \text{ and } F .
+\]</span></p>
+<p>Only the middle arrow involves <span
+class="math inline">\(c\)</span>, and it involves nothing else.</p>
+</div>
+<div id="testing-it-predict-identifiability-before-fitting"
+class="section level2">
+<h2>Testing it: predict identifiability before fitting</h2>
+<p>If the chain is right, the floor is predictable from <span
+class="math inline">\(Y\)</span> and <span
+class="math inline">\(c\)</span> with no model fitted at all. Estimate
+the rates by the rank-1 independence model — row totals times column
+totals over the grand total — and push them through the link:</p>
+<p><span class="math display">\[
+m_{ij} = \frac{y_{i\cdot}\,y_{\cdot j}}{y_{\cdot\cdot}},
+\qquad
+\widehat{\text{floor share}} =
+\frac{q_\alpha\bigl(\log(1+m/c)\bigr)}{\overline{\log(1+m/c)}} .
+\]</span></p>
+<pre class="r"><code>QA &lt;- 0.01     # a low quantile, not the minimum -- see the caveat below
+pred_obs &lt;- do.call(rbind, lapply(C_GRID, function(cf) {
+  r &lt;- do.call(rbind, lapply(1:10, function(sd) {
+    Y &lt;- sim_dataset(sd, 1)$Y
+    m  &lt;- outer(rowSums(Y), colSums(Y)) / sum(Y)        # fit-free rate estimate
+    tg &lt;- if (is.infinite(cf)) m else log1p(m / cf)
+
+    x &lt;- readRDS(file.path(cells_dir, paste0(
+           tag_of(list(seed = sd, c_true = 1, c_fit = cf)), &quot;.rds&quot;)))
+    g &lt;- lapply(c(&quot;rank1&quot;, &quot;random&quot;), function(i) {
+      L &lt;- x$fits[[i]]$LL; Fm &lt;- x$fits[[i]]$FF
+      th &lt;- tcrossprod(L, Fm) / max(1, if (is.infinite(cf)) 1 else cf)
+      c(fl = as.numeric(quantile(th, QA)) / mean(th), h = mean_hoyer(L)) })
+
+    c(min_m = min(m),
+      predicted = as.numeric(quantile(tg, QA)) / mean(tg),
+      observed  = g[[1]][&quot;fl&quot;],
+      init_disagreement = abs(g[[1]][&quot;h&quot;] - g[[2]][&quot;h&quot;]))
+  }))
+  as.data.frame(t(c(c_fit = cf, colMeans(r))))
+}))
+knitr::kable(pred_obs, digits = c(3, 4, 3, 3, 6), row.names = FALSE,
+  caption = &quot;min_m and &#39;predicted&#39; use only Y and c. Nothing is fitted to produce them.&quot;)</code></pre>
+<table>
+<caption>min_m and ‘predicted’ use only Y and c. Nothing is fitted to
+produce them.</caption>
+<thead>
+<tr class="header">
+<th align="right">c_fit</th>
+<th align="right">min_m</th>
+<th align="right">predicted</th>
+<th align="right">observed.fl</th>
+<th align="right">init_disagreement.h</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1e-03</td>
+<td align="right">0.2829</td>
+<td align="right">0.881</td>
+<td align="right">0.880</td>
+<td align="right">0.051611</td>
+</tr>
+<tr class="even">
+<td align="right">1e-02</td>
+<td align="right">0.2829</td>
+<td align="right">0.822</td>
+<td align="right">0.820</td>
+<td align="right">0.028600</td>
+</tr>
+<tr class="odd">
+<td align="right">1e-01</td>
+<td align="right">0.2829</td>
+<td align="right">0.689</td>
+<td align="right">0.683</td>
+<td align="right">0.008096</td>
+</tr>
+<tr class="even">
+<td align="right">1e+00</td>
+<td align="right">0.2829</td>
+<td align="right">0.477</td>
+<td align="right">0.453</td>
+<td align="right">0.002094</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+01</td>
+<td align="right">0.2829</td>
+<td align="right">0.355</td>
+<td align="right">0.319</td>
+<td align="right">0.000005</td>
+</tr>
+<tr class="even">
+<td align="right">1e+02</td>
+<td align="right">0.2829</td>
+<td align="right">0.330</td>
+<td align="right">0.285</td>
+<td align="right">0.000003</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+03</td>
+<td align="right">0.2829</td>
+<td align="right">0.327</td>
+<td align="right">0.280</td>
+<td align="right">0.000004</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">0.2829</td>
+<td align="right">0.327</td>
+<td align="right">0.279</td>
+<td align="right">0.000003</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<pre class="r"><code>lg &lt;- function(x) log10(pmax(x, 1e-12))
+c(`cor(predicted, observed)`             = cor(pred_obs$predicted, pred_obs$observed),
+  `cor(predicted, log10 disagreement)`   = cor(pred_obs$predicted, lg(pred_obs$init_disagreement)),
+  `cor(observed,  log10 disagreement)`   = cor(pred_obs$observed,  lg(pred_obs$init_disagreement)))</code></pre>
+<pre><code>          cor(predicted, observed) cor(predicted, log10 disagreement) 
+                         0.9998288                          0.9512599 
+cor(observed,  log10 disagreement) 
+                         0.9551765 </code></pre>
+<p>Two things to read here. The prediction tracks the realized floor
+essentially exactly, and it also tracks <strong>initialization
+disagreement</strong> — how far apart two starts land in Hoyer sparsity
+at the same <span class="math inline">\(c\)</span>. That disagreement is
+a purely empirical fingerprint of non-identifiability: same data,
+log-likelihoods equal to within 0.008, different answer. Being able to
+forecast it from <span class="math inline">\(Y\)</span> and <span
+class="math inline">\(c\)</span> before fitting is the sense in which
+the explanation is not circular.</p>
+<p>Note also that <code>min_m</code> is <em>identical at every <span
+class="math inline">\(c\)</span></em> — it is a property of <span
+class="math inline">\(Y\)</span> alone. All of the variation in the
+predicted floor comes from the link.</p>
+</div>
+<div id="two-things-that-do-not-work" class="section level2">
+<h2>Two things that do not work</h2>
+<p><strong>Minimum-based statistics are fragile.</strong> Using <span
+class="math inline">\(\min\hat\theta\)</span> rather than a low
+quantile, the floor reads as <span class="math inline">\(0\)</span> for
+<span class="math inline">\(c \ge 10\)</span> because coordinate descent
+drives a single coordinate to around <span
+class="math inline">\(10^{-13}\)</span>, while the bulk of the low end
+sits near <span class="math inline">\(0.28\)</span>. One entry out of
+<span class="math inline">\(90{,}000\)</span> flips the diagnostic. The
+<span class="math inline">\(1\%\)</span> quantile is stable and tracks
+the prediction with correlation <span
+class="math inline">\(1.000\)</span>.</p>
+<p><strong><span class="math inline">\(q_F\)</span> computed on a fit is
+useless for the same reason.</strong> The closed form <span
+class="math inline">\(q_F = K\min_{j,k} f_{jk}/s_j\)</span> is exactly
+right for the <em>truth</em>, but evaluated on fitted factors it returns
+<span class="math inline">\(\sim 10^{-12}\)</span> at every <span
+class="math inline">\(c\)</span> — one numerically-zero coordinate
+destroys the minimum, reporting “no freedom” for factorizations that are
+visibly loose. Replacing the minimum with a <span
+class="math inline">\(5\%\)</span> quantile restores it (correlation
+<span class="math inline">\(0.96\)</span> with initialization
+disagreement); at a <span class="math inline">\(25\%\)</span> quantile
+it is dead again, so the information really does live near the
+boundary.</p>
+</div>
+<div id="what-this-means-for-comparing-fits-across-c"
+class="section level2">
+<h2>What this means for comparing fits across c</h2>
+<p>The fitted rates are pinned by the data; the split of sparsity
+between <span class="math inline">\(L\)</span> and <span
+class="math inline">\(F\)</span> is not; and the <em>joint level</em> of
+sparsity is set by where <span class="math inline">\(c\)</span> places
+the data’s rate floor on the log1p curve. So:</p>
+<ul>
+<li><strong>Sparsity is not comparable across <span
+class="math inline">\(c\)</span>.</strong> “The <span
+class="math inline">\(c = 0.01\)</span> factors are denser than the
+<span class="math inline">\(c = 10\)</span> factors” is a statement
+about the link, not the data.</li>
+<li><strong>Quantities that depend on <span
+class="math inline">\(LF&#39;\)</span> are comparable</strong> — fitted
+rates, held-out log-likelihood, which samples resemble which. Use those
+for model comparison.</li>
+<li><strong>Report the floor share alongside any sparsity
+claim</strong>, and fit from at least two initializations. If the floor
+is high and the two starts disagree, the sparsity being reported is a
+property of <span class="math inline">\(c\)</span>.</li>
+<li>If the split genuinely matters for the science, it has to be pinned
+by something outside the likelihood: a sparsity penalty, a prior, or an
+anchor assumption.</li>
+</ul>
 </div>
 </div>
 <div id="what-to-take-from-this" class="section level1">
@@ -1853,14 +2266,29 @@ class="math inline">\(c\)</span> since the link maps zero to zero. Given
 them, the sparsity trend in <span class="math inline">\(c\)</span>
 disappears entirely — which is the test that separates “inherent to the
 model” from “a property of this data”.</p></li>
+<li><p><strong>None of this needs the truth.</strong> The likelihood
+objective contains no <span class="math inline">\(c\)</span>; <span
+class="math inline">\(c\)</span> only restricts the feasible set. A
+rank-<span class="math inline">\(K\)</span> model cannot represent
+scattered sampling zeros as structural zeros – its zero set is always
+the complement of a union of <span class="math inline">\(K\)</span>
+rectangles – so it returns a strictly positive rate surface whose low
+end is fixed by <span class="math inline">\(Y\)</span> and <span
+class="math inline">\(K\)</span>. <span class="math inline">\(c\)</span>
+then decides where that floor lands on the log1p curve, and the floor is
+what forbids joint sparsity. Every link is checkable on your own data: a
+rank-1 estimate of the rates pushed through the link predicts the
+realized floor, and predicts initialization disagreement, before any
+model is fitted.</p></li>
 <li><p><strong>Practical consequence.</strong> At small <span
 class="math inline">\(c\)</span>, prefer conclusions that depend on
 <span class="math inline">\(LF&#39;\)</span> (fitted rates, held-out
 likelihood, which samples resemble which) over conclusions that depend
 on the split (how sparse the factors are, how many features a factor
-“uses”). If the split matters, it has to be pinned by something outside
-the likelihood — a sparsity penalty, a prior, or an anchor
-assumption.</p></li>
+“uses”). Sparsity is not comparable across <span
+class="math inline">\(c\)</span>. If the split matters, it has to be
+pinned by something outside the likelihood – a sparsity penalty, a
+prior, or an anchor assumption.</p></li>
 </ol>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.5.2 (2025-10-31)
