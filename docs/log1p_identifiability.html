@@ -511,6 +511,9 @@ fitfree
 full-search
 </li>
 <li>
+p2m-check
+</li>
+<li>
 sweep
 </li>
 <li>
@@ -546,15 +549,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree273420eb8885a97ba26a1d78f035631a81506a91targetblank273420ea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea88307108499a3d8a057c2cc20343645669b68b6targetblanka883071a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/273420eb8885a97ba26a1d78f035631a81506a91" target="_blank">273420e</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/a88307108499a3d8a057c2cc20343645669b68b6" target="_blank">a883071</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree273420eb8885a97ba26a1d78f035631a81506a91targetblank273420ea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea88307108499a3d8a057c2cc20343645669b68b6targetblanka883071a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -564,7 +567,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/273420eb8885a97ba26a1d78f035631a81506a91" target="_blank">273420e</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/a88307108499a3d8a057c2cc20343645669b68b6" target="_blank">a883071</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -583,6 +586,9 @@ Ignored files:
     Ignored:    analysis/c_grid_sim_cache/
     Ignored:    analysis/figure/
     Ignored:    analysis/log1p_identifiability_cache/
+
+Untracked files:
+    Untracked:  =
 
 </code></pre>
 <p>
@@ -628,6 +634,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a88307108499a3d8a057c2cc20343645669b68b6/analysis/log1p_identifiability.Rmd" target="_blank">a883071</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Give the Hoyer-relevant argument: a peak-to-mean budget set by c
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/5d43fa39ef5ee3902ba34e7c0fdf248801e855d8/docs/log1p_identifiability.html" target="_blank">5d43fa3</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -724,8 +764,10 @@ Add c-grid simulation results and the identifiability analysis
 library(cowplot)
 library(log1pNMF)
 theme_set(theme_cowplot(font_size = 11))</code></pre>
-<pre class="r"><code>exp_dir &lt;- path.expand(&quot;~/Documents/log1pNMF/inst/paper_figures/experiments&quot;)
+<pre class="r"><code>exp_dir   &lt;- path.expand(&quot;~/Documents/log1pNMF/inst/paper_figures/experiments&quot;)
+cells_dir &lt;- file.path(exp_dir, &quot;c_grid_sim&quot;)       # the 640 per-cell fits
 source(file.path(exp_dir, &quot;c_grid_sim_common.R&quot;))   # generator, for the examples
+stopifnot(dir.exists(cells_dir))
 
 hoyer &lt;- function(v) { v &lt;- abs(v); n &lt;- length(v)
                        (sqrt(n) - sum(v)/sqrt(sum(v^2))) / (sqrt(n) - 1) }
@@ -1446,6 +1488,247 @@ optimizer. Conversely, <strong>each zero of <span
 class="math inline">\(\theta\)</span> relaxes exactly one of these
 cross-intersection requirements</strong>, buying sparsity on both sides
 at once.</p>
+<p>This argument is about <em>exact</em> zeros, and so it speaks
+directly to exact sparsity. Hoyer sparsity is a continuous measure of
+concentration, and a vector with no zeros at all can still be very
+sparse in the Hoyer sense. The next subsection gives the continuous
+analogue, which turns out to be about the <strong>range of values in
+<span class="math inline">\(\theta\)</span></strong> rather than its
+zeros.</p>
+</div>
+<div id="the-continuous-version-a-peak-to-mean-budget"
+class="section level2">
+<h2>The continuous version: a peak-to-mean budget</h2>
+<p>Hoyer sparsity does not require zeros, so the exact-support argument
+is not the whole story. The continuous statement is about range, and it
+comes in three pieces.</p>
+<p><strong>Piece 1: Hoyer is controlled by peak-to-mean.</strong> For a
+nonnegative vector <span class="math inline">\(x\)</span> of length
+<span class="math inline">\(n\)</span>, write <span
+class="math inline">\(P(x) = x_{\max}/\bar{x}\)</span>. Since <span
+class="math inline">\(\|x\|_2^2 \le \|x\|_\infty\|x\|_1\)</span>,</p>
+<p><span class="math display">\[
+\frac{\|x\|_1}{\|x\|_2} \;\ge\; \frac{\|x\|_1}{\sqrt{\|x\|_\infty
+\|x\|_1}}
+= \sqrt{\frac{\|x\|_1}{\|x\|_\infty}} = \sqrt{\frac{n}{P(x)}},
+\qquad\text{so}\qquad
+H(x) \;\le\; \frac{\sqrt{n}-\sqrt{n/P}}{\sqrt{n}-1} \;\approx\; 1 -
+\frac{1}{\sqrt{P}} .
+\]</span></p>
+<p>A vector can only be Hoyer-sparse if some entries stick far above the
+mean. If <span class="math inline">\(P = 1\)</span> the vector is
+constant and <span class="math inline">\(H = 0\)</span>.</p>
+<p>Relatedly, if the entries are confined to a band <span
+class="math inline">\([b, M]\)</span> with <span
+class="math inline">\(\rho = M/b\)</span>, the most concentrated
+arrangement puts a fraction <span class="math inline">\(u^\star =
+1/(\rho+1)\)</span> of entries at <span class="math inline">\(M\)</span>
+and the rest at <span class="math inline">\(b\)</span>, giving</p>
+<p><span class="math display">\[
+H_{\max}(\rho) = 1 - \frac{2\sqrt{\rho}}{\rho+1} =
+\frac{(\sqrt{\rho}-1)^2}{\rho+1}.
+\]</span></p>
+<p>So <span class="math inline">\(\rho = 1 \Rightarrow H_{\max} =
+0\)</span>: no range, no sparsity, zeros or not.</p>
+<p><strong>Piece 2: <span class="math inline">\(\theta\)</span>’s range
+is a budget that <span class="math inline">\(L\)</span> and <span
+class="math inline">\(F\)</span> must share.</strong> Fix a factor <span
+class="math inline">\(k\)</span> and let <span
+class="math inline">\(i^\star = \arg\max_i \ell_{ik}\)</span>, <span
+class="math inline">\(j^\star = \arg\max_j f_{jk}\)</span>. Because
+every term is nonnegative we may drop all but the <span
+class="math inline">\(k\)</span>th,</p>
+<p><span class="math display">\[
+\theta_{\max} \;\ge\; \theta_{i^\star j^\star} = \sum_m \ell_{i^\star m}
+f_{j^\star m}
+\;\ge\; \ell^{\max}_k f^{\max}_k .
+\]</span></p>
+<p>Meanwhile <span class="math inline">\(\bar\theta = \sum_m \bar\ell_m
+\bar f_m\)</span>. Writing <span class="math inline">\(w_k = \bar\ell_k
+\bar f_k / \bar\theta\)</span> for factor <span
+class="math inline">\(k\)</span>’s share of the mean and dividing,</p>
+<p><span class="math display">\[
+\boxed{\;P_L(k)\cdot P_F(k)\cdot w_k \;\le\; P_\theta \;}
+\qquad
+P_\theta = \frac{\theta_{\max}}{\bar\theta},\quad
+P_L(k) = \frac{\ell^{\max}_k}{\bar\ell_k},\quad
+P_F(k) = \frac{f^{\max}_k}{\bar f_k}.
+\]</span></p>
+<p>This is exact, needs no zeros, and is the continuous counterpart of
+the support argument. The peakedness of <span
+class="math inline">\(L\)</span> and of <span
+class="math inline">\(F\)</span> enter <strong>multiplicatively</strong>
+against a single budget <span class="math inline">\(P_\theta\)</span>.
+Combined with Piece 1 it caps both Hoyer values at once: neither factor
+can concentrate unless <span class="math inline">\(\theta\)</span> has
+range to spend.</p>
+<p>It also reconciles the two observations that motivated all of this.
+At fixed <span class="math inline">\(\theta\)</span> the budget is
+fixed, so pushing <span class="math inline">\(P_L\)</span> up must push
+<span class="math inline">\(P_F\)</span> down — that is the mixing
+family, a movement <em>along</em> the constraint. Changing <span
+class="math inline">\(c\)</span> changes <span
+class="math inline">\(P_\theta\)</span> itself, moving the constraint
+surface, which lets both rise together.</p>
+<p><strong>Piece 3: <span class="math inline">\(c\)</span> sets <span
+class="math inline">\(P_\theta\)</span>.</strong> With <span
+class="math inline">\(\theta = \log(1+\lambda/c)\)</span>,</p>
+<p><span class="math display">\[
+P_\theta(c) =
+\frac{\log(1+\lambda_{\max}/c)}{\overline{\log(1+\lambda/c)}} .
+\]</span></p>
+<p>As <span class="math inline">\(c \to \infty\)</span> the logs
+linearize and <span class="math inline">\(P_\theta \to
+\lambda_{\max}/\bar\lambda\)</span>, the rates’ own peak-to-mean. As
+<span class="math inline">\(c \to 0\)</span> every term behaves like
+<span class="math inline">\(\log(1/c) + \log\lambda\)</span>, the shared
+divergent part dominates, and</p>
+<p><span class="math display">\[
+P_\theta(c) \;\longrightarrow\; 1,
+\qquad
+P_\theta(c) - 1 \;\approx\; \frac{\log\lambda_{\max} -
+\overline{\log\lambda}}{\log(1/c)} .
+\]</span></p>
+<p><strong>Small <span class="math inline">\(c\)</span> compresses <span
+class="math inline">\(\theta\)</span> toward a constant, which drives
+the budget to 1, which forces both factors flat.</strong> The rates
+never changed; only how far apart the link places them did.</p>
+<pre class="r"><code>p2m &lt;- function(v) max(v) / mean(v)
+knitr::kable(do.call(rbind, lapply(C_GRID, function(cf) {
+  r &lt;- do.call(rbind, lapply(1:10, function(sd) {
+    x  &lt;- readRDS(file.path(cells_dir, paste0(
+            tag_of(list(seed = sd, c_true = 1, c_fit = cf)), &quot;.rds&quot;)))
+    L &lt;- x$fits$rank1$LL; Fm &lt;- x$fits$rank1$FF
+    th &lt;- tcrossprod(L, Fm) / max(1, if (is.infinite(cf)) 1 else cf)
+    w  &lt;- colMeans(L) * colMeans(Fm); w &lt;- w / sum(w)
+    PL &lt;- apply(L, 2, p2m); PF &lt;- apply(Fm, 2, p2m)
+    c(P_theta = p2m(th), P_L = mean(PL), P_F = mean(PF),
+      `P_L P_F w` = max(PL * PF * w),
+      `Hoyer L` = mean(apply(L, 2, hoyer)),
+      `Hoyer F` = mean(apply(Fm, 2, hoyer)),
+      violations = sum(PL * PF * w &gt; p2m(th) * (1 + 1e-8)))
+  }))
+  as.data.frame(t(c(c_fit = cf, colMeans(r))))
+})), digits = c(3, 2, 2, 2, 2, 3, 3, 0), row.names = FALSE,
+caption = &quot;The bound is exact (no violations in 80 fits x 3 factors) and essentially tight: the fits spend the whole budget.&quot;)</code></pre>
+<table>
+<caption>The bound is exact (no violations in 80 fits x 3 factors) and
+essentially tight: the fits spend the whole budget.</caption>
+<thead>
+<tr class="header">
+<th align="right">c_fit</th>
+<th align="right">P_theta</th>
+<th align="right">P_L</th>
+<th align="right">P_F</th>
+<th align="right">P_L P_F w</th>
+<th align="right">Hoyer L</th>
+<th align="right">Hoyer F</th>
+<th align="right">violations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1e-03</td>
+<td align="right">1.56</td>
+<td align="right">1.97</td>
+<td align="right">2.46</td>
+<td align="right">1.54</td>
+<td align="right">0.124</td>
+<td align="right">0.074</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">1e-02</td>
+<td align="right">1.85</td>
+<td align="right">2.04</td>
+<td align="right">2.73</td>
+<td align="right">1.82</td>
+<td align="right">0.133</td>
+<td align="right">0.090</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1e-01</td>
+<td align="right">2.66</td>
+<td align="right">2.19</td>
+<td align="right">3.48</td>
+<td align="right">2.56</td>
+<td align="right">0.159</td>
+<td align="right">0.144</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">1e+00</td>
+<td align="right">5.59</td>
+<td align="right">2.67</td>
+<td align="right">6.09</td>
+<td align="right">5.54</td>
+<td align="right">0.240</td>
+<td align="right">0.321</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+01</td>
+<td align="right">13.01</td>
+<td align="right">3.38</td>
+<td align="right">11.03</td>
+<td align="right">12.93</td>
+<td align="right">0.326</td>
+<td align="right">0.503</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">1e+02</td>
+<td align="right">18.30</td>
+<td align="right">3.64</td>
+<td align="right">14.02</td>
+<td align="right">18.22</td>
+<td align="right">0.350</td>
+<td align="right">0.562</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+03</td>
+<td align="right">19.26</td>
+<td align="right">3.67</td>
+<td align="right">14.52</td>
+<td align="right">19.18</td>
+<td align="right">0.353</td>
+<td align="right">0.570</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">19.38</td>
+<td align="right">3.68</td>
+<td align="right">14.58</td>
+<td align="right">19.30</td>
+<td align="right">0.354</td>
+<td align="right">0.571</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>The budget <span class="math inline">\(P_\theta\)</span> climbs from
+1.6 to 19.4 across the grid, <span class="math inline">\(P_L\)</span>
+and <span class="math inline">\(P_F\)</span> climb with it, and the
+product sits right against the bound in every row. That tightness is the
+point: the optimizer is not leaving sparsity on the table at small <span
+class="math inline">\(c\)</span> — there is none to take.</p>
 </div>
 <div id="where-c-comes-in-again" class="section level2">
 <h2>Where c comes in, again</h2>
@@ -1500,8 +1783,7 @@ page</a>: reconstruct <span class="math inline">\(\hat\theta = \hat
 L\hat F&#39;\)</span> at each <span
 class="math inline">\(c_{\text{fit}}\)</span> and measure how much of it
 is an irreducible constant.</p>
-<pre class="r"><code>cells_dir &lt;- file.path(exp_dir, &quot;c_grid_sim&quot;)
-knitr::kable(do.call(rbind, lapply(C_GRID, function(cf) {
+<pre class="r"><code>knitr::kable(do.call(rbind, lapply(C_GRID, function(cf) {
   x  &lt;- readRDS(file.path(cells_dir, paste0(
           tag_of(list(seed = 1, c_true = 1, c_fit = cf)), &quot;.rds&quot;)))
   Lh &lt;- x$fits$rank1$LL; Fh &lt;- x$fits$rank1$FF
@@ -2234,15 +2516,20 @@ reach.</p></li>
 mixing family makes <span class="math inline">\(L\)</span> denser and
 <span class="math inline">\(F\)</span> sparser simultaneously. Reporting
 sparsity for one without the other can be actively misleading.</p>
-<p>But the <em>joint level</em> is a separate question, fixed by a
-different mechanism: <span class="math inline">\(\theta_{ij} &gt;
-0\)</span> requires <span
+<p>But the <em>joint level</em> is a separate question with its own
+mechanism. For exact sparsity it is support intersection: <span
+class="math inline">\(\theta_{ij} &gt; 0\)</span> requires <span
 class="math inline">\(\operatorname{supp}(\ell_i)\)</span> and <span
-class="math inline">\(\operatorname{supp}(f_j)\)</span> to intersect, so
-a <span class="math inline">\(\theta\)</span> bounded away from zero
-cannot be built from two sparse factors at all. Zeros in <span
-class="math inline">\(\theta\)</span> relax those requirements and buy
-sparsity on both sides at once.</p></li>
+class="math inline">\(\operatorname{supp}(f_j)\)</span> to meet, so a
+<span class="math inline">\(\theta\)</span> bounded away from zero
+cannot be built from two sparse factors. For <strong>Hoyer</strong>
+sparsity, which needs no zeros, the continuous analogue is a
+multiplicative budget on peak-to-mean ratios, <span
+class="math inline">\(P_L(k)P_F(k)w_k \le P_\theta\)</span>, together
+with <span class="math inline">\(H(x)\lesssim 1-1/\sqrt{P(x)}\)</span>.
+Both factors can only be peaked if <span
+class="math inline">\(\theta\)</span> has range to spend, and that bound
+is essentially tight in practice.</p></li>
 <li><p><strong>Zeros are what buy identifiability</strong>, and they
 must be <em>exact</em> or nearly so. <span
 class="math inline">\(q_F\)</span> is zero as soon as one <span
