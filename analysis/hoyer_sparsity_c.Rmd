@@ -395,6 +395,212 @@ A companion page,
 covers the other half: for a *fixed* budget, exactly which factorizations are
 equally likely, and how sparsity moves between $L$ and $F$ along that constraint.
 
+# Appendix: a two-sided bound on sparsity
+
+*Nothing above depends on this section.* The upper bound is the result of the
+page; this appendix states the full two-sided version and proves the half that
+has not been proved yet. The lower half turns out to be valid but weak, so it is
+best read as a statement about what is *possible*, not about what happens.
+
+## The sandwich
+
+Throughout, $\theta = LF'$ with $L, F\ge 0$ of rank $K$, and
+
+$$
+w_k \;=\; \frac{\operatorname{mean}(\ell_{\cdot k})\operatorname{mean}(f_{\cdot k})}{\operatorname{mean}(\theta)},
+\qquad \sum_k w_k = 1 ,
+$$
+
+as in Step B. Define, for a target peak-to-mean $P$ and a length $m$,
+
+$$
+H_{\min}(P,m) \;=\; \frac{\sqrt{m}-m\big/\sqrt{P^{2}+(m-1)q^{2}}}{\sqrt{m}-1},
+\qquad q=\frac{m-P}{m-1},
+\qquad\text{so}\qquad
+H_{\min}(P,m)\approx 1-\frac{1}{\sqrt{1+P^{2}/m}} .
+$$
+
+> **Sandwich.** For any nonnegative factorization $\theta = LF'$,
+>
+> **(upper — proved in Steps A and B)** for *every* factor $k$ and *both* sides,
+> $$
+> H(\ell_{\cdot k}) \;\le\; 1-\sqrt{\frac{w_k}{\operatorname{pm}(\theta)}},
+> \qquad
+> H(f_{\cdot k}) \;\le\; 1-\sqrt{\frac{w_k}{\operatorname{pm}(\theta)}} ;
+> $$
+>
+> **(lower — proved below)** for *at least one* factor $k$,
+> $$
+> \max\bigl\{H(\ell_{\cdot k}),\,H(f_{\cdot k})\bigr\}
+> \;\ge\; H_{\min}\!\bigl(\sqrt{\operatorname{pm}(\theta)},\;\max(n,p)\bigr) .
+> $$
+>
+> Both bounds are increasing in $\operatorname{pm}(\theta)$.
+
+The two halves say different things, and the quantifiers matter. The upper half
+constrains **every** column: nothing can be sparser than this. The lower half
+constrains **some** column: at least one side of one factor must be at least
+this sparse. Raising $c$ raises $\operatorname{pm}(\theta)$ and so lifts both
+ends of the band, which is the formal counterpart of the rising lower envelope
+seen in the simulations.
+
+The upper half needs no new work. Step B gives
+$\operatorname{pm}(\ell_{\cdot k})\operatorname{pm}(f_{\cdot k})w_k\le\operatorname{pm}(\theta)$,
+and $\operatorname{pm}(f_{\cdot k})\ge 1$ always, so
+$\operatorname{pm}(\ell_{\cdot k})\le \operatorname{pm}(\theta)/w_k$; substituting
+into Step A's $H \le 1-1/\sqrt{\operatorname{pm}}$ gives the stated form, and the
+argument is symmetric in $L$ and $F$.
+
+The rest of this appendix proves the lower half, in two lemmas.
+
+## Lemma 1: the least sparse a vector can be at a given peak-to-mean
+
+> For nonnegative $x$ of length $m$ with $\operatorname{pm}(x)=P$,
+> $$H(x)\;\ge\;H_{\min}(P,m),$$
+> with equality for $x^\star=(P,q,\dots,q)$, $q=(m-P)/(m-1)$.
+
+**Proof.** $H$ is a decreasing function of $\|x\|_1/\|x\|_2$, so minimising $H$
+means minimising $\|x\|_2$. Both $H$ and $\operatorname{pm}$ are scale
+invariant, so normalise $\operatorname{mean}(x)=1$; then $\|x\|_1=m$ is fixed and
+the constraint $\operatorname{pm}(x)=P$ says $\max(x)=P$.
+
+One coordinate is therefore pinned at $P$, contributing $P^2$ to $\|x\|_2^2$
+regardless. The remaining $m-1$ coordinates are nonnegative and must sum to
+$m-P$, and among vectors with a fixed sum the squared norm
+$\sum_{i\ge 2}x_i^2$ is minimised when all entries are equal — by Cauchy–Schwarz,
+$\sum_{i\ge2}x_i^2\ge\bigl(\sum_{i\ge2}x_i\bigr)^2/(m-1)$, with equality exactly
+when they are. That common value is $q=(m-P)/(m-1)$, which satisfies
+$0\le q\le P$ for every $1\le P\le m$, so $x^\star$ is feasible and $P$ really is
+its maximum. Substituting $\|x\|_1=m$ and
+$\|x\|_2^2=P^2+(m-1)q^2$ into the definition of $H$ gives $H_{\min}(P,m)$. $\square$
+
+Note the shape. Step A's upper bound involves $P$; this lower bound involves
+$P^{2}/m$. A lone spike among many coordinates barely moves $\ell_1/\ell_2$, so
+the lower bound only becomes interesting once $P$ approaches $\sqrt{m}$.
+
+```{r A1-check}
+Hmin <- function(P, m) { q <- (m - P)/(m - 1)
+  (sqrt(m) - m/sqrt(P^2 + (m-1)*q^2)) / (sqrt(m) - 1) }
+
+set.seed(1); m <- 400
+knitr::kable(do.call(rbind, lapply(c(2, 10, 50, 200), function(P) {
+  best <- Inf                       # random x with pm exactly P: mean 1, one entry P
+  for (rep in 1:8000) {
+    y <- rexp(m - 1)^runif(1, 0.2, 4); y <- y/sum(y)*(m - P)
+    if (max(y) > P) next
+    best <- min(best, hoyer(c(P, y)))
+  }
+  data.frame(P = P, `H_min(P, m)` = Hmin(P, m),
+             `H of x-star` = hoyer(c(P, rep((m - P)/(m - 1), m - 1))),
+             `best of 8000 random` = best, check.names = FALSE)
+})), digits = 5, row.names = FALSE,
+caption = "x-star attains the bound exactly; random vectors never beat it.")
+```
+
+## Lemma 2: the reverse of the budget inequality
+
+> $\displaystyle \operatorname{pm}(\theta)\;\le\;\max_k\ \operatorname{pm}(\ell_{\cdot k})\cdot\operatorname{pm}(f_{\cdot k}).$
+
+**Proof.** Step B bounded $\max(\theta)$ from *below* by discarding all but one
+term. Bound it from *above* instead by taking the largest possible value of each
+term: for every $i,j$,
+
+$$
+\theta_{ij}=\sum_m \ell_{im}f_{jm}\;\le\;\sum_m \max(\ell_{\cdot m})\max(f_{\cdot m}),
+\qquad\text{so}\qquad
+\max(\theta)\;\le\;\sum_m \max(\ell_{\cdot m})\max(f_{\cdot m}).
+$$
+
+The mean factorizes as before,
+$\operatorname{mean}(\theta)=\sum_m\operatorname{mean}(\ell_{\cdot m})\operatorname{mean}(f_{\cdot m})$.
+Put $a_m=\max(\ell_{\cdot m})\max(f_{\cdot m})$ and
+$b_m=\operatorname{mean}(\ell_{\cdot m})\operatorname{mean}(f_{\cdot m})>0$, and
+apply the mediant inequality $\bigl(\sum_m a_m\bigr)/\bigl(\sum_m b_m\bigr)\le\max_m (a_m/b_m)$:
+
+$$
+\operatorname{pm}(\theta)=\frac{\max(\theta)}{\operatorname{mean}(\theta)}
+\;\le\;\frac{\sum_m a_m}{\sum_m b_m}
+\;\le\;\max_m \frac{a_m}{b_m}
+\;=\;\max_m\ \operatorname{pm}(\ell_{\cdot m})\operatorname{pm}(f_{\cdot m}). \qquad\square
+$$
+
+Together with Step B the product is now pinned on both sides:
+
+$$
+\operatorname{pm}(\theta)\;\le\;\max_k\ \operatorname{pm}(\ell_{\cdot k})\operatorname{pm}(f_{\cdot k})
+\;\le\;\frac{\operatorname{pm}(\theta)}{\min_k w_k}.
+$$
+
+## Proof of the lower half
+
+By Lemma 2 there is a factor $k$ with
+$\operatorname{pm}(\ell_{\cdot k})\operatorname{pm}(f_{\cdot k})\ge\operatorname{pm}(\theta)$.
+A product of two numbers cannot have both factors below the square root of the
+product, so
+
+$$
+\max\bigl\{\operatorname{pm}(\ell_{\cdot k}),\ \operatorname{pm}(f_{\cdot k})\bigr\}
+\;\ge\;\sqrt{\operatorname{pm}(\theta)} .
+$$
+
+Apply Lemma 1 to whichever column achieves that maximum. Its length is $n$ or
+$p$, and $H_{\min}(P,m)$ is decreasing in $m$, so using $\max(n,p)$ is valid
+either way:
+
+$$
+\max\bigl\{H(\ell_{\cdot k}),\,H(f_{\cdot k})\bigr\}\;\ge\;H_{\min}\!\bigl(\sqrt{\operatorname{pm}(\theta)},\ \max(n,p)\bigr).
+\qquad\square
+$$
+
+## Both halves, checked on the fits
+
+```{r A3-check, cache=TRUE}
+knitr::kable(do.call(rbind, lapply(C_GRID, function(cf) {
+  r <- do.call(rbind, lapply(1:10, function(sd) {
+    x <- readRDS(file.path(cells_dir, paste0(
+           tag_of(list(seed = sd, c_true = 1, c_fit = cf)), ".rds")))
+    L <- x$fits$rank1$LL; Fm <- x$fits$rank1$FF
+    th <- tcrossprod(L, Fm) / max(1, if (is.infinite(cf)) 1 else cf)
+    w  <- colMeans(L) * colMeans(Fm); w <- w/sum(w)
+    P  <- pm(th); mm <- max(nrow(L), nrow(Fm))
+    HL <- apply(L, 2, hoyer); HF <- apply(Fm, 2, hoyer)
+    ub <- 1 - sqrt(w/P)                                  # upper, every column
+    k  <- which.max(apply(L, 2, pm) * apply(Fm, 2, pm))  # the factor Lemma 2 gives
+    c(`pm(theta)`       = P,
+      `upper bound`     = max(ub),
+      `largest H seen`  = max(c(HL, HF)),
+      `max H at that k` = max(HL[k], HF[k]),
+      `lower bound`     = Hmin(sqrt(P), mm),
+      `upper violations`= sum(HL > ub + 1e-9) + sum(HF > ub + 1e-9),
+      `lower violations`= as.numeric(max(HL[k], HF[k]) < Hmin(sqrt(P), mm) - 1e-9))
+  }))
+  as.data.frame(t(c(c_fit = cf, colMeans(r))))
+})), digits = c(3, 2, 3, 3, 3, 4, 0, 0), row.names = FALSE,
+caption = "Columns are ordered as they appear in the sandwich: upper bound, what is observed, lower bound.")
+```
+
+## How useful is the lower half?
+
+Not very, quantitatively. The guarantee moves from about $10^{-4}$ to $0.02$
+across the grid while the fits deliver $0.18$ to $0.59$ — the right *shape*, off
+by more than an order of magnitude. Lemma 1 explains why: the bound depends on
+$P^{2}/m$, and here $\sqrt{\operatorname{pm}(\theta)}\le 4.4$ against
+$m=300$, so it never comes near the regime where it bites.
+
+The gap is structural, not loose algebra. Lemmas 1 and 2 hold for *every*
+nonnegative factorization of $\theta$, and a maximum-likelihood fit is not
+adversarial. Closing it would need an argument about what maximum likelihood
+actually does — that the fit concentrates because concentrating fits the data,
+not merely because the geometry permits it. That is a different theorem and this
+page does not have it.
+
+So the pairing worth remembering:
+
+- the **upper** bound is tight and explanatory — the fits spend their entire
+  budget, which is why it predicts their behaviour;
+- the **lower** bound is valid and correctly monotone but loose — it establishes
+  that the trend cannot be reversed, not that it must be as strong as observed.
+
 ```{r session}
 sessionInfo()
 ```

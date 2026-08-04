@@ -261,6 +261,87 @@ Panels share a $y$ scale deliberately: the penalty for being in the wrong
 **regime** ($\sim$1000) dwarfs the penalty within a regime ($\sim$1), and a free
 $y$ would rescale each panel and hide that.
 
+# Are the rates themselves recovered?
+
+Before looking at the factors, it is worth checking the quantity the likelihood
+actually pins down: the fitted rates $\hat\lambda$. Below, for one seed, are the
+three simulations at $c = 10^{-3}$, $1$ and $\infty$, each fitted at its own $c$
+— so these are the well-specified cells on the diagonal. Every entry of the
+$300\times300$ matrix is plotted, true rate against fitted rate, on log axes with
+$y = x$ marked.
+
+```{r rates-vs-truth, fig.width=12, fig.height=4.2, cache=TRUE}
+CS   <- c(1e-3, 1, Inf)
+fmtc <- function(z) if (is.infinite(z)) "Inf" else
+  format(z, scientific = FALSE, trim = TRUE, drop0trailing = TRUE)
+panel_labs <- vapply(CS, function(z)
+  sprintf("simulated and fitted at c = %s", fmtc(z)), character(1))
+
+rate_dat <- do.call(rbind, lapply(CS, function(cc) {
+  dd <- sim_dataset(1, cc)
+  x  <- readRDS(file.path(cells_dir, paste0(
+          tag_of(list(seed = 1, c_true = cc, c_fit = cc)), ".rds")))
+  L <- x$fits$rank1$LL; Fm <- x$fits$rank1$FF
+  lf <- if (is.infinite(cc)) tcrossprod(L, Fm) else
+          cc * expm1(tcrossprod(L, Fm) / max(1, cc))
+  data.frame(true = as.vector(dd$lambda), fitted = pmax(as.vector(lf), 1e-6),
+             panel = sprintf("simulated and fitted at c = %s", fmtc(cc)))
+}))
+rate_dat$panel <- factor(rate_dat$panel, levels = panel_labs)
+stopifnot(!any(is.na(rate_dat$panel)))
+
+ggplot(rate_dat, aes(true, fitted)) +
+  geom_abline(slope = 1, intercept = 0, colour = "#C2410C", linewidth = 0.7) +
+  geom_bin2d(bins = 90) +
+  scale_fill_gradient(low = "#DDE8EA", high = "#0E5C6B", trans = "log10",
+                      name = "entries") +
+  facet_wrap(~ panel, nrow = 1, scales = "free") +
+  scale_x_log10() + scale_y_log10() +
+  labs(x = "true rate", y = "fitted rate",
+       title = "Fitted vs true rates, seed 1, well-specified fits",
+       subtitle = "each panel: 90,000 matrix entries.  orange line is y = x") +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = "bold", size = 10),
+        panel.border = element_rect(colour = "grey80", fill = NA))
+```
+
+```{r rates-summary}
+knitr::kable(do.call(rbind, lapply(CS, function(cc) {
+  dd <- sim_dataset(1, cc)
+  x  <- readRDS(file.path(cells_dir, paste0(
+          tag_of(list(seed = 1, c_true = cc, c_fit = cc)), ".rds")))
+  L <- x$fits$rank1$LL; Fm <- x$fits$rank1$FF
+  lf <- if (is.infinite(cc)) tcrossprod(L, Fm) else
+          cc * expm1(tcrossprod(L, Fm) / max(1, cc))
+  lt <- as.vector(dd$lambda); lf <- as.vector(lf)
+  data.frame(c = fmtc(cc),
+             `true min` = min(lt), `true max` = max(lt),
+             `fitted min` = min(lf), `fitted max` = max(lf),
+             `cor(log)` = cor(log(lt), log(pmax(lf, 1e-12))),
+             `RMSE(log1p)` = sqrt(mean((log1p(lt) - log1p(pmax(lf, 0)))^2)),
+             check.names = FALSE)
+})), digits = 4, row.names = FALSE)
+```
+
+Three things to take from this.
+
+**The rates are recovered about equally well at every $c$.** The mass lies on
+$y = x$ in all three panels and the RMSE on the log1p scale is essentially
+identical across them. This is the concrete version of a point that recurs
+below: the likelihood determines $LF'$, and hence $\hat\lambda$, but says much
+less about how that product is split into factors. Whatever $c$ does to the
+factors, it barely touches the fit to the data.
+
+**The scatter widens at the low end** in every panel — ordinary Poisson
+behaviour, since the information about a rate scales with the rate.
+
+**Only the $c = \infty$ panel has a tail of entries driven to essentially zero**,
+visible as the smear along the bottom reaching $10^{-9}$; the other two panels
+stop cleanly at their smallest true rate. With a linear link the model can place
+structural near-zeros, and at small $c$ it cannot. That is the same floor that
+drives the sparsity results below, seen directly in the rates rather than
+through a sparsity measure.
+
 # Sparsity and factor separation
 
 **These metrics must fix the initialization**, unlike the likelihood ones. The
