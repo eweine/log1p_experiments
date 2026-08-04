@@ -543,15 +543,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreef6db4f8bad52016326eb5a6ea640aa46d67b8f5ctargetblankf6db4f8a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree88c64a63c6e7267d73f867fcb8c76718f9b0d707targetblank88c64a6a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/f6db4f8bad52016326eb5a6ea640aa46d67b8f5c" target="_blank">f6db4f8</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/88c64a63c6e7267d73f867fcb8c76718f9b0d707" target="_blank">88c64a6</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreef6db4f8bad52016326eb5a6ea640aa46d67b8f5ctargetblankf6db4f8a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree88c64a63c6e7267d73f867fcb8c76718f9b0d707targetblank88c64a6a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -561,7 +561,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/f6db4f8bad52016326eb5a6ea640aa46d67b8f5c" target="_blank">f6db4f8</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/88c64a63c6e7267d73f867fcb8c76718f9b0d707" target="_blank">88c64a6</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -625,6 +625,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/88c64a63c6e7267d73f867fcb8c76718f9b0d707/analysis/hoyer_sparsity_c.Rmd" target="_blank">88c64a6</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+State the Step B budget as a sum of Hoyer sparsities
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/706c47cf350becdc83c1295001c114db8403a57d/docs/hoyer_sparsity_c.html" target="_blank">706c47c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1117,10 +1151,20 @@ sparsity. The two are interchangeable, because Step A’s inequality can
 be read backwards. Define the <strong>density</strong> of a length-<span
 class="math inline">\(m\)</span> nonnegative vector,</p>
 <p><span class="math display">\[
-d(x) \;=\; 1-\Bigl(1-\tfrac{1}{\sqrt m}\Bigr)H(x)
+d(x) \;=\; 1-\gamma_m H(x) \;=\; \frac{\|x\|_1}{\sqrt m\,\|x\|_2}
 \;\in\;\Bigl[\tfrac{1}{\sqrt m},\,1\Bigr],
-\qquad d(x)\approx 1-H(x) \text{ for large } m .
+\qquad \gamma_m = 1-\frac{1}{\sqrt m},
 \]</span></p>
+<p>so <span class="math inline">\(d(x)\approx 1-H(x)\)</span> for large
+<span class="math inline">\(m\)</span>. The second equality is worth
+pausing on: it is exact, and it says the density is nothing but the
+<strong>normalized <span class="math inline">\(\ell_1/\ell_2\)</span>
+ratio</strong>, of which Hoyer sparsity is the affine rescaling onto
+<span class="math inline">\([0,1]\)</span>. That is why the results
+below are natively multiplicative in <span
+class="math inline">\(d\)</span> — the budget is a product of norm
+ratios — and why restating them in Hoyer units costs a constant <span
+class="math inline">\(\gamma_m\)</span> per column.</p>
 <p>Solving the boxed inequality of Step A for <span
 class="math inline">\(\operatorname{pm}\)</span> — it is an equivalence,
 not a weakening — gives</p>
@@ -1139,18 +1183,68 @@ Step B from the other end:</p>
 \]</span></p>
 <p>Taking square roots:</p>
 <p><span class="math display">\[
-\boxed{\;d(\ell_{\cdot k})\cdot d(f_{\cdot
-k})\;\ge\;\sqrt{\frac{w_k}{\operatorname{pm}(\theta)}}\;}
+d(\ell_{\cdot k})\cdot d(f_{\cdot k})\;\ge\;r_k,
+\qquad r_k \;=\; \sqrt{\frac{w_k}{\operatorname{pm}(\theta)}},
 \qquad\text{for every factor } k .
 \]</span></p>
-<p>This is Step B with nothing thrown away, stated in the units of the
-figures: a <strong>hyperbola in the <span
-class="math inline">\((H(\ell_{\cdot k}), H(f_{\cdot k}))\)</span>
+<p>This is Step B with nothing thrown away: a <strong>hyperbola in the
+<span class="math inline">\((H(\ell_{\cdot k}), H(f_{\cdot k}))\)</span>
 plane</strong>, with the feasible region on the origin side of it. Both
 columns of a factor cannot be sparse at once, and lowering <span
 class="math inline">\(c\)</span> — which lowers <span
 class="math inline">\(\operatorname{pm}(\theta)\)</span>, Step C — pulls
 the whole frontier toward the origin.</p>
+</div>
+<div id="the-budget-as-a-sum-of-sparsities" class="section level2">
+<h2>The budget as a sum of sparsities</h2>
+<p>The hyperbola is exact but reads awkwardly, because expanding it
+leaves a cross term,</p>
+<p><span class="math display">\[
+\gamma_n H(\ell_{\cdot k}) + \gamma_p H(f_{\cdot k})
+- \gamma_n\gamma_p\,H(\ell_{\cdot k})H(f_{\cdot k}) \;\le\; 1-r_k .
+\]</span></p>
+<p>Ask instead the question the picture suggests: <strong>how large can
+the two sparsities be <em>added together</em>?</strong> Substitute <span
+class="math inline">\(u=d(\ell_{\cdot k})\)</span>, <span
+class="math inline">\(v=d(f_{\cdot k})\)</span>, so that <span
+class="math inline">\(H(\ell_{\cdot k})=(1-u)/\gamma_n\)</span> and
+likewise for <span class="math inline">\(v\)</span>, and the constraint
+is just <span class="math inline">\(uv\ge r_k\)</span> on <span
+class="math inline">\(u,v\in(0,1]\)</span>. Then by the weighted AM–GM
+inequality</p>
+<p><span class="math display">\[
+\frac{u}{\gamma_n}+\frac{v}{\gamma_p}\;\ge\;2\sqrt{\frac{uv}{\gamma_n\gamma_p}}\;\ge\;2\sqrt{\frac{r_k}{\gamma_n\gamma_p}},
+\]</span></p>
+<p>and since <span class="math inline">\(H(\ell_{\cdot k})+H(f_{\cdot
+k}) = 1/\gamma_n+1/\gamma_p-(u/\gamma_n+v/\gamma_p)\)</span>,</p>
+<p><span class="math display">\[
+\boxed{\;H(\ell_{\cdot k}) + H(f_{\cdot k})
+\;\le\;
+\frac{1}{\gamma_n}+\frac{1}{\gamma_p}-\frac{2\sqrt{r_k}}{\sqrt{\gamma_n\gamma_p}}
+\;\xrightarrow[\;n,p\to\infty\;]{}\;
+2\left(1-\Bigl(\frac{w_k}{\operatorname{pm}(\theta)}\Bigr)^{1/4}\right)\;}
+\]</span></p>
+<p>Here <span class="math inline">\(n=p=300\)</span>, so <span
+class="math inline">\(\gamma_n=\gamma_p=\gamma=0.9423\)</span> and the
+bound is simply <span
+class="math inline">\(\tfrac{2}{\gamma}\bigl(1-\sqrt{r_k}\bigr)=2.123\,(1-\sqrt{r_k})\)</span>.
+This is the statement to remember: <strong>the two columns of a factor
+split a single sparsity allowance, and <span
+class="math inline">\(c\)</span> sets how large that allowance
+is.</strong></p>
+<p>Two things make it worth preferring to the hyperbola in practice.</p>
+<p><strong>It gives up nothing.</strong> AM–GM is an equality at <span
+class="math inline">\(u=v\)</span>, and that point is feasible, so the
+right-hand side is the <em>exact maximum</em> of <span
+class="math inline">\(H(\ell_{\cdot k})+H(f_{\cdot k})\)</span> over the
+constraint set — the sharpest statement that exists about the sum, not a
+relaxation of the hyperbola. The only information discarded is how the
+total gets split between the two columns, and the bound is attained
+whenever they are equally sparse.</p>
+<p><strong>It is much stronger than the one-column corollary
+below.</strong> Halving it gives an average per column, which the table
+shows carries less than half the slack of the cap obtained by discarding
+<span class="math inline">\(d(f_{\cdot k})\)</span> outright.</p>
 </div>
 <div id="corollary-a-bound-on-one-column-at-a-time"
 class="section level2">
@@ -1212,24 +1306,29 @@ col &lt;- do.call(rbind, lapply(list.files(cells_dir, &quot;\\.rds$&quot;, full.
                  pmL = apply(L, 2, pm),   pmF = apply(Fm, 2, pm))
     }))
   }))
-col$rhs  &lt;- sqrt(col$w / col$pm_theta)                 # the hyperbola bound
-col$capL &lt;- (1 - col$rhs) / (1 - 1/sqrt(300))          # the one-column cap
+gam      &lt;- 1 - 1/sqrt(300)                            # n = p = 300 throughout
+col$rhs  &lt;- sqrt(col$w / col$pm_theta)                 # r_k, the hyperbola bound
+col$capL &lt;- (1 - col$rhs) / gam                        # the one-column cap
+col$capS &lt;- pmin(2, (2/gam) * (1 - sqrt(col$rhs)))     # the sum-form cap
 
 qs &lt;- function(v) sprintf(&quot;%.2f   (%.2f – %.2f)&quot;, median(v), min(v), max(v))
 knitr::kable(data.frame(
   quantity = c(&quot;Step B itself:  pm(theta) / [pm(l) pm(f) w]&quot;,
                &quot;w_k, the per-factor price   (1/K = 0.33)&quot;,
                &quot;pm(f_.k), discarded to reach one column&quot;,
-               &quot;hyperbola slack:  d(l) d(f) / sqrt(w/pm(theta))&quot;,
+               &quot;hyperbola slack:  d(l) d(f) / r_k&quot;,
+               &quot;sum-form slack:  cap - [H(l) + H(f)]   (Hoyer units)&quot;,
+               &quot;|H(l_.k) - H(f_.k)|, where the sum form is exact at 0&quot;,
                &quot;one-column slack:  cap - H(l_.k)   (Hoyer units)&quot;),
   `median (min – max)` = c(
     qs(col$pm_theta / (col$pmL * col$pmF * col$w)), qs(col$w), qs(col$pmF),
-    qs(col$dL * col$dF / col$rhs), qs(col$capL - col$HL)),
+    qs(col$dL * col$dF / col$rhs), qs(col$capS - col$HL - col$HF),
+    qs(abs(col$HL - col$HF)), qs(col$capL - col$HL)),
   check.names = FALSE), row.names = FALSE)</code></pre>
 <table>
 <colgroup>
-<col width="69%" />
-<col width="30%" />
+<col width="74%" />
+<col width="25%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1251,8 +1350,17 @@ knitr::kable(data.frame(
 <td align="left">7.79 (1.54 – 19.96)</td>
 </tr>
 <tr class="even">
-<td align="left">hyperbola slack: d(l) d(f) / sqrt(w/pm(theta))</td>
+<td align="left">hyperbola slack: d(l) d(f) / r_k</td>
 <td align="left">2.04 (1.38 – 3.36)</td>
+</tr>
+<tr class="odd">
+<td align="left">sum-form slack: cap - [H(l) + H(f)] (Hoyer units)</td>
+<td align="left">0.47 (0.31 – 0.73)</td>
+</tr>
+<tr class="even">
+<td align="left">|H(l_.k) - H(f_.k)|, where the sum form is exact at
+0</td>
+<td align="left">0.16 (0.00 – 0.34)</td>
 </tr>
 <tr class="odd">
 <td align="left">one-column slack: cap - H(l_.k) (Hoyer units)</td>
@@ -1261,9 +1369,10 @@ knitr::kable(data.frame(
 </tbody>
 </table>
 <pre class="r"><code>cat(&quot;violations — hyperbola:&quot;, sum(col$dL * col$dF &lt; col$rhs - 1e-9),
+    &quot; sum form:&quot;, sum(col$HL + col$HF &gt; col$capS + 1e-9),
     &quot; one-column L:&quot;, sum(col$HL &gt; col$capL + 1e-9),
     &quot; one-column F:&quot;, sum(col$HF &gt; col$capL + 1e-9), &quot;of&quot;, nrow(col), &quot;\n&quot;)</code></pre>
-<pre><code>violations — hyperbola: 0  one-column L: 0  one-column F: 0 of 3840 </code></pre>
+<pre><code>violations — hyperbola: 0  sum form: 0  one-column L: 0  one-column F: 0 of 3840 </code></pre>
 <div class="alert alert-warning">
 <p>
 <strong>Warning:</strong> The above code chunk cached its results, but
@@ -1292,6 +1401,12 @@ on these fits that throws away a factor of about eight. That is why the
 one-column bound carries 0.56 of slack in Hoyer units while the
 hyperbola carries a factor of two — and the factor of two that remains
 is Step A’s slack, not the budget argument’s.</p>
+<p>The sum form sits where you would want it: 0.47 of slack on the
+<em>pair</em>, so 0.23 per column, against 0.56 for the one-column cap.
+And the columns stay reasonably near the diagonal <span
+class="math inline">\(H(\ell_{\cdot k})=H(f_{\cdot k})\)</span> where
+the sum bound is attained — median separation 0.16 — so little is lost
+by declining to say how the allowance is split.</p>
 <pre class="r"><code>pA &lt;- ggplot(col, aes(rhs, dL * dF)) +
   geom_abline(slope = 1, intercept = 0, colour = &quot;#C2410C&quot;, linewidth = 0.9) +
   geom_point(colour = &quot;#0E8FA8&quot;, alpha = 0.25, size = 0.9) +
@@ -1310,18 +1425,24 @@ sub$panel &lt;- factor(paste(&quot;c_fit =&quot;, fmtc(sub$c_fit)),
 stopifnot(!any(is.na(sub$panel)))
 frontier &lt;- do.call(rbind, lapply(levels(sub$panel), function(p) {
   r  &lt;- median(sub$rhs[sub$panel == p])
-  hl &lt;- seq(0, 0.995, length.out = 400); d &lt;- 1 - hl * (1 - 1/sqrt(300))
+  hl &lt;- seq(0, 0.995, length.out = 400); d &lt;- 1 - hl * gam
   data.frame(panel = factor(p, levels = levels(sub$panel)), HL = hl,
-             HF = (1 - r/d) / (1 - 1/sqrt(300)))
+             HF = (1 - r/d) / gam, cap_sum = (2/gam) * (1 - sqrt(r)))
 }))
+touch &lt;- unique(frontier[, c(&quot;panel&quot;, &quot;cap_sum&quot;)])       # tangency, on H(l)=H(f)
+touch$HL &lt;- touch$HF &lt;- touch$cap_sum / 2
 pB &lt;- ggplot(sub, aes(HL, HF)) +
+  geom_abline(data = frontier, aes(slope = -1, intercept = cap_sum),
+              colour = &quot;#0E5C6B&quot;, linetype = &quot;dashed&quot;, linewidth = 0.7) +
   geom_line(data = frontier, colour = &quot;#C2410C&quot;, linewidth = 0.9) +
+  geom_point(data = touch, shape = 21, size = 2.6, stroke = 0.9,
+             colour = &quot;#0E5C6B&quot;, fill = &quot;white&quot;) +
   geom_point(colour = &quot;#0E8FA8&quot;, alpha = 0.4, size = 0.9) +
   facet_wrap(~ panel, nrow = 1) +
   coord_cartesian(xlim = c(0, 0.8), ylim = c(0, 0.9)) +
   labs(x = &quot;H(l_.k)&quot;, y = &quot;H(f_.k)&quot;,
        title = &quot;The frontier moves out as c grows&quot;,
-       subtitle = &quot;curve drawn at each panel&#39;s median w_k / pm(theta)&quot;)
+       subtitle = &quot;solid: the hyperbola.  dashed: the sum form, touching it at the open circle&quot;)
 plot_grid(pA, pB, nrow = 2)</code></pre>
 <img src="figure/hoyer_sparsity_c.Rmd/stepB-hyperbola-1.png" alt="" width="880" style="display: block; margin: auto;" />
 <div class="alert alert-warning">
@@ -1339,13 +1460,16 @@ remove this warning. See the
 </p>
 </div>
 <p>The lower row is the picture worth keeping. The feasible region is
-the area below each curve; only <span class="math inline">\(c\)</span>
-moves the curve. At <span class="math inline">\(c=10^{-3}\)</span> the
-frontier is pinched into the corner and the fits sit right against it —
-there is no sparser factorization to find. By <span
-class="math inline">\(c=100\)</span> the frontier has swung out and the
-fits, now much sparser in absolute terms, are no longer anywhere near
-it.</p>
+the area below each solid curve; only <span
+class="math inline">\(c\)</span> moves it. At <span
+class="math inline">\(c=10^{-3}\)</span> the frontier is pinched into
+the corner and the fits sit right against it — there is no sparser
+factorization to find. By <span class="math inline">\(c=100\)</span> the
+frontier has swung out and the fits, now much sparser in absolute terms,
+are no longer anywhere near it. The dashed line is the sum form: a line
+of slope <span class="math inline">\(-1\)</span> touching the hyperbola
+exactly on the diagonal, which is the geometric content of “it gives up
+nothing about the sum.”</p>
 </div>
 </div>
 <div id="step-c-c-is-what-sets-the-budget" class="section level1">
