@@ -206,6 +206,168 @@ and $c$ fixed and moving among equally-good factorizations slides *along* the
 budget constraint — a trade. Changing $c$ moves the constraint itself — so both
 can rise together.
 
+## The same budget, written in Hoyer units
+
+Step B constrains peak-to-mean; what you actually measure is Hoyer sparsity. The
+two are interchangeable, because Step A's inequality can be read backwards. Define
+the **density** of a length-$m$ nonnegative vector,
+
+$$
+d(x) \;=\; 1-\Bigl(1-\tfrac{1}{\sqrt m}\Bigr)H(x) \;\in\;\Bigl[\tfrac{1}{\sqrt m},\,1\Bigr],
+\qquad d(x)\approx 1-H(x) \text{ for large } m .
+$$
+
+Solving the boxed inequality of Step A for $\operatorname{pm}$ — it is an
+equivalence, not a weakening — gives
+
+$$
+H(x)\le\frac{\sqrt m-\sqrt{m/\operatorname{pm}(x)}}{\sqrt m-1}
+\iff
+\operatorname{pm}(x)\;\ge\;\frac{1}{d(x)^2} .
+$$
+
+Apply that to $\ell_{\cdot k}$ and to $f_{\cdot k}$, multiply, and read Step B
+from the other end:
+
+$$
+\frac{1}{d(\ell_{\cdot k})^{2}\,d(f_{\cdot k})^{2}}
+\;\le\;\operatorname{pm}(\ell_{\cdot k})\operatorname{pm}(f_{\cdot k})
+\;\le\;\frac{\operatorname{pm}(\theta)}{w_k} .
+$$
+
+Taking square roots:
+
+$$
+\boxed{\;d(\ell_{\cdot k})\cdot d(f_{\cdot k})\;\ge\;\sqrt{\frac{w_k}{\operatorname{pm}(\theta)}}\;}
+\qquad\text{for every factor } k .
+$$
+
+This is Step B with nothing thrown away, stated in the units of the figures: a
+**hyperbola in the $(H(\ell_{\cdot k}), H(f_{\cdot k}))$ plane**, with the
+feasible region on the origin side of it. Both columns of a factor cannot be
+sparse at once, and lowering $c$ — which lowers $\operatorname{pm}(\theta)$,
+Step C — pulls the whole frontier toward the origin.
+
+## Corollary: a bound on one column at a time
+
+Since $d(f_{\cdot k})\le 1$, drop it:
+
+$$
+H(\ell_{\cdot k})\;\le\;\frac{1-\sqrt{w_k/\operatorname{pm}(\theta)}}{1-1/\sqrt n}
+\;\approx\;1-\sqrt{\frac{w_k}{\operatorname{pm}(\theta)}},
+$$
+
+and symmetrically for $f_{\cdot k}$. This is the upper half of the
+[appendix](#the-sandwich) sandwich. It is a genuine theorem about a single
+column, but it is much weaker than the hyperbola, and the $w_k$ cannot be removed:
+take $K=2$ with a flat dominant factor plus a vanishing spike,
+$\ell_{\cdot 2}=\varepsilon e_1$, $f_{\cdot 2}=\varepsilon e_1$. Then
+$\operatorname{pm}(\theta)\to 1$ while $\operatorname{pm}(\ell_{\cdot 2})=n$; the
+factor stays admissible only because $w_2\to 0$ with it.
+
+Averaging the corollary over $k$ and using $\sqrt{w_k}\ge w_k$, so that
+$\sum_k\sqrt{w_k}\ge\sum_k w_k=1$, removes $w$ entirely and bounds the quantity
+the simulation figures actually plot:
+
+$$
+\frac1K\sum_{k}H(\ell_{\cdot k})\;\;\le\;\;1-\frac{1}{K\sqrt{\operatorname{pm}(\theta)}} .
+$$
+
+The observed $\sum_k\sqrt{w_k}$ is $1.73=\sqrt3=\sqrt K$ almost exactly — the
+equal-shares value — so in practice the $K$ in the denominator behaves like
+$\sqrt K$. That is an observation about these fits, not a theorem.
+
+## How much is lost going from the pair to one column
+
+All 640 cells, both initializations, $K=3$: 3,840 factor-columns.
+
+```{r stepB-columns, cache=TRUE}
+dens <- function(x) 1 - hoyer(x) * (1 - 1/sqrt(length(x)))
+
+col <- do.call(rbind, lapply(list.files(cells_dir, "\\.rds$", full.names = TRUE),
+  function(f) {
+    x <- readRDS(f)
+    do.call(rbind, lapply(names(x$fits), function(init) {
+      L <- x$fits[[init]]$LL; Fm <- x$fits[[init]]$FF
+      th <- tcrossprod(L, Fm)              # pm and H are both scale invariant,
+      w  <- colMeans(L) * colMeans(Fm)     # so the alpha rescaling is irrelevant
+      data.frame(c_fit = x$rows$c_fit[1], init = init, k = seq_len(ncol(L)),
+                 pm_theta = pm(th), w = w / sum(w),
+                 HL = apply(L, 2, hoyer), HF = apply(Fm, 2, hoyer),
+                 dL = apply(L, 2, dens),  dF = apply(Fm, 2, dens),
+                 pmL = apply(L, 2, pm),   pmF = apply(Fm, 2, pm))
+    }))
+  }))
+col$rhs  <- sqrt(col$w / col$pm_theta)                 # the hyperbola bound
+col$capL <- (1 - col$rhs) / (1 - 1/sqrt(300))          # the one-column cap
+
+qs <- function(v) sprintf("%.2f   (%.2f – %.2f)", median(v), min(v), max(v))
+knitr::kable(data.frame(
+  quantity = c("Step B itself:  pm(theta) / [pm(l) pm(f) w]",
+               "w_k, the per-factor price   (1/K = 0.33)",
+               "pm(f_.k), discarded to reach one column",
+               "hyperbola slack:  d(l) d(f) / sqrt(w/pm(theta))",
+               "one-column slack:  cap - H(l_.k)   (Hoyer units)"),
+  `median (min – max)` = c(
+    qs(col$pm_theta / (col$pmL * col$pmF * col$w)), qs(col$w), qs(col$pmF),
+    qs(col$dL * col$dF / col$rhs), qs(col$capL - col$HL)),
+  check.names = FALSE), row.names = FALSE)
+
+cat("violations — hyperbola:", sum(col$dL * col$dF < col$rhs - 1e-9),
+    " one-column L:", sum(col$HL > col$capL + 1e-9),
+    " one-column F:", sum(col$HF > col$capL + 1e-9), "of", nrow(col), "\n")
+```
+
+Read the table top to bottom and the accounting is complete. **Step B is nearly
+an equality** on real fits — median slack 1.09, minimum 1.00 — so the budget
+argument is not merely true, it is spent. **$w_k$ behaves**: it sits at $1/K$, so
+going per-factor costs a clean factor of $K$ and nothing worse. Everything else
+is the third row: the only route from a statement about the pair to a statement
+about one column is to discard $\operatorname{pm}(f_{\cdot k})\ge 1$, and on these
+fits that throws away a factor of about eight. That is why the one-column bound
+carries 0.56 of slack in Hoyer units while the hyperbola carries a factor of two
+— and the factor of two that remains is Step A's slack, not the budget argument's.
+
+```{r stepB-hyperbola, fig.width=8, fig.height=7, cache=TRUE}
+pA <- ggplot(col, aes(rhs, dL * dF)) +
+  geom_abline(slope = 1, intercept = 0, colour = "#C2410C", linewidth = 0.9) +
+  geom_point(colour = "#0E8FA8", alpha = 0.25, size = 0.9) +
+  scale_x_log10() + scale_y_log10() +
+  labs(x = "sqrt(w_k / pm(theta))   — the bound",
+       y = "d(l) x d(f)   — the fit",
+       title = "Every column obeys the hyperbola",
+       subtitle = "3,840 factor-columns; points must lie above the line")
+
+fmtc <- function(v) ifelse(is.infinite(v), "∞",
+  format(v, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))
+SHOW <- c(1e-3, 1, 100, Inf)
+sub  <- col[col$c_fit %in% SHOW, ]
+sub$panel <- factor(paste("c_fit =", fmtc(sub$c_fit)),
+                    levels = paste("c_fit =", fmtc(SHOW)))
+stopifnot(!any(is.na(sub$panel)))
+frontier <- do.call(rbind, lapply(levels(sub$panel), function(p) {
+  r  <- median(sub$rhs[sub$panel == p])
+  hl <- seq(0, 0.995, length.out = 400); d <- 1 - hl * (1 - 1/sqrt(300))
+  data.frame(panel = factor(p, levels = levels(sub$panel)), HL = hl,
+             HF = (1 - r/d) / (1 - 1/sqrt(300)))
+}))
+pB <- ggplot(sub, aes(HL, HF)) +
+  geom_line(data = frontier, colour = "#C2410C", linewidth = 0.9) +
+  geom_point(colour = "#0E8FA8", alpha = 0.4, size = 0.9) +
+  facet_wrap(~ panel, nrow = 1) +
+  coord_cartesian(xlim = c(0, 0.8), ylim = c(0, 0.9)) +
+  labs(x = "H(l_.k)", y = "H(f_.k)",
+       title = "The frontier moves out as c grows",
+       subtitle = "curve drawn at each panel's median w_k / pm(theta)")
+plot_grid(pA, pB, nrow = 2)
+```
+
+The lower row is the picture worth keeping. The feasible region is the area
+below each curve; only $c$ moves the curve. At $c=10^{-3}$ the frontier is
+pinched into the corner and the fits sit right against it — there is no sparser
+factorization to find. By $c=100$ the frontier has swung out and the fits, now
+much sparser in absolute terms, are no longer anywhere near it.
+
 # Step C: c is what sets the budget
 
 Here is the crux. $\theta$ is not free; it is the rates seen through the link,
@@ -444,12 +606,10 @@ this sparse. Raising $c$ raises $\operatorname{pm}(\theta)$ and so lifts both
 ends of the band, which is the formal counterpart of the rising lower envelope
 seen in the simulations.
 
-The upper half needs no new work. Step B gives
-$\operatorname{pm}(\ell_{\cdot k})\operatorname{pm}(f_{\cdot k})w_k\le\operatorname{pm}(\theta)$,
-and $\operatorname{pm}(f_{\cdot k})\ge 1$ always, so
-$\operatorname{pm}(\ell_{\cdot k})\le \operatorname{pm}(\theta)/w_k$; substituting
-into Step A's $H \le 1-1/\sqrt{\operatorname{pm}}$ gives the stated form, and the
-argument is symmetric in $L$ and $F$.
+The upper half needs no new work: it is the one-column corollary proved at the
+end of Step B, where the stronger hyperbola form
+$d(\ell_{\cdot k})d(f_{\cdot k})\ge\sqrt{w_k/\operatorname{pm}(\theta)}$ and the
+cost of weakening it to a single column are also given.
 
 The rest of this appendix proves the lower half, in two lemmas.
 
