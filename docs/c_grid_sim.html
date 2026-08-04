@@ -394,7 +394,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-08-02
+<strong>Last updated:</strong> 2026-08-04
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -509,6 +509,9 @@ data-summary
 <li>
 floor-vs-freedom
 </li>
+<li>
+rates-vs-truth
+</li>
 </ul>
 <p>To ensure reproducibility of the results, delete the cache directory
 <code>c_grid_sim_cache</code> and re-run the analysis. To have workflowr
@@ -536,15 +539,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea85bccf8fd34780a806e8cd7349b35ae4663a7d9targetblanka85bccfa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree4e965aba48209dfeb7ac44a69c2e6ba702330066targetblank4e965aba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/a85bccf8fd34780a806e8cd7349b35ae4663a7d9" target="_blank">a85bccf</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/4e965aba48209dfeb7ac44a69c2e6ba702330066" target="_blank">4e965ab</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea85bccf8fd34780a806e8cd7349b35ae4663a7d9targetblanka85bccfa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree4e965aba48209dfeb7ac44a69c2e6ba702330066targetblank4e965aba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -554,7 +557,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/a85bccf8fd34780a806e8cd7349b35ae4663a7d9" target="_blank">a85bccf</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/4e965aba48209dfeb7ac44a69c2e6ba702330066" target="_blank">4e965ab</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -569,8 +572,10 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
+    Ignored:    .DS_Store
     Ignored:    analysis/c_grid_sim_cache/
     Ignored:    analysis/figure/
+    Ignored:    analysis/hoyer_sparsity_c_cache/
     Ignored:    analysis/log1p_identifiability_cache/
 
 </code></pre>
@@ -617,6 +622,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/4e965aba48209dfeb7ac44a69c2e6ba702330066/analysis/c_grid_sim.Rmd" target="_blank">4e965ab</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Add a fitted-vs-true rates section to the c-grid notebook
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/c_grid_sim.html" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -947,6 +986,43 @@ ggplot(cnt, aes(cf, ct)) +
         plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
         panel.border = element_rect(colour = &quot;grey70&quot;, fill = NA))</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/winner-matrix-1.png" alt="" width="770" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-winner-matrix-1">
+Past versions of winner-matrix-1.png
+</button>
+</p>
+<div id="fig-winner-matrix-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/winner-matrix-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The likelihood recovers <span class="math inline">\(c\)</span>
 <strong>in the middle of the range and nowhere else</strong>. At <span
 class="math inline">\(c_{\text{true}} = 1\)</span> and <span
@@ -1003,6 +1079,43 @@ SUB_REF &lt;- paste(SUB, &quot;\ndashed: the true value for that simulation&quot
        trans = &quot;log1p&quot;, breaks = c(0, 1, 10, 100, 1000),
        labels = c(&quot;0&quot;, &quot;1&quot;, &quot;10&quot;, &quot;100&quot;, &quot;1000&quot;))</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/loglik-panels-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-loglik-panels-1">
+Past versions of loglik-panels-1.png
+</button>
+</p>
+<div id="fig-loglik-panels-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/loglik-panels-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><span class="math inline">\(y\)</span> is measured <strong>down from
 each seed’s own best</strong> <span class="math inline">\(c\)</span>,
 because raw log-likelihoods cannot be overlaid across seeds — each seed
@@ -1016,6 +1129,156 @@ deliberately: the penalty for being in the wrong <strong>regime</strong>
 ($<span class="math inline">\(1000) dwarfs the penalty within a regime
 (\)</span><span class="math inline">\(1), and a free\)</span>y$ would
 rescale each panel and hide that.</p>
+</div>
+<div id="are-the-rates-themselves-recovered" class="section level1">
+<h1>Are the rates themselves recovered?</h1>
+<p>Before looking at the factors, it is worth checking the quantity the
+likelihood actually pins down: the fitted rates <span
+class="math inline">\(\hat\lambda\)</span>. Below, for one seed, are the
+three simulations at <span class="math inline">\(c = 10^{-3}\)</span>,
+<span class="math inline">\(1\)</span> and <span
+class="math inline">\(\infty\)</span>, each fitted at its own <span
+class="math inline">\(c\)</span> — so these are the well-specified cells
+on the diagonal. Every entry of the <span
+class="math inline">\(300\times300\)</span> matrix is plotted, true rate
+against fitted rate, on log axes with <span class="math inline">\(y =
+x\)</span> marked.</p>
+<pre class="r"><code>CS   &lt;- c(1e-3, 1, Inf)
+fmtc &lt;- function(z) if (is.infinite(z)) &quot;Inf&quot; else
+  format(z, scientific = FALSE, trim = TRUE, drop0trailing = TRUE)
+panel_labs &lt;- vapply(CS, function(z)
+  sprintf(&quot;simulated and fitted at c = %s&quot;, fmtc(z)), character(1))
+
+rate_dat &lt;- do.call(rbind, lapply(CS, function(cc) {
+  dd &lt;- sim_dataset(1, cc)
+  x  &lt;- readRDS(file.path(cells_dir, paste0(
+          tag_of(list(seed = 1, c_true = cc, c_fit = cc)), &quot;.rds&quot;)))
+  L &lt;- x$fits$rank1$LL; Fm &lt;- x$fits$rank1$FF
+  lf &lt;- if (is.infinite(cc)) tcrossprod(L, Fm) else
+          cc * expm1(tcrossprod(L, Fm) / max(1, cc))
+  data.frame(true = as.vector(dd$lambda), fitted = pmax(as.vector(lf), 1e-6),
+             panel = sprintf(&quot;simulated and fitted at c = %s&quot;, fmtc(cc)))
+}))
+rate_dat$panel &lt;- factor(rate_dat$panel, levels = panel_labs)
+stopifnot(!any(is.na(rate_dat$panel)))
+
+ggplot(rate_dat, aes(true, fitted)) +
+  geom_abline(slope = 1, intercept = 0, colour = &quot;#C2410C&quot;, linewidth = 0.7) +
+  geom_bin2d(bins = 90) +
+  scale_fill_gradient(low = &quot;#DDE8EA&quot;, high = &quot;#0E5C6B&quot;, trans = &quot;log10&quot;,
+                      name = &quot;entries&quot;) +
+  facet_wrap(~ panel, nrow = 1, scales = &quot;free&quot;) +
+  scale_x_log10() + scale_y_log10() +
+  labs(x = &quot;true rate&quot;, y = &quot;fitted rate&quot;,
+       title = &quot;Fitted vs true rates, seed 1, well-specified fits&quot;,
+       subtitle = &quot;each panel: 90,000 matrix entries.  orange line is y = x&quot;) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = &quot;bold&quot;, size = 10),
+        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))</code></pre>
+<img src="figure/c_grid_sim.Rmd/rates-vs-truth-1.png" alt="" width="1320" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<pre class="r"><code>knitr::kable(do.call(rbind, lapply(CS, function(cc) {
+  dd &lt;- sim_dataset(1, cc)
+  x  &lt;- readRDS(file.path(cells_dir, paste0(
+          tag_of(list(seed = 1, c_true = cc, c_fit = cc)), &quot;.rds&quot;)))
+  L &lt;- x$fits$rank1$LL; Fm &lt;- x$fits$rank1$FF
+  lf &lt;- if (is.infinite(cc)) tcrossprod(L, Fm) else
+          cc * expm1(tcrossprod(L, Fm) / max(1, cc))
+  lt &lt;- as.vector(dd$lambda); lf &lt;- as.vector(lf)
+  data.frame(c = fmtc(cc),
+             `true min` = min(lt), `true max` = max(lt),
+             `fitted min` = min(lf), `fitted max` = max(lf),
+             `cor(log)` = cor(log(lt), log(pmax(lf, 1e-12))),
+             `RMSE(log1p)` = sqrt(mean((log1p(lt) - log1p(pmax(lf, 0)))^2)),
+             check.names = FALSE)
+})), digits = 4, row.names = FALSE)</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="8%" />
+<col width="13%" />
+<col width="13%" />
+<col width="16%" />
+<col width="16%" />
+<col width="13%" />
+<col width="17%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">c</th>
+<th align="right">true min</th>
+<th align="right">true max</th>
+<th align="right">fitted min</th>
+<th align="right">fitted max</th>
+<th align="right">cor(log)</th>
+<th align="right">RMSE(log1p)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0.001</td>
+<td align="right">0.5307</td>
+<td align="right">22.7630</td>
+<td align="right">0.1929</td>
+<td align="right">26.1958</td>
+<td align="right">0.9654</td>
+<td align="right">0.0654</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="right">0.4704</td>
+<td align="right">22.0893</td>
+<td align="right">0.0782</td>
+<td align="right">25.4180</td>
+<td align="right">0.9753</td>
+<td align="right">0.0624</td>
+</tr>
+<tr class="odd">
+<td align="left">Inf</td>
+<td align="right">0.2587</td>
+<td align="right">20.7042</td>
+<td align="right">0.0000</td>
+<td align="right">22.8501</td>
+<td align="right">0.9087</td>
+<td align="right">0.0606</td>
+</tr>
+</tbody>
+</table>
+<p>Three things to take from this.</p>
+<p><strong>The rates are recovered about equally well at every <span
+class="math inline">\(c\)</span>.</strong> The mass lies on <span
+class="math inline">\(y = x\)</span> in all three panels and the RMSE on
+the log1p scale is essentially identical across them. This is the
+concrete version of a point that recurs below: the likelihood determines
+<span class="math inline">\(LF&#39;\)</span>, and hence <span
+class="math inline">\(\hat\lambda\)</span>, but says much less about how
+that product is split into factors. Whatever <span
+class="math inline">\(c\)</span> does to the factors, it barely touches
+the fit to the data.</p>
+<p><strong>The scatter widens at the low end</strong> in every panel —
+ordinary Poisson behaviour, since the information about a rate scales
+with the rate.</p>
+<p><strong>Only the <span class="math inline">\(c = \infty\)</span>
+panel has a tail of entries driven to essentially zero</strong>, visible
+as the smear along the bottom reaching <span
+class="math inline">\(10^{-9}\)</span>; the other two panels stop
+cleanly at their smallest true rate. With a linear link the model can
+place structural near-zeros, and at small <span
+class="math inline">\(c\)</span> it cannot. That is the same floor that
+drives the sparsity results below, seen directly in the rates rather
+than through a sparsity measure.</p>
 </div>
 <div id="sparsity-and-factor-separation" class="section level1">
 <h1>Sparsity and factor separation</h1>
@@ -1086,11 +1349,85 @@ columns.</p>
        title = &quot;Sparsity of the recovered loadings — rank-1 initialization&quot;,
        subtitle = SUB_REF)</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/hoyer-L-rank1-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-hoyer-L-rank1-1">
+Past versions of hoyer-L-rank1-1.png
+</button>
+</p>
+<div id="fig-hoyer-L-rank1-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/hoyer-L-rank1-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>panels(b_random, &quot;hoyer_L&quot;, ref = &quot;hoyer_L_true&quot;,
        ylab = &quot;mean Hoyer sparsity of loadings&quot;,
        title = &quot;Sparsity of the recovered loadings — random initialization&quot;,
        subtitle = SUB_REF)</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/hoyer-L-random-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-hoyer-L-random-1">
+Past versions of hoyer-L-random-1.png
+</button>
+</p>
+<div id="fig-hoyer-L-random-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/hoyer-L-random-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The dashed reference is identical in every panel, as it must be:
 <span class="math inline">\(L\)</span> is drawn once per seed and shared
 across all <span class="math inline">\(c_{\text{true}}\)</span>.</p>
@@ -1102,11 +1439,85 @@ across all <span class="math inline">\(c_{\text{true}}\)</span>.</p>
        title = &quot;Sparsity of the recovered factors — rank-1 initialization&quot;,
        subtitle = SUB_REF)</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/hoyer-F-rank1-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-hoyer-F-rank1-1">
+Past versions of hoyer-F-rank1-1.png
+</button>
+</p>
+<div id="fig-hoyer-F-rank1-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/hoyer-F-rank1-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>panels(b_random, &quot;hoyer_F&quot;, ref = &quot;hoyer_F_true&quot;,
        ylab = &quot;mean Hoyer sparsity of factors&quot;,
        title = &quot;Sparsity of the recovered factors — random initialization&quot;,
        subtitle = SUB_REF)</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/hoyer-F-random-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-hoyer-F-random-1">
+Past versions of hoyer-F-random-1.png
+</button>
+</p>
+<div id="fig-hoyer-F-random-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/hoyer-F-random-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The reference here is the sparsity of the <strong>realized</strong>
 truth <span class="math inline">\(F_c = \alpha_c F_0 + \beta_c\)</span>,
 which is what the fit estimates. It rises with <span
@@ -1132,11 +1543,85 @@ that is true of the truth.</p>
        title = &quot;Rank correlation between recovered factors — rank-1 initialization&quot;,
        subtitle = SUB_REF)</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/rankcor-rank1-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-rankcor-rank1-1">
+Past versions of rankcor-rank1-1.png
+</button>
+</p>
+<div id="fig-rankcor-rank1-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/rankcor-rank1-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>panels(b_random, &quot;rankcor_F&quot;, ref = &quot;rankcor_F_true&quot;,
        ylab = &quot;mean rank correlation between factors&quot;,
        title = &quot;Rank correlation between recovered factors — random initialization&quot;,
        subtitle = SUB_REF)</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/rankcor-random-1.png" alt="" width="1320" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-rankcor-random-1">
+Past versions of rankcor-random-1.png
+</button>
+</p>
+<div id="fig-rankcor-random-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/rankcor-random-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Mean Spearman correlation over the <span
 class="math inline">\(K(K-1)/2\)</span> distinct factor pairs. The
 dashed reference is again identical across panels — Spearman correlation
@@ -1253,16 +1738,127 @@ structure_grid &lt;- function(c_true, seed = pick_seed, init = pick_init) {
 <h2>Simulated at the smallest c</h2>
 <pre class="r"><code>structure_grid(min(C_GRID))</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/structure-small-1.png" alt="" width="1430" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-structure-small-1">
+Past versions of structure-small-1.png
+</button>
+</p>
+<div id="fig-structure-small-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/structure-small-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="simulated-at-c-1" class="section level2">
 <h2>Simulated at c = 1</h2>
 <pre class="r"><code>structure_grid(1)</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/structure-one-1.png" alt="" width="1430" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-structure-one-1">
+Past versions of structure-one-1.png
+</button>
+</p>
+<div id="fig-structure-one-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/structure-one-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="simulated-at-c-inf" class="section level2">
 <h2>Simulated at c = Inf</h2>
 <pre class="r"><code>structure_grid(Inf)</code></pre>
 <p><img src="figure/c_grid_sim.Rmd/structure-inf-1.png" alt="" width="1430" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-structure-inf-1">
+Past versions of structure-inf-1.png
+</button>
+</p>
+<div id="fig-structure-inf-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/356fc6c8f13b5e9c19dcee3d41d80488e33cd143/docs/figure/c_grid_sim.Rmd/structure-inf-1.png" target="_blank">356fc6c</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 <div id="why-are-the-small-c-fits-so-much-less-sparse-than-the-truth"
@@ -1690,7 +2286,7 @@ LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlap
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
-time zone: America/Chicago
+time zone: America/Denver
 tzcode source: internal
 
 attached base packages:
@@ -1721,15 +2317,16 @@ loaded via a namespace (and not attached):
 [52] jsonlite_2.0.0        callr_3.7.6           hms_1.1.4            
 [55] mixsqp_0.3-54         ggrepel_0.9.8         irlba_2.3.7          
 [58] plotly_4.12.0         jquerylib_0.1.4       tidyr_1.3.2          
-[61] glue_1.8.1            uwot_0.2.4            stringi_1.8.7        
-[64] gtable_0.3.6          later_1.4.8           sfsmisc_1.1-23       
-[67] quadprog_1.5-8        tibble_3.3.1          pillar_1.11.1        
-[70] htmltools_0.5.9       truncnorm_1.0-9       R6_2.6.1             
-[73] rprojroot_2.1.1       evaluate_1.0.5        lattice_0.22-9       
-[76] RhpcBLASctl_0.23-42   SQUAREM_2026.1        ashr_2.2-63          
-[79] httpuv_1.6.17         bslib_0.10.0          Rcpp_1.1.1-1.1       
-[82] distr_2.9.7           whisker_0.4.1         xfun_0.57            
-[85] fs_2.1.0              getPass_0.2-4         pkgconfig_2.0.3      </code></pre>
+[61] glue_1.8.1            codetools_0.2-20      uwot_0.2.4           
+[64] stringi_1.8.7         gtable_0.3.6          later_1.4.8          
+[67] sfsmisc_1.1-23        quadprog_1.5-8        tibble_3.3.1         
+[70] pillar_1.11.1         htmltools_0.5.9       truncnorm_1.0-9      
+[73] R6_2.6.1              rprojroot_2.1.1       evaluate_1.0.5       
+[76] lattice_0.22-9        RhpcBLASctl_0.23-42   SQUAREM_2026.1       
+[79] ashr_2.2-63           httpuv_1.6.17         bslib_0.10.0         
+[82] Rcpp_1.1.1-1.1        distr_2.9.7           whisker_0.4.1        
+[85] xfun_0.57             fs_2.1.0              getPass_0.2-4        
+[88] pkgconfig_2.0.3      </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1750,7 +2347,7 @@ LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlap
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
-time zone: America/Chicago
+time zone: America/Denver
 tzcode source: internal
 
 attached base packages:
@@ -1781,15 +2378,16 @@ loaded via a namespace (and not attached):
 [52] jsonlite_2.0.0        callr_3.7.6           hms_1.1.4            
 [55] mixsqp_0.3-54         ggrepel_0.9.8         irlba_2.3.7          
 [58] plotly_4.12.0         jquerylib_0.1.4       tidyr_1.3.2          
-[61] glue_1.8.1            uwot_0.2.4            stringi_1.8.7        
-[64] gtable_0.3.6          later_1.4.8           sfsmisc_1.1-23       
-[67] quadprog_1.5-8        tibble_3.3.1          pillar_1.11.1        
-[70] htmltools_0.5.9       truncnorm_1.0-9       R6_2.6.1             
-[73] rprojroot_2.1.1       evaluate_1.0.5        lattice_0.22-9       
-[76] RhpcBLASctl_0.23-42   SQUAREM_2026.1        ashr_2.2-63          
-[79] httpuv_1.6.17         bslib_0.10.0          Rcpp_1.1.1-1.1       
-[82] distr_2.9.7           whisker_0.4.1         xfun_0.57            
-[85] fs_2.1.0              getPass_0.2-4         pkgconfig_2.0.3      </code></pre>
+[61] glue_1.8.1            codetools_0.2-20      uwot_0.2.4           
+[64] stringi_1.8.7         gtable_0.3.6          later_1.4.8          
+[67] sfsmisc_1.1-23        quadprog_1.5-8        tibble_3.3.1         
+[70] pillar_1.11.1         htmltools_0.5.9       truncnorm_1.0-9      
+[73] R6_2.6.1              rprojroot_2.1.1       evaluate_1.0.5       
+[76] lattice_0.22-9        RhpcBLASctl_0.23-42   SQUAREM_2026.1       
+[79] ashr_2.2-63           httpuv_1.6.17         bslib_0.10.0         
+[82] Rcpp_1.1.1-1.1        distr_2.9.7           whisker_0.4.1        
+[85] xfun_0.57             fs_2.1.0              getPass_0.2-4        
+[88] pkgconfig_2.0.3      </code></pre>
 </div>
 </div>
 </div>

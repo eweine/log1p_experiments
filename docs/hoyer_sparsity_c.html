@@ -505,6 +505,9 @@ aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
 The following chunks had caches available:
 <ul>
 <li>
+A3-check
+</li>
+<li>
 verify
 </li>
 </ul>
@@ -534,15 +537,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreebc83b6dd636b1ae2c3c13bb807f0b6da4f4f80b5targetblankbc83b6da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree4e965aba48209dfeb7ac44a69c2e6ba702330066targetblank4e965aba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/bc83b6dd636b1ae2c3c13bb807f0b6da4f4f80b5" target="_blank">bc83b6d</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/4e965aba48209dfeb7ac44a69c2e6ba702330066" target="_blank">4e965ab</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreebc83b6dd636b1ae2c3c13bb807f0b6da4f4f80b5targetblankbc83b6da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree4e965aba48209dfeb7ac44a69c2e6ba702330066targetblank4e965aba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +555,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/bc83b6dd636b1ae2c3c13bb807f0b6da4f4f80b5" target="_blank">bc83b6d</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/4e965aba48209dfeb7ac44a69c2e6ba702330066" target="_blank">4e965ab</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -569,7 +572,6 @@ were generated:
 Ignored files:
     Ignored:    .DS_Store
     Ignored:    analysis/c_grid_sim_cache/
-    Ignored:    analysis/figure/
     Ignored:    analysis/hoyer_sparsity_c_cache/
     Ignored:    analysis/log1p_identifiability_cache/
 
@@ -617,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/4e965aba48209dfeb7ac44a69c2e6ba702330066/analysis/hoyer_sparsity_c.Rmd" target="_blank">4e965ab</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Add a fitted-vs-true rates section to the c-grid notebook
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/08b802f8b6b92d8497c66c48a997bda869dcce44/docs/hoyer_sparsity_c.html" target="_blank">08b802f</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1516,6 +1552,424 @@ factorization</a>, covers the other half: for a <em>fixed</em> budget,
 exactly which factorizations are equally likely, and how sparsity moves
 between <span class="math inline">\(L\)</span> and <span
 class="math inline">\(F\)</span> along that constraint.</p>
+</div>
+<div id="appendix-a-two-sided-bound-on-sparsity" class="section level1">
+<h1>Appendix: a two-sided bound on sparsity</h1>
+<p><em>Nothing above depends on this section.</em> The upper bound is
+the result of the page; this appendix states the full two-sided version
+and proves the half that has not been proved yet. The lower half turns
+out to be valid but weak, so it is best read as a statement about what
+is <em>possible</em>, not about what happens.</p>
+<div id="the-sandwich" class="section level2">
+<h2>The sandwich</h2>
+<p>Throughout, <span class="math inline">\(\theta = LF&#39;\)</span>
+with <span class="math inline">\(L, F\ge 0\)</span> of rank <span
+class="math inline">\(K\)</span>, and</p>
+<p><span class="math display">\[
+w_k \;=\; \frac{\operatorname{mean}(\ell_{\cdot
+k})\operatorname{mean}(f_{\cdot k})}{\operatorname{mean}(\theta)},
+\qquad \sum_k w_k = 1 ,
+\]</span></p>
+<p>as in Step B. Define, for a target peak-to-mean <span
+class="math inline">\(P\)</span> and a length <span
+class="math inline">\(m\)</span>,</p>
+<p><span class="math display">\[
+H_{\min}(P,m) \;=\;
+\frac{\sqrt{m}-m\big/\sqrt{P^{2}+(m-1)q^{2}}}{\sqrt{m}-1},
+\qquad q=\frac{m-P}{m-1},
+\qquad\text{so}\qquad
+H_{\min}(P,m)\approx 1-\frac{1}{\sqrt{1+P^{2}/m}} .
+\]</span></p>
+<blockquote>
+<p><strong>Sandwich.</strong> For any nonnegative factorization <span
+class="math inline">\(\theta = LF&#39;\)</span>,</p>
+<p><strong>(upper — proved in Steps A and B)</strong> for <em>every</em>
+factor <span class="math inline">\(k\)</span> and <em>both</em> sides,
+<span class="math display">\[
+H(\ell_{\cdot k}) \;\le\;
+1-\sqrt{\frac{w_k}{\operatorname{pm}(\theta)}},
+\qquad
+H(f_{\cdot k}) \;\le\; 1-\sqrt{\frac{w_k}{\operatorname{pm}(\theta)}} ;
+\]</span></p>
+<p><strong>(lower — proved below)</strong> for <em>at least one</em>
+factor <span class="math inline">\(k\)</span>, <span
+class="math display">\[
+\max\bigl\{H(\ell_{\cdot k}),\,H(f_{\cdot k})\bigr\}
+\;\ge\;
+H_{\min}\!\bigl(\sqrt{\operatorname{pm}(\theta)},\;\max(n,p)\bigr) .
+\]</span></p>
+<p>Both bounds are increasing in <span
+class="math inline">\(\operatorname{pm}(\theta)\)</span>.</p>
+</blockquote>
+<p>The two halves say different things, and the quantifiers matter. The
+upper half constrains <strong>every</strong> column: nothing can be
+sparser than this. The lower half constrains <strong>some</strong>
+column: at least one side of one factor must be at least this sparse.
+Raising <span class="math inline">\(c\)</span> raises <span
+class="math inline">\(\operatorname{pm}(\theta)\)</span> and so lifts
+both ends of the band, which is the formal counterpart of the rising
+lower envelope seen in the simulations.</p>
+<p>The upper half needs no new work. Step B gives <span
+class="math inline">\(\operatorname{pm}(\ell_{\cdot
+k})\operatorname{pm}(f_{\cdot
+k})w_k\le\operatorname{pm}(\theta)\)</span>, and <span
+class="math inline">\(\operatorname{pm}(f_{\cdot k})\ge 1\)</span>
+always, so <span class="math inline">\(\operatorname{pm}(\ell_{\cdot
+k})\le \operatorname{pm}(\theta)/w_k\)</span>; substituting into Step
+A’s <span class="math inline">\(H \le
+1-1/\sqrt{\operatorname{pm}}\)</span> gives the stated form, and the
+argument is symmetric in <span class="math inline">\(L\)</span> and
+<span class="math inline">\(F\)</span>.</p>
+<p>The rest of this appendix proves the lower half, in two lemmas.</p>
+</div>
+<div
+id="lemma-1-the-least-sparse-a-vector-can-be-at-a-given-peak-to-mean"
+class="section level2">
+<h2>Lemma 1: the least sparse a vector can be at a given
+peak-to-mean</h2>
+<blockquote>
+<p>For nonnegative <span class="math inline">\(x\)</span> of length
+<span class="math inline">\(m\)</span> with <span
+class="math inline">\(\operatorname{pm}(x)=P\)</span>, <span
+class="math display">\[H(x)\;\ge\;H_{\min}(P,m),\]</span> with equality
+for <span class="math inline">\(x^\star=(P,q,\dots,q)\)</span>, <span
+class="math inline">\(q=(m-P)/(m-1)\)</span>.</p>
+</blockquote>
+<p><strong>Proof.</strong> <span class="math inline">\(H\)</span> is a
+decreasing function of <span
+class="math inline">\(\|x\|_1/\|x\|_2\)</span>, so minimising <span
+class="math inline">\(H\)</span> means minimising <span
+class="math inline">\(\|x\|_2\)</span>. Both <span
+class="math inline">\(H\)</span> and <span
+class="math inline">\(\operatorname{pm}\)</span> are scale invariant, so
+normalise <span class="math inline">\(\operatorname{mean}(x)=1\)</span>;
+then <span class="math inline">\(\|x\|_1=m\)</span> is fixed and the
+constraint <span class="math inline">\(\operatorname{pm}(x)=P\)</span>
+says <span class="math inline">\(\max(x)=P\)</span>.</p>
+<p>One coordinate is therefore pinned at <span
+class="math inline">\(P\)</span>, contributing <span
+class="math inline">\(P^2\)</span> to <span
+class="math inline">\(\|x\|_2^2\)</span> regardless. The remaining <span
+class="math inline">\(m-1\)</span> coordinates are nonnegative and must
+sum to <span class="math inline">\(m-P\)</span>, and among vectors with
+a fixed sum the squared norm <span class="math inline">\(\sum_{i\ge
+2}x_i^2\)</span> is minimised when all entries are equal — by
+Cauchy–Schwarz, <span
+class="math inline">\(\sum_{i\ge2}x_i^2\ge\bigl(\sum_{i\ge2}x_i\bigr)^2/(m-1)\)</span>,
+with equality exactly when they are. That common value is <span
+class="math inline">\(q=(m-P)/(m-1)\)</span>, which satisfies <span
+class="math inline">\(0\le q\le P\)</span> for every <span
+class="math inline">\(1\le P\le m\)</span>, so <span
+class="math inline">\(x^\star\)</span> is feasible and <span
+class="math inline">\(P\)</span> really is its maximum. Substituting
+<span class="math inline">\(\|x\|_1=m\)</span> and <span
+class="math inline">\(\|x\|_2^2=P^2+(m-1)q^2\)</span> into the
+definition of <span class="math inline">\(H\)</span> gives <span
+class="math inline">\(H_{\min}(P,m)\)</span>. <span
+class="math inline">\(\square\)</span></p>
+<p>Note the shape. Step A’s upper bound involves <span
+class="math inline">\(P\)</span>; this lower bound involves <span
+class="math inline">\(P^{2}/m\)</span>. A lone spike among many
+coordinates barely moves <span
+class="math inline">\(\ell_1/\ell_2\)</span>, so the lower bound only
+becomes interesting once <span class="math inline">\(P\)</span>
+approaches <span class="math inline">\(\sqrt{m}\)</span>.</p>
+<pre class="r"><code>Hmin &lt;- function(P, m) { q &lt;- (m - P)/(m - 1)
+  (sqrt(m) - m/sqrt(P^2 + (m-1)*q^2)) / (sqrt(m) - 1) }
+
+set.seed(1); m &lt;- 400
+knitr::kable(do.call(rbind, lapply(c(2, 10, 50, 200), function(P) {
+  best &lt;- Inf                       # random x with pm exactly P: mean 1, one entry P
+  for (rep in 1:8000) {
+    y &lt;- rexp(m - 1)^runif(1, 0.2, 4); y &lt;- y/sum(y)*(m - P)
+    if (max(y) &gt; P) next
+    best &lt;- min(best, hoyer(c(P, y)))
+  }
+  data.frame(P = P, `H_min(P, m)` = Hmin(P, m),
+             `H of x-star` = hoyer(c(P, rep((m - P)/(m - 1), m - 1))),
+             `best of 8000 random` = best, check.names = FALSE)
+})), digits = 5, row.names = FALSE,
+caption = &quot;x-star attains the bound exactly; random vectors never beat it.&quot;)</code></pre>
+<table>
+<caption>x-star attains the bound exactly; random vectors never beat
+it.</caption>
+<thead>
+<tr class="header">
+<th align="right">P</th>
+<th align="right">H_min(P, m)</th>
+<th align="right">H of x-star</th>
+<th align="right">best of 8000 random</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">0.00132</td>
+<td align="right">0.00132</td>
+<td align="right">0.02505</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">0.09292</td>
+<td align="right">0.09292</td>
+<td align="right">0.10963</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="right">0.65527</td>
+<td align="right">0.65527</td>
+<td align="right">0.65632</td>
+</tr>
+<tr class="even">
+<td align="right">200</td>
+<td align="right">0.94750</td>
+<td align="right">0.94750</td>
+<td align="right">0.94751</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="lemma-2-the-reverse-of-the-budget-inequality"
+class="section level2">
+<h2>Lemma 2: the reverse of the budget inequality</h2>
+<blockquote>
+<p><span class="math inline">\(\displaystyle
+\operatorname{pm}(\theta)\;\le\;\max_k\ \operatorname{pm}(\ell_{\cdot
+k})\cdot\operatorname{pm}(f_{\cdot k}).\)</span></p>
+</blockquote>
+<p><strong>Proof.</strong> Step B bounded <span
+class="math inline">\(\max(\theta)\)</span> from <em>below</em> by
+discarding all but one term. Bound it from <em>above</em> instead by
+taking the largest possible value of each term: for every <span
+class="math inline">\(i,j\)</span>,</p>
+<p><span class="math display">\[
+\theta_{ij}=\sum_m \ell_{im}f_{jm}\;\le\;\sum_m \max(\ell_{\cdot
+m})\max(f_{\cdot m}),
+\qquad\text{so}\qquad
+\max(\theta)\;\le\;\sum_m \max(\ell_{\cdot m})\max(f_{\cdot m}).
+\]</span></p>
+<p>The mean factorizes as before, <span
+class="math inline">\(\operatorname{mean}(\theta)=\sum_m\operatorname{mean}(\ell_{\cdot
+m})\operatorname{mean}(f_{\cdot m})\)</span>. Put <span
+class="math inline">\(a_m=\max(\ell_{\cdot m})\max(f_{\cdot m})\)</span>
+and <span class="math inline">\(b_m=\operatorname{mean}(\ell_{\cdot
+m})\operatorname{mean}(f_{\cdot m})&gt;0\)</span>, and apply the mediant
+inequality <span class="math inline">\(\bigl(\sum_m
+a_m\bigr)/\bigl(\sum_m b_m\bigr)\le\max_m (a_m/b_m)\)</span>:</p>
+<p><span class="math display">\[
+\operatorname{pm}(\theta)=\frac{\max(\theta)}{\operatorname{mean}(\theta)}
+\;\le\;\frac{\sum_m a_m}{\sum_m b_m}
+\;\le\;\max_m \frac{a_m}{b_m}
+\;=\;\max_m\ \operatorname{pm}(\ell_{\cdot m})\operatorname{pm}(f_{\cdot
+m}). \qquad\square
+\]</span></p>
+<p>Together with Step B the product is now pinned on both sides:</p>
+<p><span class="math display">\[
+\operatorname{pm}(\theta)\;\le\;\max_k\ \operatorname{pm}(\ell_{\cdot
+k})\operatorname{pm}(f_{\cdot k})
+\;\le\;\frac{\operatorname{pm}(\theta)}{\min_k w_k}.
+\]</span></p>
+</div>
+<div id="proof-of-the-lower-half" class="section level2">
+<h2>Proof of the lower half</h2>
+<p>By Lemma 2 there is a factor <span class="math inline">\(k\)</span>
+with <span class="math inline">\(\operatorname{pm}(\ell_{\cdot
+k})\operatorname{pm}(f_{\cdot k})\ge\operatorname{pm}(\theta)\)</span>.
+A product of two numbers cannot have both factors below the square root
+of the product, so</p>
+<p><span class="math display">\[
+\max\bigl\{\operatorname{pm}(\ell_{\cdot k}),\
+\operatorname{pm}(f_{\cdot k})\bigr\}
+\;\ge\;\sqrt{\operatorname{pm}(\theta)} .
+\]</span></p>
+<p>Apply Lemma 1 to whichever column achieves that maximum. Its length
+is <span class="math inline">\(n\)</span> or <span
+class="math inline">\(p\)</span>, and <span
+class="math inline">\(H_{\min}(P,m)\)</span> is decreasing in <span
+class="math inline">\(m\)</span>, so using <span
+class="math inline">\(\max(n,p)\)</span> is valid either way:</p>
+<p><span class="math display">\[
+\max\bigl\{H(\ell_{\cdot k}),\,H(f_{\cdot
+k})\bigr\}\;\ge\;H_{\min}\!\bigl(\sqrt{\operatorname{pm}(\theta)},\
+\max(n,p)\bigr).
+\qquad\square
+\]</span></p>
+</div>
+<div id="both-halves-checked-on-the-fits" class="section level2">
+<h2>Both halves, checked on the fits</h2>
+<pre class="r"><code>knitr::kable(do.call(rbind, lapply(C_GRID, function(cf) {
+  r &lt;- do.call(rbind, lapply(1:10, function(sd) {
+    x &lt;- readRDS(file.path(cells_dir, paste0(
+           tag_of(list(seed = sd, c_true = 1, c_fit = cf)), &quot;.rds&quot;)))
+    L &lt;- x$fits$rank1$LL; Fm &lt;- x$fits$rank1$FF
+    th &lt;- tcrossprod(L, Fm) / max(1, if (is.infinite(cf)) 1 else cf)
+    w  &lt;- colMeans(L) * colMeans(Fm); w &lt;- w/sum(w)
+    P  &lt;- pm(th); mm &lt;- max(nrow(L), nrow(Fm))
+    HL &lt;- apply(L, 2, hoyer); HF &lt;- apply(Fm, 2, hoyer)
+    ub &lt;- 1 - sqrt(w/P)                                  # upper, every column
+    k  &lt;- which.max(apply(L, 2, pm) * apply(Fm, 2, pm))  # the factor Lemma 2 gives
+    c(`pm(theta)`       = P,
+      `upper bound`     = max(ub),
+      `largest H seen`  = max(c(HL, HF)),
+      `max H at that k` = max(HL[k], HF[k]),
+      `lower bound`     = Hmin(sqrt(P), mm),
+      `upper violations`= sum(HL &gt; ub + 1e-9) + sum(HF &gt; ub + 1e-9),
+      `lower violations`= as.numeric(max(HL[k], HF[k]) &lt; Hmin(sqrt(P), mm) - 1e-9))
+  }))
+  as.data.frame(t(c(c_fit = cf, colMeans(r))))
+})), digits = c(3, 2, 3, 3, 3, 4, 0, 0), row.names = FALSE,
+caption = &quot;Columns are ordered as they appear in the sandwich: upper bound, what is observed, lower bound.&quot;)</code></pre>
+<table>
+<caption>Columns are ordered as they appear in the sandwich: upper
+bound, what is observed, lower bound.</caption>
+<colgroup>
+<col width="5%" />
+<col width="9%" />
+<col width="11%" />
+<col width="14%" />
+<col width="15%" />
+<col width="11%" />
+<col width="16%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">c_fit</th>
+<th align="right">pm(theta)</th>
+<th align="right">upper bound</th>
+<th align="right">largest H seen</th>
+<th align="right">max H at that k</th>
+<th align="right">lower bound</th>
+<th align="right">upper violations</th>
+<th align="right">lower violations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1e-03</td>
+<td align="right">1.56</td>
+<td align="right">0.708</td>
+<td align="right">0.186</td>
+<td align="right">0.183</td>
+<td align="right">0.0001</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">1e-02</td>
+<td align="right">1.85</td>
+<td align="right">0.691</td>
+<td align="right">0.190</td>
+<td align="right">0.189</td>
+<td align="right">0.0002</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1e-01</td>
+<td align="right">2.66</td>
+<td align="right">0.686</td>
+<td align="right">0.196</td>
+<td align="right">0.195</td>
+<td align="right">0.0007</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">1e+00</td>
+<td align="right">5.59</td>
+<td align="right">0.763</td>
+<td align="right">0.333</td>
+<td align="right">0.323</td>
+<td align="right">0.0033</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+01</td>
+<td align="right">13.01</td>
+<td align="right">0.846</td>
+<td align="right">0.522</td>
+<td align="right">0.515</td>
+<td align="right">0.0119</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">1e+02</td>
+<td align="right">18.30</td>
+<td align="right">0.871</td>
+<td align="right">0.587</td>
+<td align="right">0.578</td>
+<td align="right">0.0186</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+03</td>
+<td align="right">19.26</td>
+<td align="right">0.874</td>
+<td align="right">0.596</td>
+<td align="right">0.587</td>
+<td align="right">0.0198</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">19.38</td>
+<td align="right">0.874</td>
+<td align="right">0.597</td>
+<td align="right">0.588</td>
+<td align="right">0.0200</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+</div>
+<div id="how-useful-is-the-lower-half" class="section level2">
+<h2>How useful is the lower half?</h2>
+<p>Not very, quantitatively. The guarantee moves from about <span
+class="math inline">\(10^{-4}\)</span> to <span
+class="math inline">\(0.02\)</span> across the grid while the fits
+deliver <span class="math inline">\(0.18\)</span> to <span
+class="math inline">\(0.59\)</span> — the right <em>shape</em>, off by
+more than an order of magnitude. Lemma 1 explains why: the bound depends
+on <span class="math inline">\(P^{2}/m\)</span>, and here <span
+class="math inline">\(\sqrt{\operatorname{pm}(\theta)}\le 4.4\)</span>
+against <span class="math inline">\(m=300\)</span>, so it never comes
+near the regime where it bites.</p>
+<p>The gap is structural, not loose algebra. Lemmas 1 and 2 hold for
+<em>every</em> nonnegative factorization of <span
+class="math inline">\(\theta\)</span>, and a maximum-likelihood fit is
+not adversarial. Closing it would need an argument about what maximum
+likelihood actually does — that the fit concentrates because
+concentrating fits the data, not merely because the geometry permits it.
+That is a different theorem and this page does not have it.</p>
+<p>So the pairing worth remembering:</p>
+<ul>
+<li>the <strong>upper</strong> bound is tight and explanatory — the fits
+spend their entire budget, which is why it predicts their
+behaviour;</li>
+<li>the <strong>lower</strong> bound is valid and correctly monotone but
+loose — it establishes that the trend cannot be reversed, not that it
+must be as strong as observed.</li>
+</ul>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.5.2 (2025-10-31)
 Platform: aarch64-apple-darwin20
@@ -1600,6 +2054,7 @@ loaded via a namespace (and not attached):
 [53] knitr_1.51         dichromat_2.0-0.1  farver_2.1.2       htmltools_0.5.9   
 [57] labeling_0.4.3     rmarkdown_2.31     compiler_4.5.2     getPass_0.2-4     
 [61] S7_0.2.2          </code></pre>
+</div>
 </div>
 </div>
 
