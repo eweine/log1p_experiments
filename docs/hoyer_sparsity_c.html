@@ -395,7 +395,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-08-02
+<strong>Last updated:</strong> 2026-08-03
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3167a7f52e9425b59cade978a1106e6d991a9459targetblank3167a7fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed50dabc603ea3b04c40072d74dd8bf6ddde2b8fftargetblankd50dabca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/3167a7f52e9425b59cade978a1106e6d991a9459" target="_blank">3167a7f</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/d50dabc603ea3b04c40072d74dd8bf6ddde2b8ff" target="_blank">d50dabc</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3167a7f52e9425b59cade978a1106e6d991a9459targetblank3167a7fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed50dabc603ea3b04c40072d74dd8bf6ddde2b8fftargetblankd50dabca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/3167a7f52e9425b59cade978a1106e6d991a9459" target="_blank">3167a7f</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/d50dabc603ea3b04c40072d74dd8bf6ddde2b8ff" target="_blank">d50dabc</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -622,6 +622,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d50dabc603ea3b04c40072d74dd8bf6ddde2b8ff/analysis/hoyer_sparsity_c.Rmd" target="_blank">d50dabc</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-03
+</td>
+<td>
+Clean up the notation on the Hoyer sparsity page
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/17cefaff33c5a46b1cb42dffe906527a58ca6d22/docs/hoyer_sparsity_c.html" target="_blank">17cefaf</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/3167a7f52e9425b59cade978a1106e6d991a9459/analysis/hoyer_sparsity_c.Rmd" target="_blank">3167a7f</a>
 </td>
 <td>
@@ -647,9 +681,15 @@ exp_dir   &lt;- path.expand(&quot;~/Documents/log1pNMF/inst/paper_figures/experi
 cells_dir &lt;- file.path(exp_dir, &quot;c_grid_sim&quot;)
 source(file.path(exp_dir, &quot;c_grid_sim_common.R&quot;))
 
+## Hoyer sparsity of a nonnegative vector: 0 if all entries are equal, 1 if one
+## entry carries everything.
 hoyer &lt;- function(x) { x &lt;- abs(x); n &lt;- length(x)
   (sqrt(n) - sum(x)/sqrt(sum(x^2))) / (sqrt(n) - 1) }
-p2m &lt;- function(x) max(x) / mean(x)          # peak-to-mean ratio</code></pre>
+
+## pm(): peak-to-mean. The ONLY summary used on this page. It takes a vector or
+## a matrix and returns one number, so pm(L[, k]) is a column&#39;s peak-to-mean and
+## pm(theta) is the whole matrix&#39;s.
+pm &lt;- function(x) max(x) / mean(x)</code></pre>
 <div id="the-question" class="section level1">
 <h1>The question</h1>
 <p>You have a count matrix <span class="math inline">\(Y\)</span>. You
@@ -659,8 +699,8 @@ less sparse depending on which <span class="math inline">\(c\)</span>
 you used, even though nothing about the data changed. What decides
 that?</p>
 <p>This page answers exactly that, and nothing else. It is about
-<strong>Hoyer</strong> sparsity — a continuous measure that does not
-require any exact zeros — expressed purely in terms of <span
+<strong>Hoyer</strong> sparsity — a continuous measure that requires no
+exact zeros — expressed purely in terms of <span
 class="math inline">\(Y\)</span> and <span
 class="math inline">\(c\)</span>.</p>
 <p><strong>The answer in one sentence.</strong> The Hoyer sparsity that
@@ -675,132 +715,269 @@ class="math inline">\(1\)</span> and <span
 class="math inline">\(\lambda\)</span>’s own peak-to-mean.</p>
 <p>The rest of the page is that sentence in four steps.</p>
 </div>
+<div id="notation" class="section level1">
+<h1>Notation</h1>
+<p>Only one summary statistic appears on this page, applied to different
+things. For any nonnegative vector or matrix <span
+class="math inline">\(v\)</span> with at least one positive entry,</p>
+<p><span class="math display">\[
+\operatorname{pm}(v) \;=\; \frac{\max(v)}{\operatorname{mean}(v)}
+\;\ge\; 1 ,
+\]</span></p>
+<p>the <strong>peak-to-mean ratio</strong>: how large the biggest entry
+is relative to a typical one. <span
+class="math inline">\(\operatorname{pm}(v) = 1\)</span> exactly when
+<span class="math inline">\(v\)</span> is constant.</p>
+<p>The objects it gets applied to:</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>symbol</th>
+<th>shape</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(Y\)</span></td>
+<td><span class="math inline">\(n \times p\)</span></td>
+<td>the observed counts</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\lambda\)</span></td>
+<td><span class="math inline">\(n \times p\)</span></td>
+<td>the rates, <span class="math inline">\(\mathbb{E}[Y]\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\theta = \log(1+\lambda/c)\)</span></td>
+<td><span class="math inline">\(n \times p\)</span></td>
+<td>the linear predictor</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(L\)</span>, <span
+class="math inline">\(F\)</span></td>
+<td><span class="math inline">\(n\times K\)</span>, <span
+class="math inline">\(p\times K\)</span></td>
+<td>the factorization, <span class="math inline">\(\theta =
+LF&#39;\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\ell_{\cdot k}\)</span></td>
+<td>length <span class="math inline">\(n\)</span></td>
+<td>column <span class="math inline">\(k\)</span> of <span
+class="math inline">\(L\)</span> — every sample’s loading on factor
+<span class="math inline">\(k\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(f_{\cdot k}\)</span></td>
+<td>length <span class="math inline">\(p\)</span></td>
+<td>column <span class="math inline">\(k\)</span> of <span
+class="math inline">\(F\)</span> — every feature’s weight on factor
+<span class="math inline">\(k\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\ell_{i\cdot}\)</span></td>
+<td>length <span class="math inline">\(K\)</span></td>
+<td>row <span class="math inline">\(i\)</span> of <span
+class="math inline">\(L\)</span> — sample <span
+class="math inline">\(i\)</span>’s loadings across factors</td>
+</tr>
+</tbody>
+</table>
+<p>So <span class="math inline">\(\max(\ell_{\cdot k}) = \max_i
+\ell_{ik}\)</span> is the largest loading any sample places on factor
+<span class="math inline">\(k\)</span>, and <span
+class="math inline">\(\operatorname{pm}(\ell_{\cdot k})\)</span> is that
+divided by the average loading on factor <span
+class="math inline">\(k\)</span>. Hoyer sparsity is always computed per
+column and then averaged over the <span class="math inline">\(K\)</span>
+columns, matching the earlier pages.</p>
+</div>
 <div id="step-a-hoyer-sparsity-is-peak-to-mean-in-disguise"
 class="section level1">
 <h1>Step A: Hoyer sparsity is peak-to-mean in disguise</h1>
 <p>For a nonnegative vector <span class="math inline">\(x\)</span> of
-length <span class="math inline">\(n\)</span>,</p>
+length <span class="math inline">\(n\)</span>, Hoyer sparsity is</p>
 <p><span class="math display">\[
-H(x) = \frac{\sqrt{n} - \|x\|_1/\|x\|_2}{\sqrt{n}-1},
-\qquad\text{and write}\qquad
-P(x) = \frac{x_{\max}}{\bar{x}} .
+H(x) = \frac{\sqrt{n} - \|x\|_1/\|x\|_2}{\sqrt{n}-1} .
 \]</span></p>
-<p><span class="math inline">\(P\)</span> asks a simple question: how
-big is the largest entry compared with a typical one? Now use <span
-class="math inline">\(\|x\|_2^2 = \sum x_i^2 \le x_{\max}\sum x_i =
-\|x\|_\infty\|x\|_1\)</span>:</p>
+<p>Use <span class="math inline">\(\|x\|_2^2 = \sum_i x_i^2 \le
+\max(x)\sum_i x_i = \|x\|_\infty\|x\|_1\)</span>, and note <span
+class="math inline">\(\|x\|_1/\|x\|_\infty =
+n\,\operatorname{mean}(x)/\max(x) = n/\operatorname{pm}(x)\)</span>:</p>
 <p><span class="math display">\[
 \frac{\|x\|_1}{\|x\|_2} \;\ge\;
 \frac{\|x\|_1}{\sqrt{\|x\|_\infty\|x\|_1}}
-\;=\; \sqrt{\frac{\|x\|_1}{\|x\|_\infty}} \;=\; \sqrt{\frac{n}{P}},
+\;=\; \sqrt{\frac{\|x\|_1}{\|x\|_\infty}} \;=\;
+\sqrt{\frac{n}{\operatorname{pm}(x)}},
 \]</span></p>
 <p>and therefore</p>
 <p><span class="math display">\[
-\boxed{\;H(x) \;\le\; \frac{\sqrt{n}-\sqrt{n/P}}{\sqrt{n}-1} \;\approx\;
-1 - \frac{1}{\sqrt{P}}\;}
+\boxed{\;H(x) \;\le\;
+\frac{\sqrt{n}-\sqrt{n/\operatorname{pm}(x)}}{\sqrt{n}-1}
+\;\approx\; 1 - \frac{1}{\sqrt{\operatorname{pm}(x)}}\;}
 \]</span></p>
-<p>This is the whole of Step A, and it is worth reading in words:
-<strong>a vector can only be Hoyer-sparse if some of its entries stick
-far above its mean.</strong> If <span class="math inline">\(P =
-1\)</span> every entry equals the mean, the vector is constant, and
-<span class="math inline">\(H = 0\)</span> — no matter how many entries
-there are and regardless of whether any are zero. Sparsity requires
-<em>range</em>, not zeros.</p>
+<p>In words: <strong>a vector can only be Hoyer-sparse if some of its
+entries stick far above its mean.</strong> If <span
+class="math inline">\(\operatorname{pm}(x) = 1\)</span> every entry
+equals the mean, the vector is constant, and <span
+class="math inline">\(H(x) = 0\)</span> — however many entries it has,
+and whether or not any of them are zero. Sparsity needs <em>range</em>,
+not zeros.</p>
 <pre class="r"><code>set.seed(1); n &lt;- 500
 sim &lt;- do.call(rbind, lapply(seq(0, 1, length.out = 60), function(a) {
   do.call(rbind, lapply(1:8, function(r) {
     x &lt;- (1 - a) + a * rexp(n)^2          # dial from constant to heavy-tailed
-    data.frame(P = p2m(x), H = hoyer(x)) }) ) }))
-curve &lt;- data.frame(P = seq(1, max(sim$P), length.out = 300))
-curve$bound &lt;- 1 - 1/sqrt(curve$P)
+    data.frame(pm = pm(x), H = hoyer(x)) }) ) }))
+curve &lt;- data.frame(pm = seq(1, max(sim$pm), length.out = 300))
+curve$bound &lt;- 1 - 1/sqrt(curve$pm)
 
-ggplot(sim, aes(P, H)) +
+ggplot(sim, aes(pm, H)) +
   geom_point(colour = &quot;#0E8FA8&quot;, alpha = 0.5, size = 1.2) +
-  geom_line(data = curve, aes(P, bound), colour = &quot;#C2410C&quot;, linewidth = 1) +
+  geom_line(data = curve, aes(pm, bound), colour = &quot;#C2410C&quot;, linewidth = 1) +
   scale_x_log10() +
-  labs(x = &quot;peak-to-mean  P = max / mean&quot;, y = &quot;Hoyer sparsity&quot;,
+  labs(x = &quot;pm(x)  =  max / mean&quot;, y = &quot;Hoyer sparsity  H(x)&quot;,
        title = &quot;Sparsity is bounded by peak-to-mean&quot;,
-       subtitle = &quot;points: random nonnegative vectors.  line: 1 - 1/sqrt(P)&quot;)</code></pre>
+       subtitle = &quot;points: random nonnegative vectors.   line: 1 - 1/sqrt(pm)&quot;)</code></pre>
 <p><img src="figure/hoyer_sparsity_c.Rmd/stepA-1.png" alt="" width="770" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-stepA-1">
+Past versions of stepA-1.png
+</button>
+</p>
+<div id="fig-stepA-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/17cefaff33c5a46b1cb42dffe906527a58ca6d22/docs/figure/hoyer_sparsity_c.Rmd/stepA-1.png" target="_blank">17cefaf</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="step-b-l-and-f-share-a-single-budget" class="section level1">
 <h1>Step B: L and F share a single budget</h1>
 <p>The fit gives <span class="math inline">\(\theta = LF&#39;\)</span>
-with <span class="math inline">\(L, F \ge 0\)</span>. Fix a factor <span
-class="math inline">\(k\)</span>, and let <span
-class="math inline">\(i^\star\)</span> be the sample with the largest
-loading on it and <span class="math inline">\(j^\star\)</span> the
-feature with the largest weight on it. Because <strong>every term in the
-sum is nonnegative</strong> we may throw all the others away:</p>
+with <span class="math inline">\(L, F \ge 0\)</span>. Fix one factor
+<span class="math inline">\(k\)</span>. Let <span
+class="math inline">\(i^\star\)</span> be the sample achieving <span
+class="math inline">\(\max(\ell_{\cdot k})\)</span> and <span
+class="math inline">\(j^\star\)</span> the feature achieving <span
+class="math inline">\(\max(f_{\cdot k})\)</span>. Because <strong>every
+term of the sum is nonnegative</strong>, we may discard all but the
+<span class="math inline">\(k\)</span>th:</p>
 <p><span class="math display">\[
-\theta_{\max} \;\ge\; \theta_{i^\star j^\star}
-= \sum_{m}\ell_{i^\star m}f_{j^\star m}
-\;\ge\; \ell^{\max}_k\, f^{\max}_k .
+\max(\theta) \;\ge\; \theta_{i^\star j^\star}
+\;=\; \sum_{m=1}^{K}\ell_{i^\star m}\,f_{j^\star m}
+\;\ge\; \ell_{i^\star k}\,f_{j^\star k}
+\;=\; \max(\ell_{\cdot k})\cdot\max(f_{\cdot k}) .
 \]</span></p>
-<p>The mean is <span class="math inline">\(\bar\theta = \sum_m
-\bar\ell_m\bar f_m\)</span>. Let <span class="math inline">\(w_k =
-\bar\ell_k\bar f_k/\bar\theta \in (0,1)\)</span> be the share of <span
-class="math inline">\(\bar\theta\)</span> contributed by factor <span
-class="math inline">\(k\)</span>. Dividing the display by <span
-class="math inline">\(\bar\theta\)</span> and inserting <span
-class="math inline">\(\bar\ell_k\bar f_k\)</span> top and bottom,</p>
+<p>For the mean, the double average factorizes: <span
+class="math inline">\(\operatorname{mean}(\theta) =
+\sum_{m}\operatorname{mean}(\ell_{\cdot m})\operatorname{mean}(f_{\cdot
+m})\)</span>. Let</p>
 <p><span class="math display">\[
-\boxed{\;P_L(k)\;\cdot\;P_F(k)\;\cdot\;w_k \;\;\le\;\; P_\theta\;}
-\qquad
-P_\theta=\frac{\theta_{\max}}{\bar\theta},\quad
-P_L(k)=\frac{\ell^{\max}_k}{\bar\ell_k},\quad
-P_F(k)=\frac{f^{\max}_k}{\bar f_k}.
+w_k \;=\; \frac{\operatorname{mean}(\ell_{\cdot
+k})\operatorname{mean}(f_{\cdot k})}{\operatorname{mean}(\theta)}
+\;\in\;(0,1)
 \]</span></p>
-<p>Read it as a <strong>budget</strong>. <span
-class="math inline">\(P_\theta\)</span> is how much peak-to-mean the
-fitted <span class="math inline">\(\theta\)</span> has to spend. The two
-factors’ peakedness multiply against it, so:</p>
+<p>be the share of <span
+class="math inline">\(\operatorname{mean}(\theta)\)</span> that factor
+<span class="math inline">\(k\)</span> contributes; the <span
+class="math inline">\(w_k\)</span> sum to one. Dividing the display by
+<span class="math inline">\(\operatorname{mean}(\theta)\)</span> and
+multiplying and dividing by <span
+class="math inline">\(\operatorname{mean}(\ell_{\cdot
+k})\operatorname{mean}(f_{\cdot k})\)</span>:</p>
+<p><span class="math display">\[
+\boxed{\;\operatorname{pm}(\ell_{\cdot
+k})\;\cdot\;\operatorname{pm}(f_{\cdot k})\;\cdot\;w_k
+\;\;\le\;\; \operatorname{pm}(\theta)\;}
+\qquad \text{for every factor } k .
+\]</span></p>
+<p>Read <span class="math inline">\(\operatorname{pm}(\theta)\)</span>
+as a <strong>budget</strong>: how much peak-to-mean the fitted <span
+class="math inline">\(\theta\)</span> has available. The two factors’
+peak-to-mean ratios enter <em>multiplicatively</em> against it, so</p>
 <ul>
 <li>they <strong>trade</strong>: at fixed <span
-class="math inline">\(P_\theta\)</span>, making <span
-class="math inline">\(L\)</span> more peaked forces <span
-class="math inline">\(F\)</span> flatter;</li>
-<li>they are <strong>jointly capped</strong>: neither can be peaked at
-all if <span class="math inline">\(P_\theta\)</span> is near <span
-class="math inline">\(1\)</span>, because the product cannot exceed
-it.</li>
+class="math inline">\(\operatorname{pm}(\theta)\)</span>, making <span
+class="math inline">\(\ell_{\cdot k}\)</span> more peaked forces <span
+class="math inline">\(f_{\cdot k}\)</span> flatter;</li>
+<li>they are <strong>jointly capped</strong>: if <span
+class="math inline">\(\operatorname{pm}(\theta)\)</span> is near <span
+class="math inline">\(1\)</span> then neither can be peaked, since their
+product cannot exceed it.</li>
 </ul>
-<p>Combining with Step A, if <span class="math inline">\(\theta\)</span>
-has no range then neither factor can be Hoyer-sparse, and no choice of
-optimizer or initialization can change that.</p>
-<p>This is also why the two things you may have noticed are not in
-conflict. Holding the data and <span class="math inline">\(c\)</span>
-fixed and moving between equally-good factorizations slides along the
-budget line — a trade. Changing <span class="math inline">\(c\)</span>
-moves the budget line itself — so both can rise together.</p>
+<p>Combined with Step A: if <span class="math inline">\(\theta\)</span>
+has no range, neither factor can be Hoyer-sparse, and no optimizer or
+initialization can change that.</p>
+<p>This also reconciles the two behaviours you may have noticed. Holding
+the data and <span class="math inline">\(c\)</span> fixed and moving
+among equally-good factorizations slides <em>along</em> the budget
+constraint — a trade. Changing <span class="math inline">\(c\)</span>
+moves the constraint itself — so both can rise together.</p>
 </div>
 <div id="step-c-c-is-what-sets-the-budget" class="section level1">
 <h1>Step C: c is what sets the budget</h1>
 <p>Here is the crux. <span class="math inline">\(\theta\)</span> is not
-free: it is the rates seen through the link,</p>
-<p><span class="math display">\[
-\theta = \log\!\left(1+\frac{\lambda}{c}\right).
-\]</span></p>
-<p>Take five rates and never change them. Look at what <span
+free; it is the rates seen through the link, <span
+class="math inline">\(\theta = \log(1+\lambda/c)\)</span>. Take five
+rates and never change them, then look at what <span
 class="math inline">\(c\)</span> does to their peak-to-mean:</p>
 <pre class="r"><code>lam &lt;- c(0.1, 0.5, 1, 5, 20)
 cs  &lt;- c(1e-3, 1e-2, 1e-1, 1, 10, 100, 1e3, Inf)
 knitr::kable(do.call(rbind, lapply(cs, function(cc) {
   th &lt;- if (is.infinite(cc)) lam else log1p(lam/cc)
   data.frame(c = format(cc),
-             theta = paste(sprintf(&quot;%.3g&quot;, th), collapse = &quot;  &quot;),
-             P_theta = p2m(th), `sparsity cap` = 1 - 1/sqrt(p2m(th)),
+             `theta = log1p(lambda/c)` = paste(sprintf(&quot;%.3g&quot;, th), collapse = &quot;  &quot;),
+             `pm(theta)` = pm(th),
+             `sparsity cap 1-1/sqrt(pm)` = 1 - 1/sqrt(pm(th)),
              check.names = FALSE) })),
   digits = 3, row.names = FALSE,
-  caption = &quot;The same five rates throughout. Only c changes.&quot;)</code></pre>
+  caption = &quot;The same five rates in every row. Only c changes.&quot;)</code></pre>
 <table>
-<caption>The same five rates throughout. Only c changes.</caption>
+<caption>The same five rates in every row. Only c changes.</caption>
+<colgroup>
+<col width="7%" />
+<col width="48%" />
+<col width="12%" />
+<col width="32%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">c</th>
-<th align="left">theta</th>
-<th align="right">P_theta</th>
-<th align="right">sparsity cap</th>
+<th align="left">theta = log1p(lambda/c)</th>
+<th align="right">pm(theta)</th>
+<th align="right">sparsity cap 1-1/sqrt(pm)</th>
 </tr>
 </thead>
 <tbody>
@@ -854,49 +1031,86 @@ knitr::kable(do.call(rbind, lapply(cs, function(cc) {
 </tr>
 </tbody>
 </table>
-<p>The rates never move. Their own peak-to-mean is 3.76. But the budget
-the fit actually gets runs from about 1.37 at <span
+<p>The rates never move; their own peak-to-mean is <span
+class="math inline">\(\operatorname{pm}(\lambda) = 3.76\)</span>. But
+the budget the fit actually receives runs from about 1.37 at <span
 class="math inline">\(c=10^{-3}\)</span> up to 3.76 at <span
-class="math inline">\(c=\infty\)</span>, and with it the sparsity cap
-roughly triples.</p>
-<p><strong>Why.</strong> For <span class="math inline">\(c\)</span> much
-smaller than the rates, <span
-class="math inline">\(\log(1+\lambda/c)\approx \log(1/c) +
-\log\lambda\)</span>: every entry acquires the same large constant <span
-class="math inline">\(\log(1/c)\)</span>, and a shared additive constant
-is exactly what destroys peak-to-mean. For <span
-class="math inline">\(c\)</span> much larger than the rates, <span
+class="math inline">\(c=\infty\)</span>, and the sparsity cap roughly
+triples with it.</p>
+<p><strong>Why.</strong> For <span class="math inline">\(c\)</span> well
+below the rates, <span class="math inline">\(\log(1+\lambda/c)\approx
+\log(1/c) + \log\lambda\)</span>: every entry picks up the <em>same</em>
+large additive constant <span class="math inline">\(\log(1/c)\)</span>,
+and a shared additive constant is exactly what destroys peak-to-mean.
+For <span class="math inline">\(c\)</span> well above the rates, <span
 class="math inline">\(\log(1+\lambda/c)\approx\lambda/c\)</span>, a pure
-rescaling, which preserves peak-to-mean exactly. Formally</p>
+rescaling, which leaves peak-to-mean untouched. Formally, writing <span
+class="math inline">\(\theta_c = \log(1+\lambda/c)\)</span>,</p>
 <p><span class="math display">\[
-P_\theta(c)\;\xrightarrow[c\to 0]{}\;1,
+\operatorname{pm}(\theta_c)\;\xrightarrow[c\to 0]{}\;1,
 \qquad
-P_\theta(c) - 1 \;\approx\;
-\frac{\log\lambda_{\max}-\overline{\log\lambda}}{\log(1/c)},
+\operatorname{pm}(\theta_c) - 1 \;\approx\;
+\frac{\log\max(\lambda)-\operatorname{mean}(\log\lambda)}{\log(1/c)},
 \qquad
-P_\theta(c)\;\xrightarrow[c\to\infty]{}\;\frac{\lambda_{\max}}{\bar\lambda}.
+\operatorname{pm}(\theta_c)\;\xrightarrow[c\to\infty]{}\;\operatorname{pm}(\lambda).
 \]</span></p>
 <pre class="r"><code>grid &lt;- 10^seq(-4, 4, length.out = 200)
-d &lt;- data.frame(c = grid,
-                P = sapply(grid, function(cc) p2m(log1p(lam/cc))))
-ggplot(d, aes(c, P)) +
-  geom_hline(yintercept = p2m(lam), linetype = &quot;dashed&quot;, colour = &quot;#C2410C&quot;) +
+d &lt;- data.frame(c = grid, pm = sapply(grid, function(cc) pm(log1p(lam/cc))))
+ggplot(d, aes(c, pm)) +
+  geom_hline(yintercept = pm(lam), linetype = &quot;dashed&quot;, colour = &quot;#C2410C&quot;) +
   geom_hline(yintercept = 1, linetype = &quot;dotted&quot;, colour = &quot;grey50&quot;) +
   geom_line(colour = &quot;#0E5C6B&quot;, linewidth = 1) +
   scale_x_log10() +
-  annotate(&quot;text&quot;, x = 1e3, y = p2m(lam), vjust = -0.7, size = 3.2,
-           colour = &quot;#C2410C&quot;, label = &quot;max/mean of the rates&quot;) +
+  annotate(&quot;text&quot;, x = 1e3, y = pm(lam), vjust = -0.7, size = 3.2,
+           colour = &quot;#C2410C&quot;, label = &quot;pm(lambda)&quot;) +
   annotate(&quot;text&quot;, x = 1e-4, y = 1, vjust = -0.7, hjust = 0, size = 3.2,
            colour = &quot;grey35&quot;, label = &quot;no range left&quot;) +
-  labs(x = &quot;c&quot;, y = expression(P[theta]),
+  labs(x = &quot;c&quot;, y = &quot;pm(theta)&quot;,
        title = &quot;The sparsity budget, as a function of c&quot;,
        subtitle = &quot;same rates throughout; only the link changes&quot;)</code></pre>
 <p><img src="figure/hoyer_sparsity_c.Rmd/stepC-plot-1.png" alt="" width="715" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-stepC-plot-1">
+Past versions of stepC-plot-1.png
+</button>
+</p>
+<div id="fig-stepC-plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/17cefaff33c5a46b1cb42dffe906527a58ca6d22/docs/figure/hoyer_sparsity_c.Rmd/stepC-plot-1.png" target="_blank">17cefaf</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="step-d-the-rates-come-from-y-not-from-c"
 class="section level1">
 <h1>Step D: the rates come from Y, not from c</h1>
-<p>The last link is why we may treat <span
+<p>The last link is what lets us treat <span
 class="math inline">\(\lambda\)</span> as given. The Poisson
 log-likelihood is</p>
 <p><span class="math display">\[
@@ -906,15 +1120,15 @@ log-likelihood is</p>
 <p>which contains <strong>no <span class="math inline">\(c\)</span>
 anywhere</strong>. <span class="math inline">\(c\)</span> appears only
 in the feasible set — which rate matrices are reachable, namely those
-with <span class="math inline">\(\log(1+\lambda/c)\)</span> of
+for which <span class="math inline">\(\log(1+\lambda/c)\)</span> has
 nonnegative rank <span class="math inline">\(K\)</span>. So <span
 class="math inline">\(c\)</span> does not change what a good set of
 rates is; the fitted rates are governed by <span
 class="math inline">\(Y\)</span>.</p>
 <p>That means <span class="math inline">\(\lambda\)</span> can be
 estimated from <span class="math inline">\(Y\)</span> before fitting
-anything. The crudest estimate suffices for this purpose — the rank-1
-independence model</p>
+anything, and for this purpose the crudest estimate is enough — the
+rank-1 independence model</p>
 <p><span class="math display">\[
 m_{ij} = \frac{y_{i\cdot}\,y_{\cdot j}}{y_{\cdot\cdot}} .
 \]</span></p>
@@ -926,39 +1140,39 @@ class="math inline">\(c\)</span>, with no model fitted:</p>
 <ol style="list-style-type: decimal">
 <li><span class="math inline">\(m_{ij} = y_{i\cdot}y_{\cdot
 j}/y_{\cdot\cdot}\)</span></li>
-<li><span class="math inline">\(P_\theta(c) = \max_{ij}\log(1+m_{ij}/c)
-\big/ \overline{\log(1+m/c)}\)</span></li>
-<li>sparsity cap <span class="math inline">\(\approx 1 -
-1/\sqrt{P_\theta(c)}\)</span>, shared between <span
+<li>compute <span
+class="math inline">\(\operatorname{pm}\bigl(\log(1+m/c)\bigr)\)</span></li>
+<li>the joint sparsity cap is <span class="math inline">\(\approx 1 -
+1/\sqrt{\operatorname{pm}}\)</span>, shared between <span
 class="math inline">\(L\)</span> and <span
 class="math inline">\(F\)</span></li>
 </ol>
-<p>If <span class="math inline">\(P_\theta(c)\)</span> is near 1, sparse
-factors are unobtainable at that <span class="math inline">\(c\)</span>
-and any sparsity you do see is an artifact of the optimizer’s path.</p>
+<p>If <span class="math inline">\(\operatorname{pm}\)</span> comes out
+near 1, sparse factors are unavailable at that <span
+class="math inline">\(c\)</span>, and whatever sparsity a fit reports is
+an artifact of the optimizer’s path.</p>
 <pre class="r"><code>sparsity_budget &lt;- function(Y, c) {
-  m  &lt;- outer(rowSums(Y), colSums(Y)) / sum(Y)
+  m  &lt;- outer(rowSums(Y), colSums(Y)) / sum(Y)   # rank-1 estimate of the rates
   th &lt;- if (is.infinite(c)) m else log1p(m / c)
-  P  &lt;- max(th) / mean(th)
-  c(P_theta = P, cap = 1 - 1/sqrt(P))
+  c(pm_theta = pm(th), cap = 1 - 1/sqrt(pm(th)))
 }
-Y &lt;- sim_dataset(1, 1)$Y                       # any count matrix
+Y &lt;- sim_dataset(1, 1)$Y                          # any count matrix
 round(t(sapply(C_GRID, function(cc) c(c = cc, sparsity_budget(Y, cc)))), 3)</code></pre>
-<pre><code>         c P_theta   cap
-[1,] 1e-03   1.413 0.159
-[2,] 1e-02   1.625 0.215
-[3,] 1e-01   2.185 0.324
-[4,] 1e+00   4.029 0.502
-[5,] 1e+01   8.115 0.649
-[6,] 1e+02  10.775 0.695
-[7,] 1e+03  11.244 0.702
-[8,]   Inf  11.301 0.703</code></pre>
+<pre><code>         c pm_theta   cap
+[1,] 1e-03    1.413 0.159
+[2,] 1e-02    1.625 0.215
+[3,] 1e-01    2.185 0.324
+[4,] 1e+00    4.029 0.502
+[5,] 1e+01    8.115 0.649
+[6,] 1e+02   10.775 0.695
+[7,] 1e+03   11.244 0.702
+[8,]   Inf   11.301 0.703</code></pre>
 </div>
 <div id="does-it-hold-on-real-fits" class="section level1">
 <h1>Does it hold on real fits?</h1>
 <p>Against the 640 fits from the <a href="c_grid_sim.html">c-grid
-simulation</a>: the budget inequality of Step B should never be
-violated, and if the argument is right it should be roughly
+simulation</a>. The Step B inequality should never be violated, and if
+the argument is explanatory rather than merely true it should be roughly
 <em>tight</em> — the optimizer should spend what it is given.</p>
 <pre class="r"><code>ver &lt;- do.call(rbind, lapply(C_GRID, function(cf) {
   r &lt;- do.call(rbind, lapply(1:10, function(sd) {
@@ -968,35 +1182,36 @@ violated, and if the argument is right it should be roughly
     L &lt;- x$fits$rank1$LL; Fm &lt;- x$fits$rank1$FF
     th &lt;- tcrossprod(L, Fm) / max(1, if (is.infinite(cf)) 1 else cf)
     w  &lt;- colMeans(L) * colMeans(Fm); w &lt;- w / sum(w)
-    PL &lt;- apply(L, 2, p2m); PF &lt;- apply(Fm, 2, p2m)
-    c(`predicted P (from Y,c)` = unname(sparsity_budget(Yd, cf)[&quot;P_theta&quot;]),
-      `actual P of theta-hat`  = p2m(th),
-      `P_L P_F w`              = max(PL * PF * w),
-      `Hoyer L`                = mean(apply(L,  2, hoyer)),
-      `Hoyer F`                = mean(apply(Fm, 2, hoyer)),
-      violations               = sum(PL * PF * w &gt; p2m(th) * (1 + 1e-8)))
+    pmL &lt;- apply(L,  2, pm)          # pm(l_.k) for each factor k
+    pmF &lt;- apply(Fm, 2, pm)          # pm(f_.k) for each factor k
+    c(`pm predicted from Y,c`  = unname(sparsity_budget(Yd, cf)[&quot;pm_theta&quot;]),
+      `pm(theta) of the fit`   = pm(th),
+      `pm(l)pm(f)w, worst k`   = max(pmL * pmF * w),
+      `mean H(l_.k)`           = mean(apply(L,  2, hoyer)),
+      `mean H(f_.k)`           = mean(apply(Fm, 2, hoyer)),
+      violations               = sum(pmL * pmF * w &gt; pm(th) * (1 + 1e-8)))
   }))
   as.data.frame(t(c(c_fit = cf, colMeans(r))))
 }))
 knitr::kable(ver, digits = c(3, 2, 2, 2, 3, 3, 0), row.names = FALSE)</code></pre>
 <table>
 <colgroup>
-<col width="6%" />
-<col width="26%" />
-<col width="25%" />
-<col width="11%" />
-<col width="9%" />
-<col width="9%" />
+<col width="5%" />
+<col width="20%" />
+<col width="19%" />
+<col width="19%" />
 <col width="12%" />
+<col width="12%" />
+<col width="10%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th align="right">c_fit</th>
-<th align="right">predicted P (from Y,c)</th>
-<th align="right">actual P of theta-hat</th>
-<th align="right">P_L P_F w</th>
-<th align="right">Hoyer L</th>
-<th align="right">Hoyer F</th>
+<th align="right">pm predicted from Y,c</th>
+<th align="right">pm(theta) of the fit</th>
+<th align="right">pm(l)pm(f)w, worst k</th>
+<th align="right">mean H(l_.k)</th>
+<th align="right">mean H(f_.k)</th>
 <th align="right">violations</th>
 </tr>
 </thead>
@@ -1090,14 +1305,13 @@ remove this warning. See the
 </p>
 </div>
 <p>Three things to check in that table.</p>
-<p><strong>The inequality is never violated</strong> — as it must not
-be, being an identity plus nonnegativity.</p>
-<p><strong>It is tight.</strong> <code>P_L P_F w</code> sits just under
-<code>actual P of theta-hat</code> in every row. The fits use their
-whole budget, which is what makes the bound explanatory rather than
-merely true: at small <span class="math inline">\(c\)</span> the
-optimizer is not failing to find sparse factors, there are none to
-find.</p>
+<p><strong>The inequality is never violated</strong>, as it must not be,
+being an identity plus nonnegativity.</p>
+<p><strong>It is tight.</strong> The <code>pm(l)pm(f)w</code> column
+sits just under <code>pm(theta) of the fit</code> in every row. The fits
+use their whole budget, which is what makes the bound explanatory: at
+small <span class="math inline">\(c\)</span> the optimizer is not
+failing to find sparse factors, there are none to find.</p>
 <p><strong>The budget predicted from <span
 class="math inline">\(Y\)</span> and <span
 class="math inline">\(c\)</span> alone tracks the realized one</strong>,
@@ -1106,26 +1320,64 @@ so the whole chain can be evaluated before fitting.</p>
               format(ver$c_fit, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))
 ver$cf &lt;- factor(lab, levels = lab)
 long &lt;- rbind(
-  data.frame(cf = ver$cf, what = &quot;budget P (theta)&quot;, v = ver$`actual P of theta-hat`),
-  data.frame(cf = ver$cf, what = &quot;spent  P_L P_F w&quot;, v = ver$`P_L P_F w`))
+  data.frame(cf = ver$cf, what = &quot;budget:  pm(theta)&quot;,   v = ver$`pm(theta) of the fit`),
+  data.frame(cf = ver$cf, what = &quot;spent:   pm(l)pm(f)w&quot;, v = ver$`pm(l)pm(f)w, worst k`))
 p1 &lt;- ggplot(long, aes(cf, v, colour = what, group = what)) +
   geom_line(linewidth = 1) + geom_point(size = 2) +
   scale_colour_manual(values = c(&quot;#0E5C6B&quot;, &quot;#C2410C&quot;), name = NULL) +
   labs(x = &quot;c used for fitting&quot;, y = &quot;peak-to-mean&quot;,
        title = &quot;The budget, and what the fit spends&quot;) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
-p2 &lt;- ggplot(ver, aes(`actual P of theta-hat`)) +
-  geom_line(aes(y = `Hoyer L`, colour = &quot;L&quot;), linewidth = 1) +
-  geom_line(aes(y = `Hoyer F`, colour = &quot;F&quot;), linewidth = 1) +
-  geom_line(aes(y = 1 - 1/sqrt(`actual P of theta-hat`), colour = &quot;cap&quot;),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+        legend.text = element_text(size = 8))
+p2 &lt;- ggplot(ver, aes(`pm(theta) of the fit`)) +
+  geom_line(aes(y = `mean H(l_.k)`, colour = &quot;H(l)&quot;), linewidth = 1) +
+  geom_line(aes(y = `mean H(f_.k)`, colour = &quot;H(f)&quot;), linewidth = 1) +
+  geom_line(aes(y = 1 - 1/sqrt(`pm(theta) of the fit`), colour = &quot;cap&quot;),
             linetype = &quot;dashed&quot;, linewidth = 0.8) +
-  scale_colour_manual(values = c(L = &quot;#0E8FA8&quot;, F = &quot;#C2410C&quot;, cap = &quot;grey40&quot;),
-                      name = NULL) +
+  scale_colour_manual(values = c(`H(l)` = &quot;#0E8FA8&quot;, `H(f)` = &quot;#C2410C&quot;,
+                                 cap = &quot;grey40&quot;), name = NULL) +
   scale_x_log10() +
-  labs(x = expression(P[theta]), y = &quot;mean Hoyer sparsity&quot;,
+  labs(x = &quot;pm(theta)&quot;, y = &quot;mean Hoyer sparsity&quot;,
        title = &quot;Both factors rise with the budget&quot;)
 plot_grid(p1, p2, nrow = 1)</code></pre>
 <p><img src="figure/hoyer_sparsity_c.Rmd/verify-plot-1.png" alt="" width="880" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-verify-plot-1">
+Past versions of verify-plot-1.png
+</button>
+</p>
+<div id="fig-verify-plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/17cefaff33c5a46b1cb42dffe906527a58ca6d22/docs/figure/hoyer_sparsity_c.Rmd/verify-plot-1.png" target="_blank">17cefaf</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="what-to-do-with-this" class="section level1">
 <h1>What to do with this</h1>
@@ -1137,22 +1389,22 @@ even available at that <span class="math inline">\(c\)</span>.</li>
 class="math inline">\(c\)</span>.</strong> “The <span
 class="math inline">\(c=0.01\)</span> factors are denser than the <span
 class="math inline">\(c=10\)</span> factors” is a statement about <span
-class="math inline">\(\log(1+\cdot/c)\)</span>, not about the data. The
+class="math inline">\(\log(1+\cdot/c)\)</span>, not about the data: the
 budgets differ, so the comparison is meaningless.</li>
-<li><strong>Do compare things that depend on <span
+<li><strong>Do compare quantities that depend on <span
 class="math inline">\(LF&#39;\)</span></strong> — fitted rates, held-out
 log-likelihood, which samples resemble which. Those do not depend on how
 the budget was split.</li>
-<li><strong>If sparsity is scientifically important, impose it.</strong>
-The likelihood will not choose it for you; only a penalty, a prior, or
-an anchor assumption will.</li>
+<li><strong>If sparsity matters scientifically, impose it.</strong> The
+likelihood will not choose it for you; only a penalty, a prior, or an
+anchor assumption will.</li>
 </ul>
 <p>A companion page, <a
 href="log1p_identifiability.html">Non-identifiability of the log1p
-factorization</a>, covers the other half of the story: for a
-<em>fixed</em> budget, exactly which factorizations are equally likely
-and how sparsity moves between <span class="math inline">\(L\)</span>
-and <span class="math inline">\(F\)</span> along that constraint.</p>
+factorization</a>, covers the other half: for a <em>fixed</em> budget,
+exactly which factorizations are equally likely, and how sparsity moves
+between <span class="math inline">\(L\)</span> and <span
+class="math inline">\(F\)</span> along that constraint.</p>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.5.2 (2025-10-31)
 Platform: aarch64-apple-darwin20
@@ -1165,7 +1417,7 @@ LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlap
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
-time zone: America/Chicago
+time zone: America/Denver
 tzcode source: internal
 
 attached base packages:
@@ -1211,7 +1463,7 @@ LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlap
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
-time zone: America/Chicago
+time zone: America/Denver
 tzcode source: internal
 
 attached base packages:
