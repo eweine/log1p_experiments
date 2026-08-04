@@ -539,15 +539,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree4e965aba48209dfeb7ac44a69c2e6ba702330066targetblank4e965aba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee68ace1788a5aa5ec392ffb5022fd794369f3a86targetblanke68ace1a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/4e965aba48209dfeb7ac44a69c2e6ba702330066" target="_blank">4e965ab</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/e68ace1788a5aa5ec392ffb5022fd794369f3a86" target="_blank">e68ace1</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree4e965aba48209dfeb7ac44a69c2e6ba702330066targetblank4e965aba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee68ace1788a5aa5ec392ffb5022fd794369f3a86targetblanke68ace1a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -557,7 +557,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/4e965aba48209dfeb7ac44a69c2e6ba702330066" target="_blank">4e965ab</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/e68ace1788a5aa5ec392ffb5022fd794369f3a86" target="_blank">e68ace1</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -622,6 +622,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/e68ace1788a5aa5ec392ffb5022fd794369f3a86/analysis/c_grid_sim.Rmd" target="_blank">e68ace1</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Rework the rates section: one dataset, one panel per fitted c
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/c7f6da46ee4a3a7eadef6ff893ae68e8eb5926a3/docs/c_grid_sim.html" target="_blank">c7f6da4</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1130,52 +1164,99 @@ deliberately: the penalty for being in the wrong <strong>regime</strong>
 (\)</span><span class="math inline">\(1), and a free\)</span>y$ would
 rescale each panel and hide that.</p>
 </div>
-<div id="are-the-rates-themselves-recovered" class="section level1">
-<h1>Are the rates themselves recovered?</h1>
-<p>Before looking at the factors, it is worth checking the quantity the
-likelihood actually pins down: the fitted rates <span
-class="math inline">\(\hat\lambda\)</span>. Below, for one seed, are the
-three simulations at <span class="math inline">\(c = 10^{-3}\)</span>,
-<span class="math inline">\(1\)</span> and <span
-class="math inline">\(\infty\)</span>, each fitted at its own <span
-class="math inline">\(c\)</span> — so these are the well-specified cells
-on the diagonal. Every entry of the <span
-class="math inline">\(300\times300\)</span> matrix is plotted, true rate
-against fitted rate, on log axes with <span class="math inline">\(y =
-x\)</span> marked.</p>
-<pre class="r"><code>CS   &lt;- c(1e-3, 1, Inf)
+<div id="how-close-are-the-fitted-rates-across-c"
+class="section level1">
+<h1>How close are the fitted rates, across c?</h1>
+<p>Before looking at the factors, check the quantity the likelihood
+actually pins down: the fitted rates <span
+class="math inline">\(\hat\lambda\)</span>. Take <strong>one</strong>
+simulated dataset and fit it at every <span
+class="math inline">\(c\)</span> on the grid. Each panel below plots all
+90,000 entries of that one matrix, true rate against fitted rate, on log
+axes with <span class="math inline">\(y=x\)</span> marked. The dataset
+is identical in every panel; only the <span
+class="math inline">\(c\)</span> used for fitting changes.</p>
+<pre class="r"><code>SEED &lt;- 1; CTRUE &lt;- 1; YMIN &lt;- 1e-2      # edit SEED / CTRUE to move around the grid
 fmtc &lt;- function(z) if (is.infinite(z)) &quot;Inf&quot; else
   format(z, scientific = FALSE, trim = TRUE, drop0trailing = TRUE)
-panel_labs &lt;- vapply(CS, function(z)
-  sprintf(&quot;simulated and fitted at c = %s&quot;, fmtc(z)), character(1))
+panel_labs &lt;- vapply(C_GRID, function(z) sprintf(&quot;fit at c = %s&quot;, fmtc(z)), character(1))
 
-rate_dat &lt;- do.call(rbind, lapply(CS, function(cc) {
-  dd &lt;- sim_dataset(1, cc)
-  x  &lt;- readRDS(file.path(cells_dir, paste0(
-          tag_of(list(seed = 1, c_true = cc, c_fit = cc)), &quot;.rds&quot;)))
+dd &lt;- sim_dataset(SEED, CTRUE)
+lam_true &lt;- as.vector(dd$lambda)
+
+fitted_rates &lt;- function(cf) {
+  x &lt;- readRDS(file.path(cells_dir, paste0(
+         tag_of(list(seed = SEED, c_true = CTRUE, c_fit = cf)), &quot;.rds&quot;)))
   L &lt;- x$fits$rank1$LL; Fm &lt;- x$fits$rank1$FF
-  lf &lt;- if (is.infinite(cc)) tcrossprod(L, Fm) else
-          cc * expm1(tcrossprod(L, Fm) / max(1, cc))
-  data.frame(true = as.vector(dd$lambda), fitted = pmax(as.vector(lf), 1e-6),
-             panel = sprintf(&quot;simulated and fitted at c = %s&quot;, fmtc(cc)))
-}))
-rate_dat$panel &lt;- factor(rate_dat$panel, levels = panel_labs)
-stopifnot(!any(is.na(rate_dat$panel)))
+  as.vector(if (is.infinite(cf)) tcrossprod(L, Fm)
+            else cf * expm1(tcrossprod(L, Fm) / max(1, cf)))
+}
 
-ggplot(rate_dat, aes(true, fitted)) +
-  geom_abline(slope = 1, intercept = 0, colour = &quot;#C2410C&quot;, linewidth = 0.7) +
-  geom_bin2d(bins = 90) +
+rate_dat &lt;- do.call(rbind, lapply(C_GRID, function(cf)
+  data.frame(true = lam_true, fitted = fitted_rates(cf),
+             panel = sprintf(&quot;fit at c = %s&quot;, fmtc(cf)))))
+rate_dat$panel &lt;- factor(rate_dat$panel, levels = panel_labs)
+
+## a handful of entries fall below the axis at large c; label rather than hide
+clip_lab &lt;- do.call(rbind, lapply(C_GRID, function(cf) {
+  nb &lt;- sum(fitted_rates(cf) &lt; YMIN)
+  data.frame(panel = factor(sprintf(&quot;fit at c = %s&quot;, fmtc(cf)), levels = panel_labs),
+             lab = if (nb &gt; 0) sprintf(&quot;%d entries below axis&quot;, nb) else &quot;&quot;) }))
+
+ggplot(rate_dat, aes(true, pmax(fitted, YMIN/2))) +
+  geom_abline(slope = 1, intercept = 0, colour = &quot;#C2410C&quot;, linewidth = 0.6) +
+  geom_bin2d(bins = 70) +
+  geom_text(data = clip_lab, aes(x = 0.35, y = YMIN*1.6, label = lab),
+            inherit.aes = FALSE, hjust = 0, size = 2.9, colour = &quot;grey30&quot;) +
   scale_fill_gradient(low = &quot;#DDE8EA&quot;, high = &quot;#0E5C6B&quot;, trans = &quot;log10&quot;,
                       name = &quot;entries&quot;) +
-  facet_wrap(~ panel, nrow = 1, scales = &quot;free&quot;) +
-  scale_x_log10() + scale_y_log10() +
+  facet_wrap(~ panel, nrow = 2) +
+  scale_x_log10() + scale_y_log10(limits = c(YMIN, 40)) +
   labs(x = &quot;true rate&quot;, y = &quot;fitted rate&quot;,
-       title = &quot;Fitted vs true rates, seed 1, well-specified fits&quot;,
-       subtitle = &quot;each panel: 90,000 matrix entries.  orange line is y = x&quot;) +
+       title = sprintf(&quot;One simulation (seed %d, generated at c = %s), fitted at every c&quot;,
+                       SEED, fmtc(CTRUE)),
+       subtitle = &quot;all 90,000 entries per panel.  orange line is y = x&quot;) +
   theme(strip.background = element_blank(),
         strip.text = element_text(face = &quot;bold&quot;, size = 10),
         panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))</code></pre>
-<img src="figure/c_grid_sim.Rmd/rates-vs-truth-1.png" alt="" width="1320" style="display: block; margin: auto;" />
+<p><img src="figure/c_grid_sim.Rmd/rates-vs-truth-1.png" alt="" width="1430" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-rates-vs-truth-1">
+Past versions of rates-vs-truth-1.png
+</button>
+</p>
+<div id="fig-rates-vs-truth-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/c7f6da46ee4a3a7eadef6ff893ae68e8eb5926a3/docs/figure/c_grid_sim.Rmd/rates-vs-truth-1.png" target="_blank">c7f6da4</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div class="alert alert-warning">
 <p>
 <strong>Warning:</strong> The above code chunk cached its results, but
@@ -1190,36 +1271,20 @@ remove this warning. See the
 >knitr cache options</a> for more details.
 </p>
 </div>
-<pre class="r"><code>knitr::kable(do.call(rbind, lapply(CS, function(cc) {
-  dd &lt;- sim_dataset(1, cc)
-  x  &lt;- readRDS(file.path(cells_dir, paste0(
-          tag_of(list(seed = 1, c_true = cc, c_fit = cc)), &quot;.rds&quot;)))
-  L &lt;- x$fits$rank1$LL; Fm &lt;- x$fits$rank1$FF
-  lf &lt;- if (is.infinite(cc)) tcrossprod(L, Fm) else
-          cc * expm1(tcrossprod(L, Fm) / max(1, cc))
-  lt &lt;- as.vector(dd$lambda); lf &lt;- as.vector(lf)
-  data.frame(c = fmtc(cc),
-             `true min` = min(lt), `true max` = max(lt),
+<pre class="r"><code>knitr::kable(do.call(rbind, lapply(C_GRID, function(cf) {
+  lf &lt;- fitted_rates(cf)
+  data.frame(c_fit = fmtc(cf),
              `fitted min` = min(lf), `fitted max` = max(lf),
-             `cor(log)` = cor(log(lt), log(pmax(lf, 1e-12))),
-             `RMSE(log1p)` = sqrt(mean((log1p(lt) - log1p(pmax(lf, 0)))^2)),
+             `cor(log)` = cor(log(lam_true), log(pmax(lf, 1e-12))),
+             `RMSE(log1p)` = sqrt(mean((log1p(lam_true) - log1p(pmax(lf, 0)))^2)),
              check.names = FALSE)
-})), digits = 4, row.names = FALSE)</code></pre>
-<table style="width:100%;">
-<colgroup>
-<col width="8%" />
-<col width="13%" />
-<col width="13%" />
-<col width="16%" />
-<col width="16%" />
-<col width="13%" />
-<col width="17%" />
-</colgroup>
+})), digits = 4, row.names = FALSE,
+caption = sprintf(&quot;Same dataset throughout (seed %d, generated at c = %s).&quot;, SEED, fmtc(CTRUE)))</code></pre>
+<table>
+<caption>Same dataset throughout (seed 1, generated at c = 1).</caption>
 <thead>
 <tr class="header">
-<th align="left">c</th>
-<th align="right">true min</th>
-<th align="right">true max</th>
+<th align="left">c_fit</th>
 <th align="right">fitted min</th>
 <th align="right">fitted max</th>
 <th align="right">cor(log)</th>
@@ -1229,56 +1294,90 @@ remove this warning. See the
 <tbody>
 <tr class="odd">
 <td align="left">0.001</td>
-<td align="right">0.5307</td>
-<td align="right">22.7630</td>
-<td align="right">0.1929</td>
-<td align="right">26.1958</td>
-<td align="right">0.9654</td>
-<td align="right">0.0654</td>
+<td align="right">0.2036</td>
+<td align="right">25.2794</td>
+<td align="right">0.9752</td>
+<td align="right">0.0651</td>
+</tr>
+<tr class="even">
+<td align="left">0.01</td>
+<td align="right">0.2040</td>
+<td align="right">25.2421</td>
+<td align="right">0.9755</td>
+<td align="right">0.0649</td>
+</tr>
+<tr class="odd">
+<td align="left">0.1</td>
+<td align="right">0.1902</td>
+<td align="right">25.1320</td>
+<td align="right">0.9759</td>
+<td align="right">0.0641</td>
 </tr>
 <tr class="even">
 <td align="left">1</td>
-<td align="right">0.4704</td>
-<td align="right">22.0893</td>
 <td align="right">0.0782</td>
 <td align="right">25.4180</td>
 <td align="right">0.9753</td>
 <td align="right">0.0624</td>
 </tr>
 <tr class="odd">
-<td align="left">Inf</td>
-<td align="right">0.2587</td>
-<td align="right">20.7042</td>
+<td align="left">10</td>
 <td align="right">0.0000</td>
-<td align="right">22.8501</td>
-<td align="right">0.9087</td>
-<td align="right">0.0606</td>
+<td align="right">23.5061</td>
+<td align="right">0.9243</td>
+<td align="right">0.0701</td>
+</tr>
+<tr class="even">
+<td align="left">100</td>
+<td align="right">0.0000</td>
+<td align="right">21.2956</td>
+<td align="right">0.9178</td>
+<td align="right">0.0770</td>
+</tr>
+<tr class="odd">
+<td align="left">1000</td>
+<td align="right">0.0000</td>
+<td align="right">20.8912</td>
+<td align="right">0.9206</td>
+<td align="right">0.0781</td>
+</tr>
+<tr class="even">
+<td align="left">Inf</td>
+<td align="right">0.0000</td>
+<td align="right">20.8420</td>
+<td align="right">0.9265</td>
+<td align="right">0.0782</td>
 </tr>
 </tbody>
 </table>
-<p>Three things to take from this.</p>
-<p><strong>The rates are recovered about equally well at every <span
-class="math inline">\(c\)</span>.</strong> The mass lies on <span
-class="math inline">\(y = x\)</span> in all three panels and the RMSE on
-the log1p scale is essentially identical across them. This is the
-concrete version of a point that recurs below: the likelihood determines
-<span class="math inline">\(LF&#39;\)</span>, and hence <span
-class="math inline">\(\hat\lambda\)</span>, but says much less about how
-that product is split into factors. Whatever <span
-class="math inline">\(c\)</span> does to the factors, it barely touches
-the fit to the data.</p>
-<p><strong>The scatter widens at the low end</strong> in every panel —
-ordinary Poisson behaviour, since the information about a rate scales
-with the rate.</p>
-<p><strong>Only the <span class="math inline">\(c = \infty\)</span>
-panel has a tail of entries driven to essentially zero</strong>, visible
-as the smear along the bottom reaching <span
-class="math inline">\(10^{-9}\)</span>; the other two panels stop
-cleanly at their smallest true rate. With a linear link the model can
-place structural near-zeros, and at small <span
-class="math inline">\(c\)</span> it cannot. That is the same floor that
-drives the sparsity results below, seen directly in the rates rather
-than through a sparsity measure.</p>
+<p><strong>The rates barely move.</strong> Across four orders of
+magnitude in the fitted <span class="math inline">\(c\)</span> —
+including badly misspecified values — every panel puts its mass on <span
+class="math inline">\(y=x\)</span>, and the RMSE on the log1p scale
+varies only between about 0.062 and 0.078. Fitting at <span
+class="math inline">\(c=10^{-3}\)</span> data that were generated at
+<span class="math inline">\(c=1\)</span> costs almost nothing in how
+well the mean structure is reproduced.</p>
+<p>That is worth holding onto, because the sections that follow show the
+<em>factors</em> changing a great deal over the same range. The
+likelihood determines <span class="math inline">\(LF&#39;\)</span>, and
+<span class="math inline">\(\hat\lambda\)</span> with it, but says much
+less about how that product is split into <span
+class="math inline">\(L\)</span> and <span
+class="math inline">\(F\)</span>. Two fits can agree on the rates to a
+few percent and disagree completely about what the factors look
+like.</p>
+<p><strong>The one visible difference is at the bottom of the
+range.</strong> For <span class="math inline">\(c_{\text{fit}}\le
+1\)</span> the fitted rates stop cleanly at about <span
+class="math inline">\(0.08\)</span>; for <span
+class="math inline">\(c_{\text{fit}}\ge 10\)</span> a few dozen entries
+out of 90,000 are pushed to essentially zero, down to <span
+class="math inline">\(10^{-11}\)</span>. With a nearly linear link the
+model can place structural near-zeros, and at small <span
+class="math inline">\(c\)</span> it cannot. That is the same floor
+behind the sparsity results below, visible here directly in the rates
+rather than through a sparsity measure.</p>
 </div>
 <div id="sparsity-and-factor-separation" class="section level1">
 <h1>Sparsity and factor separation</h1>
