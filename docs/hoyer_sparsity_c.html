@@ -395,7 +395,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-08-03
+<strong>Last updated:</strong> 2026-08-04
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed50dabc603ea3b04c40072d74dd8bf6ddde2b8fftargetblankd50dabca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreebc83b6dd636b1ae2c3c13bb807f0b6da4f4f80b5targetblankbc83b6da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/d50dabc603ea3b04c40072d74dd8bf6ddde2b8ff" target="_blank">d50dabc</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/bc83b6dd636b1ae2c3c13bb807f0b6da4f4f80b5" target="_blank">bc83b6d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed50dabc603ea3b04c40072d74dd8bf6ddde2b8fftargetblankd50dabca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreebc83b6dd636b1ae2c3c13bb807f0b6da4f4f80b5targetblankbc83b6da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/d50dabc603ea3b04c40072d74dd8bf6ddde2b8ff" target="_blank">d50dabc</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/bc83b6dd636b1ae2c3c13bb807f0b6da4f4f80b5" target="_blank">bc83b6d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -617,6 +617,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/bc83b6dd636b1ae2c3c13bb807f0b6da4f4f80b5/analysis/hoyer_sparsity_c.Rmd" target="_blank">bc83b6d</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Write out the algebra in the Step B derivation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/55b9b9ec44da68e4ac15de38f78006e8ae560c7f/docs/hoyer_sparsity_c.html" target="_blank">55b9b9e</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -869,6 +903,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/55b9b9ec44da68e4ac15de38f78006e8ae560c7f/docs/figure/hoyer_sparsity_c.Rmd/stepA-1.png" target="_blank">55b9b9e</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-03
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/17cefaff33c5a46b1cb42dffe906527a58ca6d22/docs/figure/hoyer_sparsity_c.Rmd/stepA-1.png" target="_blank">17cefaf</a>
 </td>
 <td>
@@ -900,10 +945,17 @@ term of the sum is nonnegative</strong>, we may discard all but the
 \;\ge\; \ell_{i^\star k}\,f_{j^\star k}
 \;=\; \max(\ell_{\cdot k})\cdot\max(f_{\cdot k}) .
 \]</span></p>
-<p>For the mean, the double average factorizes: <span
-class="math inline">\(\operatorname{mean}(\theta) =
-\sum_{m}\operatorname{mean}(\ell_{\cdot m})\operatorname{mean}(f_{\cdot
-m})\)</span>. Let</p>
+<p>For the mean, the double average factorizes across the sum over
+factors:</p>
+<p><span class="math display">\[
+\operatorname{mean}(\theta)
+= \frac{1}{np}\sum_{i,j}\sum_{m}\ell_{im}f_{jm}
+= \sum_{m}\Bigl(\frac{1}{n}\sum_i \ell_{im}\Bigr)\Bigl(\frac{1}{p}\sum_j
+f_{jm}\Bigr)
+= \sum_{m}\operatorname{mean}(\ell_{\cdot
+m})\operatorname{mean}(f_{\cdot m}).
+\]</span></p>
+<p>Let</p>
 <p><span class="math display">\[
 w_k \;=\; \frac{\operatorname{mean}(\ell_{\cdot
 k})\operatorname{mean}(f_{\cdot k})}{\operatorname{mean}(\theta)}
@@ -911,12 +963,49 @@ k})\operatorname{mean}(f_{\cdot k})}{\operatorname{mean}(\theta)}
 \]</span></p>
 <p>be the share of <span
 class="math inline">\(\operatorname{mean}(\theta)\)</span> that factor
-<span class="math inline">\(k\)</span> contributes; the <span
-class="math inline">\(w_k\)</span> sum to one. Dividing the display by
-<span class="math inline">\(\operatorname{mean}(\theta)\)</span> and
-multiplying and dividing by <span
+<span class="math inline">\(k\)</span> contributes; by the display above
+the <span class="math inline">\(w_k\)</span> sum to one.</p>
+<p>Now take the inequality <span
+class="math inline">\(\max(\theta)\ge\max(\ell_{\cdot k})\max(f_{\cdot
+k})\)</span>, divide both sides by <span
+class="math inline">\(\operatorname{mean}(\theta)\)</span>, and then
+multiply the right-hand side by <span
 class="math inline">\(\operatorname{mean}(\ell_{\cdot
-k})\operatorname{mean}(f_{\cdot k})\)</span>:</p>
+k})\operatorname{mean}(f_{\cdot k})\)</span> over itself — which is just
+multiplying by <span class="math inline">\(1\)</span> — and regroup the
+four factors:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{pm}(\theta)
+\;=\;\frac{\max(\theta)}{\operatorname{mean}(\theta)}
+&amp;\;\ge\; \frac{\max(\ell_{\cdot k})\,\max(f_{\cdot
+k})}{\operatorname{mean}(\theta)}
+&amp;&amp;\text{(divide by }\operatorname{mean}(\theta)\text{)}\\[4pt]
+&amp;\;=\; \frac{\max(\ell_{\cdot k})\,\max(f_{\cdot
+k})}{\operatorname{mean}(\theta)}
+\cdot\underbrace{\frac{\operatorname{mean}(\ell_{\cdot
+k})\operatorname{mean}(f_{\cdot k})}
+{\operatorname{mean}(\ell_{\cdot k})\operatorname{mean}(f_{\cdot
+k})}}_{=\,1}
+&amp;&amp;\text{(insert }1\text{)}\\[4pt]
+&amp;\;=\; \underbrace{\frac{\max(\ell_{\cdot
+k})}{\operatorname{mean}(\ell_{\cdot
+k})}}_{\operatorname{pm}(\ell_{\cdot k})}
+\cdot\underbrace{\frac{\max(f_{\cdot k})}{\operatorname{mean}(f_{\cdot
+k})}}_{\operatorname{pm}(f_{\cdot k})}
+\cdot\underbrace{\frac{\operatorname{mean}(\ell_{\cdot
+k})\operatorname{mean}(f_{\cdot k})}{\operatorname{mean}(\theta)}}_{w_k}
+&amp;&amp;\text{(regroup)} .
+\end{aligned}
+\]</span></p>
+<p>The middle step is the only trick, and it is not much of one: the two
+<span class="math inline">\(\operatorname{mean}\)</span> terms are
+introduced solely so that each <span class="math inline">\(\max\)</span>
+can be paired with the matching <span
+class="math inline">\(\operatorname{mean}\)</span> to form a <span
+class="math inline">\(\operatorname{pm}\)</span>, with whatever is left
+over collecting into <span class="math inline">\(w_k\)</span>. Reading
+the chain end to end,</p>
 <p><span class="math display">\[
 \boxed{\;\operatorname{pm}(\ell_{\cdot
 k})\;\cdot\;\operatorname{pm}(f_{\cdot k})\;\cdot\;w_k
@@ -1091,6 +1180,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/55b9b9ec44da68e4ac15de38f78006e8ae560c7f/docs/figure/hoyer_sparsity_c.Rmd/stepC-plot-1.png" target="_blank">55b9b9e</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-03
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/eweine/log1p_experiments/blob/17cefaff33c5a46b1cb42dffe906527a58ca6d22/docs/figure/hoyer_sparsity_c.Rmd/stepC-plot-1.png" target="_blank">17cefaf</a>
@@ -1363,6 +1463,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/55b9b9ec44da68e4ac15de38f78006e8ae560c7f/docs/figure/hoyer_sparsity_c.Rmd/verify-plot-1.png" target="_blank">55b9b9e</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-03
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/eweine/log1p_experiments/blob/17cefaff33c5a46b1cb42dffe906527a58ca6d22/docs/figure/hoyer_sparsity_c.Rmd/verify-plot-1.png" target="_blank">17cefaf</a>
