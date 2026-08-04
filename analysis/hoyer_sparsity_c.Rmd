@@ -137,17 +137,51 @@ $$
 \;=\; \max(\ell_{\cdot k})\cdot\max(f_{\cdot k}) .
 $$
 
-For the mean, the double average factorizes:
-$\operatorname{mean}(\theta) = \sum_{m}\operatorname{mean}(\ell_{\cdot m})\operatorname{mean}(f_{\cdot m})$.
+For the mean, the double average factorizes across the sum over factors:
+
+$$
+\operatorname{mean}(\theta)
+= \frac{1}{np}\sum_{i,j}\sum_{m}\ell_{im}f_{jm}
+= \sum_{m}\Bigl(\frac{1}{n}\sum_i \ell_{im}\Bigr)\Bigl(\frac{1}{p}\sum_j f_{jm}\Bigr)
+= \sum_{m}\operatorname{mean}(\ell_{\cdot m})\operatorname{mean}(f_{\cdot m}).
+$$
+
 Let
 
 $$
 w_k \;=\; \frac{\operatorname{mean}(\ell_{\cdot k})\operatorname{mean}(f_{\cdot k})}{\operatorname{mean}(\theta)} \;\in\;(0,1)
 $$
 
-be the share of $\operatorname{mean}(\theta)$ that factor $k$ contributes; the
-$w_k$ sum to one. Dividing the display by $\operatorname{mean}(\theta)$ and
-multiplying and dividing by $\operatorname{mean}(\ell_{\cdot k})\operatorname{mean}(f_{\cdot k})$:
+be the share of $\operatorname{mean}(\theta)$ that factor $k$ contributes; by the
+display above the $w_k$ sum to one.
+
+Now take the inequality $\max(\theta)\ge\max(\ell_{\cdot k})\max(f_{\cdot k})$,
+divide both sides by $\operatorname{mean}(\theta)$, and then multiply the
+right-hand side by
+$\operatorname{mean}(\ell_{\cdot k})\operatorname{mean}(f_{\cdot k})$ over
+itself — which is just multiplying by $1$ — and regroup the four factors:
+
+$$
+\begin{aligned}
+\operatorname{pm}(\theta)
+\;=\;\frac{\max(\theta)}{\operatorname{mean}(\theta)}
+&\;\ge\; \frac{\max(\ell_{\cdot k})\,\max(f_{\cdot k})}{\operatorname{mean}(\theta)}
+&&\text{(divide by }\operatorname{mean}(\theta)\text{)}\\[4pt]
+&\;=\; \frac{\max(\ell_{\cdot k})\,\max(f_{\cdot k})}{\operatorname{mean}(\theta)}
+\cdot\underbrace{\frac{\operatorname{mean}(\ell_{\cdot k})\operatorname{mean}(f_{\cdot k})}
+{\operatorname{mean}(\ell_{\cdot k})\operatorname{mean}(f_{\cdot k})}}_{=\,1}
+&&\text{(insert }1\text{)}\\[4pt]
+&\;=\; \underbrace{\frac{\max(\ell_{\cdot k})}{\operatorname{mean}(\ell_{\cdot k})}}_{\operatorname{pm}(\ell_{\cdot k})}
+\cdot\underbrace{\frac{\max(f_{\cdot k})}{\operatorname{mean}(f_{\cdot k})}}_{\operatorname{pm}(f_{\cdot k})}
+\cdot\underbrace{\frac{\operatorname{mean}(\ell_{\cdot k})\operatorname{mean}(f_{\cdot k})}{\operatorname{mean}(\theta)}}_{w_k}
+&&\text{(regroup)} .
+\end{aligned}
+$$
+
+The middle step is the only trick, and it is not much of one: the two
+$\operatorname{mean}$ terms are introduced solely so that each $\max$ can be
+paired with the matching $\operatorname{mean}$ to form a $\operatorname{pm}$,
+with whatever is left over collecting into $w_k$. Reading the chain end to end,
 
 $$
 \boxed{\;\operatorname{pm}(\ell_{\cdot k})\;\cdot\;\operatorname{pm}(f_{\cdot k})\;\cdot\;w_k
