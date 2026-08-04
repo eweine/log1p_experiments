@@ -20,9 +20,15 @@ exp_dir   <- path.expand("~/Documents/log1pNMF/inst/paper_figures/experiments")
 cells_dir <- file.path(exp_dir, "c_grid_sim")
 source(file.path(exp_dir, "c_grid_sim_common.R"))
 
+## Hoyer sparsity of a nonnegative vector: 0 if all entries are equal, 1 if one
+## entry carries everything.
 hoyer <- function(x) { x <- abs(x); n <- length(x)
   (sqrt(n) - sum(x)/sqrt(sum(x^2))) / (sqrt(n) - 1) }
-p2m <- function(x) max(x) / mean(x)          # peak-to-mean ratio
+
+## pm(): peak-to-mean. The ONLY summary used on this page. It takes a vector or
+## a matrix and returns one number, so pm(L[, k]) is a column's peak-to-mean and
+## pm(theta) is the whole matrix's.
+pm <- function(x) max(x) / mean(x)
 ```
 
 # The question
@@ -32,8 +38,8 @@ The factors come out visibly more or less sparse depending on which $c$ you used
 even though nothing about the data changed. What decides that?
 
 This page answers exactly that, and nothing else. It is about **Hoyer** sparsity
-— a continuous measure that does not require any exact zeros — expressed purely
-in terms of $Y$ and $c$.
+— a continuous measure that requires no exact zeros — expressed purely in terms
+of $Y$ and $c$.
 
 **The answer in one sentence.** The Hoyer sparsity that $L$ and $F$ can achieve
 is jointly capped by the *peak-to-mean ratio* of $\theta = \log(1+\lambda/c)$;
@@ -42,105 +48,135 @@ $1$ and $\lambda$'s own peak-to-mean.
 
 The rest of the page is that sentence in four steps.
 
+# Notation
+
+Only one summary statistic appears on this page, applied to different things.
+For any nonnegative vector or matrix $v$ with at least one positive entry,
+
+$$
+\operatorname{pm}(v) \;=\; \frac{\max(v)}{\operatorname{mean}(v)} \;\ge\; 1 ,
+$$
+
+the **peak-to-mean ratio**: how large the biggest entry is relative to a typical
+one. $\operatorname{pm}(v) = 1$ exactly when $v$ is constant.
+
+The objects it gets applied to:
+
+| symbol | shape | meaning |
+|---|---|---|
+| $Y$ | $n \times p$ | the observed counts |
+| $\lambda$ | $n \times p$ | the rates, $\mathbb{E}[Y]$ |
+| $\theta = \log(1+\lambda/c)$ | $n \times p$ | the linear predictor |
+| $L$, $F$ | $n\times K$, $p\times K$ | the factorization, $\theta = LF'$ |
+| $\ell_{\cdot k}$ | length $n$ | column $k$ of $L$ — every sample's loading on factor $k$ |
+| $f_{\cdot k}$ | length $p$ | column $k$ of $F$ — every feature's weight on factor $k$ |
+| $\ell_{i\cdot}$ | length $K$ | row $i$ of $L$ — sample $i$'s loadings across factors |
+
+So $\max(\ell_{\cdot k}) = \max_i \ell_{ik}$ is the largest loading any sample
+places on factor $k$, and $\operatorname{pm}(\ell_{\cdot k})$ is that divided by
+the average loading on factor $k$. Hoyer sparsity is always computed per column
+and then averaged over the $K$ columns, matching the earlier pages.
+
 # Step A: Hoyer sparsity is peak-to-mean in disguise
 
-For a nonnegative vector $x$ of length $n$,
+For a nonnegative vector $x$ of length $n$, Hoyer sparsity is
 
 $$
-H(x) = \frac{\sqrt{n} - \|x\|_1/\|x\|_2}{\sqrt{n}-1},
-\qquad\text{and write}\qquad
-P(x) = \frac{x_{\max}}{\bar{x}} .
+H(x) = \frac{\sqrt{n} - \|x\|_1/\|x\|_2}{\sqrt{n}-1} .
 $$
 
-$P$ asks a simple question: how big is the largest entry compared with a typical
-one? Now use $\|x\|_2^2 = \sum x_i^2 \le x_{\max}\sum x_i = \|x\|_\infty\|x\|_1$:
+Use $\|x\|_2^2 = \sum_i x_i^2 \le \max(x)\sum_i x_i = \|x\|_\infty\|x\|_1$, and
+note $\|x\|_1/\|x\|_\infty = n\,\operatorname{mean}(x)/\max(x) = n/\operatorname{pm}(x)$:
 
 $$
 \frac{\|x\|_1}{\|x\|_2} \;\ge\; \frac{\|x\|_1}{\sqrt{\|x\|_\infty\|x\|_1}}
-\;=\; \sqrt{\frac{\|x\|_1}{\|x\|_\infty}} \;=\; \sqrt{\frac{n}{P}},
+\;=\; \sqrt{\frac{\|x\|_1}{\|x\|_\infty}} \;=\; \sqrt{\frac{n}{\operatorname{pm}(x)}},
 $$
 
 and therefore
 
 $$
-\boxed{\;H(x) \;\le\; \frac{\sqrt{n}-\sqrt{n/P}}{\sqrt{n}-1} \;\approx\; 1 - \frac{1}{\sqrt{P}}\;}
+\boxed{\;H(x) \;\le\; \frac{\sqrt{n}-\sqrt{n/\operatorname{pm}(x)}}{\sqrt{n}-1}
+\;\approx\; 1 - \frac{1}{\sqrt{\operatorname{pm}(x)}}\;}
 $$
 
-This is the whole of Step A, and it is worth reading in words: **a vector can only
-be Hoyer-sparse if some of its entries stick far above its mean.** If $P = 1$
-every entry equals the mean, the vector is constant, and $H = 0$ — no matter how
-many entries there are and regardless of whether any are zero. Sparsity requires
-*range*, not zeros.
+In words: **a vector can only be Hoyer-sparse if some of its entries stick far
+above its mean.** If $\operatorname{pm}(x) = 1$ every entry equals the mean, the
+vector is constant, and $H(x) = 0$ — however many entries it has, and whether or
+not any of them are zero. Sparsity needs *range*, not zeros.
 
 ```{r stepA, fig.width=7, fig.height=3.4}
 set.seed(1); n <- 500
 sim <- do.call(rbind, lapply(seq(0, 1, length.out = 60), function(a) {
   do.call(rbind, lapply(1:8, function(r) {
     x <- (1 - a) + a * rexp(n)^2          # dial from constant to heavy-tailed
-    data.frame(P = p2m(x), H = hoyer(x)) }) ) }))
-curve <- data.frame(P = seq(1, max(sim$P), length.out = 300))
-curve$bound <- 1 - 1/sqrt(curve$P)
+    data.frame(pm = pm(x), H = hoyer(x)) }) ) }))
+curve <- data.frame(pm = seq(1, max(sim$pm), length.out = 300))
+curve$bound <- 1 - 1/sqrt(curve$pm)
 
-ggplot(sim, aes(P, H)) +
+ggplot(sim, aes(pm, H)) +
   geom_point(colour = "#0E8FA8", alpha = 0.5, size = 1.2) +
-  geom_line(data = curve, aes(P, bound), colour = "#C2410C", linewidth = 1) +
+  geom_line(data = curve, aes(pm, bound), colour = "#C2410C", linewidth = 1) +
   scale_x_log10() +
-  labs(x = "peak-to-mean  P = max / mean", y = "Hoyer sparsity",
+  labs(x = "pm(x)  =  max / mean", y = "Hoyer sparsity  H(x)",
        title = "Sparsity is bounded by peak-to-mean",
-       subtitle = "points: random nonnegative vectors.  line: 1 - 1/sqrt(P)")
+       subtitle = "points: random nonnegative vectors.   line: 1 - 1/sqrt(pm)")
 ```
 
 # Step B: L and F share a single budget
 
-The fit gives $\theta = LF'$ with $L, F \ge 0$. Fix a factor $k$, and let
-$i^\star$ be the sample with the largest loading on it and $j^\star$ the feature
-with the largest weight on it. Because **every term in the sum is nonnegative**
-we may throw all the others away:
+The fit gives $\theta = LF'$ with $L, F \ge 0$. Fix one factor $k$. Let
+$i^\star$ be the sample achieving $\max(\ell_{\cdot k})$ and $j^\star$ the
+feature achieving $\max(f_{\cdot k})$. Because **every term of the sum is
+nonnegative**, we may discard all but the $k$th:
 
 $$
-\theta_{\max} \;\ge\; \theta_{i^\star j^\star}
-= \sum_{m}\ell_{i^\star m}f_{j^\star m}
-\;\ge\; \ell^{\max}_k\, f^{\max}_k .
+\max(\theta) \;\ge\; \theta_{i^\star j^\star}
+\;=\; \sum_{m=1}^{K}\ell_{i^\star m}\,f_{j^\star m}
+\;\ge\; \ell_{i^\star k}\,f_{j^\star k}
+\;=\; \max(\ell_{\cdot k})\cdot\max(f_{\cdot k}) .
 $$
 
-The mean is $\bar\theta = \sum_m \bar\ell_m\bar f_m$. Let
-$w_k = \bar\ell_k\bar f_k/\bar\theta \in (0,1)$ be the share of $\bar\theta$
-contributed by factor $k$. Dividing the display by $\bar\theta$ and inserting
-$\bar\ell_k\bar f_k$ top and bottom,
+For the mean, the double average factorizes:
+$\operatorname{mean}(\theta) = \sum_{m}\operatorname{mean}(\ell_{\cdot m})\operatorname{mean}(f_{\cdot m})$.
+Let
 
 $$
-\boxed{\;P_L(k)\;\cdot\;P_F(k)\;\cdot\;w_k \;\;\le\;\; P_\theta\;}
-\qquad
-P_\theta=\frac{\theta_{\max}}{\bar\theta},\quad
-P_L(k)=\frac{\ell^{\max}_k}{\bar\ell_k},\quad
-P_F(k)=\frac{f^{\max}_k}{\bar f_k}.
+w_k \;=\; \frac{\operatorname{mean}(\ell_{\cdot k})\operatorname{mean}(f_{\cdot k})}{\operatorname{mean}(\theta)} \;\in\;(0,1)
 $$
 
-Read it as a **budget**. $P_\theta$ is how much peak-to-mean the fitted $\theta$
-has to spend. The two factors' peakedness multiply against it, so:
+be the share of $\operatorname{mean}(\theta)$ that factor $k$ contributes; the
+$w_k$ sum to one. Dividing the display by $\operatorname{mean}(\theta)$ and
+multiplying and dividing by $\operatorname{mean}(\ell_{\cdot k})\operatorname{mean}(f_{\cdot k})$:
 
-- they **trade**: at fixed $P_\theta$, making $L$ more peaked forces $F$ flatter;
-- they are **jointly capped**: neither can be peaked at all if $P_\theta$ is near
-  $1$, because the product cannot exceed it.
+$$
+\boxed{\;\operatorname{pm}(\ell_{\cdot k})\;\cdot\;\operatorname{pm}(f_{\cdot k})\;\cdot\;w_k
+\;\;\le\;\; \operatorname{pm}(\theta)\;}
+\qquad \text{for every factor } k .
+$$
 
-Combining with Step A, if $\theta$ has no range then neither factor can be
-Hoyer-sparse, and no choice of optimizer or initialization can change that.
+Read $\operatorname{pm}(\theta)$ as a **budget**: how much peak-to-mean the
+fitted $\theta$ has available. The two factors' peak-to-mean ratios enter
+*multiplicatively* against it, so
 
-This is also why the two things you may have noticed are not in conflict. Holding
-the data and $c$ fixed and moving between equally-good factorizations slides
-along the budget line — a trade. Changing $c$ moves the budget line itself — so
-both can rise together.
+- they **trade**: at fixed $\operatorname{pm}(\theta)$, making $\ell_{\cdot k}$
+  more peaked forces $f_{\cdot k}$ flatter;
+- they are **jointly capped**: if $\operatorname{pm}(\theta)$ is near $1$ then
+  neither can be peaked, since their product cannot exceed it.
+
+Combined with Step A: if $\theta$ has no range, neither factor can be
+Hoyer-sparse, and no optimizer or initialization can change that.
+
+This also reconciles the two behaviours you may have noticed. Holding the data
+and $c$ fixed and moving among equally-good factorizations slides *along* the
+budget constraint — a trade. Changing $c$ moves the constraint itself — so both
+can rise together.
 
 # Step C: c is what sets the budget
 
-Here is the crux. $\theta$ is not free: it is the rates seen through the link,
-
-$$
-\theta = \log\!\left(1+\frac{\lambda}{c}\right).
-$$
-
-Take five rates and never change them. Look at what $c$ does to their
-peak-to-mean:
+Here is the crux. $\theta$ is not free; it is the rates seen through the link,
+$\theta = \log(1+\lambda/c)$. Take five rates and never change them, then look at
+what $c$ does to their peak-to-mean:
 
 ```{r stepC-table}
 lam <- c(0.1, 0.5, 1, 5, 20)
@@ -148,54 +184,55 @@ cs  <- c(1e-3, 1e-2, 1e-1, 1, 10, 100, 1e3, Inf)
 knitr::kable(do.call(rbind, lapply(cs, function(cc) {
   th <- if (is.infinite(cc)) lam else log1p(lam/cc)
   data.frame(c = format(cc),
-             theta = paste(sprintf("%.3g", th), collapse = "  "),
-             P_theta = p2m(th), `sparsity cap` = 1 - 1/sqrt(p2m(th)),
+             `theta = log1p(lambda/c)` = paste(sprintf("%.3g", th), collapse = "  "),
+             `pm(theta)` = pm(th),
+             `sparsity cap 1-1/sqrt(pm)` = 1 - 1/sqrt(pm(th)),
              check.names = FALSE) })),
   digits = 3, row.names = FALSE,
-  caption = "The same five rates throughout. Only c changes.")
+  caption = "The same five rates in every row. Only c changes.")
 ```
 
-The rates never move. Their own peak-to-mean is `r round(p2m(lam), 2)`. But the
-budget the fit actually gets runs from about `r round(p2m(log1p(lam/1e-3)), 2)`
-at $c=10^{-3}$ up to `r round(p2m(lam), 2)` at $c=\infty$, and with it the
-sparsity cap roughly triples.
+The rates never move; their own peak-to-mean is
+$\operatorname{pm}(\lambda) = `r round(pm(lam), 2)`$. But the budget the fit
+actually receives runs from about `r round(pm(log1p(lam/1e-3)), 2)` at
+$c=10^{-3}$ up to `r round(pm(lam), 2)` at $c=\infty$, and the sparsity cap
+roughly triples with it.
 
-**Why.** For $c$ much smaller than the rates,
-$\log(1+\lambda/c)\approx \log(1/c) + \log\lambda$: every entry acquires the same
-large constant $\log(1/c)$, and a shared additive constant is exactly what
-destroys peak-to-mean. For $c$ much larger than the rates,
-$\log(1+\lambda/c)\approx\lambda/c$, a pure rescaling, which preserves
-peak-to-mean exactly. Formally
+**Why.** For $c$ well below the rates,
+$\log(1+\lambda/c)\approx \log(1/c) + \log\lambda$: every entry picks up the
+*same* large additive constant $\log(1/c)$, and a shared additive constant is
+exactly what destroys peak-to-mean. For $c$ well above the rates,
+$\log(1+\lambda/c)\approx\lambda/c$, a pure rescaling, which leaves peak-to-mean
+untouched. Formally, writing $\theta_c = \log(1+\lambda/c)$,
 
 $$
-P_\theta(c)\;\xrightarrow[c\to 0]{}\;1,
+\operatorname{pm}(\theta_c)\;\xrightarrow[c\to 0]{}\;1,
 \qquad
-P_\theta(c) - 1 \;\approx\; \frac{\log\lambda_{\max}-\overline{\log\lambda}}{\log(1/c)},
+\operatorname{pm}(\theta_c) - 1 \;\approx\; \frac{\log\max(\lambda)-\operatorname{mean}(\log\lambda)}{\log(1/c)},
 \qquad
-P_\theta(c)\;\xrightarrow[c\to\infty]{}\;\frac{\lambda_{\max}}{\bar\lambda}.
+\operatorname{pm}(\theta_c)\;\xrightarrow[c\to\infty]{}\;\operatorname{pm}(\lambda).
 $$
 
 ```{r stepC-plot, fig.width=6.5, fig.height=3.6}
 grid <- 10^seq(-4, 4, length.out = 200)
-d <- data.frame(c = grid,
-                P = sapply(grid, function(cc) p2m(log1p(lam/cc))))
-ggplot(d, aes(c, P)) +
-  geom_hline(yintercept = p2m(lam), linetype = "dashed", colour = "#C2410C") +
+d <- data.frame(c = grid, pm = sapply(grid, function(cc) pm(log1p(lam/cc))))
+ggplot(d, aes(c, pm)) +
+  geom_hline(yintercept = pm(lam), linetype = "dashed", colour = "#C2410C") +
   geom_hline(yintercept = 1, linetype = "dotted", colour = "grey50") +
   geom_line(colour = "#0E5C6B", linewidth = 1) +
   scale_x_log10() +
-  annotate("text", x = 1e3, y = p2m(lam), vjust = -0.7, size = 3.2,
-           colour = "#C2410C", label = "max/mean of the rates") +
+  annotate("text", x = 1e3, y = pm(lam), vjust = -0.7, size = 3.2,
+           colour = "#C2410C", label = "pm(lambda)") +
   annotate("text", x = 1e-4, y = 1, vjust = -0.7, hjust = 0, size = 3.2,
            colour = "grey35", label = "no range left") +
-  labs(x = "c", y = expression(P[theta]),
+  labs(x = "c", y = "pm(theta)",
        title = "The sparsity budget, as a function of c",
        subtitle = "same rates throughout; only the link changes")
 ```
 
 # Step D: the rates come from Y, not from c
 
-The last link is why we may treat $\lambda$ as given. The Poisson
+The last link is what lets us treat $\lambda$ as given. The Poisson
 log-likelihood is
 
 $$
@@ -203,12 +240,12 @@ $$
 $$
 
 which contains **no $c$ anywhere**. $c$ appears only in the feasible set — which
-rate matrices are reachable, namely those with $\log(1+\lambda/c)$ of nonnegative
-rank $K$. So $c$ does not change what a good set of rates is; the fitted rates
-are governed by $Y$.
+rate matrices are reachable, namely those for which $\log(1+\lambda/c)$ has
+nonnegative rank $K$. So $c$ does not change what a good set of rates is; the
+fitted rates are governed by $Y$.
 
-That means $\lambda$ can be estimated from $Y$ before fitting anything. The
-crudest estimate suffices for this purpose — the rank-1 independence model
+That means $\lambda$ can be estimated from $Y$ before fitting anything, and for
+this purpose the crudest estimate is enough — the rank-1 independence model
 
 $$
 m_{ij} = \frac{y_{i\cdot}\,y_{\cdot j}}{y_{\cdot\cdot}} .
@@ -219,28 +256,29 @@ $$
 Given $Y$ and a candidate $c$, with no model fitted:
 
 1. $m_{ij} = y_{i\cdot}y_{\cdot j}/y_{\cdot\cdot}$
-2. $P_\theta(c) = \max_{ij}\log(1+m_{ij}/c) \big/ \overline{\log(1+m/c)}$
-3. sparsity cap $\approx 1 - 1/\sqrt{P_\theta(c)}$, shared between $L$ and $F$
+2. compute $\operatorname{pm}\bigl(\log(1+m/c)\bigr)$
+3. the joint sparsity cap is $\approx 1 - 1/\sqrt{\operatorname{pm}}$, shared
+   between $L$ and $F$
 
-If $P_\theta(c)$ is near 1, sparse factors are unobtainable at that $c$ and any
-sparsity you do see is an artifact of the optimizer's path.
+If $\operatorname{pm}$ comes out near 1, sparse factors are unavailable at that
+$c$, and whatever sparsity a fit reports is an artifact of the optimizer's path.
 
 ```{r recipe}
 sparsity_budget <- function(Y, c) {
-  m  <- outer(rowSums(Y), colSums(Y)) / sum(Y)
+  m  <- outer(rowSums(Y), colSums(Y)) / sum(Y)   # rank-1 estimate of the rates
   th <- if (is.infinite(c)) m else log1p(m / c)
-  P  <- max(th) / mean(th)
-  c(P_theta = P, cap = 1 - 1/sqrt(P))
+  c(pm_theta = pm(th), cap = 1 - 1/sqrt(pm(th)))
 }
-Y <- sim_dataset(1, 1)$Y                       # any count matrix
+Y <- sim_dataset(1, 1)$Y                          # any count matrix
 round(t(sapply(C_GRID, function(cc) c(c = cc, sparsity_budget(Y, cc)))), 3)
 ```
 
 # Does it hold on real fits?
 
-Against the 640 fits from the [c-grid simulation](c_grid_sim.html): the budget
-inequality of Step B should never be violated, and if the argument is right it
-should be roughly *tight* — the optimizer should spend what it is given.
+Against the 640 fits from the [c-grid simulation](c_grid_sim.html). The Step B
+inequality should never be violated, and if the argument is explanatory rather
+than merely true it should be roughly *tight* — the optimizer should spend what
+it is given.
 
 ```{r verify, cache=TRUE}
 ver <- do.call(rbind, lapply(C_GRID, function(cf) {
@@ -251,13 +289,14 @@ ver <- do.call(rbind, lapply(C_GRID, function(cf) {
     L <- x$fits$rank1$LL; Fm <- x$fits$rank1$FF
     th <- tcrossprod(L, Fm) / max(1, if (is.infinite(cf)) 1 else cf)
     w  <- colMeans(L) * colMeans(Fm); w <- w / sum(w)
-    PL <- apply(L, 2, p2m); PF <- apply(Fm, 2, p2m)
-    c(`predicted P (from Y,c)` = unname(sparsity_budget(Yd, cf)["P_theta"]),
-      `actual P of theta-hat`  = p2m(th),
-      `P_L P_F w`              = max(PL * PF * w),
-      `Hoyer L`                = mean(apply(L,  2, hoyer)),
-      `Hoyer F`                = mean(apply(Fm, 2, hoyer)),
-      violations               = sum(PL * PF * w > p2m(th) * (1 + 1e-8)))
+    pmL <- apply(L,  2, pm)          # pm(l_.k) for each factor k
+    pmF <- apply(Fm, 2, pm)          # pm(f_.k) for each factor k
+    c(`pm predicted from Y,c`  = unname(sparsity_budget(Yd, cf)["pm_theta"]),
+      `pm(theta) of the fit`   = pm(th),
+      `pm(l)pm(f)w, worst k`   = max(pmL * pmF * w),
+      `mean H(l_.k)`           = mean(apply(L,  2, hoyer)),
+      `mean H(f_.k)`           = mean(apply(Fm, 2, hoyer)),
+      violations               = sum(pmL * pmF * w > pm(th) * (1 + 1e-8)))
   }))
   as.data.frame(t(c(c_fit = cf, colMeans(r))))
 }))
@@ -266,13 +305,13 @@ knitr::kable(ver, digits = c(3, 2, 2, 2, 3, 3, 0), row.names = FALSE)
 
 Three things to check in that table.
 
-**The inequality is never violated** — as it must not be, being an identity plus
+**The inequality is never violated**, as it must not be, being an identity plus
 nonnegativity.
 
-**It is tight.** `P_L P_F w` sits just under `actual P of theta-hat` in every
-row. The fits use their whole budget, which is what makes the bound explanatory
-rather than merely true: at small $c$ the optimizer is not failing to find sparse
-factors, there are none to find.
+**It is tight.** The `pm(l)pm(f)w` column sits just under `pm(theta) of the fit`
+in every row. The fits use their whole budget, which is what makes the bound
+explanatory: at small $c$ the optimizer is not failing to find sparse factors,
+there are none to find.
 
 **The budget predicted from $Y$ and $c$ alone tracks the realized one**, so the
 whole chain can be evaluated before fitting.
@@ -282,23 +321,24 @@ lab <- ifelse(is.infinite(ver$c_fit), "∞",
               format(ver$c_fit, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))
 ver$cf <- factor(lab, levels = lab)
 long <- rbind(
-  data.frame(cf = ver$cf, what = "budget P (theta)", v = ver$`actual P of theta-hat`),
-  data.frame(cf = ver$cf, what = "spent  P_L P_F w", v = ver$`P_L P_F w`))
+  data.frame(cf = ver$cf, what = "budget:  pm(theta)",   v = ver$`pm(theta) of the fit`),
+  data.frame(cf = ver$cf, what = "spent:   pm(l)pm(f)w", v = ver$`pm(l)pm(f)w, worst k`))
 p1 <- ggplot(long, aes(cf, v, colour = what, group = what)) +
   geom_line(linewidth = 1) + geom_point(size = 2) +
   scale_colour_manual(values = c("#0E5C6B", "#C2410C"), name = NULL) +
   labs(x = "c used for fitting", y = "peak-to-mean",
        title = "The budget, and what the fit spends") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
-p2 <- ggplot(ver, aes(`actual P of theta-hat`)) +
-  geom_line(aes(y = `Hoyer L`, colour = "L"), linewidth = 1) +
-  geom_line(aes(y = `Hoyer F`, colour = "F"), linewidth = 1) +
-  geom_line(aes(y = 1 - 1/sqrt(`actual P of theta-hat`), colour = "cap"),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+        legend.text = element_text(size = 8))
+p2 <- ggplot(ver, aes(`pm(theta) of the fit`)) +
+  geom_line(aes(y = `mean H(l_.k)`, colour = "H(l)"), linewidth = 1) +
+  geom_line(aes(y = `mean H(f_.k)`, colour = "H(f)"), linewidth = 1) +
+  geom_line(aes(y = 1 - 1/sqrt(`pm(theta) of the fit`), colour = "cap"),
             linetype = "dashed", linewidth = 0.8) +
-  scale_colour_manual(values = c(L = "#0E8FA8", F = "#C2410C", cap = "grey40"),
-                      name = NULL) +
+  scale_colour_manual(values = c(`H(l)` = "#0E8FA8", `H(f)` = "#C2410C",
+                                 cap = "grey40"), name = NULL) +
   scale_x_log10() +
-  labs(x = expression(P[theta]), y = "mean Hoyer sparsity",
+  labs(x = "pm(theta)", y = "mean Hoyer sparsity",
        title = "Both factors rise with the budget")
 plot_grid(p1, p2, nrow = 1)
 ```
@@ -308,19 +348,18 @@ plot_grid(p1, p2, nrow = 1)
 - **Compute `sparsity_budget(Y, c)` before you fit.** It costs nothing and tells
   you whether sparse factors are even available at that $c$.
 - **Do not compare sparsity across $c$.** "The $c=0.01$ factors are denser than
-  the $c=10$ factors" is a statement about $\log(1+\cdot/c)$, not about the data.
-  The budgets differ, so the comparison is meaningless.
-- **Do compare things that depend on $LF'$** — fitted rates, held-out
+  the $c=10$ factors" is a statement about $\log(1+\cdot/c)$, not about the data:
+  the budgets differ, so the comparison is meaningless.
+- **Do compare quantities that depend on $LF'$** — fitted rates, held-out
   log-likelihood, which samples resemble which. Those do not depend on how the
   budget was split.
-- **If sparsity is scientifically important, impose it.** The likelihood will not
+- **If sparsity matters scientifically, impose it.** The likelihood will not
   choose it for you; only a penalty, a prior, or an anchor assumption will.
 
 A companion page,
 [Non-identifiability of the log1p factorization](log1p_identifiability.html),
-covers the other half of the story: for a *fixed* budget, exactly which
-factorizations are equally likely and how sparsity moves between $L$ and $F$
-along that constraint.
+covers the other half: for a *fixed* budget, exactly which factorizations are
+equally likely, and how sparsity moves between $L$ and $F$ along that constraint.
 
 ```{r session}
 sessionInfo()
