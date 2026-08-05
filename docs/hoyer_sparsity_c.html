@@ -508,6 +508,12 @@ The following chunks had caches available:
 A3-check
 </li>
 <li>
+corr-plot
+</li>
+<li>
+corr-verify
+</li>
+<li>
 stepB-columns
 </li>
 <li>
@@ -543,15 +549,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree88c64a63c6e7267d73f867fcb8c76718f9b0d707targetblank88c64a6a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb87e08a66f77b7d415f191b37a73ea552308d241targetblankb87e08aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/88c64a63c6e7267d73f867fcb8c76718f9b0d707" target="_blank">88c64a6</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/b87e08a66f77b7d415f191b37a73ea552308d241" target="_blank">b87e08a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree88c64a63c6e7267d73f867fcb8c76718f9b0d707targetblank88c64a6a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb87e08a66f77b7d415f191b37a73ea552308d241targetblankb87e08aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -561,7 +567,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/88c64a63c6e7267d73f867fcb8c76718f9b0d707" target="_blank">88c64a6</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/b87e08a66f77b7d415f191b37a73ea552308d241" target="_blank">b87e08a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -625,6 +631,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/b87e08a66f77b7d415f191b37a73ea552308d241/analysis/hoyer_sparsity_c.Rmd" target="_blank">b87e08a</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Add the companion result: the budget also forces the factors apart
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/87d8492f7f8a40449a06398f97d2eb5cc611b358/docs/hoyer_sparsity_c.html" target="_blank">87d8492</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -833,7 +873,11 @@ hoyer &lt;- function(x) { x &lt;- abs(x); n &lt;- length(x)
 ## pm(): peak-to-mean. The ONLY summary used on this page. It takes a vector or
 ## a matrix and returns one number, so pm(L[, k]) is a column&#39;s peak-to-mean and
 ## pm(theta) is the whole matrix&#39;s.
-pm &lt;- function(x) max(x) / mean(x)</code></pre>
+pm &lt;- function(x) max(x) / mean(x)
+
+## Axis labels for values of c, with Inf spelled as the symbol.
+fmtc &lt;- function(v) ifelse(is.infinite(v), &quot;∞&quot;,
+  format(v, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))</code></pre>
 <div id="the-question" class="section level1">
 <h1>The question</h1>
 <p>You have a count matrix <span class="math inline">\(Y\)</span>. You
@@ -842,11 +886,12 @@ class="math inline">\(c\)</span>. The factors come out visibly more or
 less sparse depending on which <span class="math inline">\(c\)</span>
 you used, even though nothing about the data changed. What decides
 that?</p>
-<p>This page answers exactly that, and nothing else. It is about
-<strong>Hoyer</strong> sparsity — a continuous measure that requires no
-exact zeros — expressed purely in terms of <span
-class="math inline">\(Y\)</span> and <span
-class="math inline">\(c\)</span>.</p>
+<p>This page answers that question. It is about <strong>Hoyer</strong>
+sparsity — a continuous measure that requires no exact zeros — expressed
+purely in terms of <span class="math inline">\(Y\)</span> and <span
+class="math inline">\(c\)</span>. A companion section at the end shows
+that the same budget also decides how mutually correlated the fitted
+factors are.</p>
 <p><strong>The answer in one sentence.</strong> The Hoyer sparsity that
 <span class="math inline">\(L\)</span> and <span
 class="math inline">\(F\)</span> can achieve is jointly capped by the
@@ -1416,8 +1461,6 @@ by declining to say how the allowance is split.</p>
        title = &quot;Every column obeys the hyperbola&quot;,
        subtitle = &quot;3,840 factor-columns; points must lie above the line&quot;)
 
-fmtc &lt;- function(v) ifelse(is.infinite(v), &quot;∞&quot;,
-  format(v, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))
 SHOW &lt;- c(1e-3, 1, 100, Inf)
 sub  &lt;- col[col$c_fit %in% SHOW, ]
 sub$panel &lt;- factor(paste(&quot;c_fit =&quot;, fmtc(sub$c_fit)),
@@ -1926,6 +1969,335 @@ Eric Weine
 </table>
 </div>
 </div>
+</div>
+<div id="a-companion-small-c-also-forces-the-factors-apart"
+class="section level1">
+<h1>A companion: small c also forces the factors apart</h1>
+<p>Sparsity is not the only thing that moves with <span
+class="math inline">\(c\)</span>. In the <a
+href="c_grid_sim.html">c-grid simulation</a> the mean pairwise
+correlation <em>among</em> the <span class="math inline">\(K\)</span>
+fitted factors — a measure of how separated they are, not of how
+accurate they are — runs from about <span
+class="math inline">\(-0.35\)</span> at <span
+class="math inline">\(c=10^{-3}\)</span> to about <span
+class="math inline">\(-0.03\)</span> at <span
+class="math inline">\(c=\infty\)</span>, even though the factors that
+generated the data are mutually uncorrelated. The fits at small <span
+class="math inline">\(c\)</span> are strongly anti-correlated for a
+reason that has nothing to do with the truth, and it is the same budget
+argument.</p>
+<p><strong>The mechanism.</strong> Row <span
+class="math inline">\(i\)</span> of <span
+class="math inline">\(\theta\)</span> is a <em>nonnegative</em>
+combination of the factors, <span
+class="math inline">\(\theta_{i\cdot}=\sum_k \ell_{ik}f_{\cdot
+k}\)</span>. Center it over <span class="math inline">\(j\)</span>; the
+row means drop out and</p>
+<p><span class="math display">\[
+\sum_k \ell_{ik}\,\tilde f_{\cdot k} \;=\; \tilde\theta_{i\cdot},
+\qquad \tilde f_{\cdot k}=f_{\cdot k}-\operatorname{mean}(f_{\cdot
+k})\mathbf{1}.
+\]</span></p>
+<p>When <span class="math inline">\(c\)</span> is small <span
+class="math inline">\(\theta\)</span> is nearly constant, so the
+right-hand side is nearly zero — and <span
+class="math inline">\(K\)</span> vectors whose <em>positive</em>
+combination is near zero cannot be mutually uncorrelated. They are
+pushed apart.</p>
+<p><strong>The identity.</strong> Write <span
+class="math inline">\(s_k=\|\tilde f_{\cdot k}\|\)</span>, <span
+class="math inline">\(v_k=\tilde f_{\cdot k}/s_k\)</span> and <span
+class="math inline">\(a_{ik}=\ell_{ik}s_k\ge 0\)</span>, so that <span
+class="math inline">\(\tilde\theta_{i\cdot}=\sum_k a_{ik}v_k\)</span>
+and <span class="math inline">\(\langle
+v_k,v_{k&#39;}\rangle=\rho_{kk&#39;}\)</span> is exactly the Pearson
+correlation between factors <span class="math inline">\(k\)</span> and
+<span class="math inline">\(k&#39;\)</span>. Expanding the squared norm
+and summing over rows,</p>
+<p><span class="math display">\[
+\underbrace{\sum_i\|\tilde\theta_{i\cdot}\|^2}_{E}
+=\underbrace{\sum_{i,k}a_{ik}^2}_{A}
++\sum_{k\neq k&#39;}\Bigl(\sum_i a_{ik}a_{ik&#39;}\Bigr)\rho_{kk&#39;} .
+\]</span></p>
+<p>The weights <span class="math inline">\(\sum_i
+a_{ik}a_{ik&#39;}\)</span> are nonnegative and sum to <span
+class="math inline">\(B-A\)</span>, where <span
+class="math inline">\(B=\sum_i(\sum_k a_{ik})^2\)</span>. So the
+weighted mean pairwise correlation of the factors is not merely bounded
+— it is <em>determined</em>:</p>
+<p><span class="math display">\[
+\boxed{\;\bar\rho \;=\; \frac{E-A}{B-A}\;}
+\]</span></p>
+<p><strong>The floor.</strong> By Cauchy–Schwarz within each row, <span
+class="math inline">\((\sum_k a_{ik})^2\le K\sum_k a_{ik}^2\)</span>, so
+<span class="math inline">\(B\le KA\)</span>; since <span
+class="math inline">\(A/(B-A)\)</span> is increasing in <span
+class="math inline">\(A\)</span> this gives <span
+class="math inline">\(A/(B-A)\ge 1/(K-1)\)</span> and therefore</p>
+<p><span class="math display">\[
+\bar\rho \;\le\; -\frac{1}{K-1} \;+\; \frac{E}{B-A}
+\qquad\xrightarrow[\;E\to 0\;]{}\qquad -\frac{1}{K-1} .
+\]</span></p>
+<p><span class="math inline">\(E\)</span> is the row-centered variation
+of <span class="math inline">\(\theta\)</span> — the same spread that
+<span class="math inline">\(c\)</span> controls in Step C, here in
+squared-Frobenius rather than peak-to-mean form. As the budget vanishes
+the factors are driven to the algebraic floor <span
+class="math inline">\(-1/(K-1)\)</span>, which is <span
+class="math inline">\(-0.5\)</span> at <span
+class="math inline">\(K=3\)</span>. (The same algebra is why Dirichlet
+loadings, whose rows sum exactly to one, have mean pairwise correlation
+<span class="math inline">\(\approx-1/(K-1)\)</span> — and the true
+<span class="math inline">\(L\)</span> here measures <span
+class="math inline">\(-0.44\)</span>.)</p>
+<p>Two caveats before the numbers. <span
+class="math inline">\(B&gt;A\)</span> requires that some row load on
+more than one factor, which fails only for an exactly block-structured
+factorization. And <span class="math inline">\(\bar\rho\)</span>
+constrains the factors <em>collectively</em>: it is a weighted average,
+so it says nothing about any named pair.</p>
+<pre class="r"><code>cors &lt;- do.call(rbind, lapply(list.files(cells_dir, &quot;\\.rds$&quot;, full.names = TRUE),
+  function(f) {
+    x &lt;- readRDS(f)
+    if (is.data.frame(x)) return(NULL)        # the metrics file lives here too
+    rt &lt;- cor(x$FF_true)                      # the truth, for reference
+    do.call(rbind, lapply(names(x$fits), function(init) {
+      L &lt;- x$fits[[init]]$LL; Fm &lt;- x$fits[[init]]$FF; K &lt;- ncol(L)
+      th &lt;- tcrossprod(L, Fm)
+      Fc &lt;- sweep(Fm, 2, colMeans(Fm))                # centered factors
+      a  &lt;- sweep(L, 2, sqrt(colSums(Fc^2)), &quot;*&quot;)     # a_ik = l_ik ||f~_.k||
+      A  &lt;- sum(a^2); B &lt;- sum(rowSums(a)^2)
+      E  &lt;- sum((th - rowMeans(th))^2)                # row-centered variation
+      rp &lt;- cor(Fm); rs &lt;- cor(Fm, method = &quot;spearman&quot;)
+      data.frame(
+        c_fit = as.numeric(sub(&quot;.*_cfit&quot;, &quot;&quot;, sub(&quot;\\.rds$&quot;, &quot;&quot;, basename(f)))),
+        init = init, K = K, floor = -1/(K - 1),
+        rho_bar = (E - A)/(B - A), slack = E/(B - A),
+        pearson = mean(rp[upper.tri(rp)]), spearman = mean(rs[upper.tri(rs)]),
+        truth = mean(rt[upper.tri(rt)]))
+    }))
+  }))
+
+r1  &lt;- cors[cors$init == &quot;rank1&quot;, ]
+agg &lt;- do.call(rbind, lapply(sort(unique(r1$c_fit)), function(cc) {
+  g &lt;- r1[r1$c_fit == cc, ]
+  data.frame(c_fit = cc, `rho-bar (identity)` = mean(g$rho_bar),
+             `E/(B-A)` = mean(g$slack), `bound` = mean(g$floor + g$slack),
+             `floor -1/(K-1)` = g$floor[1], `measured Pearson` = mean(g$pearson),
+             `measured Spearman` = mean(g$spearman),
+             `true factors` = mean(g$truth), check.names = FALSE)
+}))
+knitr::kable(agg, digits = 3, row.names = FALSE)</code></pre>
+<table>
+<colgroup>
+<col width="5%" />
+<col width="18%" />
+<col width="7%" />
+<col width="6%" />
+<col width="14%" />
+<col width="16%" />
+<col width="17%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">c_fit</th>
+<th align="right">rho-bar (identity)</th>
+<th align="right">E/(B-A)</th>
+<th align="right">bound</th>
+<th align="right">floor -1/(K-1)</th>
+<th align="right">measured Pearson</th>
+<th align="right">measured Spearman</th>
+<th align="right">true factors</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1e-03</td>
+<td align="right">-0.336</td>
+<td align="right">0.362</td>
+<td align="right">-0.138</td>
+<td align="right">-0.5</td>
+<td align="right">-0.316</td>
+<td align="right">-0.346</td>
+<td align="right">0.006</td>
+</tr>
+<tr class="even">
+<td align="right">1e-02</td>
+<td align="right">-0.297</td>
+<td align="right">0.435</td>
+<td align="right">-0.065</td>
+<td align="right">-0.5</td>
+<td align="right">-0.283</td>
+<td align="right">-0.327</td>
+<td align="right">0.006</td>
+</tr>
+<tr class="odd">
+<td align="right">1e-01</td>
+<td align="right">-0.213</td>
+<td align="right">0.619</td>
+<td align="right">0.119</td>
+<td align="right">-0.5</td>
+<td align="right">-0.208</td>
+<td align="right">-0.279</td>
+<td align="right">0.006</td>
+</tr>
+<tr class="even">
+<td align="right">1e+00</td>
+<td align="right">-0.118</td>
+<td align="right">1.087</td>
+<td align="right">0.587</td>
+<td align="right">-0.5</td>
+<td align="right">-0.117</td>
+<td align="right">-0.234</td>
+<td align="right">0.006</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+01</td>
+<td align="right">-0.053</td>
+<td align="right">1.942</td>
+<td align="right">1.442</td>
+<td align="right">-0.5</td>
+<td align="right">-0.054</td>
+<td align="right">-0.233</td>
+<td align="right">0.006</td>
+</tr>
+<tr class="even">
+<td align="right">1e+02</td>
+<td align="right">-0.032</td>
+<td align="right">2.447</td>
+<td align="right">1.947</td>
+<td align="right">-0.5</td>
+<td align="right">-0.034</td>
+<td align="right">-0.205</td>
+<td align="right">0.006</td>
+</tr>
+<tr class="odd">
+<td align="right">1e+03</td>
+<td align="right">-0.029</td>
+<td align="right">2.531</td>
+<td align="right">2.031</td>
+<td align="right">-0.5</td>
+<td align="right">-0.031</td>
+<td align="right">-0.200</td>
+<td align="right">0.006</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">-0.028</td>
+<td align="right">2.541</td>
+<td align="right">2.041</td>
+<td align="right">-0.5</td>
+<td align="right">-0.031</td>
+<td align="right">-0.200</td>
+<td align="right">0.006</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>cat(&quot;identity below the bound:&quot;, sum(cors$rho_bar &lt;= cors$floor + cors$slack + 1e-9),
+    &quot;  above the floor:&quot;, sum(cors$rho_bar &gt;= cors$floor - 1e-9),
+    &quot;of&quot;, nrow(cors), &quot;fits\n&quot;)</code></pre>
+<pre><code>identity below the bound: 1280   above the floor: 1280 of 1280 fits</code></pre>
+<pre class="r"><code>cat(&quot;max |identity - measured Pearson|:&quot;, round(max(abs(cors$rho_bar - cors$pearson)), 3), &quot;\n&quot;)</code></pre>
+<pre><code>max |identity - measured Pearson|: 0.081 </code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>The identity tracks the plainly-measured pairwise Pearson correlation
+to about two decimals across the whole grid, so the quantity in the
+theory is essentially the quantity in the figures — even though one is
+weighted by <span class="math inline">\(a_{ik}a_{ik&#39;}\)</span> and
+the other is not. The true factors sit at <span
+class="math inline">\(\approx 0\)</span>, confirming that the
+anti-correlation at small <span class="math inline">\(c\)</span> is
+manufactured by the budget rather than inherited from the data.</p>
+<pre class="r"><code>lv   &lt;- fmtc(sort(unique(cors$c_fit)))
+long &lt;- rbind(
+  data.frame(cf = fmtc(agg$c_fit), what = &quot;rho-bar (identity)&quot;, v = agg$`rho-bar (identity)`),
+  data.frame(cf = fmtc(agg$c_fit), what = &quot;measured Pearson&quot;,   v = agg$`measured Pearson`),
+  data.frame(cf = fmtc(agg$c_fit), what = &quot;measured Spearman&quot;,  v = agg$`measured Spearman`))
+long$cf &lt;- factor(long$cf, levels = lv)
+stopifnot(!any(is.na(long$cf)))
+qA &lt;- ggplot(long, aes(cf, v, colour = what, group = what)) +
+  geom_hline(yintercept = cors$floor[1], linetype = &quot;dashed&quot;, colour = &quot;#C2410C&quot;) +
+  geom_line(linewidth = 0.9) + geom_point(size = 2) +
+  annotate(&quot;text&quot;, x = 1, y = cors$floor[1], vjust = -0.6, hjust = 0, size = 3.1,
+           colour = &quot;#C2410C&quot;, label = &quot;floor  -1/(K-1)&quot;) +
+  scale_colour_manual(name = NULL,
+    values = c(`rho-bar (identity)` = &quot;#0E5C6B&quot;, `measured Pearson` = &quot;#0E8FA8&quot;,
+               `measured Spearman` = &quot;#B45309&quot;)) +
+  labs(x = &quot;c used for fitting&quot;, y = &quot;mean pairwise correlation of the factors&quot;,
+       title = &quot;Small c forces the factors apart&quot;) +
+  theme(legend.text = element_text(size = 8))
+
+line &lt;- data.frame(x = 10^seq(-3, log10(max(cors$slack)), length.out = 300))
+line$y &lt;- cors$floor[1] + line$x
+qB &lt;- ggplot(cors, aes(slack, rho_bar)) +
+  geom_line(data = line, aes(x, y), colour = &quot;#C2410C&quot;, linewidth = 0.9) +
+  geom_hline(yintercept = cors$floor[1], linetype = &quot;dashed&quot;, colour = &quot;grey45&quot;) +
+  geom_point(colour = &quot;#0E8FA8&quot;, alpha = 0.3, size = 0.9) +
+  scale_x_log10() + coord_cartesian(ylim = c(-0.55, 0.15)) +
+  annotate(&quot;text&quot;, x = 1.4e-3, y = cors$floor[1], vjust = -0.6, hjust = 0,
+           size = 3.1, colour = &quot;grey35&quot;, label = &quot;floor  -1/(K-1)&quot;) +
+  labs(x = &quot;E / (B - A)   — the term c controls&quot;, y = &quot;mean pairwise correlation&quot;,
+       title = &quot;Everything sits between the floor and the bound&quot;,
+       subtitle = &quot;line: -1/(K-1) + E/(B-A).   dashed: the floor it decays to&quot;)
+plot_grid(qA, qB, nrow = 1)</code></pre>
+<img src="figure/hoyer_sparsity_c.Rmd/corr-plot-1.png" alt="" width="1045" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p><strong>How much this is worth.</strong> The <em>identity</em> is
+exact and informative everywhere: it says the mean pairwise correlation
+of the factors is a deterministic function of how flat <span
+class="math inline">\(\theta\)</span> is, which is a function of <span
+class="math inline">\(c\)</span>. The <em>bound</em> is only non-vacuous
+at <span class="math inline">\(c\le 0.01\)</span> here — the term <span
+class="math inline">\(E/(B-A)\)</span> exceeds <span
+class="math inline">\(1/(K-1)\)</span> as soon as <span
+class="math inline">\(\theta\)</span> has any real range, and then <span
+class="math inline">\(-1/(K-1)+E/(B-A)\)</span> is above zero and says
+nothing. So the floor explains the small-<span
+class="math inline">\(c\)</span> end and not the large-<span
+class="math inline">\(c\)</span> end.</p>
+<p>The result is also about <strong>Pearson</strong> correlation.
+Spearman, which is what the simulation page plots, agrees closely at
+small <span class="math inline">\(c\)</span> (<span
+class="math inline">\(-0.35\)</span> against <span
+class="math inline">\(-0.34\)</span>) but departs at large <span
+class="math inline">\(c\)</span> (<span
+class="math inline">\(-0.20\)</span> against <span
+class="math inline">\(-0.03\)</span>), where ties and skew from the now
+very sparse factors dominate the ranks. That gap is a sparsity artifact,
+not a budget one.</p>
+<p>Finally, this is about how separated the fitted factors are from
+<em>each other</em>, which is a different question from whether they are
+<em>correct</em>. Accuracy against the true factors peaks sharply at
+<span class="math inline">\(c_{\text{fit}}=c_{\text{true}}\)</span> and
+is a misspecification story, not a budget story.</p>
 </div>
 <div id="what-to-do-with-this" class="section level1">
 <h1>What to do with this</h1>
