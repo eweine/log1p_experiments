@@ -29,6 +29,10 @@ hoyer <- function(x) { x <- abs(x); n <- length(x)
 ## a matrix and returns one number, so pm(L[, k]) is a column's peak-to-mean and
 ## pm(theta) is the whole matrix's.
 pm <- function(x) max(x) / mean(x)
+
+## Axis labels for values of c, with Inf spelled as the symbol.
+fmtc <- function(v) ifelse(is.infinite(v), "∞",
+  format(v, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))
 ```
 
 # The question
@@ -37,9 +41,10 @@ You have a count matrix $Y$. You fit the log1p model at several values of $c$.
 The factors come out visibly more or less sparse depending on which $c$ you used,
 even though nothing about the data changed. What decides that?
 
-This page answers exactly that, and nothing else. It is about **Hoyer** sparsity
-— a continuous measure that requires no exact zeros — expressed purely in terms
-of $Y$ and $c$.
+This page answers that question. It is about **Hoyer** sparsity — a continuous
+measure that requires no exact zeros — expressed purely in terms of $Y$ and $c$.
+A companion section at the end shows that the same budget also decides how
+mutually correlated the fitted factors are.
 
 **The answer in one sentence.** The Hoyer sparsity that $L$ and $F$ can achieve
 is jointly capped by the *peak-to-mean ratio* of $\theta = \log(1+\lambda/c)$;
@@ -406,8 +411,6 @@ pA <- ggplot(col, aes(rhs, dL * dF)) +
        title = "Every column obeys the hyperbola",
        subtitle = "3,840 factor-columns; points must lie above the line")
 
-fmtc <- function(v) ifelse(is.infinite(v), "∞",
-  format(v, scientific = FALSE, trim = TRUE, drop0trailing = TRUE))
 SHOW <- c(1e-3, 1, 100, Inf)
 sub  <- col[col$c_fit %in% SHOW, ]
 sub$panel <- factor(paste("c_fit =", fmtc(sub$c_fit)),
@@ -614,6 +617,169 @@ p2 <- ggplot(ver, aes(`pm(theta) of the fit`)) +
        title = "Both factors rise with the budget")
 plot_grid(p1, p2, nrow = 1)
 ```
+
+# A companion: small c also forces the factors apart
+
+Sparsity is not the only thing that moves with $c$. In the
+[c-grid simulation](c_grid_sim.html) the mean pairwise correlation *among* the
+$K$ fitted factors — a measure of how separated they are, not of how accurate
+they are — runs from about $-0.35$ at $c=10^{-3}$ to about $-0.03$ at
+$c=\infty$, even though the factors that generated the data are mutually
+uncorrelated. The fits at small $c$ are strongly anti-correlated for a reason
+that has nothing to do with the truth, and it is the same budget argument.
+
+**The mechanism.** Row $i$ of $\theta$ is a *nonnegative* combination of the
+factors, $\theta_{i\cdot}=\sum_k \ell_{ik}f_{\cdot k}$. Center it over $j$; the
+row means drop out and
+
+$$
+\sum_k \ell_{ik}\,\tilde f_{\cdot k} \;=\; \tilde\theta_{i\cdot},
+\qquad \tilde f_{\cdot k}=f_{\cdot k}-\operatorname{mean}(f_{\cdot k})\mathbf{1}.
+$$
+
+When $c$ is small $\theta$ is nearly constant, so the right-hand side is nearly
+zero — and $K$ vectors whose *positive* combination is near zero cannot be
+mutually uncorrelated. They are pushed apart.
+
+**The identity.** Write $s_k=\|\tilde f_{\cdot k}\|$, $v_k=\tilde f_{\cdot k}/s_k$
+and $a_{ik}=\ell_{ik}s_k\ge 0$, so that $\tilde\theta_{i\cdot}=\sum_k a_{ik}v_k$
+and $\langle v_k,v_{k'}\rangle=\rho_{kk'}$ is exactly the Pearson correlation
+between factors $k$ and $k'$. Expanding the squared norm and summing over rows,
+
+$$
+\underbrace{\sum_i\|\tilde\theta_{i\cdot}\|^2}_{E}
+=\underbrace{\sum_{i,k}a_{ik}^2}_{A}
++\sum_{k\neq k'}\Bigl(\sum_i a_{ik}a_{ik'}\Bigr)\rho_{kk'} .
+$$
+
+The weights $\sum_i a_{ik}a_{ik'}$ are nonnegative and sum to $B-A$, where
+$B=\sum_i(\sum_k a_{ik})^2$. So the weighted mean pairwise correlation of the
+factors is not merely bounded — it is *determined*:
+
+$$
+\boxed{\;\bar\rho \;=\; \frac{E-A}{B-A}\;}
+$$
+
+**The floor.** By Cauchy–Schwarz within each row, $(\sum_k a_{ik})^2\le K\sum_k a_{ik}^2$,
+so $B\le KA$; since $A/(B-A)$ is increasing in $A$ this gives
+$A/(B-A)\ge 1/(K-1)$ and therefore
+
+$$
+\bar\rho \;\le\; -\frac{1}{K-1} \;+\; \frac{E}{B-A}
+\qquad\xrightarrow[\;E\to 0\;]{}\qquad -\frac{1}{K-1} .
+$$
+
+$E$ is the row-centered variation of $\theta$ — the same spread that $c$ controls
+in Step C, here in squared-Frobenius rather than peak-to-mean form. As the budget
+vanishes the factors are driven to the algebraic floor $-1/(K-1)$, which is
+$-0.5$ at $K=3$. (The same algebra is why Dirichlet loadings, whose rows sum
+exactly to one, have mean pairwise correlation $\approx-1/(K-1)$ — and the true
+$L$ here measures $-0.44$.)
+
+Two caveats before the numbers. $B>A$ requires that some row load on more than
+one factor, which fails only for an exactly block-structured factorization. And
+$\bar\rho$ constrains the factors *collectively*: it is a weighted average, so it
+says nothing about any named pair.
+
+```{r corr-verify, cache=TRUE}
+cors <- do.call(rbind, lapply(list.files(cells_dir, "\\.rds$", full.names = TRUE),
+  function(f) {
+    x <- readRDS(f)
+    if (is.data.frame(x)) return(NULL)        # the metrics file lives here too
+    rt <- cor(x$FF_true)                      # the truth, for reference
+    do.call(rbind, lapply(names(x$fits), function(init) {
+      L <- x$fits[[init]]$LL; Fm <- x$fits[[init]]$FF; K <- ncol(L)
+      th <- tcrossprod(L, Fm)
+      Fc <- sweep(Fm, 2, colMeans(Fm))                # centered factors
+      a  <- sweep(L, 2, sqrt(colSums(Fc^2)), "*")     # a_ik = l_ik ||f~_.k||
+      A  <- sum(a^2); B <- sum(rowSums(a)^2)
+      E  <- sum((th - rowMeans(th))^2)                # row-centered variation
+      rp <- cor(Fm); rs <- cor(Fm, method = "spearman")
+      data.frame(
+        c_fit = as.numeric(sub(".*_cfit", "", sub("\\.rds$", "", basename(f)))),
+        init = init, K = K, floor = -1/(K - 1),
+        rho_bar = (E - A)/(B - A), slack = E/(B - A),
+        pearson = mean(rp[upper.tri(rp)]), spearman = mean(rs[upper.tri(rs)]),
+        truth = mean(rt[upper.tri(rt)]))
+    }))
+  }))
+
+r1  <- cors[cors$init == "rank1", ]
+agg <- do.call(rbind, lapply(sort(unique(r1$c_fit)), function(cc) {
+  g <- r1[r1$c_fit == cc, ]
+  data.frame(c_fit = cc, `rho-bar (identity)` = mean(g$rho_bar),
+             `E/(B-A)` = mean(g$slack), `bound` = mean(g$floor + g$slack),
+             `floor -1/(K-1)` = g$floor[1], `measured Pearson` = mean(g$pearson),
+             `measured Spearman` = mean(g$spearman),
+             `true factors` = mean(g$truth), check.names = FALSE)
+}))
+knitr::kable(agg, digits = 3, row.names = FALSE)
+
+cat("identity below the bound:", sum(cors$rho_bar <= cors$floor + cors$slack + 1e-9),
+    "  above the floor:", sum(cors$rho_bar >= cors$floor - 1e-9),
+    "of", nrow(cors), "fits\n")
+cat("max |identity - measured Pearson|:", round(max(abs(cors$rho_bar - cors$pearson)), 3), "\n")
+```
+
+The identity tracks the plainly-measured pairwise Pearson correlation to about
+two decimals across the whole grid, so the quantity in the theory is essentially
+the quantity in the figures — even though one is weighted by $a_{ik}a_{ik'}$ and
+the other is not. The true factors sit at $\approx 0$, confirming that the
+anti-correlation at small $c$ is manufactured by the budget rather than inherited
+from the data.
+
+```{r corr-plot, fig.width=9.5, fig.height=3.8, cache=TRUE}
+lv   <- fmtc(sort(unique(cors$c_fit)))
+long <- rbind(
+  data.frame(cf = fmtc(agg$c_fit), what = "rho-bar (identity)", v = agg$`rho-bar (identity)`),
+  data.frame(cf = fmtc(agg$c_fit), what = "measured Pearson",   v = agg$`measured Pearson`),
+  data.frame(cf = fmtc(agg$c_fit), what = "measured Spearman",  v = agg$`measured Spearman`))
+long$cf <- factor(long$cf, levels = lv)
+stopifnot(!any(is.na(long$cf)))
+qA <- ggplot(long, aes(cf, v, colour = what, group = what)) +
+  geom_hline(yintercept = cors$floor[1], linetype = "dashed", colour = "#C2410C") +
+  geom_line(linewidth = 0.9) + geom_point(size = 2) +
+  annotate("text", x = 1, y = cors$floor[1], vjust = -0.6, hjust = 0, size = 3.1,
+           colour = "#C2410C", label = "floor  -1/(K-1)") +
+  scale_colour_manual(name = NULL,
+    values = c(`rho-bar (identity)` = "#0E5C6B", `measured Pearson` = "#0E8FA8",
+               `measured Spearman` = "#B45309")) +
+  labs(x = "c used for fitting", y = "mean pairwise correlation of the factors",
+       title = "Small c forces the factors apart") +
+  theme(legend.text = element_text(size = 8))
+
+line <- data.frame(x = 10^seq(-3, log10(max(cors$slack)), length.out = 300))
+line$y <- cors$floor[1] + line$x
+qB <- ggplot(cors, aes(slack, rho_bar)) +
+  geom_line(data = line, aes(x, y), colour = "#C2410C", linewidth = 0.9) +
+  geom_hline(yintercept = cors$floor[1], linetype = "dashed", colour = "grey45") +
+  geom_point(colour = "#0E8FA8", alpha = 0.3, size = 0.9) +
+  scale_x_log10() + coord_cartesian(ylim = c(-0.55, 0.15)) +
+  annotate("text", x = 1.4e-3, y = cors$floor[1], vjust = -0.6, hjust = 0,
+           size = 3.1, colour = "grey35", label = "floor  -1/(K-1)") +
+  labs(x = "E / (B - A)   — the term c controls", y = "mean pairwise correlation",
+       title = "Everything sits between the floor and the bound",
+       subtitle = "line: -1/(K-1) + E/(B-A).   dashed: the floor it decays to")
+plot_grid(qA, qB, nrow = 1)
+```
+
+**How much this is worth.** The *identity* is exact and informative everywhere:
+it says the mean pairwise correlation of the factors is a deterministic function
+of how flat $\theta$ is, which is a function of $c$. The *bound* is only
+non-vacuous at $c\le 0.01$ here — the term $E/(B-A)$ exceeds $1/(K-1)$ as soon as
+$\theta$ has any real range, and then $-1/(K-1)+E/(B-A)$ is above zero and says
+nothing. So the floor explains the small-$c$ end and not the large-$c$ end.
+
+The result is also about **Pearson** correlation. Spearman, which is what the
+simulation page plots, agrees closely at small $c$ ($-0.35$ against $-0.34$) but
+departs at large $c$ ($-0.20$ against $-0.03$), where ties and skew from the now
+very sparse factors dominate the ranks. That gap is a sparsity artifact, not a
+budget one.
+
+Finally, this is about how separated the fitted factors are from *each other*,
+which is a different question from whether they are *correct*. Accuracy against
+the true factors peaks sharply at $c_{\text{fit}}=c_{\text{true}}$ and is a
+misspecification story, not a budget story.
 
 # What to do with this
 
