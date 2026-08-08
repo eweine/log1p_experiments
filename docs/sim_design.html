@@ -546,15 +546,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree44543b7633e78963644fb64cc28325c1695022b2targetblank44543b7a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree75029259d811200b6a8cdb7dccb238d572fc7aa1targetblank7502925a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/44543b7633e78963644fb64cc28325c1695022b2" target="_blank">44543b7</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/75029259d811200b6a8cdb7dccb238d572fc7aa1" target="_blank">7502925</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree44543b7633e78963644fb64cc28325c1695022b2targetblank44543b7a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree75029259d811200b6a8cdb7dccb238d572fc7aa1targetblank7502925a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -564,7 +564,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/44543b7633e78963644fb64cc28325c1695022b2" target="_blank">44543b7</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/75029259d811200b6a8cdb7dccb238d572fc7aa1" target="_blank">7502925</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -629,6 +629,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/75029259d811200b6a8cdb7dccb238d572fc7aa1/analysis/sim_design.Rmd" target="_blank">7502925</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-08
+</td>
+<td>
+sim_design: profile the mean out of the pancreas calibration
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/db3a6f513b6afa9ff69af57b8f7e19d631132f77/docs/sim_design.html" target="_blank">db3a6f5</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1205,13 +1239,26 @@ Eric Weine
 <div id="calibrating-to-the-pancreas-data-instead"
 class="section level1">
 <h1>Calibrating to the pancreas data instead</h1>
-<p>MOCA anchors the approximation-accuracy experiments, but the dataset
-at the center of the paper’s applications is the pancreas data (7,606
-cells <span class="math inline">\(\times\)</span> 18,195 genes). The
-same machinery calibrates to it — only the target changes. Its count
-histogram was extracted from the raw counts
-(<code>pancreas_cytokine_lsa.Rdata</code>) with one
-<code>tabulate()</code> call.</p>
+<p>The dataset at the center of the paper’s applications is the pancreas
+data (7,606 cells <span class="math inline">\(\times\)</span> 18,195
+genes), so it is the natural primary anchor. Its count histogram was
+extracted from the raw counts (<code>pancreas_cytokine_lsa.Rdata</code>)
+with one <code>tabulate()</code> call.</p>
+<p>This calibration also serves the approximation-accuracy experiments,
+and those consume something the budget curve only pins loosely: the
+<em>absolute scale</em> of the counts (the approximation error depends
+on where the linear predictors actually live). So here the mean count is
+not added to the loss — it is <strong>profiled out</strong>: inside
+every loss evaluation, the location <span
+class="math inline">\(\mu\)</span> is solved by one-dimensional
+root-finding so that the expected mean count equals the real one
+exactly, and the optimizer searches only the remaining three knobs <span
+class="math inline">\((\pi_0, \sigma, T)\)</span> against the curve.
+This answers the cleaner question — the best curve match <em>among</em>
+generators with the correct mean — rather than blending two errors with
+an arbitrary weight. (The additive alternative, a weighted mean term in
+the loss, was tried and traded away the tail of the curve; profiling
+keeps both.)</p>
 <pre class="r"><code>zp   &lt;- readRDS(&quot;data/pancreas_count_histogram.rds&quot;)
 p_tp &lt;- c(zp$np - sum(zp$h), zp$h) / zp$np
 tvp  &lt;- 0:(length(p_tp) - 1)
@@ -1280,19 +1327,57 @@ where MOCA’s spans one and a half.</caption>
 <p>The comparison explains, through the theory, why the pancreas panels
 of the paper’s sparsity figure show the most dramatic trend across <span
 class="math inline">\(c\)</span>: its budget curve moves the most.</p>
-<pre class="r"><code>loss_p &lt;- function(par) mean(sapply(1:3, function(s) {
-  cv &lt;- curve_of(sim_Y(par, s))
-  if (any(!is.finite(cv)) || any(cv &lt;= 0)) return(1e6)
-  sum((log(cv) - log(target_p))^2) }))
-opt_p &lt;- optim(c(qlogis(0.8), -0.7, log(0.8), log(7)), loss_p,
-               method = &quot;Nelder-Mead&quot;, control = list(maxit = 600, reltol = 1e-6))
+<pre class="r"><code>M_REAL_P &lt;- sum(p_tp * tvp)
+
+## fixed randomness per seed (common random numbers): loadings, t-draws,
+## zero indicators. The inner root needs no Poisson draws, so the expected
+## mean count given these parts is deterministic and monotone in mu.
+make_parts &lt;- function(seeds) lapply(seeds, function(s) {
+  set.seed(s)
+  L &lt;- matrix(rgamma(N_S*K, A_SIG), N_S, K); L &lt;- L/rowSums(L)
+  list(L = L, tmat = matrix(rt(P_S*K, df = 4), P_S, K),
+       u = matrix(runif(P_S*K), P_S, K))
+})
+parts3 &lt;- make_parts(1:3)
+mean_rate &lt;- function(mu, sig, CAP, PI0, parts)
+  mean(sapply(parts, function(pp) {
+    Fm &lt;- pmin(exp(mu + sig*pp$tmat), CAP) * (pp$u &gt; PI0)
+    mean(C_TRUE * expm1(tcrossprod(pp$L, Fm))) }))
+solve_mu &lt;- function(sig, CAP, PI0, parts)
+  uniroot(function(m) mean_rate(m, sig, CAP, PI0, parts) - M_REAL_P,
+          c(-9, 3), tol = 1e-4)$root
+
+Y_from &lt;- function(pp, mu, sig, CAP, PI0, pseed) {
+  Fm &lt;- pmin(exp(mu + sig*pp$tmat), CAP) * (pp$u &gt; PI0)
+  set.seed(pseed)
+  matrix(rpois(NP_S, C_TRUE*expm1(tcrossprod(pp$L, Fm))), N_S, P_S)
+}
+loss_p &lt;- function(par) {
+  PI0 &lt;- plogis(par[1]); sig &lt;- exp(par[2]); CAP &lt;- exp(par[3])
+  mu &lt;- tryCatch(solve_mu(sig, CAP, PI0, parts3), error = function(e) NA)
+  if (is.na(mu)) return(1e6)
+  mean(sapply(1:3, function(s) {
+    cv &lt;- curve_of(Y_from(parts3[[s]], mu, sig, CAP, PI0, s + 5000))
+    if (any(!is.finite(cv)) || any(cv &lt;= 0)) return(1e6)
+    sum((log(cv) - log(target_p))^2) }))
+}
+opt_p &lt;- optim(c(qlogis(0.75), log(0.6), log(10)), loss_p,
+               method = &quot;Nelder-Mead&quot;, control = list(maxit = 400, reltol = 1e-6))
 stopifnot(opt_p$convergence == 0)
-knobs_p &lt;- c(pi0 = plogis(opt_p$par[1]), mu = opt_p$par[2],
-             sigma = exp(opt_p$par[3]), cap = exp(opt_p$par[4]))
+
+## the final mu is re-solved on 20 seeds: the root is cheap (no Poisson
+## draws), and three seeds are not enough to center the mean.
+PI0_p &lt;- plogis(opt_p$par[1]); sig_p &lt;- exp(opt_p$par[2]); cap_p &lt;- exp(opt_p$par[3])
+mu_p  &lt;- solve_mu(sig_p, cap_p, PI0_p, make_parts(1:20))
+knobs_p &lt;- c(pi0 = PI0_p, mu = mu_p, sigma = sig_p, cap = cap_p)
 knitr::kable(rbind(pancreas = round(knobs_p, 3), MOCA = round(knobs, 3)),
-             caption = &quot;Calibrated knobs under the two anchors.&quot;)</code></pre>
+             caption = &quot;Calibrated knobs under the two anchors. For pancreas,
+             mu is profiled (solved to match the real mean count exactly),
+             not searched.&quot;)</code></pre>
 <table>
-<caption>Calibrated knobs under the two anchors.</caption>
+<caption>Calibrated knobs under the two anchors. For pancreas, mu is
+profiled (solved to match the real mean count exactly), not
+searched.</caption>
 <thead>
 <tr class="header">
 <th align="left"></th>
@@ -1305,10 +1390,10 @@ knitr::kable(rbind(pancreas = round(knobs_p, 3), MOCA = round(knobs, 3)),
 <tbody>
 <tr class="odd">
 <td align="left">pancreas</td>
-<td align="right">0.745</td>
-<td align="right">-0.402</td>
-<td align="right">0.549</td>
-<td align="right">10.710</td>
+<td align="right">0.768</td>
+<td align="right">-0.433</td>
+<td align="right">0.528</td>
+<td align="right">9.968</td>
 </tr>
 <tr class="even">
 <td align="left">MOCA</td>
@@ -1319,9 +1404,10 @@ knitr::kable(rbind(pancreas = round(knobs_p, 3), MOCA = round(knobs, 3)),
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>saveRDS(list(par = opt_p$par, knobs = knobs_p, target = target_p, CS = CS,
-             tstar = tstar_p, n = N_S, p = P_S, K = K, a_sig = A_SIG,
-             c_true = C_TRUE, df = 4),
+<pre class="r"><code>saveRDS(list(knobs = knobs_p, target = target_p, CS = CS,
+             tstar = tstar_p, mean_target = M_REAL_P, n = N_S, p = P_S,
+             K = K, a_sig = A_SIG, c_true = C_TRUE, df = 4,
+             method = &quot;curve-matched with profiled mean&quot;),
         &quot;output/sim_calibration_pancreas.rds&quot;)</code></pre>
 <div class="alert alert-warning">
 <p>
@@ -1337,10 +1423,18 @@ remove this warning. See the
 >knitr cache options</a> for more details.
 </p>
 </div>
-<pre class="r"><code>fresh_p &lt;- sapply(101:105, function(s) curve_of(sim_Y(opt_p$par, s)))
+<pre class="r"><code>sim_pancreas &lt;- function(seed) {
+  set.seed(seed)
+  L &lt;- matrix(rgamma(N_S*K, A_SIG), N_S, K); L &lt;- L/rowSums(L)
+  Fm &lt;- matrix(pmin(exp(mu_p + sig_p*rt(P_S*K, 4)), cap_p) *
+               (runif(P_S*K) &gt; PI0_p), P_S, K)
+  matrix(rpois(NP_S, C_TRUE*expm1(tcrossprod(L, Fm))), N_S, P_S)
+}
+fresh_l &lt;- lapply(101:110, sim_pancreas)
+fresh_p &lt;- sapply(fresh_l, curve_of)
 knitr::kable(data.frame(
   c = format(CS), target = round(target_p, 1),
-  `achieved (median of 5)` = round(apply(fresh_p, 1, median), 1),
+  `achieved (median of 10)` = round(apply(fresh_p, 1, median), 1),
   ratio = round(apply(fresh_p, 1, median)/target_p, 2),
   `ratio range` = paste0(round(apply(fresh_p/target_p, 1, min), 2), &quot; – &quot;,
                          round(apply(fresh_p/target_p, 1, max), 2)),
@@ -1352,7 +1446,7 @@ knitr::kable(data.frame(
 <tr class="header">
 <th align="left">c</th>
 <th align="right">target</th>
-<th align="right">achieved (median of 5)</th>
+<th align="right">achieved (median of 10)</th>
 <th align="right">ratio</th>
 <th align="left">ratio range</th>
 </tr>
@@ -1361,91 +1455,101 @@ knitr::kable(data.frame(
 <tr class="odd">
 <td align="left">1e-03</td>
 <td align="right">12.2</td>
-<td align="right">11.2</td>
-<td align="right">0.92</td>
-<td align="left">0.89 – 0.97</td>
+<td align="right">12.5</td>
+<td align="right">1.02</td>
+<td align="left">0.96 – 1.07</td>
 </tr>
 <tr class="even">
 <td align="left">1e-02</td>
 <td align="right">15.2</td>
-<td align="right">14.1</td>
-<td align="right">0.92</td>
-<td align="left">0.89 – 0.98</td>
+<td align="right">15.5</td>
+<td align="right">1.02</td>
+<td align="left">0.96 – 1.08</td>
 </tr>
 <tr class="odd">
 <td align="left">1e-01</td>
 <td align="right">22.7</td>
-<td align="right">21.4</td>
-<td align="right">0.94</td>
-<td align="left">0.91 – 1</td>
+<td align="right">23.5</td>
+<td align="right">1.04</td>
+<td align="left">0.97 – 1.1</td>
 </tr>
 <tr class="even">
 <td align="left">1e+00</td>
 <td align="right">51.7</td>
-<td align="right">51.3</td>
-<td align="right">0.99</td>
-<td align="left">0.93 – 1.06</td>
+<td align="right">56.3</td>
+<td align="right">1.09</td>
+<td align="left">0.99 – 1.16</td>
 </tr>
 <tr class="odd">
 <td align="left">1e+01</td>
 <td align="right">210.5</td>
-<td align="right">217.1</td>
-<td align="right">1.03</td>
-<td align="left">0.9 – 1.1</td>
+<td align="right">235.8</td>
+<td align="right">1.12</td>
+<td align="left">0.97 – 1.2</td>
 </tr>
 <tr class="even">
 <td align="left">1e+02</td>
 <td align="right">1092.1</td>
-<td align="right">1031.0</td>
-<td align="right">0.94</td>
-<td align="left">0.75 – 1.04</td>
+<td align="right">1076.3</td>
+<td align="right">0.99</td>
+<td align="left">0.84 – 1.13</td>
 </tr>
 <tr class="odd">
 <td align="left">1e+03</td>
 <td align="right">4519.3</td>
-<td align="right">3829.5</td>
-<td align="right">0.85</td>
-<td align="left">0.64 – 1.1</td>
+<td align="right">3931.8</td>
+<td align="right">0.87</td>
+<td align="left">0.7 – 1.18</td>
 </tr>
 <tr class="even">
 <td align="left">Inf</td>
 <td align="right">14531.6</td>
-<td align="right">12246.8</td>
-<td align="right">0.84</td>
-<td align="left">0.65 – 1.94</td>
+<td align="right">11376.7</td>
+<td align="right">0.78</td>
+<td align="left">0.5 – 1.46</td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>Yp &lt;- sim_Y(opt_p$par, 101)
+<pre class="r"><code>mns &lt;- sapply(fresh_l, mean)
 knitr::kable(data.frame(
-  what = c(&quot;zero fraction&quot;, &quot;mean count&quot;, &quot;max count&quot;),
-  simulated = c(round(mean(Yp == 0), 3), round(mean(Yp), 3), max(Yp)),
-  real = c(round(p_tp[1], 3), round(sum(p_tp*tvp), 3),
+  what = c(&quot;zero fraction (median)&quot;, &quot;mean count (median)&quot;,
+           &quot;mean count (range)&quot;, &quot;max count (median)&quot;),
+  simulated = c(round(median(sapply(fresh_l, function(Y) mean(Y == 0))), 3),
+                round(median(mns), 3),
+                paste0(round(min(mns), 2), &quot; – &quot;, round(max(mns), 2)),
+                median(sapply(fresh_l, max))),
+  real = c(round(p_tp[1], 3), round(M_REAL_P, 3), &quot;&quot;,
            paste0(tstar_p, &quot; (size-adjusted)&quot;))),
-  caption = &quot;Byproducts under the pancreas calibration.&quot;)</code></pre>
+  caption = &quot;Byproducts under the pancreas calibration, 10 held-out seeds.&quot;)</code></pre>
 <table>
-<caption>Byproducts under the pancreas calibration.</caption>
+<caption>Byproducts under the pancreas calibration, 10 held-out
+seeds.</caption>
 <thead>
 <tr class="header">
 <th align="left">what</th>
-<th align="right">simulated</th>
+<th align="left">simulated</th>
 <th align="left">real</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">zero fraction</td>
-<td align="right">0.807</td>
+<td align="left">zero fraction (median)</td>
+<td align="left">0.828</td>
 <td align="left">0.822</td>
 </tr>
 <tr class="even">
-<td align="left">mean count</td>
-<td align="right">1.036</td>
+<td align="left">mean count (median)</td>
+<td align="left">0.659</td>
 <td align="left">0.674</td>
 </tr>
 <tr class="odd">
-<td align="left">max count</td>
-<td align="right">15061.000</td>
+<td align="left">mean count (range)</td>
+<td align="left">0.48 – 0.79</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">max count (median)</td>
+<td align="left">6221.5</td>
 <td align="left">9793 (size-adjusted)</td>
 </tr>
 </tbody>
@@ -1464,18 +1568,22 @@ remove this warning. See the
 >knitr cache options</a> for more details.
 </p>
 </div>
-<p>The knobs move in interpretable directions: less zero mass (<span
-class="math inline">\(\pi_0\)</span> 0.75 versus 0.90), a higher
-location, and a higher cap, matching a dataset with more signal per
-entry and a heavier tail. The interesting difference from MOCA is <span
-class="math inline">\(t^{*}\)</span>: the pancreas tail is heavy enough
-that even a 600$$600 subsample is expected to contain a count near <span
-class="math inline">\(10^{4}\)</span>, so the simulated rates must reach
-that scale — which is exactly what the raised cap provides. Since the
-pancreas data is the paper’s main application, <strong>this is the
-calibration the simulation experiments should use</strong>; the MOCA
-calibration remains available for anchoring the approximation-accuracy
-work.</p>
+<p>The profiled mean lands centered on the target (the seed-to-seed
+range is genuine: with a tail this heavy, the few largest rates carry
+several percent of the mean, so the mean of any one dataset wobbles),
+and the curve keeps the same quality as the curve-only fit rather than
+trading its tail away.</p>
+<p>The knobs move in interpretable directions relative to MOCA: less
+zero mass, a higher location, and a doubled cap, matching a dataset with
+more signal per entry and a heavier tail. The interesting difference is
+<span class="math inline">\(t^{*}\)</span>: the pancreas tail is heavy
+enough that even a 600$$600 subsample is expected to contain a count
+near <span class="math inline">\(10^{4}\)</span>, so the simulated rates
+must reach that scale — which is exactly what the raised cap provides.
+Since the pancreas data is the paper’s main application — and the mean
+is now pinned, which is what the approximation experiments need —
+<strong>this is the calibration for all simulation experiments</strong>;
+the MOCA calibration remains as a secondary anchor.</p>
 </div>
 <div id="what-one-dataset-looks-like" class="section level1">
 <h1>What one dataset looks like</h1>
@@ -1539,11 +1647,13 @@ target curve, which is the principled version of “the datasets are
 comparable across <span
 class="math inline">\(c_{\textrm{true}}\)</span>”.</li>
 <li><strong>Approximation accuracy</strong> — the approximation’s error
-depends on where the counts and linear predictors actually live, so the
-realism criterion that matters is exactly the one calibrated here.
-Either anchor works; MOCA (<code>output/sim_calibration.rds</code>) is
-the natural one there because it is the dataset used in the paper’s
-timing and accuracy experiments. Recalibrating for a different <span
+depends on where the counts and linear predictors actually live, which
+is why the pancreas calibration profiles the mean to match exactly
+rather than only matching the (scale-loose) curve. The same
+<code>output/sim_calibration_pancreas.rds</code> therefore serves here
+too, giving one generator for every simulation in the paper. MOCA
+(<code>output/sim_calibration.rds</code>) remains as a secondary anchor,
+and recalibrating for a different <span
 class="math inline">\(n\)</span>, <span class="math inline">\(p\)</span>
 takes seconds (<span class="math inline">\(t^*\)</span> depends on <span
 class="math inline">\(np\)</span>).</li>
