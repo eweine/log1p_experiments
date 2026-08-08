@@ -86,3 +86,5 @@ Welcome to my research website.
 
 [Why the sparsity of a log1p fit is decided by Y and c](hoyer_sparsity_c.html)
 
+[A calibrated simulation: realistic counts with controlled factors](sim_design.html)
+

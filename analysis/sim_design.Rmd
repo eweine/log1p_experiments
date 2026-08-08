@@ -1,0 +1,283 @@
+---
+title: "A calibrated simulation: realistic counts with controlled factors"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+    toc_float: true
+date: "2026-08-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.align = "center", dpi = 110)
+```
+
+```{r pkgs}
+library(ggplot2); library(cowplot)
+theme_set(theme_cowplot(font_size = 11))
+```
+
+# What this simulation is for
+
+One generator, used everywhere a simulation appears: the sparsity and
+identifiability experiments across values of $c$, and the assessment of the
+approximation accuracy. The design has three requirements.
+
+1. **The true loadings have fixed, controlled sparsity.** Whatever else varies,
+   the rows of $L$ are drawn the same way, so differences in *fitted* sparsity
+   across $c$ can never be blamed on the truth changing.
+2. **"Realistic" is a checked property, not an adjective.** The simulated
+   counts are calibrated to a real dataset against a specific criterion,
+   stated below, and the match is verified on held-out seeds.
+3. **The whole recipe fits in five lines**, so it can be described completely
+   in a paper paragraph.
+
+# The generative recipe
+
+Fix the dimensions $n$, $p$, the rank $K$, a link constant $c_{\textrm{true}}$,
+and the Dirichlet concentration $a = 0.3$. The calibration below supplies four
+numbers: a zero probability $\pi_0$, a location $\mu$, a scale $\sigma$, and a
+cap $T$. Then:
+
+1. **Loadings.** Each row of $L$ is drawn
+   $\;\mathbf{l}_{i\cdot} \sim \textrm{Dirichlet}(a, \dots, a)$.
+   With $a = 0.3$ each sample places most of its weight on a few factors —
+   membership is soft but concentrated, and its sparsity is set once by $a$.
+2. **Factors.** Each entry of $F$ is independently
+   $$f_{jk} = \begin{cases} 0 & \textrm{with probability } \pi_0 \\
+   \min\{\exp(\mu + \sigma t_{jk}),\; T\} & \textrm{otherwise}, \end{cases}
+   \qquad t_{jk} \sim t_4 .$$
+   A point mass at zero, a heavy-tailed body, and a hard ceiling.
+3. **Linear predictor.** $\Theta = L F^{\top}$.
+4. **Rates.** $\lambda_{ij} = c_{\textrm{true}}\left(e^{\theta_{ij}} - 1\right)$
+   — the inverse of the log1p link.
+5. **Counts.** $y_{ij} \sim \textrm{Poisson}(\lambda_{ij})$.
+
+Each ingredient of step 2 has one job. The point mass makes most rates exactly
+zero, which is where the zeros of real count matrices come from. The log-$t$
+body gives the counts a heavy tail, which lognormal magnitudes cannot produce
+(we tried: the maximum count comes out several times too small). The cap
+exists because the *maximum* of unbounded heavy-tailed draws varies wildly from
+seed to seed — with a cap, the extreme counts land in the same place every
+time, as they should for a matrix of fixed size.
+
+# What "realistic" means, exactly
+
+The property of the data that our theory identifies as consequential is the
+**budget curve**
+
+$$ c \;\mapsto\; \operatorname{pm}\!\left(\log(1 + Y/c)\right),
+\qquad \operatorname{pm}(x) = \frac{\max(x)}{\operatorname{mean}(x)} , $$
+
+the peak-to-mean ratio of the data seen through the link, as a function of the
+$c$ used to fit. By the results in
+[Why the sparsity of a log1p fit is decided by Y and c](hoyer_sparsity_c.html)
+(and the corresponding appendix of the paper), this curve caps the Hoyer
+sparsity that *any* rank-$K$ fit can attain at each $c$ — and on both our
+simulations and the paper's real-data fits, the cap is essentially attained.
+So if a simulation gets this curve right, it reproduces the phenomenon the
+sparsity experiments study; if it gets it wrong, no other resemblance helps.
+
+Two facts make the curve a practical calibration target.
+
+- **It is structure-blind.** $\operatorname{pm}$ sees only the multiset of
+  count values, so the curve is a functional of the count *histogram* — it can
+  be matched without matching any of the real data's latent structure.
+- **It must be size-adjusted.** The curve involves $\max(Y)$, and a
+  $26{,}000 \times 1.3$M matrix reaches deeper into its tail than any
+  simulation-sized matrix can. The honest target for a simulation with $np$
+  entries is the curve of $np$ draws from the real marginal, whose median
+  maximum $t^{*}$ solves $F(t)^{np} = \tfrac12$.
+
+The four calibrated numbers map onto the curve's features: $\pi_0$ sets the
+small-$c$ floor (the zero fraction), $\mu$ the overall level, $\sigma$ the
+transition, and $T$ the large-$c$ ceiling.
+
+# The target: MOCA
+
+We calibrate against the MOCA counts (26,183 genes $\times$ 1,331,984 cells)
+— the same dataset used in the paper's approximation-accuracy experiments,
+so a single real dataset anchors every simulation in the paper. The histogram
+was extracted once with `tabulate()`; it is a 1KB file.
+
+```{r target}
+z  <- readRDS("data/moca_count_histogram.rds")   # h = counts of value t>=1; np
+p_t <- c(z$np - sum(z$h), z$h) / z$np            # P(Y = t), t = 0, 1, ...
+tv  <- 0:(length(p_t) - 1)
+
+N_S <- 600L; P_S <- 600L; NP_S <- N_S * P_S      # simulation dimensions
+K <- 10L; A_SIG <- 0.3; C_TRUE <- 1
+
+tstar <- tv[min(which(cumsum(p_t)^NP_S >= 0.5))] # median max of NP_S draws
+CS <- c(1e-3, 1e-2, 1e-1, 1, 10, 100, 1e3, Inf)  # the fitting grid
+target <- sapply(CS, function(cc) {
+  g <- function(t) if (is.infinite(cc)) t else log1p(t/cc)
+  g(tstar) / sum(p_t * g(tv))
+})
+
+knitr::kable(data.frame(
+  `real zero fraction` = round(p_t[1], 4),
+  `real mean` = round(sum(p_t * tv), 4),
+  `real max` = max(tv),
+  `size-adjusted max t*` = tstar, check.names = FALSE))
+knitr::kable(t(setNames(round(target, 1), paste0("c=", format(CS)))),
+             caption = "The size-adjusted target budget curve.")
+```
+
+# Calibration
+
+Nelder–Mead over the four knobs. The loss is the squared log-mismatch of the
+curves, averaged over three fixed seeds (fixing seeds inside the loss makes it
+a deterministic function, which is all Nelder–Mead asks; averaging keeps the
+optimizer from exploiting one seed's luck).
+
+```{r calibrate, cache=TRUE}
+sim_Y <- function(par, seed, n = N_S, p = P_S) {
+  PI0 <- plogis(par[1]); mu <- par[2]; sig <- exp(par[3]); CAP <- exp(par[4])
+  set.seed(seed)
+  L  <- matrix(rgamma(n*K, A_SIG), n, K); L <- L / rowSums(L)
+  Fm <- matrix(pmin(exp(mu + sig * rt(p*K, df = 4)), CAP) *
+               (runif(p*K) > PI0), p, K)
+  matrix(rpois(n*p, C_TRUE * expm1(tcrossprod(L, Fm))), n, p)
+}
+curve_of <- function(Y) sapply(CS, function(cc) {
+  g <- if (is.infinite(cc)) as.numeric(Y) else log1p(Y/cc)
+  max(g) / mean(g) })
+loss <- function(par) mean(sapply(1:3, function(s) {
+  cv <- curve_of(sim_Y(par, s))
+  if (any(!is.finite(cv)) || any(cv <= 0)) return(1e6)
+  sum((log(cv) - log(target))^2) }))
+
+opt <- optim(c(qlogis(0.9), -1.3, log(0.6), log(4.3)), loss,
+             method = "Nelder-Mead", control = list(maxit = 500, reltol = 1e-6))
+stopifnot(opt$convergence == 0)
+knobs <- c(pi0 = plogis(opt$par[1]), mu = opt$par[2],
+           sigma = exp(opt$par[3]), cap = exp(opt$par[4]))
+knitr::kable(t(round(knobs, 3)), caption = "The four calibrated numbers.")
+saveRDS(list(par = opt$par, knobs = knobs, target = target, CS = CS,
+             tstar = tstar, n = N_S, p = P_S, K = K, a_sig = A_SIG,
+             c_true = C_TRUE, df = 4),
+        "output/sim_calibration.rds")
+```
+
+# Does it hold on seeds the optimizer never saw?
+
+Everything below uses seeds 101–105, disjoint from the three calibration
+seeds.
+
+```{r acceptance, cache=TRUE}
+fresh <- sapply(101:105, function(s) curve_of(sim_Y(opt$par, s)))
+knitr::kable(data.frame(
+  c = format(CS), target = round(target, 1),
+  `achieved (median of 5)` = round(apply(fresh, 1, median), 1),
+  `ratio` = round(apply(fresh, 1, median)/target, 2),
+  `ratio range` = paste0(round(apply(fresh/target, 1, min), 2), " – ",
+                         round(apply(fresh/target, 1, max), 2)),
+  check.names = FALSE), caption = "Budget curve on held-out seeds.")
+
+Y <- sim_Y(opt$par, 101)
+knitr::kable(data.frame(
+  what = c("zero fraction", "mean count", "max count"),
+  simulated = c(round(mean(Y == 0), 3), round(mean(Y), 3), max(Y)),
+  real = c(round(p_t[1], 3), round(sum(p_t*tv), 3),
+           paste0(tstar, " (size-adjusted)"))),
+  caption = "Byproducts, none of which were targeted directly.")
+```
+
+The curve lands within about $\pm 25\%$ of the target across six decades of
+$c$, and the zero fraction, mean, and maximum come along for free — which is
+the point of matching a sufficient statistic rather than a list of summary
+numbers.
+
+For contrast, the same curves for the *previous* simulation design (the
+300$\times$300, rank-3 grid used in
+[the earlier experiments](c_grid_sim.html), which calibrated the zero fraction
+to 0.5 and capped counts near 20):
+
+```{r overlay, fig.width=7, fig.height=4}
+old <- c(1.55, 1.87, 2.7, 5.6, 13.0, 18.3, 19.3, 19.4)   # pm of old-sim fits
+lab <- ifelse(is.infinite(CS), "Inf", format(CS, scientific = TRUE))
+d <- rbind(
+  data.frame(c = CS, pm = target, what = "target (MOCA, size-adjusted)"),
+  data.frame(c = CS, pm = apply(fresh, 1, median), what = "new simulation"),
+  data.frame(c = CS, pm = old, what = "old simulation"))
+d$x <- log10(ifelse(is.infinite(d$c), 1e4, d$c))
+ggplot(d, aes(x, pm, colour = what)) +
+  geom_line(linewidth = 1) + geom_point(size = 2) +
+  scale_y_log10() +
+  scale_x_continuous(breaks = log10(c(1e-3, 1e-1, 10, 1e3, 1e4)),
+                     labels = c("1e-3", "0.1", "10", "1000", "Inf")) +
+  scale_colour_manual(values = c("target (MOCA, size-adjusted)" = "#C2410C",
+                                 "new simulation" = "#0E5C6B",
+                                 "old simulation" = "grey55"), name = NULL) +
+  labs(x = "c used for fitting", y = "pm(log1p(Y/c))",
+       title = "The budget curve: target, new design, old design",
+       subtitle = "the old design was 40–100x below the real curve everywhere")
+```
+
+The old design was not wrong for its original purpose, but its budget curve
+sat two orders of magnitude below the real data's: it probed the regime where
+the sparsity ceiling collapses toward zero, which real data — with its 97%
+zeros and heavy tail — never enters.
+
+```{r tail, fig.width=6.5, fig.height=4}
+ccdf_sim <- rev(cumsum(rev(tabulate(Y[Y > 0], nbins = max(Y))))) / length(Y)
+ccdf_real <- rev(cumsum(rev(p_t[-1])))
+tt <- 1:min(length(ccdf_sim), length(ccdf_real), 200)
+d2 <- rbind(data.frame(t = tt, p = ccdf_sim[tt],  what = "simulated"),
+            data.frame(t = tt, p = ccdf_real[tt], what = "real (MOCA)"))
+d2 <- d2[d2$p > 0, ]
+ggplot(d2, aes(t, p, colour = what)) +
+  geom_line(linewidth = 1) +
+  scale_x_log10() + scale_y_log10() +
+  scale_colour_manual(values = c(`real (MOCA)` = "#C2410C",
+                                 simulated = "#0E5C6B"), name = NULL) +
+  labs(x = "count value t", y = "P(Y >= t)",
+       title = "Tail of the count distribution",
+       subtitle = "not targeted by the calibration; inherited from the curve")
+```
+
+# What one dataset looks like
+
+```{r truth, cache=TRUE}
+set.seed(101)
+L  <- matrix(rgamma(N_S*K, A_SIG), N_S, K); L <- L / rowSums(L)
+hoyer <- function(x) { m <- length(x)
+  (sqrt(m) - sum(x)/sqrt(sum(x^2)))/(sqrt(m) - 1) }
+knitr::kable(data.frame(
+  `mean Hoyer sparsity of true loading columns` = round(mean(apply(L, 2, hoyer)), 3),
+  `mean # factors carrying 90% of a sample` = round(mean(apply(L, 1, function(r)
+     min(which(cumsum(sort(r, decreasing = TRUE)) >= 0.9)))), 1),
+  check.names = FALSE),
+  caption = "The controlled side: loading structure, identical for every c and seed.")
+```
+
+# How this feeds the paper's experiments
+
+- **Sparsity and identifiability across $c$** — the grid experiments rerun
+  with this generator. If several $c_{\textrm{true}}$ values are kept, the
+  calibration is rerun per $c_{\textrm{true}}$ with the *same* target curve,
+  which is the principled version of "the datasets are comparable across
+  $c_{\textrm{true}}$".
+- **Approximation accuracy** — the approximation's error depends on where the
+  counts and linear predictors actually live, so the realism criterion that
+  matters is exactly the one calibrated here, and the anchor dataset (MOCA) is
+  already the one used in the paper's timing and accuracy experiments. The
+  same `output/sim_calibration.rds` drives both, at whatever $n$, $p$ the
+  experiment needs — recalibrating takes seconds if the size changes ($t^*$
+  depends on $np$).
+
+# What is matched, and what is not
+
+Matched, and verified on held-out seeds: the budget curve across six decades
+of $c$; the zero fraction; the mean; the maximum; the count tail.
+
+Not matched, by design: the real data's shared gene-abundance profile (our
+factor columns are exchangeable, real genes are not), size-factor
+heterogeneity across cells ($s_i = 1$ here), and gene-level mean structure.
+Consequently the factor-*correlation* phenomenology of the real fits — which
+is driven by the shared abundance profile — will not appear in this
+simulation, and no claim about it should rest on these data. If that ever
+becomes the target, the right tool is a parametric bootstrap of a real fit,
+not a redesign of this generator.
