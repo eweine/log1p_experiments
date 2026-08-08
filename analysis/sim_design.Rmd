@@ -240,11 +240,23 @@ ggplot(d2, aes(t, p, colour = what)) +
 
 # Calibrating to the pancreas data instead
 
-MOCA anchors the approximation-accuracy experiments, but the dataset at the
-center of the paper's applications is the pancreas data (7,606 cells $\times$
-18,195 genes). The same machinery calibrates to it — only the target changes.
-Its count histogram was extracted from the raw counts
+The dataset at the center of the paper's applications is the pancreas data
+(7,606 cells $\times$ 18,195 genes), so it is the natural primary anchor. Its
+count histogram was extracted from the raw counts
 (`pancreas_cytokine_lsa.Rdata`) with one `tabulate()` call.
+
+This calibration also serves the approximation-accuracy experiments, and
+those consume something the budget curve only pins loosely: the *absolute
+scale* of the counts (the approximation error depends on where the linear
+predictors actually live). So here the mean count is not added to the loss —
+it is **profiled out**: inside every loss evaluation, the location $\mu$ is
+solved by one-dimensional root-finding so that the expected mean count equals
+the real one exactly, and the optimizer searches only the remaining three
+knobs $(\pi_0, \sigma, T)$ against the curve. This answers the cleaner
+question — the best curve match *among* generators with the correct mean —
+rather than blending two errors with an arbitrary weight. (The additive
+alternative, a weighted mean term in the loss, was tried and traded away the
+tail of the curve; profiling keeps both.)
 
 ```{r pancreas-target}
 zp   <- readRDS("data/pancreas_count_histogram.rds")
@@ -274,52 +286,106 @@ paper's sparsity figure show the most dramatic trend across $c$: its budget
 curve moves the most.
 
 ```{r pancreas-calibrate, cache=TRUE}
-loss_p <- function(par) mean(sapply(1:3, function(s) {
-  cv <- curve_of(sim_Y(par, s))
-  if (any(!is.finite(cv)) || any(cv <= 0)) return(1e6)
-  sum((log(cv) - log(target_p))^2) }))
-opt_p <- optim(c(qlogis(0.8), -0.7, log(0.8), log(7)), loss_p,
-               method = "Nelder-Mead", control = list(maxit = 600, reltol = 1e-6))
+M_REAL_P <- sum(p_tp * tvp)
+
+## fixed randomness per seed (common random numbers): loadings, t-draws,
+## zero indicators. The inner root needs no Poisson draws, so the expected
+## mean count given these parts is deterministic and monotone in mu.
+make_parts <- function(seeds) lapply(seeds, function(s) {
+  set.seed(s)
+  L <- matrix(rgamma(N_S*K, A_SIG), N_S, K); L <- L/rowSums(L)
+  list(L = L, tmat = matrix(rt(P_S*K, df = 4), P_S, K),
+       u = matrix(runif(P_S*K), P_S, K))
+})
+parts3 <- make_parts(1:3)
+mean_rate <- function(mu, sig, CAP, PI0, parts)
+  mean(sapply(parts, function(pp) {
+    Fm <- pmin(exp(mu + sig*pp$tmat), CAP) * (pp$u > PI0)
+    mean(C_TRUE * expm1(tcrossprod(pp$L, Fm))) }))
+solve_mu <- function(sig, CAP, PI0, parts)
+  uniroot(function(m) mean_rate(m, sig, CAP, PI0, parts) - M_REAL_P,
+          c(-9, 3), tol = 1e-4)$root
+
+Y_from <- function(pp, mu, sig, CAP, PI0, pseed) {
+  Fm <- pmin(exp(mu + sig*pp$tmat), CAP) * (pp$u > PI0)
+  set.seed(pseed)
+  matrix(rpois(NP_S, C_TRUE*expm1(tcrossprod(pp$L, Fm))), N_S, P_S)
+}
+loss_p <- function(par) {
+  PI0 <- plogis(par[1]); sig <- exp(par[2]); CAP <- exp(par[3])
+  mu <- tryCatch(solve_mu(sig, CAP, PI0, parts3), error = function(e) NA)
+  if (is.na(mu)) return(1e6)
+  mean(sapply(1:3, function(s) {
+    cv <- curve_of(Y_from(parts3[[s]], mu, sig, CAP, PI0, s + 5000))
+    if (any(!is.finite(cv)) || any(cv <= 0)) return(1e6)
+    sum((log(cv) - log(target_p))^2) }))
+}
+opt_p <- optim(c(qlogis(0.75), log(0.6), log(10)), loss_p,
+               method = "Nelder-Mead", control = list(maxit = 400, reltol = 1e-6))
 stopifnot(opt_p$convergence == 0)
-knobs_p <- c(pi0 = plogis(opt_p$par[1]), mu = opt_p$par[2],
-             sigma = exp(opt_p$par[3]), cap = exp(opt_p$par[4]))
+
+## the final mu is re-solved on 20 seeds: the root is cheap (no Poisson
+## draws), and three seeds are not enough to center the mean.
+PI0_p <- plogis(opt_p$par[1]); sig_p <- exp(opt_p$par[2]); cap_p <- exp(opt_p$par[3])
+mu_p  <- solve_mu(sig_p, cap_p, PI0_p, make_parts(1:20))
+knobs_p <- c(pi0 = PI0_p, mu = mu_p, sigma = sig_p, cap = cap_p)
 knitr::kable(rbind(pancreas = round(knobs_p, 3), MOCA = round(knobs, 3)),
-             caption = "Calibrated knobs under the two anchors.")
-saveRDS(list(par = opt_p$par, knobs = knobs_p, target = target_p, CS = CS,
-             tstar = tstar_p, n = N_S, p = P_S, K = K, a_sig = A_SIG,
-             c_true = C_TRUE, df = 4),
+             caption = "Calibrated knobs under the two anchors. For pancreas,
+             mu is profiled (solved to match the real mean count exactly),
+             not searched.")
+saveRDS(list(knobs = knobs_p, target = target_p, CS = CS,
+             tstar = tstar_p, mean_target = M_REAL_P, n = N_S, p = P_S,
+             K = K, a_sig = A_SIG, c_true = C_TRUE, df = 4,
+             method = "curve-matched with profiled mean"),
         "output/sim_calibration_pancreas.rds")
 ```
 
 ```{r pancreas-acceptance, cache=TRUE}
-fresh_p <- sapply(101:105, function(s) curve_of(sim_Y(opt_p$par, s)))
+sim_pancreas <- function(seed) {
+  set.seed(seed)
+  L <- matrix(rgamma(N_S*K, A_SIG), N_S, K); L <- L/rowSums(L)
+  Fm <- matrix(pmin(exp(mu_p + sig_p*rt(P_S*K, 4)), cap_p) *
+               (runif(P_S*K) > PI0_p), P_S, K)
+  matrix(rpois(NP_S, C_TRUE*expm1(tcrossprod(L, Fm))), N_S, P_S)
+}
+fresh_l <- lapply(101:110, sim_pancreas)
+fresh_p <- sapply(fresh_l, curve_of)
 knitr::kable(data.frame(
   c = format(CS), target = round(target_p, 1),
-  `achieved (median of 5)` = round(apply(fresh_p, 1, median), 1),
+  `achieved (median of 10)` = round(apply(fresh_p, 1, median), 1),
   ratio = round(apply(fresh_p, 1, median)/target_p, 2),
   `ratio range` = paste0(round(apply(fresh_p/target_p, 1, min), 2), " – ",
                          round(apply(fresh_p/target_p, 1, max), 2)),
   check.names = FALSE),
   caption = "Pancreas-calibrated budget curve on held-out seeds.")
 
-Yp <- sim_Y(opt_p$par, 101)
+mns <- sapply(fresh_l, mean)
 knitr::kable(data.frame(
-  what = c("zero fraction", "mean count", "max count"),
-  simulated = c(round(mean(Yp == 0), 3), round(mean(Yp), 3), max(Yp)),
-  real = c(round(p_tp[1], 3), round(sum(p_tp*tvp), 3),
+  what = c("zero fraction (median)", "mean count (median)",
+           "mean count (range)", "max count (median)"),
+  simulated = c(round(median(sapply(fresh_l, function(Y) mean(Y == 0))), 3),
+                round(median(mns), 3),
+                paste0(round(min(mns), 2), " – ", round(max(mns), 2)),
+                median(sapply(fresh_l, max))),
+  real = c(round(p_tp[1], 3), round(M_REAL_P, 3), "",
            paste0(tstar_p, " (size-adjusted)"))),
-  caption = "Byproducts under the pancreas calibration.")
+  caption = "Byproducts under the pancreas calibration, 10 held-out seeds.")
 ```
 
-The knobs move in interpretable directions: less zero mass ($\pi_0$ 0.75
-versus 0.90), a higher location, and a higher cap, matching a dataset with
-more signal per entry and a heavier tail. The interesting difference from
-MOCA is $t^{*}$: the pancreas tail is heavy enough that even a
-600$\times$600 subsample is expected to contain a count near $10^{4}$, so the
-simulated rates must reach that scale — which is exactly what the raised cap
-provides. Since the pancreas data is the paper's main application, **this is
-the calibration the simulation experiments should use**; the MOCA calibration
-remains available for anchoring the approximation-accuracy work.
+The profiled mean lands centered on the target (the seed-to-seed range is
+genuine: with a tail this heavy, the few largest rates carry several percent
+of the mean, so the mean of any one dataset wobbles), and the curve keeps the
+same quality as the curve-only fit rather than trading its tail away.
+
+The knobs move in interpretable directions relative to MOCA: less zero mass,
+a higher location, and a doubled cap, matching a dataset with more signal per
+entry and a heavier tail. The interesting difference is $t^{*}$: the pancreas
+tail is heavy enough that even a 600$\times$600 subsample is expected to
+contain a count near $10^{4}$, so the simulated rates must reach that scale —
+which is exactly what the raised cap provides. Since the pancreas data is the
+paper's main application — and the mean is now pinned, which is what the
+approximation experiments need — **this is the calibration for all
+simulation experiments**; the MOCA calibration remains as a secondary anchor.
 
 # What one dataset looks like
 
@@ -346,11 +412,14 @@ knitr::kable(data.frame(
   curve, which is the principled version of "the datasets are comparable
   across $c_{\textrm{true}}$".
 - **Approximation accuracy** — the approximation's error depends on where the
-  counts and linear predictors actually live, so the realism criterion that
-  matters is exactly the one calibrated here. Either anchor works; MOCA
-  (`output/sim_calibration.rds`) is the natural one there because it is the
-  dataset used in the paper's timing and accuracy experiments. Recalibrating
-  for a different $n$, $p$ takes seconds ($t^*$ depends on $np$).
+  counts and linear predictors actually live, which is why the pancreas
+  calibration profiles the mean to match exactly rather than only matching
+  the (scale-loose) curve. The same
+  `output/sim_calibration_pancreas.rds` therefore serves here too, giving one
+  generator for every simulation in the paper. MOCA
+  (`output/sim_calibration.rds`) remains as a secondary anchor, and
+  recalibrating for a different $n$, $p$ takes seconds ($t^*$ depends on
+  $np$).
 
 # What is matched, and what is not
 
