@@ -511,6 +511,12 @@ acceptance
 calibrate
 </li>
 <li>
+pancreas-acceptance
+</li>
+<li>
+pancreas-calibrate
+</li>
+<li>
 truth
 </li>
 </ul>
@@ -540,15 +546,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb6e92a181b12e6e621c0cfd8788a68bcf7fc5125targetblankb6e92a1a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree44543b7633e78963644fb64cc28325c1695022b2targetblank44543b7a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/b6e92a181b12e6e621c0cfd8788a68bcf7fc5125" target="_blank">b6e92a1</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/44543b7633e78963644fb64cc28325c1695022b2" target="_blank">44543b7</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb6e92a181b12e6e621c0cfd8788a68bcf7fc5125targetblankb6e92a1a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree44543b7633e78963644fb64cc28325c1695022b2targetblank44543b7a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -558,7 +564,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/b6e92a181b12e6e621c0cfd8788a68bcf7fc5125" target="_blank">b6e92a1</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/44543b7633e78963644fb64cc28325c1695022b2" target="_blank">44543b7</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -623,6 +629,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/44543b7633e78963644fb64cc28325c1695022b2/analysis/sim_design.Rmd" target="_blank">44543b7</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-08
+</td>
+<td>
+sim_design: add pancreas calibration as the primary anchor
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/4e5c49192662959124909b21bddea73da03e4293/docs/sim_design.html" target="_blank">4e5c491</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1068,6 +1108,43 @@ ggplot(d, aes(x, pm, colour = what)) +
        title = &quot;The budget curve: target, new design, old design&quot;,
        subtitle = &quot;the old design was 40–100x below the real curve everywhere&quot;)</code></pre>
 <p><img src="figure/sim_design.Rmd/overlay-1.png" alt="" width="770" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-overlay-1">
+Past versions of overlay-1.png
+</button>
+</p>
+<div id="fig-overlay-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/4e5c49192662959124909b21bddea73da03e4293/docs/figure/sim_design.Rmd/overlay-1.png" target="_blank">4e5c491</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The old design was not wrong for its original purpose, but its budget
 curve sat two orders of magnitude below the real data’s: it probed the
 regime where the sparsity ceiling collapses toward zero, which real data
@@ -1087,6 +1164,318 @@ ggplot(d2, aes(t, p, colour = what)) +
        title = &quot;Tail of the count distribution&quot;,
        subtitle = &quot;not targeted by the calibration; inherited from the curve&quot;)</code></pre>
 <p><img src="figure/sim_design.Rmd/tail-1.png" alt="" width="715" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-tail-1">
+Past versions of tail-1.png
+</button>
+</p>
+<div id="fig-tail-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/4e5c49192662959124909b21bddea73da03e4293/docs/figure/sim_design.Rmd/tail-1.png" target="_blank">4e5c491</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="calibrating-to-the-pancreas-data-instead"
+class="section level1">
+<h1>Calibrating to the pancreas data instead</h1>
+<p>MOCA anchors the approximation-accuracy experiments, but the dataset
+at the center of the paper’s applications is the pancreas data (7,606
+cells <span class="math inline">\(\times\)</span> 18,195 genes). The
+same machinery calibrates to it — only the target changes. Its count
+histogram was extracted from the raw counts
+(<code>pancreas_cytokine_lsa.Rdata</code>) with one
+<code>tabulate()</code> call.</p>
+<pre class="r"><code>zp   &lt;- readRDS(&quot;data/pancreas_count_histogram.rds&quot;)
+p_tp &lt;- c(zp$np - sum(zp$h), zp$h) / zp$np
+tvp  &lt;- 0:(length(p_tp) - 1)
+tstar_p &lt;- tvp[min(which(cumsum(p_tp)^NP_S &gt;= 0.5))]
+target_p &lt;- sapply(CS, function(cc) {
+  g &lt;- function(t) if (is.infinite(cc)) t else log1p(t/cc)
+  g(tstar_p) / sum(p_tp * g(tvp))
+})
+knitr::kable(data.frame(
+  dataset = c(&quot;pancreas&quot;, &quot;MOCA&quot;),
+  `zero fraction` = c(round(p_tp[1], 3), round(p_t[1], 3)),
+  `mean count` = c(round(sum(p_tp*tvp), 3), round(sum(p_t*tv), 3)),
+  `max count` = c(max(tvp), max(tv)),
+  `size-adjusted max t*` = c(tstar_p, tstar),
+  `budget floor (c = 0.001)` = round(c(target_p[1], target[1]), 1),
+  `budget ceiling (c = Inf)` = round(c(target_p[8], target[8]), 0),
+  check.names = FALSE),
+  caption = &quot;The two anchors. Pancreas has fewer zeros (lower floor) and a far
+  heavier tail (higher ceiling): its budget curve spans three decades where
+  MOCA&#39;s spans one and a half.&quot;)</code></pre>
+<table>
+<caption>The two anchors. Pancreas has fewer zeros (lower floor) and a
+far heavier tail (higher ceiling): its budget curve spans three decades
+where MOCA’s spans one and a half.</caption>
+<colgroup>
+<col width="7%" />
+<col width="12%" />
+<col width="9%" />
+<col width="8%" />
+<col width="18%" />
+<col width="21%" />
+<col width="21%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">dataset</th>
+<th align="right">zero fraction</th>
+<th align="right">mean count</th>
+<th align="right">max count</th>
+<th align="right">size-adjusted max t*</th>
+<th align="right">budget floor (c = 0.001)</th>
+<th align="right">budget ceiling (c = Inf)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">pancreas</td>
+<td align="right">0.822</td>
+<td align="right">0.674</td>
+<td align="right">19487</td>
+<td align="right">9793</td>
+<td align="right">12.2</td>
+<td align="right">14532</td>
+</tr>
+<tr class="even">
+<td align="left">MOCA</td>
+<td align="right">0.974</td>
+<td align="right">0.037</td>
+<td align="right">1024</td>
+<td align="right">73</td>
+<td align="right">60.9</td>
+<td align="right">1995</td>
+</tr>
+</tbody>
+</table>
+<p>The comparison explains, through the theory, why the pancreas panels
+of the paper’s sparsity figure show the most dramatic trend across <span
+class="math inline">\(c\)</span>: its budget curve moves the most.</p>
+<pre class="r"><code>loss_p &lt;- function(par) mean(sapply(1:3, function(s) {
+  cv &lt;- curve_of(sim_Y(par, s))
+  if (any(!is.finite(cv)) || any(cv &lt;= 0)) return(1e6)
+  sum((log(cv) - log(target_p))^2) }))
+opt_p &lt;- optim(c(qlogis(0.8), -0.7, log(0.8), log(7)), loss_p,
+               method = &quot;Nelder-Mead&quot;, control = list(maxit = 600, reltol = 1e-6))
+stopifnot(opt_p$convergence == 0)
+knobs_p &lt;- c(pi0 = plogis(opt_p$par[1]), mu = opt_p$par[2],
+             sigma = exp(opt_p$par[3]), cap = exp(opt_p$par[4]))
+knitr::kable(rbind(pancreas = round(knobs_p, 3), MOCA = round(knobs, 3)),
+             caption = &quot;Calibrated knobs under the two anchors.&quot;)</code></pre>
+<table>
+<caption>Calibrated knobs under the two anchors.</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">pi0</th>
+<th align="right">mu</th>
+<th align="right">sigma</th>
+<th align="right">cap</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">pancreas</td>
+<td align="right">0.745</td>
+<td align="right">-0.402</td>
+<td align="right">0.549</td>
+<td align="right">10.710</td>
+</tr>
+<tr class="even">
+<td align="left">MOCA</td>
+<td align="right">0.902</td>
+<td align="right">-1.527</td>
+<td align="right">0.666</td>
+<td align="right">4.904</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>saveRDS(list(par = opt_p$par, knobs = knobs_p, target = target_p, CS = CS,
+             tstar = tstar_p, n = N_S, p = P_S, K = K, a_sig = A_SIG,
+             c_true = C_TRUE, df = 4),
+        &quot;output/sim_calibration_pancreas.rds&quot;)</code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<pre class="r"><code>fresh_p &lt;- sapply(101:105, function(s) curve_of(sim_Y(opt_p$par, s)))
+knitr::kable(data.frame(
+  c = format(CS), target = round(target_p, 1),
+  `achieved (median of 5)` = round(apply(fresh_p, 1, median), 1),
+  ratio = round(apply(fresh_p, 1, median)/target_p, 2),
+  `ratio range` = paste0(round(apply(fresh_p/target_p, 1, min), 2), &quot; – &quot;,
+                         round(apply(fresh_p/target_p, 1, max), 2)),
+  check.names = FALSE),
+  caption = &quot;Pancreas-calibrated budget curve on held-out seeds.&quot;)</code></pre>
+<table>
+<caption>Pancreas-calibrated budget curve on held-out seeds.</caption>
+<thead>
+<tr class="header">
+<th align="left">c</th>
+<th align="right">target</th>
+<th align="right">achieved (median of 5)</th>
+<th align="right">ratio</th>
+<th align="left">ratio range</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1e-03</td>
+<td align="right">12.2</td>
+<td align="right">11.2</td>
+<td align="right">0.92</td>
+<td align="left">0.89 – 0.97</td>
+</tr>
+<tr class="even">
+<td align="left">1e-02</td>
+<td align="right">15.2</td>
+<td align="right">14.1</td>
+<td align="right">0.92</td>
+<td align="left">0.89 – 0.98</td>
+</tr>
+<tr class="odd">
+<td align="left">1e-01</td>
+<td align="right">22.7</td>
+<td align="right">21.4</td>
+<td align="right">0.94</td>
+<td align="left">0.91 – 1</td>
+</tr>
+<tr class="even">
+<td align="left">1e+00</td>
+<td align="right">51.7</td>
+<td align="right">51.3</td>
+<td align="right">0.99</td>
+<td align="left">0.93 – 1.06</td>
+</tr>
+<tr class="odd">
+<td align="left">1e+01</td>
+<td align="right">210.5</td>
+<td align="right">217.1</td>
+<td align="right">1.03</td>
+<td align="left">0.9 – 1.1</td>
+</tr>
+<tr class="even">
+<td align="left">1e+02</td>
+<td align="right">1092.1</td>
+<td align="right">1031.0</td>
+<td align="right">0.94</td>
+<td align="left">0.75 – 1.04</td>
+</tr>
+<tr class="odd">
+<td align="left">1e+03</td>
+<td align="right">4519.3</td>
+<td align="right">3829.5</td>
+<td align="right">0.85</td>
+<td align="left">0.64 – 1.1</td>
+</tr>
+<tr class="even">
+<td align="left">Inf</td>
+<td align="right">14531.6</td>
+<td align="right">12246.8</td>
+<td align="right">0.84</td>
+<td align="left">0.65 – 1.94</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>Yp &lt;- sim_Y(opt_p$par, 101)
+knitr::kable(data.frame(
+  what = c(&quot;zero fraction&quot;, &quot;mean count&quot;, &quot;max count&quot;),
+  simulated = c(round(mean(Yp == 0), 3), round(mean(Yp), 3), max(Yp)),
+  real = c(round(p_tp[1], 3), round(sum(p_tp*tvp), 3),
+           paste0(tstar_p, &quot; (size-adjusted)&quot;))),
+  caption = &quot;Byproducts under the pancreas calibration.&quot;)</code></pre>
+<table>
+<caption>Byproducts under the pancreas calibration.</caption>
+<thead>
+<tr class="header">
+<th align="left">what</th>
+<th align="right">simulated</th>
+<th align="left">real</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">zero fraction</td>
+<td align="right">0.807</td>
+<td align="left">0.822</td>
+</tr>
+<tr class="even">
+<td align="left">mean count</td>
+<td align="right">1.036</td>
+<td align="left">0.674</td>
+</tr>
+<tr class="odd">
+<td align="left">max count</td>
+<td align="right">15061.000</td>
+<td align="left">9793 (size-adjusted)</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>The knobs move in interpretable directions: less zero mass (<span
+class="math inline">\(\pi_0\)</span> 0.75 versus 0.90), a higher
+location, and a higher cap, matching a dataset with more signal per
+entry and a heavier tail. The interesting difference from MOCA is <span
+class="math inline">\(t^{*}\)</span>: the pancreas tail is heavy enough
+that even a 600$$600 subsample is expected to contain a count near <span
+class="math inline">\(10^{4}\)</span>, so the simulated rates must reach
+that scale — which is exactly what the raised cap provides. Since the
+pancreas data is the paper’s main application, <strong>this is the
+calibration the simulation experiments should use</strong>; the MOCA
+calibration remains available for anchoring the approximation-accuracy
+work.</p>
 </div>
 <div id="what-one-dataset-looks-like" class="section level1">
 <h1>What one dataset looks like</h1>
@@ -1140,7 +1529,9 @@ remove this warning. See the
 <ul>
 <li><strong>Sparsity and identifiability across <span
 class="math inline">\(c\)</span></strong> — the grid experiments rerun
-with this generator. If several <span
+with this generator under the <strong>pancreas</strong> calibration
+(<code>output/sim_calibration_pancreas.rds</code>), since the pancreas
+data is the paper’s main application. If several <span
 class="math inline">\(c_{\textrm{true}}\)</span> values are kept, the
 calibration is rerun per <span
 class="math inline">\(c_{\textrm{true}}\)</span> with the <em>same</em>
@@ -1149,13 +1540,12 @@ comparable across <span
 class="math inline">\(c_{\textrm{true}}\)</span>”.</li>
 <li><strong>Approximation accuracy</strong> — the approximation’s error
 depends on where the counts and linear predictors actually live, so the
-realism criterion that matters is exactly the one calibrated here, and
-the anchor dataset (MOCA) is already the one used in the paper’s timing
-and accuracy experiments. The same
-<code>output/sim_calibration.rds</code> drives both, at whatever <span
+realism criterion that matters is exactly the one calibrated here.
+Either anchor works; MOCA (<code>output/sim_calibration.rds</code>) is
+the natural one there because it is the dataset used in the paper’s
+timing and accuracy experiments. Recalibrating for a different <span
 class="math inline">\(n\)</span>, <span class="math inline">\(p\)</span>
-the experiment needs — recalibrating takes seconds if the size changes
-(<span class="math inline">\(t^*\)</span> depends on <span
+takes seconds (<span class="math inline">\(t^*\)</span> depends on <span
 class="math inline">\(np\)</span>).</li>
 </ul>
 </div>
