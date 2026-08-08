@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-08-08" />
+
+<title>A calibrated simulation: realistic counts with controlled factors</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">log1p_experiments</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/eweine/log1p_experiments">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">A calibrated simulation: realistic counts
+with controlled factors</h1>
+<h4 class="date">2026-08-08</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-08-08
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>log1p_experiments/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240402code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240402)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240402code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240402)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongdetected">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
+</p>
+</div>
+<div id="strongCachestrongdetected" class="panel-collapse collapse">
+<div class="panel-body">
+The following chunks had caches available:
+<ul>
+<li>
+acceptance
+</li>
+<li>
+calibrate
+</li>
+<li>
+truth
+</li>
+</ul>
+<p>To ensure reproducibility of the results, delete the cache directory
+<code>sim_design_cache</code> and re-run the analysis. To have workflowr
+automatically delete the cache directory prior to building the file, set
+<code>delete_cache = TRUE</code> when running <code>wflow_build()</code>
+or <code>wflow_publish()</code>.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb6e92a181b12e6e621c0cfd8788a68bcf7fc5125targetblankb6e92a1a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/eweine/log1p_experiments/tree/b6e92a181b12e6e621c0cfd8788a68bcf7fc5125" target="_blank">b6e92a1</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb6e92a181b12e6e621c0cfd8788a68bcf7fc5125targetblankb6e92a1a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/eweine/log1p_experiments/tree/b6e92a181b12e6e621c0cfd8788a68bcf7fc5125" target="_blank">b6e92a1</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    analysis/c_grid_sim_cache/
+    Ignored:    analysis/hoyer_sparsity_c_cache/
+    Ignored:    analysis/log1p_identifiability_cache/
+    Ignored:    analysis/sim_design_cache/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/sim_design.Rmd</code>) and HTML
+(<code>docs/sim_design.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/b6e92a181b12e6e621c0cfd8788a68bcf7fc5125/analysis/sim_design.Rmd" target="_blank">b6e92a1</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-08
+</td>
+<td>
+Add sim_design: budget-curve-calibrated simulation matched to MOCA
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(ggplot2); library(cowplot)
+theme_set(theme_cowplot(font_size = 11))</code></pre>
+<div id="what-this-simulation-is-for" class="section level1">
+<h1>What this simulation is for</h1>
+<p>One generator, used everywhere a simulation appears: the sparsity and
+identifiability experiments across values of <span
+class="math inline">\(c\)</span>, and the assessment of the
+approximation accuracy. The design has three requirements.</p>
+<ol style="list-style-type: decimal">
+<li><strong>The true loadings have fixed, controlled sparsity.</strong>
+Whatever else varies, the rows of <span class="math inline">\(L\)</span>
+are drawn the same way, so differences in <em>fitted</em> sparsity
+across <span class="math inline">\(c\)</span> can never be blamed on the
+truth changing.</li>
+<li><strong>“Realistic” is a checked property, not an
+adjective.</strong> The simulated counts are calibrated to a real
+dataset against a specific criterion, stated below, and the match is
+verified on held-out seeds.</li>
+<li><strong>The whole recipe fits in five lines</strong>, so it can be
+described completely in a paper paragraph.</li>
+</ol>
+</div>
+<div id="the-generative-recipe" class="section level1">
+<h1>The generative recipe</h1>
+<p>Fix the dimensions <span class="math inline">\(n\)</span>, <span
+class="math inline">\(p\)</span>, the rank <span
+class="math inline">\(K\)</span>, a link constant <span
+class="math inline">\(c_{\textrm{true}}\)</span>, and the Dirichlet
+concentration <span class="math inline">\(a = 0.3\)</span>. The
+calibration below supplies four numbers: a zero probability <span
+class="math inline">\(\pi_0\)</span>, a location <span
+class="math inline">\(\mu\)</span>, a scale <span
+class="math inline">\(\sigma\)</span>, and a cap <span
+class="math inline">\(T\)</span>. Then:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Loadings.</strong> Each row of <span
+class="math inline">\(L\)</span> is drawn <span
+class="math inline">\(\;\mathbf{l}_{i\cdot} \sim \textrm{Dirichlet}(a,
+\dots, a)\)</span>. With <span class="math inline">\(a = 0.3\)</span>
+each sample places most of its weight on a few factors — membership is
+soft but concentrated, and its sparsity is set once by <span
+class="math inline">\(a\)</span>.</li>
+<li><strong>Factors.</strong> Each entry of <span
+class="math inline">\(F\)</span> is independently <span
+class="math display">\[f_{jk} = \begin{cases} 0 &amp; \textrm{with
+probability } \pi_0 \\
+\min\{\exp(\mu + \sigma t_{jk}),\; T\} &amp; \textrm{otherwise},
+\end{cases}
+\qquad t_{jk} \sim t_4 .\]</span> A point mass at zero, a heavy-tailed
+body, and a hard ceiling.</li>
+<li><strong>Linear predictor.</strong> <span
+class="math inline">\(\Theta = L F^{\top}\)</span>.</li>
+<li><strong>Rates.</strong> <span class="math inline">\(\lambda_{ij} =
+c_{\textrm{true}}\left(e^{\theta_{ij}} - 1\right)\)</span> — the inverse
+of the log1p link.</li>
+<li><strong>Counts.</strong> <span class="math inline">\(y_{ij} \sim
+\textrm{Poisson}(\lambda_{ij})\)</span>.</li>
+</ol>
+<p>Each ingredient of step 2 has one job. The point mass makes most
+rates exactly zero, which is where the zeros of real count matrices come
+from. The log-<span class="math inline">\(t\)</span> body gives the
+counts a heavy tail, which lognormal magnitudes cannot produce (we
+tried: the maximum count comes out several times too small). The cap
+exists because the <em>maximum</em> of unbounded heavy-tailed draws
+varies wildly from seed to seed — with a cap, the extreme counts land in
+the same place every time, as they should for a matrix of fixed
+size.</p>
+</div>
+<div id="what-realistic-means-exactly" class="section level1">
+<h1>What “realistic” means, exactly</h1>
+<p>The property of the data that our theory identifies as consequential
+is the <strong>budget curve</strong></p>
+<p><span class="math display">\[ c \;\mapsto\;
+\operatorname{pm}\!\left(\log(1 + Y/c)\right),
+\qquad \operatorname{pm}(x) = \frac{\max(x)}{\operatorname{mean}(x)} ,
+\]</span></p>
+<p>the peak-to-mean ratio of the data seen through the link, as a
+function of the <span class="math inline">\(c\)</span> used to fit. By
+the results in <a href="hoyer_sparsity_c.html">Why the sparsity of a
+log1p fit is decided by Y and c</a> (and the corresponding appendix of
+the paper), this curve caps the Hoyer sparsity that <em>any</em>
+rank-<span class="math inline">\(K\)</span> fit can attain at each <span
+class="math inline">\(c\)</span> — and on both our simulations and the
+paper’s real-data fits, the cap is essentially attained. So if a
+simulation gets this curve right, it reproduces the phenomenon the
+sparsity experiments study; if it gets it wrong, no other resemblance
+helps.</p>
+<p>Two facts make the curve a practical calibration target.</p>
+<ul>
+<li><strong>It is structure-blind.</strong> <span
+class="math inline">\(\operatorname{pm}\)</span> sees only the multiset
+of count values, so the curve is a functional of the count
+<em>histogram</em> — it can be matched without matching any of the real
+data’s latent structure.</li>
+<li><strong>It must be size-adjusted.</strong> The curve involves <span
+class="math inline">\(\max(Y)\)</span>, and a <span
+class="math inline">\(26{,}000 \times 1.3\)</span>M matrix reaches
+deeper into its tail than any simulation-sized matrix can. The honest
+target for a simulation with <span class="math inline">\(np\)</span>
+entries is the curve of <span class="math inline">\(np\)</span> draws
+from the real marginal, whose median maximum <span
+class="math inline">\(t^{*}\)</span> solves <span
+class="math inline">\(F(t)^{np} = \tfrac12\)</span>.</li>
+</ul>
+<p>The four calibrated numbers map onto the curve’s features: <span
+class="math inline">\(\pi_0\)</span> sets the small-<span
+class="math inline">\(c\)</span> floor (the zero fraction), <span
+class="math inline">\(\mu\)</span> the overall level, <span
+class="math inline">\(\sigma\)</span> the transition, and <span
+class="math inline">\(T\)</span> the large-<span
+class="math inline">\(c\)</span> ceiling.</p>
+</div>
+<div id="the-target-moca" class="section level1">
+<h1>The target: MOCA</h1>
+<p>We calibrate against the MOCA counts (26,183 genes <span
+class="math inline">\(\times\)</span> 1,331,984 cells) — the same
+dataset used in the paper’s approximation-accuracy experiments, so a
+single real dataset anchors every simulation in the paper. The histogram
+was extracted once with <code>tabulate()</code>; it is a 1KB file.</p>
+<pre class="r"><code>z  &lt;- readRDS(&quot;data/moca_count_histogram.rds&quot;)   # h = counts of value t&gt;=1; np
+p_t &lt;- c(z$np - sum(z$h), z$h) / z$np            # P(Y = t), t = 0, 1, ...
+tv  &lt;- 0:(length(p_t) - 1)
+
+N_S &lt;- 600L; P_S &lt;- 600L; NP_S &lt;- N_S * P_S      # simulation dimensions
+K &lt;- 10L; A_SIG &lt;- 0.3; C_TRUE &lt;- 1
+
+tstar &lt;- tv[min(which(cumsum(p_t)^NP_S &gt;= 0.5))] # median max of NP_S draws
+CS &lt;- c(1e-3, 1e-2, 1e-1, 1, 10, 100, 1e3, Inf)  # the fitting grid
+target &lt;- sapply(CS, function(cc) {
+  g &lt;- function(t) if (is.infinite(cc)) t else log1p(t/cc)
+  g(tstar) / sum(p_t * g(tv))
+})
+
+knitr::kable(data.frame(
+  `real zero fraction` = round(p_t[1], 4),
+  `real mean` = round(sum(p_t * tv), 4),
+  `real max` = max(tv),
+  `size-adjusted max t*` = tstar, check.names = FALSE))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">real zero fraction</th>
+<th align="right">real mean</th>
+<th align="right">real max</th>
+<th align="right">size-adjusted max t*</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.9741</td>
+<td align="right">0.0366</td>
+<td align="right">1024</td>
+<td align="right">73</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>knitr::kable(t(setNames(round(target, 1), paste0(&quot;c=&quot;, format(CS)))),
+             caption = &quot;The size-adjusted target budget curve.&quot;)</code></pre>
+<table>
+<caption>The size-adjusted target budget curve.</caption>
+<colgroup>
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">c=1e-03</th>
+<th align="right">c=1e-02</th>
+<th align="right">c=1e-01</th>
+<th align="right">c=1e+00</th>
+<th align="right">c=1e+01</th>
+<th align="right">c=1e+02</th>
+<th align="right">c=1e+03</th>
+<th align="right">c= Inf</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">60.9</td>
+<td align="right">71.4</td>
+<td align="right">98.7</td>
+<td align="right">204.1</td>
+<td align="right">646.7</td>
+<td align="right">1523.7</td>
+<td align="right">1929.8</td>
+<td align="right">1995.4</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="calibration" class="section level1">
+<h1>Calibration</h1>
+<p>Nelder–Mead over the four knobs. The loss is the squared log-mismatch
+of the curves, averaged over three fixed seeds (fixing seeds inside the
+loss makes it a deterministic function, which is all Nelder–Mead asks;
+averaging keeps the optimizer from exploiting one seed’s luck).</p>
+<pre class="r"><code>sim_Y &lt;- function(par, seed, n = N_S, p = P_S) {
+  PI0 &lt;- plogis(par[1]); mu &lt;- par[2]; sig &lt;- exp(par[3]); CAP &lt;- exp(par[4])
+  set.seed(seed)
+  L  &lt;- matrix(rgamma(n*K, A_SIG), n, K); L &lt;- L / rowSums(L)
+  Fm &lt;- matrix(pmin(exp(mu + sig * rt(p*K, df = 4)), CAP) *
+               (runif(p*K) &gt; PI0), p, K)
+  matrix(rpois(n*p, C_TRUE * expm1(tcrossprod(L, Fm))), n, p)
+}
+curve_of &lt;- function(Y) sapply(CS, function(cc) {
+  g &lt;- if (is.infinite(cc)) as.numeric(Y) else log1p(Y/cc)
+  max(g) / mean(g) })
+loss &lt;- function(par) mean(sapply(1:3, function(s) {
+  cv &lt;- curve_of(sim_Y(par, s))
+  if (any(!is.finite(cv)) || any(cv &lt;= 0)) return(1e6)
+  sum((log(cv) - log(target))^2) }))
+
+opt &lt;- optim(c(qlogis(0.9), -1.3, log(0.6), log(4.3)), loss,
+             method = &quot;Nelder-Mead&quot;, control = list(maxit = 500, reltol = 1e-6))
+stopifnot(opt$convergence == 0)
+knobs &lt;- c(pi0 = plogis(opt$par[1]), mu = opt$par[2],
+           sigma = exp(opt$par[3]), cap = exp(opt$par[4]))
+knitr::kable(t(round(knobs, 3)), caption = &quot;The four calibrated numbers.&quot;)</code></pre>
+<table>
+<caption>The four calibrated numbers.</caption>
+<thead>
+<tr class="header">
+<th align="right">pi0</th>
+<th align="right">mu</th>
+<th align="right">sigma</th>
+<th align="right">cap</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.902</td>
+<td align="right">-1.527</td>
+<td align="right">0.666</td>
+<td align="right">4.904</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>saveRDS(list(par = opt$par, knobs = knobs, target = target, CS = CS,
+             tstar = tstar, n = N_S, p = P_S, K = K, a_sig = A_SIG,
+             c_true = C_TRUE, df = 4),
+        &quot;output/sim_calibration.rds&quot;)</code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+</div>
+<div id="does-it-hold-on-seeds-the-optimizer-never-saw"
+class="section level1">
+<h1>Does it hold on seeds the optimizer never saw?</h1>
+<p>Everything below uses seeds 101–105, disjoint from the three
+calibration seeds.</p>
+<pre class="r"><code>fresh &lt;- sapply(101:105, function(s) curve_of(sim_Y(opt$par, s)))
+knitr::kable(data.frame(
+  c = format(CS), target = round(target, 1),
+  `achieved (median of 5)` = round(apply(fresh, 1, median), 1),
+  `ratio` = round(apply(fresh, 1, median)/target, 2),
+  `ratio range` = paste0(round(apply(fresh/target, 1, min), 2), &quot; – &quot;,
+                         round(apply(fresh/target, 1, max), 2)),
+  check.names = FALSE), caption = &quot;Budget curve on held-out seeds.&quot;)</code></pre>
+<table>
+<caption>Budget curve on held-out seeds.</caption>
+<thead>
+<tr class="header">
+<th align="left">c</th>
+<th align="right">target</th>
+<th align="right">achieved (median of 5)</th>
+<th align="right">ratio</th>
+<th align="left">ratio range</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1e-03</td>
+<td align="right">60.9</td>
+<td align="right">50.1</td>
+<td align="right">0.82</td>
+<td align="left">0.74 – 0.88</td>
+</tr>
+<tr class="even">
+<td align="left">1e-02</td>
+<td align="right">71.4</td>
+<td align="right">59.3</td>
+<td align="right">0.83</td>
+<td align="left">0.74 – 0.89</td>
+</tr>
+<tr class="odd">
+<td align="left">1e-01</td>
+<td align="right">98.7</td>
+<td align="right">83.1</td>
+<td align="right">0.84</td>
+<td align="left">0.75 – 0.89</td>
+</tr>
+<tr class="even">
+<td align="left">1e+00</td>
+<td align="right">204.1</td>
+<td align="right">177.4</td>
+<td align="right">0.87</td>
+<td align="left">0.75 – 0.9</td>
+</tr>
+<tr class="odd">
+<td align="left">1e+01</td>
+<td align="right">646.7</td>
+<td align="right">564.3</td>
+<td align="right">0.87</td>
+<td align="left">0.74 – 0.91</td>
+</tr>
+<tr class="even">
+<td align="left">1e+02</td>
+<td align="right">1523.7</td>
+<td align="right">1330.8</td>
+<td align="right">0.87</td>
+<td align="left">0.74 – 0.96</td>
+</tr>
+<tr class="odd">
+<td align="left">1e+03</td>
+<td align="right">1929.8</td>
+<td align="right">1764.0</td>
+<td align="right">0.91</td>
+<td align="left">0.75 – 0.99</td>
+</tr>
+<tr class="even">
+<td align="left">Inf</td>
+<td align="right">1995.4</td>
+<td align="right">1831.7</td>
+<td align="right">0.92</td>
+<td align="left">0.75 – 1</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>Y &lt;- sim_Y(opt$par, 101)
+knitr::kable(data.frame(
+  what = c(&quot;zero fraction&quot;, &quot;mean count&quot;, &quot;max count&quot;),
+  simulated = c(round(mean(Y == 0), 3), round(mean(Y), 3), max(Y)),
+  real = c(round(p_t[1], 3), round(sum(p_t*tv), 3),
+           paste0(tstar, &quot; (size-adjusted)&quot;))),
+  caption = &quot;Byproducts, none of which were targeted directly.&quot;)</code></pre>
+<table>
+<caption>Byproducts, none of which were targeted directly.</caption>
+<thead>
+<tr class="header">
+<th align="left">what</th>
+<th align="right">simulated</th>
+<th align="left">real</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">zero fraction</td>
+<td align="right">0.970</td>
+<td align="left">0.974</td>
+</tr>
+<tr class="even">
+<td align="left">mean count</td>
+<td align="right">0.042</td>
+<td align="left">0.037</td>
+</tr>
+<tr class="odd">
+<td align="left">max count</td>
+<td align="right">68.000</td>
+<td align="left">73 (size-adjusted)</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>The curve lands within about <span class="math inline">\(\pm
+25\%\)</span> of the target across six decades of <span
+class="math inline">\(c\)</span>, and the zero fraction, mean, and
+maximum come along for free — which is the point of matching a
+sufficient statistic rather than a list of summary numbers.</p>
+<p>For contrast, the same curves for the <em>previous</em> simulation
+design (the 300$$300, rank-3 grid used in <a href="c_grid_sim.html">the
+earlier experiments</a>, which calibrated the zero fraction to 0.5 and
+capped counts near 20):</p>
+<pre class="r"><code>old &lt;- c(1.55, 1.87, 2.7, 5.6, 13.0, 18.3, 19.3, 19.4)   # pm of old-sim fits
+lab &lt;- ifelse(is.infinite(CS), &quot;Inf&quot;, format(CS, scientific = TRUE))
+d &lt;- rbind(
+  data.frame(c = CS, pm = target, what = &quot;target (MOCA, size-adjusted)&quot;),
+  data.frame(c = CS, pm = apply(fresh, 1, median), what = &quot;new simulation&quot;),
+  data.frame(c = CS, pm = old, what = &quot;old simulation&quot;))
+d$x &lt;- log10(ifelse(is.infinite(d$c), 1e4, d$c))
+ggplot(d, aes(x, pm, colour = what)) +
+  geom_line(linewidth = 1) + geom_point(size = 2) +
+  scale_y_log10() +
+  scale_x_continuous(breaks = log10(c(1e-3, 1e-1, 10, 1e3, 1e4)),
+                     labels = c(&quot;1e-3&quot;, &quot;0.1&quot;, &quot;10&quot;, &quot;1000&quot;, &quot;Inf&quot;)) +
+  scale_colour_manual(values = c(&quot;target (MOCA, size-adjusted)&quot; = &quot;#C2410C&quot;,
+                                 &quot;new simulation&quot; = &quot;#0E5C6B&quot;,
+                                 &quot;old simulation&quot; = &quot;grey55&quot;), name = NULL) +
+  labs(x = &quot;c used for fitting&quot;, y = &quot;pm(log1p(Y/c))&quot;,
+       title = &quot;The budget curve: target, new design, old design&quot;,
+       subtitle = &quot;the old design was 40–100x below the real curve everywhere&quot;)</code></pre>
+<p><img src="figure/sim_design.Rmd/overlay-1.png" alt="" width="770" style="display: block; margin: auto;" /></p>
+<p>The old design was not wrong for its original purpose, but its budget
+curve sat two orders of magnitude below the real data’s: it probed the
+regime where the sparsity ceiling collapses toward zero, which real data
+— with its 97% zeros and heavy tail — never enters.</p>
+<pre class="r"><code>ccdf_sim &lt;- rev(cumsum(rev(tabulate(Y[Y &gt; 0], nbins = max(Y))))) / length(Y)
+ccdf_real &lt;- rev(cumsum(rev(p_t[-1])))
+tt &lt;- 1:min(length(ccdf_sim), length(ccdf_real), 200)
+d2 &lt;- rbind(data.frame(t = tt, p = ccdf_sim[tt],  what = &quot;simulated&quot;),
+            data.frame(t = tt, p = ccdf_real[tt], what = &quot;real (MOCA)&quot;))
+d2 &lt;- d2[d2$p &gt; 0, ]
+ggplot(d2, aes(t, p, colour = what)) +
+  geom_line(linewidth = 1) +
+  scale_x_log10() + scale_y_log10() +
+  scale_colour_manual(values = c(`real (MOCA)` = &quot;#C2410C&quot;,
+                                 simulated = &quot;#0E5C6B&quot;), name = NULL) +
+  labs(x = &quot;count value t&quot;, y = &quot;P(Y &gt;= t)&quot;,
+       title = &quot;Tail of the count distribution&quot;,
+       subtitle = &quot;not targeted by the calibration; inherited from the curve&quot;)</code></pre>
+<p><img src="figure/sim_design.Rmd/tail-1.png" alt="" width="715" style="display: block; margin: auto;" /></p>
+</div>
+<div id="what-one-dataset-looks-like" class="section level1">
+<h1>What one dataset looks like</h1>
+<pre class="r"><code>set.seed(101)
+L  &lt;- matrix(rgamma(N_S*K, A_SIG), N_S, K); L &lt;- L / rowSums(L)
+hoyer &lt;- function(x) { m &lt;- length(x)
+  (sqrt(m) - sum(x)/sqrt(sum(x^2)))/(sqrt(m) - 1) }
+knitr::kable(data.frame(
+  `mean Hoyer sparsity of true loading columns` = round(mean(apply(L, 2, hoyer)), 3),
+  `mean # factors carrying 90% of a sample` = round(mean(apply(L, 1, function(r)
+     min(which(cumsum(sort(r, decreasing = TRUE)) &gt;= 0.9)))), 1),
+  check.names = FALSE),
+  caption = &quot;The controlled side: loading structure, identical for every c and seed.&quot;)</code></pre>
+<table>
+<caption>The controlled side: loading structure, identical for every c
+and seed.</caption>
+<colgroup>
+<col width="52%" />
+<col width="47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">mean Hoyer sparsity of true loading columns</th>
+<th align="right">mean # factors carrying 90% of a sample</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.464</td>
+<td align="right">4.3</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+</div>
+<div id="how-this-feeds-the-papers-experiments" class="section level1">
+<h1>How this feeds the paper’s experiments</h1>
+<ul>
+<li><strong>Sparsity and identifiability across <span
+class="math inline">\(c\)</span></strong> — the grid experiments rerun
+with this generator. If several <span
+class="math inline">\(c_{\textrm{true}}\)</span> values are kept, the
+calibration is rerun per <span
+class="math inline">\(c_{\textrm{true}}\)</span> with the <em>same</em>
+target curve, which is the principled version of “the datasets are
+comparable across <span
+class="math inline">\(c_{\textrm{true}}\)</span>”.</li>
+<li><strong>Approximation accuracy</strong> — the approximation’s error
+depends on where the counts and linear predictors actually live, so the
+realism criterion that matters is exactly the one calibrated here, and
+the anchor dataset (MOCA) is already the one used in the paper’s timing
+and accuracy experiments. The same
+<code>output/sim_calibration.rds</code> drives both, at whatever <span
+class="math inline">\(n\)</span>, <span class="math inline">\(p\)</span>
+the experiment needs — recalibrating takes seconds if the size changes
+(<span class="math inline">\(t^*\)</span> depends on <span
+class="math inline">\(np\)</span>).</li>
+</ul>
+</div>
+<div id="what-is-matched-and-what-is-not" class="section level1">
+<h1>What is matched, and what is not</h1>
+<p>Matched, and verified on held-out seeds: the budget curve across six
+decades of <span class="math inline">\(c\)</span>; the zero fraction;
+the mean; the maximum; the count tail.</p>
+<p>Not matched, by design: the real data’s shared gene-abundance profile
+(our factor columns are exchangeable, real genes are not), size-factor
+heterogeneity across cells (<span class="math inline">\(s_i = 1\)</span>
+here), and gene-level mean structure. Consequently the
+factor-<em>correlation</em> phenomenology of the real fits — which is
+driven by the shared abundance profile — will not appear in this
+simulation, and no claim about it should rest on these data. If that
+ever becomes the target, the right tool is a parametric bootstrap of a
+real fit, not a redesign of this generator.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Ventura 13.5
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Chicago
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] cowplot_1.2.0   ggplot2_4.0.3   workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.6       jsonlite_2.0.0     dplyr_1.2.1        compiler_4.5.2    
+ [5] promises_1.5.0     tidyselect_1.2.1   Rcpp_1.1.1-1.1     stringr_1.6.0     
+ [9] git2r_0.36.2       dichromat_2.0-0.1  callr_3.7.6        later_1.4.8       
+[13] jquerylib_0.1.4    scales_1.4.0       yaml_2.3.12        fastmap_1.2.0     
+[17] R6_2.6.1           generics_0.1.4     knitr_1.51         tibble_3.3.1      
+[21] rprojroot_2.1.1    RColorBrewer_1.1-3 bslib_0.10.0       pillar_1.11.1     
+[25] rlang_1.2.0        cachem_1.1.0       stringi_1.8.7      httpuv_1.6.17     
+[29] xfun_0.57          S7_0.2.2           getPass_0.2-4      fs_2.1.0          
+[33] sass_0.4.10        otel_0.2.0         cli_3.6.6          withr_3.0.2       
+[37] magrittr_2.0.5     digest_0.6.39      grid_4.5.2         processx_3.9.0    
+[41] rstudioapi_0.18.0  lifecycle_1.0.5    vctrs_0.7.3        evaluate_1.0.5    
+[45] glue_1.8.1         farver_2.1.2       whisker_0.4.1      rmarkdown_2.31    
+[49] httr_1.4.8         tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9   </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
