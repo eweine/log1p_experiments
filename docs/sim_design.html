@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2026-08-08" />
+<meta name="date" content="2026-08-09" />
 
 <title>The calibrated simulation: a paper-ready description</title>
 
@@ -366,7 +366,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">The calibrated simulation: a paper-ready
 description</h1>
-<h4 class="date">2026-08-08</h4>
+<h4 class="date">2026-08-09</h4>
 
 </div>
 
@@ -395,7 +395,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-08-08
+<strong>Last updated:</strong> 2026-08-09
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -549,15 +549,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree7617718fbe1511c0aab06985c5d691de7411dedftargetblank7617718a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree7da324878c9b4725d5fb1b4060e69f66013228betargetblank7da3248a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/7617718fbe1511c0aab06985c5d691de7411dedf" target="_blank">7617718</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/7da324878c9b4725d5fb1b4060e69f66013228be" target="_blank">7da3248</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree7617718fbe1511c0aab06985c5d691de7411dedftargetblank7617718a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree7da324878c9b4725d5fb1b4060e69f66013228betargetblank7da3248a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -567,7 +567,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/7617718fbe1511c0aab06985c5d691de7411dedf" target="_blank">7617718</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/7da324878c9b4725d5fb1b4060e69f66013228be" target="_blank">7da3248</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -632,6 +632,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/7da324878c9b4725d5fb1b4060e69f66013228be/analysis/sim_design.Rmd" target="_blank">7da3248</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-09
+</td>
+<td>
+sim_design: sweep the generating c over 1e-3, 1, Inf
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/61755b648564acbcecf07803debdb68ae0190e45/docs/sim_design.html" target="_blank">61755b6</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -759,104 +793,122 @@ Add sim_design: budget-curve-calibrated simulation matched to MOCA
 </div>
 </div>
 <p>This page describes <strong>exactly</strong> the simulation that the
-exact-vs-approx experiment will run. To make drift impossible, every
-constant below is read from the experiment’s own configuration file
+exact-vs-approx / sparsity experiment will run. To make drift
+impossible, every constant below is read from the experiment’s own
+configuration file
 (<code>inst/paper_figures/experiments/approx_sim_common.R</code> in the
-log1pNMF repo), which is what the cluster workers source. An earlier
-version of this page developed the method with a MOCA anchor; that
+log1pNMF repo), which is what the cluster workers source — including the
+calibrated knobs, which that file in turn reads from
+<code>approx_sim_calibration.rds</code> with a consistency check. An
+earlier version of this page developed the method with a MOCA anchor and
+a single <span class="math inline">\(c_{\textrm{true}}\)</span>; that
 material is in the git history.</p>
 <pre class="r"><code>library(ggplot2); library(cowplot)
 theme_set(theme_cowplot(font_size = 11))
 
 exp_dir &lt;- path.expand(&quot;~/Documents/log1pNMF/inst/paper_figures/experiments&quot;)
-source(file.path(exp_dir, &quot;approx_sim_common.R&quot;))
-cal &lt;- readRDS(file.path(exp_dir, &quot;approx_sim_calibration.rds&quot;))
-stopifnot(all.equal(unname(cal$knobs),
-                    c(PI0, MU, SIGMA, CAP), tolerance = 1e-4))
+source(file.path(exp_dir, &quot;approx_sim_common.R&quot;), chdir = TRUE)
 
 knitr::kable(data.frame(
   parameter = c(&quot;n (samples)&quot;, &quot;p (features)&quot;, &quot;K (rank, true = fitted)&quot;,
-                &quot;Dirichlet concentration a&quot;, &quot;zero probability pi0&quot;,
-                &quot;location mu&quot;, &quot;scale sigma&quot;, &quot;cap T&quot;, &quot;floor T_lo&quot;,
-                &quot;t degrees of freedom&quot;, &quot;c used to generate&quot;),
-  value = c(N_ROWS, N_COLS, K_TRUE, A_SIG, round(PI0, 4), round(MU, 4),
-            round(SIGMA, 4), round(CAP, 4), FLOOR, T_DF, C_TRUE),
-  role = c(&quot;fixed by design&quot;, &quot;fixed by design&quot;, &quot;fixed by design&quot;,
-           &quot;fixed by design (controls loading sparsity)&quot;,
-           &quot;calibrated&quot;, &quot;calibrated (profiled)&quot;, &quot;calibrated&quot;, &quot;calibrated&quot;,
-           &quot;fixed by design (see below)&quot;,
-           &quot;fixed by design&quot;, &quot;fixed by design&quot;)),
-  caption = &quot;Every number the generator uses, read from approx_sim_common.R.&quot;)</code></pre>
+                &quot;Dirichlet concentration a&quot;, &quot;t degrees of freedom&quot;,
+                &quot;rate-scale magnitude floor&quot;, &quot;c_true grid&quot;),
+  value = c(N_ROWS, N_COLS, K_TRUE, A_SIG, T_DF, CAL$rate_floor,
+            paste(sapply(C_TRUE_GRID, fmtc), collapse = &quot;, &quot;)),
+  role = &quot;fixed by design&quot;),
+  caption = &quot;The design constants, read from approx_sim_common.R.&quot;)</code></pre>
 <table>
-<caption>Every number the generator uses, read from
-approx_sim_common.R.</caption>
-<colgroup>
-<col width="32%" />
-<col width="11%" />
-<col width="55%" />
-</colgroup>
+<caption>The design constants, read from approx_sim_common.R.</caption>
 <thead>
 <tr class="header">
 <th align="left">parameter</th>
-<th align="right">value</th>
+<th align="left">value</th>
 <th align="left">role</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">n (samples)</td>
-<td align="right">500.0000</td>
+<td align="left">500</td>
 <td align="left">fixed by design</td>
 </tr>
 <tr class="even">
 <td align="left">p (features)</td>
-<td align="right">500.0000</td>
+<td align="left">500</td>
 <td align="left">fixed by design</td>
 </tr>
 <tr class="odd">
 <td align="left">K (rank, true = fitted)</td>
-<td align="right">5.0000</td>
+<td align="left">5</td>
 <td align="left">fixed by design</td>
 </tr>
 <tr class="even">
 <td align="left">Dirichlet concentration a</td>
-<td align="right">0.3000</td>
-<td align="left">fixed by design (controls loading sparsity)</td>
+<td align="left">0.3</td>
+<td align="left">fixed by design</td>
 </tr>
 <tr class="odd">
-<td align="left">zero probability pi0</td>
-<td align="right">0.7738</td>
-<td align="left">calibrated</td>
-</tr>
-<tr class="even">
-<td align="left">location mu</td>
-<td align="right">-1.2512</td>
-<td align="left">calibrated (profiled)</td>
-</tr>
-<tr class="odd">
-<td align="left">scale sigma</td>
-<td align="right">0.7067</td>
-<td align="left">calibrated</td>
-</tr>
-<tr class="even">
-<td align="left">cap T</td>
-<td align="right">7.7587</td>
-<td align="left">calibrated</td>
-</tr>
-<tr class="odd">
-<td align="left">floor T_lo</td>
-<td align="right">0.0500</td>
-<td align="left">fixed by design (see below)</td>
-</tr>
-<tr class="even">
 <td align="left">t degrees of freedom</td>
-<td align="right">4.0000</td>
+<td align="left">4</td>
+<td align="left">fixed by design</td>
+</tr>
+<tr class="even">
+<td align="left">rate-scale magnitude floor</td>
+<td align="left">0.05</td>
 <td align="left">fixed by design</td>
 </tr>
 <tr class="odd">
-<td align="left">c used to generate</td>
-<td align="right">1.0000</td>
+<td align="left">c_true grid</td>
+<td align="left">0.001, 1, Inf</td>
 <td align="left">fixed by design</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>kb &lt;- KNOBS
+kb$c_true &lt;- sapply(kb$c_true, fmtc)
+knitr::kable(kb, digits = 4,
+  caption = &quot;The calibrated knobs, one row per c_true. pi0, sigma and cap are
+  searched; mu is profiled (solved so the expected mean count equals the real
+  0.674); floor is the fixed rate-scale floor mapped through each link.&quot;)</code></pre>
+<table>
+<caption>The calibrated knobs, one row per c_true. pi0, sigma and cap
+are searched; mu is profiled (solved so the expected mean count equals
+the real 0.674); floor is the fixed rate-scale floor mapped through each
+link.</caption>
+<thead>
+<tr class="header">
+<th align="left">c_true</th>
+<th align="right">pi0</th>
+<th align="right">mu</th>
+<th align="right">sigma</th>
+<th align="right">cap</th>
+<th align="right">floor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0.001</td>
+<td align="right">0.9592</td>
+<td align="right">2.1956</td>
+<td align="right">0.0994</td>
+<td align="right">15.5685</td>
+<td align="right">3.9318</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="right">0.8379</td>
+<td align="right">-0.9633</td>
+<td align="right">0.6652</td>
+<td align="right">7.8197</td>
+<td align="right">0.0488</td>
+</tr>
+<tr class="odd">
+<td align="left">Inf</td>
+<td align="right">0.9011</td>
+<td align="right">-2.4179</td>
+<td align="right">1.4668</td>
+<td align="right">911.2182</td>
+<td align="right">0.0500</td>
 </tr>
 </tbody>
 </table>
@@ -864,70 +916,89 @@ approx_sim_common.R.</caption>
 class="section level1">
 <h1>The description, as the paper would give it</h1>
 <blockquote>
-<p>Counts were simulated from the log1p NMF model itself, with
-parameters calibrated so that the simulated data reproduce the count
-characteristics of the pancreas dataset. For each of ten seeds we drew
-an <span class="math inline">\(n \times K\)</span> loading matrix <span
-class="math inline">\(L\)</span> with rows <span
-class="math inline">\(\mathbf{l}_{i\cdot} \sim \textrm{Dirichlet}(0.3,
-\dots, 0.3)\)</span>, so that every sample concentrates on a small
-number of factors, and a <span class="math inline">\(p \times K\)</span>
-factor matrix <span class="math inline">\(F\)</span> with independent
-entries that are zero with probability <span
-class="math inline">\(\pi_0\)</span> and otherwise <span
-class="math inline">\(\exp(\mu + \sigma t)\)</span>, <span
-class="math inline">\(t \sim t_4\)</span>, truncated to <span
-class="math inline">\([T_{\textrm{lo}}, T]\)</span> — a point mass at
-zero and a heavy-tailed body, truncated on both sides. Each feature was
+<p>Counts were simulated from the log1p NMF model itself at each of
+three link constants <span class="math inline">\(c_{\textrm{true}} \in
+\{10^{-3}, 1, \infty\}\)</span>, with parameters calibrated so that all
+three regimes reproduce the count characteristics of the pancreas
+dataset. For each of ten seeds we drew an <span class="math inline">\(n
+\times K\)</span> loading matrix <span class="math inline">\(L\)</span>
+with rows <span class="math inline">\(\mathbf{l}_{i\cdot} \sim
+\textrm{Dirichlet}(0.3, \dots, 0.3)\)</span> — the same <span
+class="math inline">\(L\)</span> at every <span
+class="math inline">\(c_{\textrm{true}}\)</span>, so the true loadings
+and their sparsity are identical across regimes — and a <span
+class="math inline">\(p \times K\)</span> factor matrix <span
+class="math inline">\(F\)</span> with independent entries that are zero
+with probability <span class="math inline">\(\pi_0\)</span> and
+otherwise <span class="math inline">\(\exp(\mu + \sigma t)\)</span>,
+<span class="math inline">\(t \sim t_4\)</span>, truncated to <span
+class="math inline">\([T_{\textrm{lo}}, T]\)</span>. Each feature was
 conditioned to load on at least one factor, and the lower truncation
-guarantees it does so at a detectable level; together these are the
-analogue of filtering genes for detectable expression. Counts were then
-drawn as <span class="math inline">\(y_{ij} \sim
+(0.05 expected counts, mapped through the link) guarantees it does so at
+a detectable level; together these are the analogue of filtering genes
+for detectable expression. Counts were drawn as <span
+class="math inline">\(y_{ij} \sim
 \textrm{Poisson}(\lambda_{ij})\)</span> with <span
-class="math inline">\(\lambda_{ij} = e^{\theta_{ij}} - 1\)</span> and
-<span class="math inline">\(\Theta = LF^{\top}\)</span>, i.e. from the
-model at <span class="math inline">\(c = 1\)</span>. The four constants
-<span class="math inline">\((\pi_0, \mu, \sigma, T)\)</span> were chosen
-by matching two properties of the real data: the mean count, matched
-exactly, and the curve <span class="math inline">\(c \mapsto
-\operatorname{pm}(\log(1 + Y/c))\)</span> — the peak-to-mean ratio of
-the data on the link scale, which by [the sparsity results] governs the
-factor sparsity attainable at each <span
-class="math inline">\(c\)</span> — matched in least squares across <span
-class="math inline">\(c \in [10^{-4}, 10^{4}]\)</span>, after adjusting
-the real curve to the simulation’s size. The resulting datasets are
-88–89% zeros with a mean count of about 0.6 and maximum counts in the
-low thousands, against 82%, 0.67, and (size-adjusted) $$8,800 for the
-real data.</p>
+class="math inline">\(\lambda_{ij} = c_{\textrm{true}}(e^{\theta_{ij}} -
+1)\)</span> for finite <span
+class="math inline">\(c_{\textrm{true}}\)</span> and <span
+class="math inline">\(\lambda_{ij} = \theta_{ij}\)</span> at <span
+class="math inline">\(c_{\textrm{true}} = \infty\)</span>, where <span
+class="math inline">\(\Theta = LF^{\top}\)</span>. The constants <span
+class="math inline">\((\pi_0, \mu, \sigma, T)\)</span> were calibrated
+separately at each <span
+class="math inline">\(c_{\textrm{true}}\)</span> against the same two
+targets: the real mean count, matched exactly, and the curve <span
+class="math inline">\(c \mapsto \operatorname{pm}(\log(1 +
+Y/c))\)</span> — the peak-to-mean ratio of the data on the link scale,
+which by [the sparsity results] governs the factor sparsity attainable
+at each fitting <span class="math inline">\(c\)</span> — matched in
+least squares across <span class="math inline">\(c \in [10^{-4},
+10^{4}]\)</span> after adjusting the real curve to the simulation’s
+size. Calibrating every regime to one shared target is what makes the
+datasets comparable across <span
+class="math inline">\(c_{\textrm{true}}\)</span>.</p>
 </blockquote>
-<p>Everything in that paragraph is verified below on the ten seeds the
-experiment will actually use.</p>
+<p>Everything in that paragraph is verified below on the thirty datasets
+(ten seeds <span class="math inline">\(\times\)</span> three <span
+class="math inline">\(c_{\textrm{true}}\)</span>) the experiment will
+actually use.</p>
 </div>
 <div id="the-generative-model-precisely" class="section level1">
 <h1>The generative model, precisely</h1>
-<p>For seed <span class="math inline">\(s \in \{1, \dots,
-10\}\)</span>:</p>
+<p>For seed <span class="math inline">\(s \in \{1, \dots, 10\}\)</span>
+and each <span class="math inline">\(c_{\textrm{true}}\)</span>, with
+knobs <span class="math inline">\((\pi_0, \mu, \sigma, T,
+T_{\textrm{lo}})\)</span> from that <span
+class="math inline">\(c_{\textrm{true}}\)</span>’s row of the table
+above:</p>
 <ol style="list-style-type: decimal">
 <li><span class="math inline">\(\mathbf{l}_{i\cdot} \sim
 \textrm{Dirichlet}(a, \dots, a)\)</span> independently, <span
-class="math inline">\(a = 0.3\)</span>, giving <span
-class="math inline">\(L \in \mathbb{R}_{\geq 0}^{500 \times
-5}\)</span>.</li>
+class="math inline">\(a = 0.3\)</span>. The draw depends only on the
+seed, so the same <span class="math inline">\(L\)</span> underlies all
+three <span class="math inline">\(c_{\textrm{true}}\)</span> (as do the
+raw <span class="math inline">\(u_{jk}\)</span> and <span
+class="math inline">\(t_{jk}\)</span> draws behind <span
+class="math inline">\(F\)</span>).</li>
 <li><span class="math inline">\(u_{jk} \sim \textrm{Unif}(0,1)\)</span>
 and <span class="math inline">\(t_{jk} \sim t_{4}\)</span>
 independently, and <span class="math display">\[f_{jk} =
-\textrm{clamp}\left(\exp(\mu + \sigma t_{jk});\; T_{\textrm{lo}},\,
-T\right) \cdot
-\mathbf{1}\{u_{jk} &gt; \pi_0\},\]</span> except that a feature <span
+\textrm{clamp}\left(\exp(\mu + \sigma t_{jk});\
+T_{\textrm{lo}},\, T\right) \cdot \mathbf{1}\{u_{jk} &gt;
+\pi_0\},\]</span> except that a feature <span
 class="math inline">\(j\)</span> with <span class="math inline">\(u_{jk}
 \leq \pi_0\)</span> for every <span class="math inline">\(k\)</span>
 keeps its single largest-<span class="math inline">\(u_{jk}\)</span>
 factor (so no feature is dead; deterministic given <span
 class="math inline">\(u\)</span>).</li>
-<li><span class="math inline">\(\Theta = LF^{\top}\)</span>, <span
-class="math inline">\(\;\lambda_{ij} = c_{\textrm{true}}(e^{\theta_{ij}}
-- 1)\)</span> with <span class="math inline">\(c_{\textrm{true}} =
-1\)</span>, <span class="math inline">\(\;y_{ij} \sim
+<li><span class="math inline">\(\Theta = LF^{\top}\)</span>; <span
+class="math inline">\(\lambda_{ij} = c_{\textrm{true}}(e^{\theta_{ij}} -
+1)\)</span> for finite <span
+class="math inline">\(c_{\textrm{true}}\)</span>, and <span
+class="math inline">\(\lambda_{ij} = \theta_{ij}\)</span> at <span
+class="math inline">\(c_{\textrm{true}} = \infty\)</span> (the plain
+Poisson NMF limit); <span class="math inline">\(y_{ij} \sim
 \textrm{Poisson}(\lambda_{ij})\)</span>. In the rare event a row or
 column of <span class="math inline">\(Y\)</span> is entirely zero, the
 Poisson draw (only) is repeated with the next sub-seed; the fitting code
@@ -935,187 +1006,210 @@ rejects all-zero columns, as do real pipelines.</li>
 </ol>
 <p>There are no size factors (<span class="math inline">\(s_i =
 1\)</span>; everything is fit with <code>s = FALSE</code>). The two
-truncation points have distinct jobs. The cap bounds the rates at <span
-class="math inline">\(e^{T} - 1 \approx 2341\)</span>, which is what
-makes the maximum count land in the same place on every seed — unbounded
-heavy tails made <span class="math inline">\(\max(Y)\)</span> swing by
-an order of magnitude across seeds when we tried them. The floor <span
-class="math inline">\(T_{\textrm{lo}} = 0.05\)</span> exists because a
-feature active in a single factor can otherwise draw a magnitude so
-small that its column of <span class="math inline">\(Y\)</span> is all
-zero with probability near one, which the fitting code rejects — the
-seed-7 dataset did exactly this before the floor was added. At the
-floor, a single-factor feature’s column has expected total count <span
-class="math inline">\(\approx T_{\textrm{lo}} \cdot n/K = 5\)</span>.
-The floor moves about 4% of the nonzero entries; the knobs above were
-recalibrated with it in place.</p>
+truncation points have distinct jobs. The cap bounds the maximum count,
+which otherwise swings by an order of magnitude across seeds under an
+unbounded heavy tail. The floor exists because a feature active in a
+single factor can otherwise draw a magnitude so small that its column of
+<span class="math inline">\(Y\)</span> is all zero with probability near
+one, which the fitting code rejects — the seed-7 dataset did exactly
+this before the floor was added. The floor is defined on the
+<strong>rate scale</strong> — 0.05 expected counts — and mapped through
+each link (<span class="math inline">\(T_{\textrm{lo}} = \log(1 +
+0.05/c_{\textrm{true}})\)</span>, i.e. 3.93 at <span
+class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span> and <span
+class="math inline">\(0.05\)</span> at <span
+class="math inline">\(c_{\textrm{true}} = \infty\)</span>), so it
+imposes the same detectability requirement in every regime.</p>
 </div>
-<div id="how-the-four-calibrated-numbers-were-chosen"
-class="section level1">
-<h1>How the four calibrated numbers were chosen</h1>
-<p>The target is the real pancreas count matrix (7,606 cells <span
+<div id="how-the-calibrated-numbers-were-chosen" class="section level1">
+<h1>How the calibrated numbers were chosen</h1>
+<p>The target — <strong>identical for every <span
+class="math inline">\(c_{\textrm{true}}\)</span>, which is the
+point</strong> — is the real pancreas count matrix (7,606 cells <span
 class="math inline">\(\times\)</span> 18,195 genes; 82.2% zeros, mean
 0.674). Two properties are matched:</p>
 <ul>
 <li><strong>The budget curve</strong> <span class="math inline">\(c
 \mapsto \operatorname{pm}(\log(1+Y/c))\)</span>, in least squares on the
-log scale over the experiment’s own <span
-class="math inline">\(c\)</span> grid. This curve depends only on the
-count histogram, and it is the quantity our sparsity theory identifies
-as governing what any fit can do at each <span
-class="math inline">\(c\)</span>. Because it involves a maximum it must
-be <strong>size-adjusted</strong>: the target uses <span
+log scale over the experiment’s own fitting grid. The curve depends only
+on the count histogram, and it is the quantity our sparsity theory
+identifies as governing what any fit can do at each <span
+class="math inline">\(c\)</span>. Because it involves a maximum it is
+<strong>size-adjusted</strong>: the target uses <span
 class="math inline">\(t^{*} = 8820\)</span>, the median maximum of <span
 class="math inline">\(np = 250000\)</span> draws from the real marginal,
-not the real matrix’s own maximum (19487).</li>
+not the real matrix’s own maximum.</li>
 <li><strong>The mean count, exactly.</strong> The approximation
 experiments consume the absolute scale of the counts, and the curve
-alone pins it only loosely. So <span class="math inline">\(\mu\)</span>
-is not searched: inside every calibration step it is solved by
-one-dimensional root-finding so the expected mean count equals the real
-0.674 (profiling). Nelder–Mead searches only <span
-class="math inline">\((\pi_0, \sigma, T)\)</span> against the curve,
-with common random numbers across evaluations; the final <span
-class="math inline">\(\mu\)</span> is re-solved on 20 seeds.</li>
+alone pins it only loosely. <span class="math inline">\(\mu\)</span> is
+therefore profiled — solved by one-dimensional root-finding inside every
+calibration step — rather than searched; Nelder–Mead searches only <span
+class="math inline">\((\pi_0, \sigma, T)\)</span>, with common random
+numbers, and the final <span class="math inline">\(\mu\)</span> is
+re-solved on 20 seeds.</li>
 </ul>
 <p>The calibration code is <code>calibrate_approx_sim.R</code>, next to
-the experiment scripts; it writes
-<code>approx_sim_calibration.rds</code>, from which the knobs in the
-table above were checked.</p>
+the experiment scripts; it loops over the <span
+class="math inline">\(c_{\textrm{true}}\)</span> grid and writes
+<code>approx_sim_calibration.rds</code>, which
+<code>approx_sim_common.R</code> reads back with a consistency
+check.</p>
 </div>
-<div id="verification-on-the-ten-seeds-the-experiment-will-use"
+<div id="verification-on-the-thirty-datasets-the-experiment-will-use"
 class="section level1">
-<h1>Verification on the ten seeds the experiment will use</h1>
-<p>Not held-out seeds — these are datasets 1–10, exactly as the workers
-will regenerate them.</p>
-<pre class="r"><code>ds &lt;- lapply(seq_len(N_SEEDS), sim_dataset)
-curve_of &lt;- function(Y) sapply(cal$CS, function(cc) {
-  g &lt;- log1p(Y / cc); max(g) / mean(g) })
-cvs &lt;- sapply(ds, function(d) curve_of(d$Y))
+<h1>Verification on the thirty datasets the experiment will use</h1>
+<p>Not held-out seeds — these are the (seed, <span
+class="math inline">\(c_{\textrm{true}}\)</span>) datasets exactly as
+the workers will regenerate them.</p>
+<pre class="r"><code>ds &lt;- list()
+for (ct in C_TRUE_GRID)
+  for (s in seq_len(N_SEEDS))
+    ds[[paste(fmtc(ct), s)]] &lt;- sim_dataset(s, ct)
 
-knitr::kable(data.frame(
-  c = format(cal$CS), `target pm` = round(cal$target, 1),
-  `simulated pm (median of 10)` = round(apply(cvs, 1, median), 1),
-  ratio = round(apply(cvs, 1, median) / cal$target, 2),
-  `ratio range` = paste0(round(apply(cvs / cal$target, 1, min), 2), &quot; – &quot;,
-                         round(apply(cvs / cal$target, 1, max), 2)),
-  check.names = FALSE),
-  caption = &quot;Budget curve of the ten experiment datasets vs the size-adjusted
-  pancreas target.&quot;)</code></pre>
+curve_of &lt;- function(Y) sapply(CAL$CS, function(cc) {
+  g &lt;- log1p(Y / cc); max(g) / mean(g) })
+
+ratio_tab &lt;- data.frame(`c for fitting` = format(CAL$CS), check.names = FALSE)
+for (ct in C_TRUE_GRID) {
+  cvs &lt;- sapply(seq_len(N_SEEDS),
+                function(s) curve_of(ds[[paste(fmtc(ct), s)]]$Y))
+  r &lt;- cvs / CAL$target
+  ratio_tab[[paste0(&quot;c_true = &quot;, fmtc(ct))]] &lt;-
+    sprintf(&quot;%.2f  (%.2f–%.2f)&quot;, apply(r, 1, median),
+            apply(r, 1, min), apply(r, 1, max))
+}
+knitr::kable(ratio_tab, caption = &quot;Budget-curve ratio to the shared
+  size-adjusted pancreas target: median (range) over the ten seeds, per
+  c_true. 1.00 = exact match.&quot;)</code></pre>
 <table>
-<caption>Budget curve of the ten experiment datasets vs the
-size-adjusted pancreas target.</caption>
+<caption>Budget-curve ratio to the shared size-adjusted pancreas target:
+median (range) over the ten seeds, per c_true. 1.00 = exact
+match.</caption>
+<colgroup>
+<col width="20%" />
+<col width="26%" />
+<col width="26%" />
+<col width="26%" />
+</colgroup>
 <thead>
 <tr class="header">
-<th align="left">c</th>
-<th align="right">target pm</th>
-<th align="right">simulated pm (median of 10)</th>
-<th align="right">ratio</th>
-<th align="left">ratio range</th>
+<th align="left">c for fitting</th>
+<th align="left">c_true = 0.001</th>
+<th align="left">c_true = 1</th>
+<th align="left">c_true = Inf</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1e-04</td>
-<td align="right">10.6</td>
-<td align="right">15.5</td>
-<td align="right">1.46</td>
-<td align="left">1.4 – 1.59</td>
+<td align="left">2.02 (1.90–2.16)</td>
+<td align="left">1.38 (1.34–1.49)</td>
+<td align="left">2.44 (2.14–2.69)</td>
 </tr>
 <tr class="even">
 <td align="left">1e-03</td>
-<td align="right">12.2</td>
-<td align="right">17.6</td>
-<td align="right">1.44</td>
-<td align="left">1.39 – 1.58</td>
+<td align="left">1.99 (1.85–2.12)</td>
+<td align="left">1.37 (1.32–1.48)</td>
+<td align="left">2.38 (2.07–2.62)</td>
 </tr>
 <tr class="odd">
 <td align="left">1e-02</td>
-<td align="right">15.1</td>
-<td align="right">21.6</td>
-<td align="right">1.43</td>
-<td align="left">1.37 – 1.57</td>
+<td align="left">1.94 (1.77–2.06)</td>
+<td align="left">1.35 (1.31–1.47)</td>
+<td align="left">2.30 (1.92–2.53)</td>
 </tr>
 <tr class="even">
 <td align="left">1e-01</td>
-<td align="right">22.5</td>
-<td align="right">31.7</td>
-<td align="right">1.41</td>
-<td align="left">1.35 – 1.58</td>
+<td align="left">1.82 (1.63–1.94)</td>
+<td align="left">1.35 (1.28–1.46)</td>
+<td align="left">2.13 (1.70–2.38)</td>
 </tr>
 <tr class="odd">
 <td align="left">1e+00</td>
-<td align="right">51.1</td>
-<td align="right">70.5</td>
-<td align="right">1.38</td>
-<td align="left">1.29 – 1.63</td>
+<td align="left">1.55 (1.37–1.69)</td>
+<td align="left">1.34 (1.22–1.45)</td>
+<td align="left">1.72 (1.35–2.04)</td>
 </tr>
 <tr class="even">
 <td align="left">1e+01</td>
-<td align="right">207.3</td>
-<td align="right">239.7</td>
-<td align="right">1.16</td>
-<td align="left">1.02 – 1.56</td>
+<td align="left">1.17 (1.00–1.31)</td>
+<td align="left">1.17 (0.96–1.36)</td>
+<td align="left">1.07 (0.73–1.48)</td>
 </tr>
 <tr class="odd">
 <td align="left">1e+02</td>
-<td align="right">1067.5</td>
-<td align="right">785.9</td>
-<td align="right">0.74</td>
-<td align="left">0.59 – 1.15</td>
+<td align="left">0.85 (0.69–1.03)</td>
+<td align="left">0.78 (0.54–1.09)</td>
+<td align="left">0.49 (0.29–0.77)</td>
 </tr>
 <tr class="even">
 <td align="left">1e+03</td>
-<td align="right">4339.8</td>
-<td align="right">1838.3</td>
-<td align="right">0.42</td>
-<td align="left">0.32 – 0.74</td>
+<td align="left">0.67 (0.44–0.85)</td>
+<td align="left">0.47 (0.29–0.78)</td>
+<td align="left">0.21 (0.08–0.34)</td>
 </tr>
 <tr class="odd">
 <td align="left">1e+04</td>
-<td align="right">9999.9</td>
-<td align="right">2631.2</td>
-<td align="right">0.26</td>
-<td align="left">0.2 – 0.48</td>
+<td align="left">0.56 (0.26–0.68)</td>
+<td align="left">0.29 (0.18–0.51)</td>
+<td align="left">0.11 (0.04–0.17)</td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>zf &lt;- sapply(ds, function(d) mean(d$Y == 0))
-mn &lt;- sapply(ds, function(d) mean(d$Y))
-mx &lt;- sapply(ds, function(d) max(d$Y))
-knitr::kable(data.frame(
-  what = c(&quot;zero fraction&quot;, &quot;mean count&quot;, &quot;max count&quot;),
-  `simulated, median (range)` = c(
-    sprintf(&quot;%.3f  (%.3f – %.3f)&quot;, median(zf), min(zf), max(zf)),
-    sprintf(&quot;%.3f  (%.3f – %.3f)&quot;, median(mn), min(mn), max(mn)),
-    sprintf(&quot;%.0f  (%d – %d)&quot;, median(mx), min(mx), max(mx))),
-  real = c(&quot;0.822&quot;, &quot;0.674&quot;, paste0(cal$tstar, &quot; (size-adjusted)&quot;)),
-  check.names = FALSE),
-  caption = &quot;Count characteristics of the ten datasets.&quot;)</code></pre>
+<pre class="r"><code>stat_tab &lt;- data.frame(
+  what = c(&quot;zero fraction&quot;, &quot;mean count&quot;, &quot;max count&quot;), check.names = FALSE)
+for (ct in C_TRUE_GRID) {
+  Ys &lt;- lapply(seq_len(N_SEEDS), function(s) ds[[paste(fmtc(ct), s)]]$Y)
+  zf &lt;- sapply(Ys, function(Y) mean(Y == 0)); mn &lt;- sapply(Ys, mean)
+  mx &lt;- sapply(Ys, max)
+  stat_tab[[paste0(&quot;c_true = &quot;, fmtc(ct))]] &lt;- c(
+    sprintf(&quot;%.3f (%.3f–%.3f)&quot;, median(zf), min(zf), max(zf)),
+    sprintf(&quot;%.3f (%.3f–%.3f)&quot;, median(mn), min(mn), max(mn)),
+    sprintf(&quot;%.0f (%d–%d)&quot;, median(mx), min(mx), max(mx)))
+}
+stat_tab$real &lt;- c(&quot;0.822&quot;, &quot;0.674&quot;, paste0(CAL$tstar, &quot; (size-adj.)&quot;))
+knitr::kable(stat_tab, caption = &quot;Count characteristics, median (range) over
+  the ten seeds.&quot;)</code></pre>
 <table>
-<caption>Count characteristics of the ten datasets.</caption>
+<caption>Count characteristics, median (range) over the ten
+seeds.</caption>
+<colgroup>
+<col width="15%" />
+<col width="21%" />
+<col width="21%" />
+<col width="21%" />
+<col width="18%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">what</th>
-<th align="left">simulated, median (range)</th>
+<th align="left">c_true = 0.001</th>
+<th align="left">c_true = 1</th>
+<th align="left">c_true = Inf</th>
 <th align="left">real</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">zero fraction</td>
-<td align="left">0.886 (0.882 – 0.894)</td>
+<td align="left">0.918 (0.914–0.924)</td>
+<td align="left">0.879 (0.875–0.888)</td>
+<td align="left">0.938 (0.930–0.942)</td>
 <td align="left">0.822</td>
 </tr>
 <tr class="even">
 <td align="left">mean count</td>
-<td align="left">0.797 (0.384 – 1.073)</td>
+<td align="left">0.748 (0.416–1.063)</td>
+<td align="left">0.714 (0.393–1.280)</td>
+<td align="left">0.639 (0.171–1.439)</td>
 <td align="left">0.674</td>
 </tr>
 <tr class="odd">
 <td align="left">max count</td>
-<td align="left">2248 (1646 – 2318)</td>
-<td align="left">8820 (size-adjusted)</td>
+<td align="left">5162 (1129–5840)</td>
+<td align="left">2386 (1155–2525)</td>
+<td align="left">920 (64–964)</td>
+<td align="left">8820 (size-adj.)</td>
 </tr>
 </tbody>
 </table>
@@ -1136,106 +1230,180 @@ remove this warning. See the
 <pre class="r"><code>zp   &lt;- readRDS(&quot;data/pancreas_count_histogram.rds&quot;)
 p_tp &lt;- c(zp$np - sum(zp$h), zp$h) / zp$np
 ccdf_real &lt;- rev(cumsum(rev(p_tp[-1])))
-Yall &lt;- unlist(lapply(ds, function(d) d$Y[d$Y &gt; 0]))
-ccdf_sim &lt;- rev(cumsum(rev(tabulate(Yall, nbins = max(Yall))))) / (N_SEEDS * N_ROWS * N_COLS)
-tt &lt;- 1:min(length(ccdf_real), length(ccdf_sim), 3000)
-d2 &lt;- rbind(data.frame(t = tt, p = ccdf_sim[tt],  what = &quot;simulated (10 datasets pooled)&quot;),
-            data.frame(t = tt, p = ccdf_real[tt], what = &quot;real (pancreas)&quot;))
-d2 &lt;- d2[d2$p &gt; 0, ]
+d2 &lt;- data.frame(t = seq_along(ccdf_real), p = ccdf_real,
+                 what = &quot;real (pancreas)&quot;)
+for (ct in C_TRUE_GRID) {
+  Yall &lt;- unlist(lapply(seq_len(N_SEEDS),
+                        function(s) { Y &lt;- ds[[paste(fmtc(ct), s)]]$Y; Y[Y &gt; 0] }))
+  cc &lt;- rev(cumsum(rev(tabulate(Yall, nbins = max(Yall))))) /
+        (N_SEEDS * N_ROWS * N_COLS)
+  d2 &lt;- rbind(d2, data.frame(t = seq_along(cc), p = cc,
+                             what = paste0(&quot;simulated, c_true = &quot;, fmtc(ct))))
+}
+d2 &lt;- d2[d2$p &gt; 0 &amp; d2$t &lt;= 3000, ]
 ggplot(d2, aes(t, p, colour = what)) +
-  geom_line(linewidth = 1) +
+  geom_line(linewidth = 0.9) +
   scale_x_log10() + scale_y_log10() +
   scale_colour_manual(values = c(`real (pancreas)` = &quot;#C2410C&quot;,
-                                 `simulated (10 datasets pooled)` = &quot;#0E5C6B&quot;),
-                      name = NULL) +
+    `simulated, c_true = 0.001` = &quot;#0E8FA8&quot;,
+    `simulated, c_true = 1` = &quot;#0E5C6B&quot;,
+    `simulated, c_true = Inf` = &quot;#B45309&quot;), name = NULL) +
   labs(x = &quot;count value t&quot;, y = &quot;P(Y &gt;= t)&quot;,
-       title = &quot;Tail of the count distribution&quot;,
+       title = &quot;Tail of the count distribution, per c_true&quot;,
        subtitle = &quot;not targeted directly; inherited from the curve match&quot;)</code></pre>
-<p><img src="figure/sim_design.Rmd/tail-plot-1.png" alt="" width="715" style="display: block; margin: auto;" /></p>
+<p><img src="figure/sim_design.Rmd/tail-plot-1.png" alt="" width="770" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-tail-plot-1">
+Past versions of tail-plot-1.png
+</button>
+</p>
+<div id="fig-tail-plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/61755b648564acbcecf07803debdb68ae0190e45/docs/figure/sim_design.Rmd/tail-plot-1.png" target="_blank">61755b6</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The controlled side of the design — the truth the fits will be scored
-against:</p>
+against. The loading rows are identical across <span
+class="math inline">\(c_{\textrm{true}}\)</span> by construction, and
+the table shows it:</p>
 <pre class="r"><code>hoyer &lt;- function(x) { m &lt;- length(x)
   (sqrt(m) - sum(x)/sqrt(sum(x^2)))/(sqrt(m) - 1) }
-knitr::kable(data.frame(
+tt &lt;- data.frame(
   what = c(&quot;mean Hoyer sparsity of loading columns&quot;,
            &quot;mean # factors carrying 90% of a sample&quot;,
            &quot;fraction of exact zeros in F&quot;,
            &quot;mean # factors per feature&quot;,
-           &quot;mean Hoyer sparsity of factor columns&quot;),
-  `median over the 10 seeds` = c(
-    round(median(sapply(ds, function(d) mean(apply(d$L, 2, hoyer)))), 3),
-    round(median(sapply(ds, function(d) mean(apply(d$L, 1, function(r)
+           &quot;mean Hoyer sparsity of factor columns&quot;), check.names = FALSE)
+for (ct in C_TRUE_GRID) {
+  D &lt;- lapply(seq_len(N_SEEDS), function(s) ds[[paste(fmtc(ct), s)]])
+  tt[[paste0(&quot;c_true = &quot;, fmtc(ct))]] &lt;- c(
+    round(median(sapply(D, function(d) mean(apply(d$L, 2, hoyer)))), 3),
+    round(median(sapply(D, function(d) mean(apply(d$L, 1, function(r)
       min(which(cumsum(sort(r, decreasing = TRUE)) &gt;= 0.9)))))), 2),
-    round(median(sapply(ds, function(d) mean(d$FF == 0))), 3),
-    round(median(sapply(ds, function(d) mean(rowSums(d$FF &gt; 0)))), 2),
-    round(median(sapply(ds, function(d) mean(apply(d$FF, 2, hoyer)))), 3)),
-  check.names = FALSE),
-  caption = &quot;Truth structure: identical in distribution across all seeds and
-  all c; the loading sparsity is set once by a = 0.3.&quot;)</code></pre>
+    round(median(sapply(D, function(d) mean(d$FF == 0))), 3),
+    round(median(sapply(D, function(d) mean(rowSums(d$FF &gt; 0)))), 2),
+    round(median(sapply(D, function(d) mean(apply(d$FF, 2, hoyer)))), 3))
+}
+knitr::kable(tt, caption = &quot;Truth structure, median over the ten seeds. The
+  loading rows (first two lines) are byte-identical across c_true; the factor
+  law differs because its knobs are calibrated per c_true.&quot;)</code></pre>
 <table>
-<caption>Truth structure: identical in distribution across all seeds and
-all c; the loading sparsity is set once by a = 0.3.</caption>
+<caption>Truth structure, median over the ten seeds. The loading rows
+(first two lines) are byte-identical across c_true; the factor law
+differs because its knobs are calibrated per c_true.</caption>
+<colgroup>
+<col width="50%" />
+<col width="18%" />
+<col width="13%" />
+<col width="16%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">what</th>
-<th align="right">median over the 10 seeds</th>
+<th align="right">c_true = 0.001</th>
+<th align="right">c_true = 1</th>
+<th align="right">c_true = Inf</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">mean Hoyer sparsity of loading columns</td>
 <td align="right">0.399</td>
+<td align="right">0.399</td>
+<td align="right">0.399</td>
 </tr>
 <tr class="even">
 <td align="left">mean # factors carrying 90% of a sample</td>
 <td align="right">2.540</td>
+<td align="right">2.540</td>
+<td align="right">2.540</td>
 </tr>
 <tr class="odd">
 <td align="left">fraction of exact zeros in F</td>
-<td align="right">0.719</td>
+<td align="right">0.797</td>
+<td align="right">0.757</td>
+<td align="right">0.784</td>
 </tr>
 <tr class="even">
 <td align="left">mean # factors per feature</td>
-<td align="right">1.410</td>
+<td align="right">1.020</td>
+<td align="right">1.220</td>
+<td align="right">1.080</td>
 </tr>
 <tr class="odd">
 <td align="left">mean Hoyer sparsity of factor columns</td>
-<td align="right">0.740</td>
+<td align="right">0.580</td>
+<td align="right">0.730</td>
+<td align="right">0.947</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div id="honest-limits-of-the-match-at-k-5" class="section level1">
 <h1>Honest limits of the match at K = 5</h1>
-<p>The same calibration machinery matched the pancreas curve to within
-<span class="math inline">\(\pm 16\%\)</span> at <span
+<p>The same machinery matched the pancreas curve to within <span
+class="math inline">\(\pm 16\%\)</span> at <span
 class="math inline">\(600 \times 600\)</span>, <span
 class="math inline">\(K = 10\)</span> (git history of this page). At
 <span class="math inline">\(K = 5\)</span> it cannot do as well, and the
 reason is structural: with five factors and Dirichlet-peaked rows, each
 entry’s rate is nearly a single-factor draw, and the knobs cannot feed
 the zero fraction, the mean, and the extreme tail simultaneously. Two
-richer variants — a free tail degree of freedom, and two-component
+richer variants — a free tail degree of freedom and two-component
 magnitudes — fixed one end of the curve only by sacrificing the other,
-and were rejected. The realized compromise, visible in the tables above:
-zeros ~0.89 vs 0.822 (so the budget curve runs ~1.4–1.5<span
-class="math inline">\(\times\)</span> high at the small-<span
-class="math inline">\(c\)</span> end), and a maximum around 2,000 vs the
-size-adjusted 8,820 (so the curve runs ~0.3–0.8<span
-class="math inline">\(\times\)</span> at the large-<span
-class="math inline">\(c\)</span> end). The mean is centered by
-construction. If the tail mismatch ever matters, the honest fix is <span
-class="math inline">\(K = 10\)</span>, not more knobs.</p>
+and were rejected.</p>
+<p>The compromise differs by regime, as the tables above show. <span
+class="math inline">\(c_{\textrm{true}} = 1\)</span> is the best
+matched. At <span class="math inline">\(c_{\textrm{true}} =
+10^{-3}\)</span> the exponential link amplifies the magnitudes, which
+helps the tail (maxima near 5,000) at some cost in zeros. <span
+class="math inline">\(c_{\textrm{true}} = \infty\)</span> is the weakest
+match: with the identity link the tail must come entirely from the
+factor magnitudes themselves, with no amplification and every loading
+below one attenuating them, so the maxima reach only $<span
+class="math inline">\(1,000 and the zeros run high. This is worth
+knowing when
+reading the results, but it does not undercut the comparison design: all
+three regimes are calibrated to the same target, and the fits at
+every\)</span>c_{}$ within a regime see identical data.</p>
 </div>
 <div id="the-experiment-this-feeds" class="section level1">
 <h1>The experiment this feeds</h1>
 <p>Read from the same configuration file:</p>
 <pre class="r"><code>knitr::kable(data.frame(
-  setting = c(&quot;datasets&quot;, &quot;c grid for fitting&quot;, &quot;methods&quot;,
-              &quot;initialization&quot;, &quot;convergence tolerance&quot;,
+  setting = c(&quot;datasets&quot;, &quot;c_true grid (generation)&quot;, &quot;c grid for fitting&quot;,
+              &quot;methods&quot;, &quot;initialization&quot;, &quot;convergence tolerance&quot;,
               &quot;iteration safety cap&quot;, &quot;optimization-time cap&quot;,
               &quot;SLURM wall clock&quot;, &quot;threads per fit&quot;, &quot;tasks&quot;),
-  value = c(sprintf(&quot;%d seeds, generated once each at c = %s&quot;, N_SEEDS, C_TRUE),
+  value = c(sprintf(&quot;%d seeds per c_true (same L across c_true)&quot;, N_SEEDS),
+            paste(sapply(C_TRUE_GRID, fmtc), collapse = &quot;, &quot;),
             paste(format(CC_GRID, scientific = TRUE, trim = TRUE), collapse = &quot;, &quot;),
             paste(METHODS, collapse = &quot;, &quot;),
             &quot;rank-1 (each method&#39;s own warm-up, seeded)&quot;,
@@ -1245,14 +1413,13 @@ class="math inline">\(K = 10\)</span>, not more knobs.</p>
             &quot;24h (backstop only)&quot;,
             THREADS,
             sprintf(&quot;%d  (one fit per task)&quot;, N_TASKS))),
-  caption = &quot;The exact-vs-approx protocol, from approx_sim_common.R and
-  run_approx_sim.sbatch.&quot;)</code></pre>
+  caption = &quot;The protocol, from approx_sim_common.R and run_approx_sim.sbatch.&quot;)</code></pre>
 <table>
-<caption>The exact-vs-approx protocol, from approx_sim_common.R and
+<caption>The protocol, from approx_sim_common.R and
 run_approx_sim.sbatch.</caption>
 <colgroup>
-<col width="26%" />
-<col width="73%" />
+<col width="28%" />
+<col width="71%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1263,44 +1430,48 @@ run_approx_sim.sbatch.</caption>
 <tbody>
 <tr class="odd">
 <td align="left">datasets</td>
-<td align="left">10 seeds, generated once each at c = 1</td>
+<td align="left">10 seeds per c_true (same L across c_true)</td>
 </tr>
 <tr class="even">
+<td align="left">c_true grid (generation)</td>
+<td align="left">0.001, 1, Inf</td>
+</tr>
+<tr class="odd">
 <td align="left">c grid for fitting</td>
 <td align="left">1e-04, 1e-03, 1e-02, 1e-01, 1e+00, 1e+01, 1e+02, 1e+03,
 1e+04</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">methods</td>
 <td align="left">exact, taylor, chebyshev</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">initialization</td>
 <td align="left">rank-1 (each method’s own warm-up, seeded)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">convergence tolerance</td>
 <td align="left">1e-06</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">iteration safety cap</td>
 <td align="left">250,000</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">optimization-time cap</td>
 <td align="left">none</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">SLURM wall clock</td>
 <td align="left">24h (backstop only)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">threads per fit</td>
 <td align="left">1</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">tasks</td>
-<td align="left">270 (one fit per task)</td>
+<td align="left">810 (one fit per task)</td>
 </tr>
 </tbody>
 </table>
@@ -1308,9 +1479,12 @@ run_approx_sim.sbatch.</caption>
 falls below the tolerance — the approximate methods converge on the
 approximate objective — and the comparison number recorded for every fit
 is the <strong>exact</strong> Poisson log-likelihood of its fitted
-rates. Each task writes one .rds; after the round,
-<code>check_approx_sim.R</code> lists anything missing or unconverged
-for resubmission.</p>
+rates. The exact fits across the <span
+class="math inline">\(c_{\textrm{fit}}\)</span> grid double as the
+sparsity experiment: fitted <span class="math inline">\(L\)</span> and
+<span class="math inline">\(F\)</span> are saved for every task. After
+the round, <code>check_approx_sim.R</code> lists anything missing or
+unconverged for resubmission.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
