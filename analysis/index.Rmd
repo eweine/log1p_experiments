@@ -88,3 +88,5 @@ Welcome to my research website.
 
 [A calibrated simulation: realistic counts with controlled factors](sim_design.html)
 
+[When does max-1 loading scaling coincide with topic proportions?](max1_vs_proportions.html)
+

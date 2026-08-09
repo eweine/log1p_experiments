@@ -1,0 +1,146 @@
+---
+title: "When does max-1 loading scaling coincide with topic proportions?"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+date: "2026-08-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# The question
+
+In the BBC structure plots, the $c = \infty$ document scores all total
+exactly 1 — they look like the topic model's own proportion normalization,
+even though the figures apply the paper's loading-scaling rule: divide the
+loadings by the size factors, then scale each column of $\mathbf{L}$ so its
+maximum is 1. One might wonder whether the rule was actually applied there.
+
+This page proves that no discrepancy exists: the plotted scores **are** the
+paper's rule, and the rule coincides with the proportion normalization
+exactly when every factor contains a "pure" document. The BBC fit satisfies
+that condition; the pancreas fit does not, and its bars visibly exceed 1
+under the very same code.
+
+# Setup
+
+A Poisson NMF fit of an $n \times p$ count matrix $Y$:
+$y_{ij} \sim \textrm{Poisson}(\lambda_{ij})$ with
+$\Lambda = \mathbf{L}\mathbf{F}^{\top}$, $\mathbf{L}, \mathbf{F} \geq 0$.
+Write $y_{i\cdot} = \sum_j y_{ij}$ for the row totals,
+$F_k = \sum_j f_{jk}$ for the factor totals, and let the size factors be
+$s_i = y_{i\cdot}/\bar{y}$ for any convenient constant $\bar{y}$ (only
+ratios within a column will matter).
+
+Two normalizations of the loadings:
+
+- **The paper's rule**, as implemented in the figures:
+  $$a_{ik} \;=\; \frac{l_{ik}/s_i}{\max_{i'}\left(l_{i'k}/s_{i'}\right)},$$
+  i.e. `normalize_bars(diag(1/s) %*% L)`.
+- **Topic proportions** (`fastTopics::poisson2multinom`):
+  $$p_{ik} \;=\; \frac{l_{ik} F_k}{\sum_{m} l_{im} F_m},
+  \qquad \textstyle\sum_k p_{ik} = 1 .$$
+
+# Lemma: fitted row totals equal observed row totals
+
+At any local maximum of the Poisson NMF log-likelihood (with no row of
+$\mathbf{L}$ identically zero),
+$$\sum_j \lambda_{ij} \;=\; y_{i\cdot} \qquad \text{for every } i.$$
+
+**Proof.** Scaling row $i$ of $\mathbf{L}$ by $t > 0$ is a feasible move that
+scales row $i$ of $\Lambda$ by $t$ and leaves all other rows untouched. The
+terms of the log-likelihood involving row $i$ are
+$\sum_j \left(y_{ij}\log \lambda_{ij} - \lambda_{ij}\right)$, whose
+derivative in $t$ at $t = 1$ is $y_{i\cdot} - \sum_j \lambda_{ij}$. At a
+maximum this must vanish. $\square$
+
+# Proposition: the rule is a column rescaling of the proportions
+
+$$a_{ik} \;=\; \frac{p_{ik}}{\max_{i'} p_{i'k}} .$$
+
+**Proof.** By the lemma, the denominator of $p_{ik}$ is
+$\sum_m l_{im}F_m = \sum_j \lambda_{ij} = y_{i\cdot} = \bar{y}\, s_i$, so
+$$p_{ik} \;=\; \frac{l_{ik} F_k}{\bar{y}\, s_i}
+\;=\; \frac{l_{ik}}{s_i}\cdot\frac{F_k}{\bar{y}} .$$
+Within a column $k$, the factor $F_k/\bar{y}$ is a constant, so
+$p_{ik} \propto l_{ik}/s_i$ across $i$, and dividing by the column maximum
+cancels the constant:
+$$\frac{p_{ik}}{\max_{i'} p_{i'k}}
+= \frac{l_{ik}/s_i}{\max_{i'}\left(l_{i'k}/s_{i'}\right)} = a_{ik}. \square$$
+
+**Corollary 1 (the pure-document condition).**
+$a_{ik} = p_{ik}$ for all $i, k$ — i.e. the max-1 rule reproduces the
+topic proportions exactly — **if and only if** every factor has a pure
+document: $\max_i p_{ik} = 1$ for every $k$.
+
+**Corollary 2 (bars can only exceed 1).** The plotted bar heights satisfy
+$$\sum_k a_{ik} \;=\; \sum_k \frac{p_{ik}}{\max_{i'} p_{i'k}}
+\;\geq\; \sum_k p_{ik} \;=\; 1 ,$$
+with equality for document $i$ exactly when every factor that document
+touches has a pure document somewhere. So under this rule, bars totalling
+exactly 1 is the *extreme* case, attained when the fit is clustered enough
+that each factor has anchor documents — it is a property of the fit, not a
+different normalization.
+
+# Verification on the paper's fits
+
+`A` below is computed exactly as in the figure scripts; `P` by
+`poisson2multinom`.
+
+```{r verify}
+suppressMessages(library(fastTopics))
+load(path.expand("~/Documents/log1pNMF/inst/paper_figures/data/experiment_results.Rdata"))
+normalize_bars <- function(M) sweep(M, 2, apply(M, 2, max), "/")
+
+out <- lapply(c("bbc", "pancreas"), function(ds) {
+  tm <- res_list[[ds]][["Inf"]]
+  s  <- res_list[[ds]][["1"]]$s
+  A  <- normalize_bars(as.matrix(tm$L) / s)
+  P  <- poisson2multinom(tm)$L
+  ## the lemma, checked directly: fitted row totals must be proportional to
+  ## the size factors (i.e., to the observed row totals); r_i constant <=> lemma
+  Fk <- colSums(tm$F)
+  r  <- as.vector(as.matrix(tm$L) %*% Fk) / s
+  data.frame(
+    dataset = ds, K = ncol(A),
+    `lemma: max/min of fitted rowsum / s` = round(max(r)/min(r), 6),
+    `min over k of max_i p_ik` = round(min(apply(P, 2, max)), 3),
+    `max |A - P|` = signif(max(abs(A - P)), 3),
+    `bar height median` = round(median(rowSums(A)), 3),
+    `bar height max` = round(max(rowSums(A)), 3),
+    check.names = FALSE)
+})
+knitr::kable(do.call(rbind, out), row.names = FALSE)
+```
+
+```{r purity}
+tmb <- res_list$bbc[["Inf"]]
+Pb  <- poisson2multinom(tmb)$L
+tmp <- res_list$pancreas[["Inf"]]
+Pp  <- poisson2multinom(tmp)$L
+knitr::kable(data.frame(
+  topic = seq_len(10),
+  `bbc: max_i p_ik` = round(apply(Pb, 2, max), 4)),
+  caption = "BBC: every one of the 10 topics has a pure document, so
+  Corollary 1 applies and A = P (up to convergence tolerance).")
+knitr::kable(data.frame(
+  factor = seq_len(13),
+  `pancreas: max_i p_ik` = round(apply(Pp, 2, max), 3)),
+  caption = "Pancreas: several factors have no pure cell, so A != P and the
+  bars exceed 1 (up to 1.34) under the very same rule.")
+```
+
+# Conclusion
+
+The $c = \infty$ document scores in the BBC figures are normalized exactly
+by the paper's max-1 rule. Their coincidence with topic-model proportions is a
+theorem, not a discrepancy: the rule equals the proportion normalization if
+and only if every factor has a document with proportion one, which the BBC
+$c = \infty$ fit satisfies for all ten factors: the plotted matrix equals the
+proportions matrix up to the fit's convergence tolerance (max absolute
+difference 1.4e-5, the same order as the lemma's residual in the table). The pancreas $c = \infty$ fit
+fails the condition and its bars exceed one under the same code — the rule
+at work, visibly.
