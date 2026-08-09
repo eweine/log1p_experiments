@@ -5,7 +5,7 @@ output:
     code_folding: hide
     toc: true
     toc_float: true
-date: "2026-08-08"
+date: "2026-08-09"
 ---
 
 ```{r setup, include=FALSE}
@@ -13,222 +13,258 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
                       fig.align = "center", dpi = 110)
 ```
 
-This page describes **exactly** the simulation that the exact-vs-approx
-experiment will run. To make drift impossible, every constant below is read
-from the experiment's own configuration file
+This page describes **exactly** the simulation that the exact-vs-approx /
+sparsity experiment will run. To make drift impossible, every constant below
+is read from the experiment's own configuration file
 (`inst/paper_figures/experiments/approx_sim_common.R` in the log1pNMF repo),
-which is what the cluster workers source. An earlier version of this page
-developed the method with a MOCA anchor; that material is in the git history.
+which is what the cluster workers source — including the calibrated knobs,
+which that file in turn reads from `approx_sim_calibration.rds` with a
+consistency check. An earlier version of this page developed the method with
+a MOCA anchor and a single $c_{\textrm{true}}$; that material is in the git
+history.
 
 ```{r source-config}
 library(ggplot2); library(cowplot)
 theme_set(theme_cowplot(font_size = 11))
 
 exp_dir <- path.expand("~/Documents/log1pNMF/inst/paper_figures/experiments")
-source(file.path(exp_dir, "approx_sim_common.R"))
-cal <- readRDS(file.path(exp_dir, "approx_sim_calibration.rds"))
-stopifnot(all.equal(unname(cal$knobs),
-                    c(PI0, MU, SIGMA, CAP), tolerance = 1e-4))
+source(file.path(exp_dir, "approx_sim_common.R"), chdir = TRUE)
 
 knitr::kable(data.frame(
   parameter = c("n (samples)", "p (features)", "K (rank, true = fitted)",
-                "Dirichlet concentration a", "zero probability pi0",
-                "location mu", "scale sigma", "cap T", "floor T_lo",
-                "t degrees of freedom", "c used to generate"),
-  value = c(N_ROWS, N_COLS, K_TRUE, A_SIG, round(PI0, 4), round(MU, 4),
-            round(SIGMA, 4), round(CAP, 4), FLOOR, T_DF, C_TRUE),
-  role = c("fixed by design", "fixed by design", "fixed by design",
-           "fixed by design (controls loading sparsity)",
-           "calibrated", "calibrated (profiled)", "calibrated", "calibrated",
-           "fixed by design (see below)",
-           "fixed by design", "fixed by design")),
-  caption = "Every number the generator uses, read from approx_sim_common.R.")
+                "Dirichlet concentration a", "t degrees of freedom",
+                "rate-scale magnitude floor", "c_true grid"),
+  value = c(N_ROWS, N_COLS, K_TRUE, A_SIG, T_DF, CAL$rate_floor,
+            paste(sapply(C_TRUE_GRID, fmtc), collapse = ", ")),
+  role = "fixed by design"),
+  caption = "The design constants, read from approx_sim_common.R.")
+
+kb <- KNOBS
+kb$c_true <- sapply(kb$c_true, fmtc)
+knitr::kable(kb, digits = 4,
+  caption = "The calibrated knobs, one row per c_true. pi0, sigma and cap are
+  searched; mu is profiled (solved so the expected mean count equals the real
+  0.674); floor is the fixed rate-scale floor mapped through each link.")
 ```
 
 # The description, as the paper would give it
 
-> Counts were simulated from the log1p NMF model itself, with parameters
-> calibrated so that the simulated data reproduce the count characteristics
-> of the pancreas dataset. For each of ten seeds we drew an
+> Counts were simulated from the log1p NMF model itself at each of three
+> link constants $c_{\textrm{true}} \in \{10^{-3}, 1, \infty\}$, with
+> parameters calibrated so that all three regimes reproduce the count
+> characteristics of the pancreas dataset. For each of ten seeds we drew an
 > $n \times K$ loading matrix $L$ with rows
-> $\mathbf{l}_{i\cdot} \sim \textrm{Dirichlet}(0.3, \dots, 0.3)$, so that
-> every sample concentrates on a small number of factors, and a
-> $p \times K$ factor matrix $F$ with independent entries that are zero with
-> probability $\pi_0$ and otherwise
-> $\exp(\mu + \sigma t)$, $t \sim t_4$, truncated to $[T_{\textrm{lo}}, T]$ —
-> a point mass at zero and a heavy-tailed body, truncated on both sides.
-> Each feature was conditioned to load on at least one factor, and the lower
-> truncation guarantees it does so at a detectable level; together these are
-> the analogue of filtering genes for detectable expression. Counts were then drawn as
-> $y_{ij} \sim \textrm{Poisson}(\lambda_{ij})$ with
-> $\lambda_{ij} = e^{\theta_{ij}} - 1$ and $\Theta = LF^{\top}$, i.e. from
-> the model at $c = 1$. The four constants
-> $(\pi_0, \mu, \sigma, T)$ were chosen by matching two properties of the
-> real data: the mean count, matched exactly, and the curve
+> $\mathbf{l}_{i\cdot} \sim \textrm{Dirichlet}(0.3, \dots, 0.3)$ — the same
+> $L$ at every $c_{\textrm{true}}$, so the true loadings and their sparsity
+> are identical across regimes — and a $p \times K$ factor matrix $F$ with
+> independent entries that are zero with probability $\pi_0$ and otherwise
+> $\exp(\mu + \sigma t)$, $t \sim t_4$, truncated to
+> $[T_{\textrm{lo}}, T]$. Each feature was conditioned to load on at least
+> one factor, and the lower truncation (0.05 expected counts, mapped through
+> the link) guarantees it does so at a detectable level; together these are
+> the analogue of filtering genes for detectable expression. Counts were
+> drawn as $y_{ij} \sim \textrm{Poisson}(\lambda_{ij})$ with
+> $\lambda_{ij} = c_{\textrm{true}}(e^{\theta_{ij}} - 1)$ for finite
+> $c_{\textrm{true}}$ and $\lambda_{ij} = \theta_{ij}$ at
+> $c_{\textrm{true}} = \infty$, where $\Theta = LF^{\top}$. The constants
+> $(\pi_0, \mu, \sigma, T)$ were calibrated separately at each
+> $c_{\textrm{true}}$ against the same two targets: the real mean count,
+> matched exactly, and the curve
 > $c \mapsto \operatorname{pm}(\log(1 + Y/c))$ — the peak-to-mean ratio of
 > the data on the link scale, which by [the sparsity results] governs the
-> factor sparsity attainable at each $c$ — matched in least squares across
-> $c \in [10^{-4}, 10^{4}]$, after adjusting the real curve to the
-> simulation's size. The resulting datasets are 88–89% zeros with a mean
-> count of about 0.6 and maximum counts in the low thousands, against 82%,
-> 0.67, and (size-adjusted) $\sim$8,800 for the real data.
+> factor sparsity attainable at each fitting $c$ — matched in least squares
+> across $c \in [10^{-4}, 10^{4}]$ after adjusting the real curve to the
+> simulation's size. Calibrating every regime to one shared target is what
+> makes the datasets comparable across $c_{\textrm{true}}$.
 
-Everything in that paragraph is verified below on the ten seeds the
-experiment will actually use.
+Everything in that paragraph is verified below on the thirty datasets
+(ten seeds $\times$ three $c_{\textrm{true}}$) the experiment will actually
+use.
 
 # The generative model, precisely
 
-For seed $s \in \{1, \dots, `r N_SEEDS`\}$:
+For seed $s \in \{1, \dots, `r N_SEEDS`\}$ and each $c_{\textrm{true}}$, with
+knobs $(\pi_0, \mu, \sigma, T, T_{\textrm{lo}})$ from that
+$c_{\textrm{true}}$'s row of the table above:
 
 1. $\mathbf{l}_{i\cdot} \sim \textrm{Dirichlet}(a, \dots, a)$ independently,
-   $a = `r A_SIG`$, giving $L \in \mathbb{R}_{\geq 0}^{`r N_ROWS` \times `r K_TRUE`}$.
+   $a = `r A_SIG`$. The draw depends only on the seed, so the same $L$
+   underlies all three $c_{\textrm{true}}$ (as do the raw $u_{jk}$ and
+   $t_{jk}$ draws behind $F$).
 2. $u_{jk} \sim \textrm{Unif}(0,1)$ and $t_{jk} \sim t_{`r T_DF`}$
    independently, and
-   $$f_{jk} = \textrm{clamp}\left(\exp(\mu + \sigma t_{jk});\; T_{\textrm{lo}},\, T\right) \cdot
-   \mathbf{1}\{u_{jk} > \pi_0\},$$
+   $$f_{jk} = \textrm{clamp}\left(\exp(\mu + \sigma t_{jk});\
+   T_{\textrm{lo}},\, T\right) \cdot \mathbf{1}\{u_{jk} > \pi_0\},$$
    except that a feature $j$ with $u_{jk} \leq \pi_0$ for every $k$ keeps its
    single largest-$u_{jk}$ factor (so no feature is dead; deterministic given
    $u$).
-3. $\Theta = LF^{\top}$, $\;\lambda_{ij} = c_{\textrm{true}}(e^{\theta_{ij}} - 1)$
-   with $c_{\textrm{true}} = `r C_TRUE`$, $\;y_{ij} \sim \textrm{Poisson}(\lambda_{ij})$.
-   In the rare event a row or column of $Y$ is entirely zero, the Poisson
-   draw (only) is repeated with the next sub-seed; the fitting code rejects
-   all-zero columns, as do real pipelines.
+3. $\Theta = LF^{\top}$;
+   $\lambda_{ij} = c_{\textrm{true}}(e^{\theta_{ij}} - 1)$ for finite
+   $c_{\textrm{true}}$, and $\lambda_{ij} = \theta_{ij}$ at
+   $c_{\textrm{true}} = \infty$ (the plain Poisson NMF limit);
+   $y_{ij} \sim \textrm{Poisson}(\lambda_{ij})$. In the rare event a row or
+   column of $Y$ is entirely zero, the Poisson draw (only) is repeated with
+   the next sub-seed; the fitting code rejects all-zero columns, as do real
+   pipelines.
 
 There are no size factors ($s_i = 1$; everything is fit with `s = FALSE`).
-The two truncation points have distinct jobs. The cap bounds the rates at
-$e^{T} - 1 \approx `r round(expm1(CAP))`$, which is what makes the maximum
-count land in the same place on every seed — unbounded heavy tails made
-$\max(Y)$ swing by an order of magnitude across seeds when we tried them.
-The floor $T_{\textrm{lo}} = `r FLOOR`$ exists because a feature active in a
-single factor can otherwise draw a magnitude so small that its column of $Y$
-is all zero with probability near one, which the fitting code rejects — the
-seed-7 dataset did exactly this before the floor was added. At the floor, a
-single-factor feature's column has expected total count
-$\approx T_{\textrm{lo}} \cdot n/K = `r round(FLOOR * N_ROWS / K_TRUE, 1)`$.
-The floor moves about 4% of the nonzero entries; the knobs above were
-recalibrated with it in place.
+The two truncation points have distinct jobs. The cap bounds the maximum
+count, which otherwise swings by an order of magnitude across seeds under an
+unbounded heavy tail. The floor exists because a feature active in a single
+factor can otherwise draw a magnitude so small that its column of $Y$ is all
+zero with probability near one, which the fitting code rejects — the seed-7
+dataset did exactly this before the floor was added. The floor is defined on
+the **rate scale** — `r CAL$rate_floor` expected counts — and mapped through
+each link ($T_{\textrm{lo}} = \log(1 + 0.05/c_{\textrm{true}})$, i.e.
+`r round(log1p(0.05/1e-3), 2)` at $c_{\textrm{true}} = 10^{-3}$ and $0.05$ at
+$c_{\textrm{true}} = \infty$), so it imposes the same detectability
+requirement in every regime.
 
-# How the four calibrated numbers were chosen
+# How the calibrated numbers were chosen
 
-The target is the real pancreas count matrix (7,606 cells $\times$ 18,195
-genes; 82.2% zeros, mean 0.674). Two properties are matched:
+The target — **identical for every $c_{\textrm{true}}$, which is the point**
+— is the real pancreas count matrix (7,606 cells $\times$ 18,195 genes;
+82.2% zeros, mean 0.674). Two properties are matched:
 
 - **The budget curve** $c \mapsto \operatorname{pm}(\log(1+Y/c))$, in least
-  squares on the log scale over the experiment's own $c$ grid. This curve
+  squares on the log scale over the experiment's own fitting grid. The curve
   depends only on the count histogram, and it is the quantity our sparsity
   theory identifies as governing what any fit can do at each $c$. Because it
-  involves a maximum it must be **size-adjusted**: the target uses
-  $t^{*} = `r cal$tstar`$, the median maximum of $np = `r N_ROWS * N_COLS`$
-  draws from the real marginal, not the real matrix's own maximum
-  (`r max(0:(length(readRDS("data/pancreas_count_histogram.rds")$h)))`).
+  involves a maximum it is **size-adjusted**: the target uses
+  $t^{*} = `r CAL$tstar`$, the median maximum of $np = `r N_ROWS * N_COLS`$
+  draws from the real marginal, not the real matrix's own maximum.
 - **The mean count, exactly.** The approximation experiments consume the
-  absolute scale of the counts, and the curve alone pins it only loosely. So
-  $\mu$ is not searched: inside every calibration step it is solved by
-  one-dimensional root-finding so the expected mean count equals the real
-  0.674 (profiling). Nelder–Mead searches only $(\pi_0, \sigma, T)$ against
-  the curve, with common random numbers across evaluations; the final $\mu$
-  is re-solved on 20 seeds.
+  absolute scale of the counts, and the curve alone pins it only loosely.
+  $\mu$ is therefore profiled — solved by one-dimensional root-finding inside
+  every calibration step — rather than searched; Nelder–Mead searches only
+  $(\pi_0, \sigma, T)$, with common random numbers, and the final $\mu$ is
+  re-solved on 20 seeds.
 
 The calibration code is `calibrate_approx_sim.R`, next to the experiment
-scripts; it writes `approx_sim_calibration.rds`, from which the knobs in the
-table above were checked.
+scripts; it loops over the $c_{\textrm{true}}$ grid and writes
+`approx_sim_calibration.rds`, which `approx_sim_common.R` reads back with a
+consistency check.
 
-# Verification on the ten seeds the experiment will use
+# Verification on the thirty datasets the experiment will use
 
-Not held-out seeds — these are datasets 1–10, exactly as the workers will
-regenerate them.
+Not held-out seeds — these are the (seed, $c_{\textrm{true}}$) datasets
+exactly as the workers will regenerate them.
 
 ```{r verify, cache=TRUE}
-ds <- lapply(seq_len(N_SEEDS), sim_dataset)
-curve_of <- function(Y) sapply(cal$CS, function(cc) {
+ds <- list()
+for (ct in C_TRUE_GRID)
+  for (s in seq_len(N_SEEDS))
+    ds[[paste(fmtc(ct), s)]] <- sim_dataset(s, ct)
+
+curve_of <- function(Y) sapply(CAL$CS, function(cc) {
   g <- log1p(Y / cc); max(g) / mean(g) })
-cvs <- sapply(ds, function(d) curve_of(d$Y))
 
-knitr::kable(data.frame(
-  c = format(cal$CS), `target pm` = round(cal$target, 1),
-  `simulated pm (median of 10)` = round(apply(cvs, 1, median), 1),
-  ratio = round(apply(cvs, 1, median) / cal$target, 2),
-  `ratio range` = paste0(round(apply(cvs / cal$target, 1, min), 2), " – ",
-                         round(apply(cvs / cal$target, 1, max), 2)),
-  check.names = FALSE),
-  caption = "Budget curve of the ten experiment datasets vs the size-adjusted
-  pancreas target.")
+ratio_tab <- data.frame(`c for fitting` = format(CAL$CS), check.names = FALSE)
+for (ct in C_TRUE_GRID) {
+  cvs <- sapply(seq_len(N_SEEDS),
+                function(s) curve_of(ds[[paste(fmtc(ct), s)]]$Y))
+  r <- cvs / CAL$target
+  ratio_tab[[paste0("c_true = ", fmtc(ct))]] <-
+    sprintf("%.2f  (%.2f–%.2f)", apply(r, 1, median),
+            apply(r, 1, min), apply(r, 1, max))
+}
+knitr::kable(ratio_tab, caption = "Budget-curve ratio to the shared
+  size-adjusted pancreas target: median (range) over the ten seeds, per
+  c_true. 1.00 = exact match.")
 
-zf <- sapply(ds, function(d) mean(d$Y == 0))
-mn <- sapply(ds, function(d) mean(d$Y))
-mx <- sapply(ds, function(d) max(d$Y))
-knitr::kable(data.frame(
-  what = c("zero fraction", "mean count", "max count"),
-  `simulated, median (range)` = c(
-    sprintf("%.3f  (%.3f – %.3f)", median(zf), min(zf), max(zf)),
-    sprintf("%.3f  (%.3f – %.3f)", median(mn), min(mn), max(mn)),
-    sprintf("%.0f  (%d – %d)", median(mx), min(mx), max(mx))),
-  real = c("0.822", "0.674", paste0(cal$tstar, " (size-adjusted)")),
-  check.names = FALSE),
-  caption = "Count characteristics of the ten datasets.")
+stat_tab <- data.frame(
+  what = c("zero fraction", "mean count", "max count"), check.names = FALSE)
+for (ct in C_TRUE_GRID) {
+  Ys <- lapply(seq_len(N_SEEDS), function(s) ds[[paste(fmtc(ct), s)]]$Y)
+  zf <- sapply(Ys, function(Y) mean(Y == 0)); mn <- sapply(Ys, mean)
+  mx <- sapply(Ys, max)
+  stat_tab[[paste0("c_true = ", fmtc(ct))]] <- c(
+    sprintf("%.3f (%.3f–%.3f)", median(zf), min(zf), max(zf)),
+    sprintf("%.3f (%.3f–%.3f)", median(mn), min(mn), max(mn)),
+    sprintf("%.0f (%d–%d)", median(mx), min(mx), max(mx)))
+}
+stat_tab$real <- c("0.822", "0.674", paste0(CAL$tstar, " (size-adj.)"))
+knitr::kable(stat_tab, caption = "Count characteristics, median (range) over
+  the ten seeds.")
 ```
 
-```{r tail-plot, fig.width=6.5, fig.height=4}
+```{r tail-plot, fig.width=7, fig.height=4}
 zp   <- readRDS("data/pancreas_count_histogram.rds")
 p_tp <- c(zp$np - sum(zp$h), zp$h) / zp$np
 ccdf_real <- rev(cumsum(rev(p_tp[-1])))
-Yall <- unlist(lapply(ds, function(d) d$Y[d$Y > 0]))
-ccdf_sim <- rev(cumsum(rev(tabulate(Yall, nbins = max(Yall))))) / (N_SEEDS * N_ROWS * N_COLS)
-tt <- 1:min(length(ccdf_real), length(ccdf_sim), 3000)
-d2 <- rbind(data.frame(t = tt, p = ccdf_sim[tt],  what = "simulated (10 datasets pooled)"),
-            data.frame(t = tt, p = ccdf_real[tt], what = "real (pancreas)"))
-d2 <- d2[d2$p > 0, ]
+d2 <- data.frame(t = seq_along(ccdf_real), p = ccdf_real,
+                 what = "real (pancreas)")
+for (ct in C_TRUE_GRID) {
+  Yall <- unlist(lapply(seq_len(N_SEEDS),
+                        function(s) { Y <- ds[[paste(fmtc(ct), s)]]$Y; Y[Y > 0] }))
+  cc <- rev(cumsum(rev(tabulate(Yall, nbins = max(Yall))))) /
+        (N_SEEDS * N_ROWS * N_COLS)
+  d2 <- rbind(d2, data.frame(t = seq_along(cc), p = cc,
+                             what = paste0("simulated, c_true = ", fmtc(ct))))
+}
+d2 <- d2[d2$p > 0 & d2$t <= 3000, ]
 ggplot(d2, aes(t, p, colour = what)) +
-  geom_line(linewidth = 1) +
+  geom_line(linewidth = 0.9) +
   scale_x_log10() + scale_y_log10() +
   scale_colour_manual(values = c(`real (pancreas)` = "#C2410C",
-                                 `simulated (10 datasets pooled)` = "#0E5C6B"),
-                      name = NULL) +
+    `simulated, c_true = 0.001` = "#0E8FA8",
+    `simulated, c_true = 1` = "#0E5C6B",
+    `simulated, c_true = Inf` = "#B45309"), name = NULL) +
   labs(x = "count value t", y = "P(Y >= t)",
-       title = "Tail of the count distribution",
+       title = "Tail of the count distribution, per c_true",
        subtitle = "not targeted directly; inherited from the curve match")
 ```
 
 The controlled side of the design — the truth the fits will be scored
-against:
+against. The loading rows are identical across $c_{\textrm{true}}$ by
+construction, and the table shows it:
 
 ```{r truth-side}
 hoyer <- function(x) { m <- length(x)
   (sqrt(m) - sum(x)/sqrt(sum(x^2)))/(sqrt(m) - 1) }
-knitr::kable(data.frame(
+tt <- data.frame(
   what = c("mean Hoyer sparsity of loading columns",
            "mean # factors carrying 90% of a sample",
            "fraction of exact zeros in F",
            "mean # factors per feature",
-           "mean Hoyer sparsity of factor columns"),
-  `median over the 10 seeds` = c(
-    round(median(sapply(ds, function(d) mean(apply(d$L, 2, hoyer)))), 3),
-    round(median(sapply(ds, function(d) mean(apply(d$L, 1, function(r)
+           "mean Hoyer sparsity of factor columns"), check.names = FALSE)
+for (ct in C_TRUE_GRID) {
+  D <- lapply(seq_len(N_SEEDS), function(s) ds[[paste(fmtc(ct), s)]])
+  tt[[paste0("c_true = ", fmtc(ct))]] <- c(
+    round(median(sapply(D, function(d) mean(apply(d$L, 2, hoyer)))), 3),
+    round(median(sapply(D, function(d) mean(apply(d$L, 1, function(r)
       min(which(cumsum(sort(r, decreasing = TRUE)) >= 0.9)))))), 2),
-    round(median(sapply(ds, function(d) mean(d$FF == 0))), 3),
-    round(median(sapply(ds, function(d) mean(rowSums(d$FF > 0)))), 2),
-    round(median(sapply(ds, function(d) mean(apply(d$FF, 2, hoyer)))), 3)),
-  check.names = FALSE),
-  caption = "Truth structure: identical in distribution across all seeds and
-  all c; the loading sparsity is set once by a = 0.3.")
+    round(median(sapply(D, function(d) mean(d$FF == 0))), 3),
+    round(median(sapply(D, function(d) mean(rowSums(d$FF > 0)))), 2),
+    round(median(sapply(D, function(d) mean(apply(d$FF, 2, hoyer)))), 3))
+}
+knitr::kable(tt, caption = "Truth structure, median over the ten seeds. The
+  loading rows (first two lines) are byte-identical across c_true; the factor
+  law differs because its knobs are calibrated per c_true.")
 ```
 
 # Honest limits of the match at K = 5
 
-The same calibration machinery matched the pancreas curve to within
-$\pm 16\%$ at $600 \times 600$, $K = 10$ (git history of this page). At
-$K = 5$ it cannot do as well, and the reason is structural: with five
-factors and Dirichlet-peaked rows, each entry's rate is nearly a
-single-factor draw, and the knobs cannot feed the zero fraction, the mean,
-and the extreme tail simultaneously. Two richer variants — a free tail
-degree of freedom, and two-component magnitudes — fixed one end of the curve
-only by sacrificing the other, and were rejected. The realized compromise,
-visible in the tables above: zeros ~0.89 vs 0.822 (so the budget curve runs
-~1.4–1.5$\times$ high at the small-$c$ end), and a maximum around 2,000 vs
-the size-adjusted 8,820 (so the curve runs ~0.3–0.8$\times$ at the large-$c$
-end). The mean is centered by construction. If the tail mismatch ever
-matters, the honest fix is $K = 10$, not more knobs.
+The same machinery matched the pancreas curve to within $\pm 16\%$ at
+$600 \times 600$, $K = 10$ (git history of this page). At $K = 5$ it cannot
+do as well, and the reason is structural: with five factors and
+Dirichlet-peaked rows, each entry's rate is nearly a single-factor draw, and
+the knobs cannot feed the zero fraction, the mean, and the extreme tail
+simultaneously. Two richer variants — a free tail degree of freedom and
+two-component magnitudes — fixed one end of the curve only by sacrificing
+the other, and were rejected.
+
+The compromise differs by regime, as the tables above show.
+$c_{\textrm{true}} = 1$ is the best matched. At
+$c_{\textrm{true}} = 10^{-3}$ the exponential link amplifies the magnitudes,
+which helps the tail (maxima near 5,000) at some cost in zeros.
+$c_{\textrm{true}} = \infty$ is the weakest match: with the identity link the
+tail must come entirely from the factor magnitudes themselves, with no
+amplification and every loading below one attenuating them, so the maxima
+reach only $\sim$1,000 and the zeros run high. This is worth knowing when
+reading the results, but it does not undercut the comparison design: all
+three regimes are calibrated to the same target, and the fits at every
+$c_{\textrm{fit}}$ within a regime see identical data.
 
 # The experiment this feeds
 
@@ -236,11 +272,12 @@ Read from the same configuration file:
 
 ```{r protocol}
 knitr::kable(data.frame(
-  setting = c("datasets", "c grid for fitting", "methods",
-              "initialization", "convergence tolerance",
+  setting = c("datasets", "c_true grid (generation)", "c grid for fitting",
+              "methods", "initialization", "convergence tolerance",
               "iteration safety cap", "optimization-time cap",
               "SLURM wall clock", "threads per fit", "tasks"),
-  value = c(sprintf("%d seeds, generated once each at c = %s", N_SEEDS, C_TRUE),
+  value = c(sprintf("%d seeds per c_true (same L across c_true)", N_SEEDS),
+            paste(sapply(C_TRUE_GRID, fmtc), collapse = ", "),
             paste(format(CC_GRID, scientific = TRUE, trim = TRUE), collapse = ", "),
             paste(METHODS, collapse = ", "),
             "rank-1 (each method's own warm-up, seeded)",
@@ -250,13 +287,13 @@ knitr::kable(data.frame(
             "24h (backstop only)",
             THREADS,
             sprintf("%d  (one fit per task)", N_TASKS))),
-  caption = "The exact-vs-approx protocol, from approx_sim_common.R and
-  run_approx_sim.sbatch.")
+  caption = "The protocol, from approx_sim_common.R and run_approx_sim.sbatch.")
 ```
 
 Every fit runs until the change in **its own objective** falls below the
 tolerance — the approximate methods converge on the approximate objective —
 and the comparison number recorded for every fit is the **exact** Poisson
-log-likelihood of its fitted rates. Each task writes one .rds; after the
-round, `check_approx_sim.R` lists anything missing or unconverged for
-resubmission.
+log-likelihood of its fitted rates. The exact fits across the
+$c_{\textrm{fit}}$ grid double as the sparsity experiment: fitted $L$ and
+$F$ are saved for every task. After the round, `check_approx_sim.R` lists
+anything missing or unconverged for resubmission.
