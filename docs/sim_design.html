@@ -549,15 +549,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree893f7e724072af652531b5991359d6d03fe3837atargetblank893f7e7a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree950e6f78f1f176990d3e0fb1498f238a0e33c8b3targetblank950e6f7a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/893f7e724072af652531b5991359d6d03fe3837a" target="_blank">893f7e7</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/950e6f78f1f176990d3e0fb1498f238a0e33c8b3" target="_blank">950e6f7</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree893f7e724072af652531b5991359d6d03fe3837atargetblank893f7e7a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree950e6f78f1f176990d3e0fb1498f238a0e33c8b3targetblank950e6f7a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -567,7 +567,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/893f7e724072af652531b5991359d6d03fe3837a" target="_blank">893f7e7</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/950e6f78f1f176990d3e0fb1498f238a0e33c8b3" target="_blank">950e6f7</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -632,6 +632,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/950e6f78f1f176990d3e0fb1498f238a0e33c8b3/analysis/sim_design.Rmd" target="_blank">950e6f7</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+sim_design results: likelihood-ratio figure matching the paper,
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/61e6cb9a616f57a935ff1728e14b245f3b65f4fa/docs/sim_design.html" target="_blank">61e6cb9</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1634,46 +1668,95 @@ Table: Mean per-entry gap, chebyshev (rows = c_true, cols = c_fit).
 |c_true = 0.001 | -0.012| -0.0098| -0.0130| -0.0160|  6.3e-02|  1.4e-02| -1.2e-02| -0.0180| -1.2e-02|
 |c_true = 1     | -0.026| -0.0130| -0.0062| -0.0033| -1.5e-05| -1.0e-07|  0.0e+00| -0.0025| -2.1e-03|
 |c_true = Inf   | -0.020| -0.0110| -0.0080| -0.0045| -5.3e-05| -1.3e-03|  1.0e-07|  0.0000|  1.0e-07|</code></pre>
+<p>The display matches the paper’s approximation-quality figure: the
+<strong>per-entry likelihood ratio</strong> <span
+class="math inline">\(\exp(\bar\ell_{\textrm{approx}} -
+\bar\ell_{\textrm{exact}})\)</span>, where <span
+class="math inline">\(\bar\ell\)</span> is the per-entry exact
+log-likelihood of the fitted rates — <span
+class="math inline">\(1\)</span> means the approximation loses nothing,
+<span class="math inline">\(0\)</span> means it collapses. Mean over the
+ten seeds, error bars <span class="math inline">\(\pm 1\)</span>
+standard error.</p>
 <pre class="r"><code>ap &lt;- subset(res, method != &quot;exact&quot;)
-ap$mag  &lt;- pmax(abs(ap$gap_pe), 1e-12)
-ap$sign &lt;- ifelse(ap$gap_pe &lt; 0, &quot;worse than exact&quot;, &quot;better than exact&quot;)
-ggplot(ap, aes(cc, mag, colour = method)) +
-  geom_point(aes(shape = sign), size = 1.7, alpha = 0.65,
-             position = position_jitter(width = 0.07, height = 0)) +
-  stat_summary(fun = median, geom = &quot;line&quot;, linewidth = 0.7) +
-  geom_hline(yintercept = 0.01, linetype = 3) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2),
-                labels = scales::label_log()) +
-  scale_y_log10(breaks = 10^seq(-10, 2, 3), labels = scales::label_log()) +
-  scale_colour_manual(values = meth_cols[-1], name = NULL) +
-  scale_shape_manual(values = c(`worse than exact` = 16,
-                                `better than exact` = 2), name = NULL) +
+ap$ratio &lt;- exp(ap$gap_pe)
+ap$Approximation &lt;- ifelse(ap$method == &quot;taylor&quot;, &quot;Taylor&quot;, &quot;Chebyshev&quot;)
+agg &lt;- do.call(data.frame,
+  aggregate(ratio ~ Approximation + cc + ct, ap,
+            function(x) c(mean = mean(x), se = sd(x) / sqrt(length(x)))))
+ymax &lt;- max(1.05, agg$ratio.mean + agg$ratio.se)
+ggplot(agg, aes(cc, ratio.mean, colour = Approximation)) +
+  geom_hline(yintercept = 1, linetype = &quot;dashed&quot;) +
+  geom_line() + geom_point() +
+  geom_errorbar(aes(ymin = ratio.mean - ratio.se,
+                    ymax = ratio.mean + ratio.se), width = 0.15) +
+  scale_x_continuous(transform = &quot;log10&quot;,
+                     breaks = c(1e-4, 1e-2, 1, 1e2, 1e4),
+                     labels = scales::label_log()) +
+  coord_cartesian(ylim = c(0, ymax)) +
   facet_wrap(~ ct, nrow = 1) +
-  labs(x = &quot;c used for fitting&quot;, y = &quot;|per-entry gap|  (log scale)&quot;,
-       title = &quot;Exact log-likelihood given up by each approximation&quot;,
-       subtitle = &quot;one point per seed; line = median; dotted line = 0.01 per entry&quot;)</code></pre>
-<p><img src="figure/sim_design.Rmd/approx-gap-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+  labs(x = &quot;Value of c for Optimization&quot;, y = &quot;Likelihood Ratio&quot;)</code></pre>
+<p><img src="figure/sim_design.Rmd/approx-ratio-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
 <p>Two regimes are visible. For <span
 class="math inline">\(c_{\textrm{fit}} \geq 0.1\)</span>
-<strong>both</strong> approximations track the exact objective closely —
-per-entry gaps of <span class="math inline">\(10^{-2}\)</span> down to
-<span class="math inline">\(10^{-10}\)</span>, i.e. from negligible to
-identical, and the scattered “better than exact” triangles
-(approximation landing in a slightly better local optimum of the common
-exact criterion) confirm the remaining spread is local-optimum noise
-rather than approximation error, as does the occasional cell where
-taylor and chebyshev land the <em>same</em> gap. For <span
+<strong>both</strong> approximations sit on the dashed line: per-entry
+gaps of <span class="math inline">\(10^{-2}\)</span> down to <span
+class="math inline">\(10^{-10}\)</span>, i.e. from negligible to
+identical (the tables above). The few points marginally <em>above</em>
+<span class="math inline">\(1\)</span> — clearest for Chebyshev mid-grid
+at <span class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span> —
+are the approximation landing in a slightly better local optimum of the
+common exact criterion, so the remaining spread there is local-optimum
+noise, not approximation error. For <span
 class="math inline">\(c_{\textrm{fit}} \leq 10^{-2}\)</span> the two
 methods part company: <strong>Chebyshev degrades gracefully</strong>
-(never worse than <span class="math inline">\(\sim 0.03\)</span> per
-entry anywhere on the grid) while <strong>Taylor fails
-outright</strong>, giving up tens to thousands of log-likelihood units
-per entry at <span class="math inline">\(c_{\textrm{fit}} \leq
-10^{-3}\)</span> — and it fails slowly, burning hours to 1M iterations
-on the way (the timing table above). The Chebyshev coefficients are fit
-to the relevant interval, while the Taylor expansion is anchored at a
-point that small <span class="math inline">\(c\)</span> pushes far from
-where the zero-term sum is evaluated.</p>
+(worst case <span class="math inline">\(\sim 0.03\)</span> per entry, a
+ratio of <span class="math inline">\(\sim 0.97\)</span>) while
+<strong>Taylor collapses to ratio <span
+class="math inline">\(0\)</span></strong> at <span
+class="math inline">\(c_{\textrm{fit}} \leq 10^{-3}\)</span>, giving up
+tens to thousands of log-likelihood units per entry. The Chebyshev
+coefficients are fit to the relevant interval, while the Taylor
+expansion is anchored at a point that small <span
+class="math inline">\(c\)</span> pushes far from where the zero-term sum
+is evaluated.</p>
+</div>
+<div id="iterations-to-convergence" class="section level2">
+<h2>Iterations to convergence</h2>
+<p>Every fit ran to the same tolerance on its own objective, so the
+iteration count is comparable within a method and diagnostic across
+methods.</p>
+<pre class="r"><code>ggplot(res, aes(cc, n_iter, colour = method)) +
+  geom_point(size = 1, alpha = 0.3,
+             position = position_jitter(width = 0.06, height = 0)) +
+  stat_summary(fun = median, geom = &quot;line&quot;, linewidth = 0.8) +
+  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+  scale_y_log10(labels = scales::label_comma()) +
+  scale_colour_manual(values = meth_cols, name = NULL) +
+  facet_wrap(~ ct, nrow = 1) +
+  labs(x = &quot;c used for fitting&quot;, y = &quot;iterations to convergence&quot;,
+       title = &quot;Iterations to convergence&quot;,
+       subtitle = &quot;one point per seed; line = median over seeds&quot;)</code></pre>
+<p><img src="figure/sim_design.Rmd/iterations-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>Iteration counts rise steadily as <span
+class="math inline">\(c_{\textrm{fit}}\)</span> decreases for every
+method — at <span class="math inline">\(c_{\textrm{fit}} =
+10^{4}\)</span> the median fit converges in <span
+class="math inline">\(\sim 55\)</span> iterations, at <span
+class="math inline">\(c_{\textrm{fit}} = 10^{-4}\)</span> the exact
+method needs <span class="math inline">\(\sim 16{,}000\)</span> —
+consistent with the increasingly ill-conditioned small-<span
+class="math inline">\(c\)</span> regime. The methods only separate where
+the approximation is poor: Chebyshev tracks exact throughout (its
+maximum anywhere is 34k iterations, vs 102k for exact), but Taylor
+detaches below <span class="math inline">\(c_{\textrm{fit}} =
+10^{-2}\)</span>, with a <em>median</em> of 272k iterations at <span
+class="math inline">\(c_{\textrm{fit}} = 10^{-4}\)</span> (all 18 fits
+that outgrew the original 250k cap were Taylor at <span
+class="math inline">\(c_{\textrm{fit}} \leq 10^{-3}\)</span>; the worst
+needed 844k). Taylor’s failure at small <span
+class="math inline">\(c\)</span> is thus doubly expensive: it converges
+to a much worse fit, and takes far longer to get there.</p>
 </div>
 <div id="sparsity-of-the-fitted-loadings-and-factors"
 class="section level2">
@@ -1688,60 +1771,124 @@ increasing in <span class="math inline">\(c\)</span>; the design says
 the truth was generated with loading sparsity <strong>identical across
 regimes</strong> (dashed line at the same height in every panel of the
 top row).</p>
-<pre class="r"><code>agg &lt;- aggregate(cbind(hoyer_L, hoyer_F) ~ method + cc + ct, res, mean)
-sp  &lt;- rbind(
-  data.frame(agg[c(&quot;method&quot;, &quot;cc&quot;, &quot;ct&quot;)], what = &quot;loadings L&quot;,
-             value = agg$hoyer_L),
-  data.frame(agg[c(&quot;method&quot;, &quot;cc&quot;, &quot;ct&quot;)], what = &quot;factors F&quot;,
-             value = agg$hoyer_F))
-sp$what &lt;- factor(sp$what, levels = c(&quot;loadings L&quot;, &quot;factors F&quot;))
-tru &lt;- unique(res[c(&quot;ct&quot;, &quot;hoyer_L_true&quot;, &quot;hoyer_F_true&quot;)])
-tru &lt;- aggregate(cbind(hoyer_L_true, hoyer_F_true) ~ ct, tru, mean)
-truth_df &lt;- rbind(
-  data.frame(ct = tru$ct, what = &quot;loadings L&quot;, value = tru$hoyer_L_true),
-  data.frame(ct = tru$ct, what = &quot;factors F&quot;,  value = tru$hoyer_F_true))
-truth_df$what &lt;- factor(truth_df$what, levels = levels(sp$what))
-ggplot(sp, aes(cc, value, colour = method)) +
-  geom_hline(data = truth_df, aes(yintercept = value), linetype = 2,
-             colour = &quot;grey40&quot;) +
-  geom_line(linewidth = 0.7) + geom_point(size = 1.6) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
-  scale_colour_manual(values = meth_cols, name = NULL) +
-  facet_grid(what ~ ct) +
-  labs(x = &quot;c used for fitting&quot;, y = &quot;mean Hoyer sparsity of columns&quot;,
-       title = &quot;Sparsity of the fit is set by the fitting c&quot;,
-       subtitle = &quot;mean over 10 seeds; dashed = the truth&#39;s own sparsity&quot;)</code></pre>
+<p>Exact fits only from here on (the previous sections established where
+the approximations can be trusted). As in the c-grid figures: thin lines
+are the ten individual seeds, the thick line their mean, the dashed line
+the truth’s own value, and the circled point marks <span
+class="math inline">\(c_{\textrm{fit}} = c_{\textrm{true}}\)</span>
+(absent at <span class="math inline">\(c_{\textrm{true}} =
+\infty\)</span>, which lies off the fitting grid).</p>
+<pre class="r"><code>## long format + the c-grid panel style, shared by the sparsity and
+## rank-correlation figures below
+make_long &lt;- function(ex, vL, vF, tL, tF) {
+  sp &lt;- rbind(
+    data.frame(ex[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;)], what = &quot;loadings L&quot;,
+               value = ex[[vL]], truth = ex[[tL]]),
+    data.frame(ex[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;)], what = &quot;factors F&quot;,
+               value = ex[[vF]], truth = ex[[tF]]))
+  sp$what &lt;- factor(sp$what, levels = c(&quot;loadings L&quot;, &quot;factors F&quot;))
+  sp
+}
+seed_panels &lt;- function(sp, ylab, title) {
+  avg &lt;- aggregate(value ~ what + cc + ct, sp, mean)
+  tru &lt;- aggregate(truth ~ what + ct, sp, mean)
+  mp  &lt;- unique(res[c(&quot;ct&quot;, &quot;c_true&quot;)])
+  dg  &lt;- merge(avg, mp)
+  dg  &lt;- dg[is.finite(dg$c_true) &amp; dg$cc == dg$c_true, ]
+  ggplot(sp, aes(cc, value)) +
+    geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;,
+              linewidth = 0.35, alpha = 0.8) +
+    geom_hline(data = tru, aes(yintercept = truth), linetype = &quot;dashed&quot;,
+               colour = &quot;#C2410C&quot;, linewidth = 0.5) +
+    geom_line(data = avg, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+    geom_point(data = avg, colour = &quot;#0E5C6B&quot;, size = 1.6) +
+    geom_point(data = dg, shape = 21, size = 3.6, stroke = 1.1,
+               fill = NA, colour = &quot;#C2410C&quot;) +
+    scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+    facet_grid(what ~ ct) +
+    labs(x = &quot;c used for fitting&quot;, y = ylab, title = title,
+         subtitle = paste(&quot;thin lines: 10 individual seeds;  thick line:&quot;,
+                          &quot;mean;  dashed: the true value;  circled:&quot;,
+                          &quot;c_fit = c_true&quot;)) +
+    theme(strip.background = element_blank(),
+          strip.text = element_text(face = &quot;bold&quot;, size = 10),
+          plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
+          panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))
+}</code></pre>
+<pre class="r"><code>ex &lt;- subset(res, method == &quot;exact&quot;)
+seed_panels(make_long(ex, &quot;hoyer_L&quot;, &quot;hoyer_F&quot;,
+                      &quot;hoyer_L_true&quot;, &quot;hoyer_F_true&quot;),
+            ylab  = &quot;mean Hoyer sparsity of columns&quot;,
+            title = &quot;Sparsity of the fit is set by the fitting c&quot;)</code></pre>
 <p><img src="figure/sim_design.Rmd/sparsity-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
-<p>Three things to read off:</p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-sparsity-fig-1">
+Past versions of sparsity-fig-1.png
+</button>
+</p>
+<div id="fig-sparsity-fig-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/61e6cb9a616f57a935ff1728e14b245f3b65f4fa/docs/figure/sim_design.Rmd/sparsity-fig-1.png" target="_blank">61e6cb9</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Two things to read off:</p>
 <ul>
-<li><strong>Monotonicity.</strong> At every <span
+<li><strong>Monotonicity, seed by seed.</strong> At every <span
 class="math inline">\(c_{\textrm{true}}\)</span>, for both <span
 class="math inline">\(L\)</span> and <span
 class="math inline">\(F\)</span>, sparsity increases in <span
 class="math inline">\(c_{\textrm{fit}}\)</span> across the entire
-eight-decade grid — the budget mechanism, on data whose budget curve was
-calibrated to a real dataset’s.</li>
+eight-decade grid — and the thin lines show this is true of essentially
+every individual seed, not just the average; the seed spread is a small
+band around the mean.</li>
 <li><strong>The fit recovers the truth’s sparsity when fit at the true
-<span class="math inline">\(c\)</span>.</strong> The fitted curves cross
-their dashed truth lines at <span class="math inline">\(c_{\textrm{fit}}
-\approx c_{\textrm{true}}\)</span> in every panel: e.g. for loadings
-(truth <span class="math inline">\(0.398\)</span> everywhere) the exact
-fits give <span class="math inline">\(0.41\)</span> at <span
-class="math inline">\((10^{-3}, 10^{-3})\)</span>, <span
+<span class="math inline">\(c\)</span>.</strong> The circled points sit
+almost exactly on the dashed truth lines: for loadings (truth <span
+class="math inline">\(0.398\)</span> everywhere) the exact fits give
+<span class="math inline">\(0.41\)</span> at <span
+class="math inline">\((10^{-3}, 10^{-3})\)</span> and <span
 class="math inline">\(0.41\)</span> at <span class="math inline">\((1,
-1)\)</span>, and <span class="math inline">\(0.40\)</span> at <span
-class="math inline">\((\infty, 10^{3\text{--}4})\)</span>; for factors
-the crossing is equally tight (<span class="math inline">\(|{\Delta}| =
-0.004\)</span> at <span class="math inline">\(c_{\textrm{true}} =
-1\)</span>). Misfit in <span class="math inline">\(c\)</span> translates
-directly into over- or under-sparse estimates.</li>
-<li><strong>The approximations preserve the sparsity story wherever they
-are accurate.</strong> The three method curves are near-coincident for
-<span class="math inline">\(c_{\textrm{fit}} \geq 0.1\)</span>; at the
-small-<span class="math inline">\(c\)</span> end Taylor’s curves pull
-away from exact (its fits there are not usable anyway, per the previous
-section), while Chebyshev stays within a few hundredths.</li>
+1)\)</span>, and the <span class="math inline">\(c_{\textrm{true}} =
+\infty\)</span> curves reach the truth at the top of the grid (<span
+class="math inline">\(0.40\)</span> at <span
+class="math inline">\(c_{\textrm{fit}} = 10^{3\text{--}4}\)</span>); for
+factors the crossing is equally tight (<span
+class="math inline">\(|{\Delta}| = 0.004\)</span> at <span
+class="math inline">\(c_{\textrm{true}} = 1\)</span>). Misfit in <span
+class="math inline">\(c\)</span> translates directly into over- or
+under-sparse estimates.</li>
 </ul>
+<p>The approximate fits (not shown) trace the same curves wherever the
+approximation is accurate; Taylor’s small-<span
+class="math inline">\(c\)</span> fits deviate, but those are exactly the
+fits the accuracy section already ruled out.</p>
 </div>
 <div id="rank-correlation-of-the-factors" class="section level2">
 <h2>Rank correlation of the factors</h2>
@@ -1752,32 +1899,48 @@ theory’s companion argument predicts that as columns sparsify, their
 rankings decouple — pairwise rank correlations should drift with <span
 class="math inline">\(c_{\textrm{fit}}\)</span> alongside the sparsity
 itself.</p>
-<pre class="r"><code>agg &lt;- aggregate(cbind(rankcor_L, rankcor_F) ~ method + cc + ct, res, mean)
-rc  &lt;- rbind(
-  data.frame(agg[c(&quot;method&quot;, &quot;cc&quot;, &quot;ct&quot;)], what = &quot;loadings L&quot;,
-             value = agg$rankcor_L),
-  data.frame(agg[c(&quot;method&quot;, &quot;cc&quot;, &quot;ct&quot;)], what = &quot;factors F&quot;,
-             value = agg$rankcor_F))
-rc$what &lt;- factor(rc$what, levels = c(&quot;loadings L&quot;, &quot;factors F&quot;))
-tru &lt;- aggregate(cbind(rankcor_L_true, rankcor_F_true) ~ ct,
-                 unique(res[c(&quot;ct&quot;, &quot;rankcor_L_true&quot;, &quot;rankcor_F_true&quot;)]),
-                 mean)
-truth_df &lt;- rbind(
-  data.frame(ct = tru$ct, what = &quot;loadings L&quot;, value = tru$rankcor_L_true),
-  data.frame(ct = tru$ct, what = &quot;factors F&quot;,  value = tru$rankcor_F_true))
-truth_df$what &lt;- factor(truth_df$what, levels = levels(rc$what))
-ggplot(rc, aes(cc, value, colour = method)) +
-  geom_hline(data = truth_df, aes(yintercept = value), linetype = 2,
-             colour = &quot;grey40&quot;) +
-  geom_line(linewidth = 0.7) + geom_point(size = 1.6) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
-  scale_colour_manual(values = meth_cols, name = NULL) +
-  facet_grid(what ~ ct) +
-  labs(x = &quot;c used for fitting&quot;,
-       y = &quot;mean pairwise Spearman correlation&quot;,
-       title = &quot;Rank correlation between fitted columns&quot;,
-       subtitle = &quot;mean over 10 seeds; dashed = the truth&#39;s own value&quot;)</code></pre>
+<pre class="r"><code>seed_panels(make_long(ex, &quot;rankcor_L&quot;, &quot;rankcor_F&quot;,
+                      &quot;rankcor_L_true&quot;, &quot;rankcor_F_true&quot;),
+            ylab  = &quot;mean pairwise Spearman correlation&quot;,
+            title = &quot;Rank correlation between fitted columns&quot;)</code></pre>
 <p><img src="figure/sim_design.Rmd/rankcor-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-rankcor-fig-1">
+Past versions of rankcor-fig-1.png
+</button>
+</p>
+<div id="fig-rankcor-fig-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/61e6cb9a616f57a935ff1728e14b245f3b65f4fa/docs/figure/sim_design.Rmd/rankcor-fig-1.png" target="_blank">61e6cb9</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>For the <strong>loadings</strong> at <span
 class="math inline">\(c_{\textrm{true}} = 1\)</span> and <span
 class="math inline">\(\infty\)</span> the effect is clean: pairwise rank
@@ -1785,23 +1948,29 @@ correlation rises toward zero as <span
 class="math inline">\(c_{\textrm{fit}}\)</span> grows, reaching the
 truth’s value (<span class="math inline">\(-0.174\)</span>) near <span
 class="math inline">\(c_{\textrm{fit}} \approx
-c_{\textrm{true}}\)</span>, and all three methods lie on top of each
-other. At <span class="math inline">\(c_{\textrm{true}} =
-10^{-3}\)</span> the exact curve is not monotone — it peaks around <span
+c_{\textrm{true}}\)</span>, with a tight seed band. At <span
+class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span> the mean
+curve is not monotone — it peaks around <span
 class="math inline">\(c_{\textrm{fit}} = 10\)</span> and comes back down
-where the fits are heavily over-sparsified — and the methods separate, a
-first hint of what the factor panels show clearly. For the
-<strong>factors</strong> the movement with <span
-class="math inline">\(c\)</span> is small and the three methods scatter
-around each other even at moderate <span
-class="math inline">\(c_{\textrm{fit}}\)</span>, where their
-log-likelihoods are nearly identical: pairwise Spearman between sparse,
-heavy-tailed columns is dominated by which local optimum a fit landed
-in, not by the objective it optimized, so we read little into the fine
-structure here. The one robust feature is that <strong>every fit’s
-factor columns are more rank-correlated than the truth’s</strong> (all
-curves sit above the dashed lines): the fits never fully reproduce the
-decoupling of the generative factors.</p>
+where the fits are heavily over-sparsified — and the thin lines show the
+seeds genuinely disagreeing about the large-<span
+class="math inline">\(c\)</span> end. For the <strong>factors</strong>
+the curves are non-monotone but, at <span
+class="math inline">\(c_{\textrm{true}} = 1\)</span> and <span
+class="math inline">\(\infty\)</span>, systematic — the seed bands are
+tight, and the pairwise rank correlation is at its most negative,
+i.e. closest to the truth’s decoupled factors, in a trough near <span
+class="math inline">\(c_{\textrm{fit}} \approx
+c_{\textrm{true}}\)</span> (at <span
+class="math inline">\(c_{\textrm{fit}} = 1\)</span> and <span
+class="math inline">\(10\)</span> respectively), rising toward zero or
+above on both sides, where the fits are mis-sparsified. At <span
+class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span> the factor
+curve is flat and the seed spread dominates. The one robust feature
+across all regimes is that <strong>every fit’s factor columns are more
+rank-correlated than the truth’s</strong> (the entire seed band sits
+above the dashed lines): the fits never fully reproduce the decoupling
+of the generative factors.</p>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
