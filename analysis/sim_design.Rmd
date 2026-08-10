@@ -358,8 +358,8 @@ The display matches the paper's approximation-quality figure: the
 **per-entry likelihood ratio** $\exp(\bar\ell_{\textrm{approx}} -
 \bar\ell_{\textrm{exact}})$, where $\bar\ell$ is the per-entry exact
 log-likelihood of the fitted rates — $1$ means the approximation loses
-nothing, $0$ means it collapses. Mean over the ten seeds, error bars
-$\pm 1$ standard error.
+nothing, $0$ means it collapses. Mean over the ten seeds, error bars a 95%
+confidence interval ($t_{9}$-based).
 
 ```{r approx-ratio-fig, fig.width=8.5, fig.height=3.4}
 ap <- subset(res, method != "exact")
@@ -367,13 +367,15 @@ ap$ratio <- exp(ap$gap_pe)
 ap$Approximation <- ifelse(ap$method == "taylor", "Taylor", "Chebyshev")
 agg <- do.call(data.frame,
   aggregate(ratio ~ Approximation + cc + ct, ap,
-            function(x) c(mean = mean(x), se = sd(x) / sqrt(length(x)))))
-ymax <- max(1.05, agg$ratio.mean + agg$ratio.se)
+            function(x) c(mean = mean(x),
+                          half = qt(0.975, length(x) - 1) *
+                                 sd(x) / sqrt(length(x)))))
+ymax <- max(1.05, agg$ratio.mean + agg$ratio.half)
 ggplot(agg, aes(cc, ratio.mean, colour = Approximation)) +
   geom_hline(yintercept = 1, linetype = "dashed") +
   geom_line() + geom_point() +
-  geom_errorbar(aes(ymin = ratio.mean - ratio.se,
-                    ymax = ratio.mean + ratio.se), width = 0.15) +
+  geom_errorbar(aes(ymin = ratio.mean - ratio.half,
+                    ymax = ratio.mean + ratio.half), width = 0.15) +
   scale_x_continuous(transform = "log10",
                      breaks = c(1e-4, 1e-2, 1, 1e2, 1e4),
                      labels = scales::label_log()) +
