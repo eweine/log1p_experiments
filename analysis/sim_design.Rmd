@@ -354,42 +354,80 @@ for (m in c("taylor", "chebyshev")) {
 }
 ```
 
-```{r approx-gap-fig, fig.width=8.5, fig.height=3.6}
+The display matches the paper's approximation-quality figure: the
+**per-entry likelihood ratio** $\exp(\bar\ell_{\textrm{approx}} -
+\bar\ell_{\textrm{exact}})$, where $\bar\ell$ is the per-entry exact
+log-likelihood of the fitted rates — $1$ means the approximation loses
+nothing, $0$ means it collapses. Mean over the ten seeds, error bars
+$\pm 1$ standard error.
+
+```{r approx-ratio-fig, fig.width=8.5, fig.height=3.4}
 ap <- subset(res, method != "exact")
-ap$mag  <- pmax(abs(ap$gap_pe), 1e-12)
-ap$sign <- ifelse(ap$gap_pe < 0, "worse than exact", "better than exact")
-ggplot(ap, aes(cc, mag, colour = method)) +
-  geom_point(aes(shape = sign), size = 1.7, alpha = 0.65,
-             position = position_jitter(width = 0.07, height = 0)) +
-  stat_summary(fun = median, geom = "line", linewidth = 0.7) +
-  geom_hline(yintercept = 0.01, linetype = 3) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2),
-                labels = scales::label_log()) +
-  scale_y_log10(breaks = 10^seq(-10, 2, 3), labels = scales::label_log()) +
-  scale_colour_manual(values = meth_cols[-1], name = NULL) +
-  scale_shape_manual(values = c(`worse than exact` = 16,
-                                `better than exact` = 2), name = NULL) +
+ap$ratio <- exp(ap$gap_pe)
+ap$Approximation <- ifelse(ap$method == "taylor", "Taylor", "Chebyshev")
+agg <- do.call(data.frame,
+  aggregate(ratio ~ Approximation + cc + ct, ap,
+            function(x) c(mean = mean(x), se = sd(x) / sqrt(length(x)))))
+ymax <- max(1.05, agg$ratio.mean + agg$ratio.se)
+ggplot(agg, aes(cc, ratio.mean, colour = Approximation)) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  geom_line() + geom_point() +
+  geom_errorbar(aes(ymin = ratio.mean - ratio.se,
+                    ymax = ratio.mean + ratio.se), width = 0.15) +
+  scale_x_continuous(transform = "log10",
+                     breaks = c(1e-4, 1e-2, 1, 1e2, 1e4),
+                     labels = scales::label_log()) +
+  coord_cartesian(ylim = c(0, ymax)) +
   facet_wrap(~ ct, nrow = 1) +
-  labs(x = "c used for fitting", y = "|per-entry gap|  (log scale)",
-       title = "Exact log-likelihood given up by each approximation",
-       subtitle = "one point per seed; line = median; dotted line = 0.01 per entry")
+  labs(x = "Value of c for Optimization", y = "Likelihood Ratio")
 ```
 
 Two regimes are visible. For $c_{\textrm{fit}} \geq 0.1$ **both**
-approximations track the exact objective closely — per-entry gaps of
-$10^{-2}$ down to $10^{-10}$, i.e. from negligible to identical, and the
-scattered "better than exact" triangles (approximation landing in a slightly
-better local optimum of the common exact criterion) confirm the remaining
-spread is local-optimum noise rather than approximation error, as does the
-occasional cell where taylor and chebyshev land the *same* gap. For
+approximations sit on the dashed line: per-entry gaps of $10^{-2}$ down to
+$10^{-10}$, i.e. from negligible to identical (the tables above). The few
+points marginally *above* $1$ — clearest for Chebyshev mid-grid at
+$c_{\textrm{true}} = 10^{-3}$ — are the approximation landing in a slightly
+better local optimum of the common exact criterion, so the remaining spread
+there is local-optimum noise, not approximation error. For
 $c_{\textrm{fit}} \leq 10^{-2}$ the two methods part company: **Chebyshev
-degrades gracefully** (never worse than $\sim 0.03$ per entry anywhere on
-the grid) while **Taylor fails outright**, giving up tens to thousands of
-log-likelihood units per entry at $c_{\textrm{fit}} \leq 10^{-3}$ — and it
-fails slowly, burning hours to 1M iterations on the way (the timing table
-above). The Chebyshev coefficients are fit to the relevant interval, while
-the Taylor expansion is anchored at a point that small $c$ pushes far from
-where the zero-term sum is evaluated.
+degrades gracefully** (worst case $\sim 0.03$ per entry, a ratio of
+$\sim 0.97$) while **Taylor collapses to ratio $0$** at
+$c_{\textrm{fit}} \leq 10^{-3}$, giving up tens to thousands of
+log-likelihood units per entry. The Chebyshev coefficients are fit to the
+relevant interval, while the Taylor expansion is anchored at a point that
+small $c$ pushes far from where the zero-term sum is evaluated.
+
+## Iterations to convergence
+
+Every fit ran to the same tolerance on its own objective, so the iteration
+count is comparable within a method and diagnostic across methods.
+
+```{r iterations-fig, fig.width=8.5, fig.height=3.4}
+ggplot(res, aes(cc, n_iter, colour = method)) +
+  geom_point(size = 1, alpha = 0.3,
+             position = position_jitter(width = 0.06, height = 0)) +
+  stat_summary(fun = median, geom = "line", linewidth = 0.8) +
+  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+  scale_y_log10(labels = scales::label_comma()) +
+  scale_colour_manual(values = meth_cols, name = NULL) +
+  facet_wrap(~ ct, nrow = 1) +
+  labs(x = "c used for fitting", y = "iterations to convergence",
+       title = "Iterations to convergence",
+       subtitle = "one point per seed; line = median over seeds")
+```
+
+Iteration counts rise steadily as $c_{\textrm{fit}}$ decreases for every
+method — at $c_{\textrm{fit}} = 10^{4}$ the median fit converges in
+$\sim 55$ iterations, at $c_{\textrm{fit}} = 10^{-4}$ the exact method needs
+$\sim 16{,}000$ — consistent with the increasingly ill-conditioned small-$c$
+regime. The methods only separate where the approximation is poor:
+Chebyshev tracks exact throughout (its maximum anywhere is 34k iterations,
+vs 102k for exact), but Taylor detaches below $c_{\textrm{fit}} = 10^{-2}$,
+with a *median* of 272k iterations at $c_{\textrm{fit}} = 10^{-4}$ (all 18
+fits that outgrew the original 250k cap were Taylor at
+$c_{\textrm{fit}} \leq 10^{-3}$; the worst needed 844k). Taylor's failure at
+small $c$ is thus doubly expensive: it converges to a much worse fit, and
+takes far longer to get there.
 
 ## Sparsity of the fitted loadings and factors
 
@@ -400,51 +438,79 @@ $\operatorname{pm}(\log(1+Y/c))$, increasing in $c$; the design says the
 truth was generated with loading sparsity **identical across regimes**
 (dashed line at the same height in every panel of the top row).
 
-```{r sparsity-fig, fig.width=8.5, fig.height=5.4}
-agg <- aggregate(cbind(hoyer_L, hoyer_F) ~ method + cc + ct, res, mean)
-sp  <- rbind(
-  data.frame(agg[c("method", "cc", "ct")], what = "loadings L",
-             value = agg$hoyer_L),
-  data.frame(agg[c("method", "cc", "ct")], what = "factors F",
-             value = agg$hoyer_F))
-sp$what <- factor(sp$what, levels = c("loadings L", "factors F"))
-tru <- unique(res[c("ct", "hoyer_L_true", "hoyer_F_true")])
-tru <- aggregate(cbind(hoyer_L_true, hoyer_F_true) ~ ct, tru, mean)
-truth_df <- rbind(
-  data.frame(ct = tru$ct, what = "loadings L", value = tru$hoyer_L_true),
-  data.frame(ct = tru$ct, what = "factors F",  value = tru$hoyer_F_true))
-truth_df$what <- factor(truth_df$what, levels = levels(sp$what))
-ggplot(sp, aes(cc, value, colour = method)) +
-  geom_hline(data = truth_df, aes(yintercept = value), linetype = 2,
-             colour = "grey40") +
-  geom_line(linewidth = 0.7) + geom_point(size = 1.6) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
-  scale_colour_manual(values = meth_cols, name = NULL) +
-  facet_grid(what ~ ct) +
-  labs(x = "c used for fitting", y = "mean Hoyer sparsity of columns",
-       title = "Sparsity of the fit is set by the fitting c",
-       subtitle = "mean over 10 seeds; dashed = the truth's own sparsity")
+Exact fits only from here on (the previous sections established where the
+approximations can be trusted). As in the c-grid figures: thin lines are the
+ten individual seeds, the thick line their mean, the dashed line the truth's
+own value, and the circled point marks $c_{\textrm{fit}} = c_{\textrm{true}}$
+(absent at $c_{\textrm{true}} = \infty$, which lies off the fitting grid).
+
+```{r seed-panels-helper}
+## long format + the c-grid panel style, shared by the sparsity and
+## rank-correlation figures below
+make_long <- function(ex, vL, vF, tL, tF) {
+  sp <- rbind(
+    data.frame(ex[c("seed", "cc", "ct")], what = "loadings L",
+               value = ex[[vL]], truth = ex[[tL]]),
+    data.frame(ex[c("seed", "cc", "ct")], what = "factors F",
+               value = ex[[vF]], truth = ex[[tF]]))
+  sp$what <- factor(sp$what, levels = c("loadings L", "factors F"))
+  sp
+}
+seed_panels <- function(sp, ylab, title) {
+  avg <- aggregate(value ~ what + cc + ct, sp, mean)
+  tru <- aggregate(truth ~ what + ct, sp, mean)
+  mp  <- unique(res[c("ct", "c_true")])
+  dg  <- merge(avg, mp)
+  dg  <- dg[is.finite(dg$c_true) & dg$cc == dg$c_true, ]
+  ggplot(sp, aes(cc, value)) +
+    geom_line(aes(group = seed), colour = "#9BB7BD",
+              linewidth = 0.35, alpha = 0.8) +
+    geom_hline(data = tru, aes(yintercept = truth), linetype = "dashed",
+               colour = "#C2410C", linewidth = 0.5) +
+    geom_line(data = avg, colour = "#0E5C6B", linewidth = 1) +
+    geom_point(data = avg, colour = "#0E5C6B", size = 1.6) +
+    geom_point(data = dg, shape = 21, size = 3.6, stroke = 1.1,
+               fill = NA, colour = "#C2410C") +
+    scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+    facet_grid(what ~ ct) +
+    labs(x = "c used for fitting", y = ylab, title = title,
+         subtitle = paste("thin lines: 10 individual seeds;  thick line:",
+                          "mean;  dashed: the true value;  circled:",
+                          "c_fit = c_true")) +
+    theme(strip.background = element_blank(),
+          strip.text = element_text(face = "bold", size = 10),
+          plot.subtitle = element_text(size = 10, colour = "grey35"),
+          panel.border = element_rect(colour = "grey80", fill = NA))
+}
 ```
 
-Three things to read off:
+```{r sparsity-fig, fig.width=8.5, fig.height=5.4}
+ex <- subset(res, method == "exact")
+seed_panels(make_long(ex, "hoyer_L", "hoyer_F",
+                      "hoyer_L_true", "hoyer_F_true"),
+            ylab  = "mean Hoyer sparsity of columns",
+            title = "Sparsity of the fit is set by the fitting c")
+```
 
-- **Monotonicity.** At every $c_{\textrm{true}}$, for both $L$ and $F$,
-  sparsity increases in $c_{\textrm{fit}}$ across the entire eight-decade
-  grid — the budget mechanism, on data whose budget curve was calibrated to
-  a real dataset's.
+Two things to read off:
+
+- **Monotonicity, seed by seed.** At every $c_{\textrm{true}}$, for both $L$
+  and $F$, sparsity increases in $c_{\textrm{fit}}$ across the entire
+  eight-decade grid — and the thin lines show this is true of essentially
+  every individual seed, not just the average; the seed spread is a small
+  band around the mean.
 - **The fit recovers the truth's sparsity when fit at the true $c$.** The
-  fitted curves cross their dashed truth lines at
-  $c_{\textrm{fit}} \approx c_{\textrm{true}}$ in every panel: e.g. for
-  loadings (truth $0.398$ everywhere) the exact fits give $0.41$ at
-  $(10^{-3}, 10^{-3})$, $0.41$ at $(1, 1)$, and $0.40$ at
-  $(\infty, 10^{3\text{--}4})$; for factors the crossing is equally tight
-  ($|{\Delta}| = 0.004$ at $c_{\textrm{true}} = 1$). Misfit in $c$
-  translates directly into over- or under-sparse estimates.
-- **The approximations preserve the sparsity story wherever they are
-  accurate.** The three method curves are near-coincident for
-  $c_{\textrm{fit}} \geq 0.1$; at the small-$c$ end Taylor's curves pull
-  away from exact (its fits there are not usable anyway, per the previous
-  section), while Chebyshev stays within a few hundredths.
+  circled points sit almost exactly on the dashed truth lines: for loadings
+  (truth $0.398$ everywhere) the exact fits give $0.41$ at
+  $(10^{-3}, 10^{-3})$ and $0.41$ at $(1, 1)$, and the
+  $c_{\textrm{true}} = \infty$ curves reach the truth at the top of the
+  grid ($0.40$ at $c_{\textrm{fit}} = 10^{3\text{--}4}$); for factors the
+  crossing is equally tight ($|{\Delta}| = 0.004$ at $c_{\textrm{true}} = 1$).
+  Misfit in $c$ translates directly into over- or under-sparse estimates.
+
+The approximate fits (not shown) trace the same curves wherever the
+approximation is accurate; Taylor's small-$c$ fits deviate, but those are
+exactly the fits the accuracy section already ruled out.
 
 ## Rank correlation of the factors
 
@@ -455,49 +521,30 @@ as columns sparsify, their rankings decouple — pairwise rank correlations
 should drift with $c_{\textrm{fit}}$ alongside the sparsity itself.
 
 ```{r rankcor-fig, fig.width=8.5, fig.height=5.4}
-agg <- aggregate(cbind(rankcor_L, rankcor_F) ~ method + cc + ct, res, mean)
-rc  <- rbind(
-  data.frame(agg[c("method", "cc", "ct")], what = "loadings L",
-             value = agg$rankcor_L),
-  data.frame(agg[c("method", "cc", "ct")], what = "factors F",
-             value = agg$rankcor_F))
-rc$what <- factor(rc$what, levels = c("loadings L", "factors F"))
-tru <- aggregate(cbind(rankcor_L_true, rankcor_F_true) ~ ct,
-                 unique(res[c("ct", "rankcor_L_true", "rankcor_F_true")]),
-                 mean)
-truth_df <- rbind(
-  data.frame(ct = tru$ct, what = "loadings L", value = tru$rankcor_L_true),
-  data.frame(ct = tru$ct, what = "factors F",  value = tru$rankcor_F_true))
-truth_df$what <- factor(truth_df$what, levels = levels(rc$what))
-ggplot(rc, aes(cc, value, colour = method)) +
-  geom_hline(data = truth_df, aes(yintercept = value), linetype = 2,
-             colour = "grey40") +
-  geom_line(linewidth = 0.7) + geom_point(size = 1.6) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
-  scale_colour_manual(values = meth_cols, name = NULL) +
-  facet_grid(what ~ ct) +
-  labs(x = "c used for fitting",
-       y = "mean pairwise Spearman correlation",
-       title = "Rank correlation between fitted columns",
-       subtitle = "mean over 10 seeds; dashed = the truth's own value")
+seed_panels(make_long(ex, "rankcor_L", "rankcor_F",
+                      "rankcor_L_true", "rankcor_F_true"),
+            ylab  = "mean pairwise Spearman correlation",
+            title = "Rank correlation between fitted columns")
 ```
 
 For the **loadings** at $c_{\textrm{true}} = 1$ and $\infty$ the effect is
 clean: pairwise rank correlation rises toward zero as $c_{\textrm{fit}}$
 grows, reaching the truth's value ($-0.174$) near
-$c_{\textrm{fit}} \approx c_{\textrm{true}}$, and all three methods lie on
-top of each other. At $c_{\textrm{true}} = 10^{-3}$ the exact curve is not
-monotone — it peaks around $c_{\textrm{fit}} = 10$ and comes back down where
-the fits are heavily over-sparsified — and the methods separate, a first
-hint of what the factor panels show clearly. For the **factors** the
-movement with $c$ is small and the three methods scatter around each other
-even at moderate $c_{\textrm{fit}}$, where their log-likelihoods are nearly
-identical: pairwise Spearman between sparse, heavy-tailed columns is
-dominated by which local optimum a fit landed in, not by the objective it
-optimized, so we read little into the fine structure here. The one robust
-feature is that **every fit's factor columns are more rank-correlated than
-the truth's** (all curves sit above the dashed lines): the fits never fully
-reproduce the decoupling of the generative factors.
+$c_{\textrm{fit}} \approx c_{\textrm{true}}$, with a tight seed band. At
+$c_{\textrm{true}} = 10^{-3}$ the mean curve is not monotone — it peaks
+around $c_{\textrm{fit}} = 10$ and comes back down where the fits are
+heavily over-sparsified — and the thin lines show the seeds genuinely
+disagreeing about the large-$c$ end. For the **factors** the curves are
+non-monotone but, at $c_{\textrm{true}} = 1$ and $\infty$, systematic — the
+seed bands are tight, and the pairwise rank correlation is at its most
+negative, i.e. closest to the truth's decoupled factors, in a trough near
+$c_{\textrm{fit}} \approx c_{\textrm{true}}$ (at $c_{\textrm{fit}} = 1$ and
+$10$ respectively), rising toward zero or above on both sides, where the
+fits are mis-sparsified. At $c_{\textrm{true}} = 10^{-3}$ the factor curve
+is flat and the seed spread dominates. The one robust feature across all
+regimes is that **every fit's factor columns are more rank-correlated than
+the truth's** (the entire seed band sits above the dashed lines): the fits
+never fully reproduce the decoupling of the generative factors.
 
 ## Summary
 
