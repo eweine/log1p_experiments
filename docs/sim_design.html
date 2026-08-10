@@ -549,15 +549,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2fcdd058f53d0076a0c6110242a5317667e571e0targetblank2fcdd05a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb3a00c92298a42ee37468ebe219ddc2c30ce9fcatargetblankb3a00c9a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/2fcdd058f53d0076a0c6110242a5317667e571e0" target="_blank">2fcdd05</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/b3a00c92298a42ee37468ebe219ddc2c30ce9fca" target="_blank">b3a00c9</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2fcdd058f53d0076a0c6110242a5317667e571e0targetblank2fcdd05a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb3a00c92298a42ee37468ebe219ddc2c30ce9fcatargetblankb3a00c9a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -567,7 +567,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/2fcdd058f53d0076a0c6110242a5317667e571e0" target="_blank">2fcdd05</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/b3a00c92298a42ee37468ebe219ddc2c30ce9fca" target="_blank">b3a00c9</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -632,6 +632,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/b3a00c92298a42ee37468ebe219ddc2c30ce9fca/analysis/sim_design.Rmd" target="_blank">b3a00c9</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+sim_design: fitted budget vs the proposition fixed-rate budget (true
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/4346638cec99ffb8ee69e3146553ae43b47c96ba/docs/sim_design.html" target="_blank">4346638</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2244,6 +2278,124 @@ ggplot(exm, aes(cc, pm_B)) +
         plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
         panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))</code></pre>
 <p><img src="figure/sim_design.Rmd/budget-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-budget-fig-1">
+Past versions of budget-fig-1.png
+</button>
+</p>
+<div id="fig-budget-fig-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/4346638cec99ffb8ee69e3146553ae43b47c96ba/docs/figure/sim_design.Rmd/budget-fig-1.png" target="_blank">4346638</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><strong>The proposition’s fixed-rate budget predicts the fitted
+budget.</strong> The monotone-budget proposition is a statement about a
+<em>fixed</em> matrix of rates viewed through different links: for rates
+<span class="math inline">\(\boldsymbol{\Lambda}\)</span> it concerns
+<span
+class="math inline">\(\operatorname{pm}(\mathbf{B}^{*}_{c})\)</span>
+with <span class="math inline">\(b^{*}_{ij}(c) = \log(1 +
+\lambda_{ij}/c)\)</span>. In this simulation the natural fixed rates are
+the truth itself, and the quantity <span class="math inline">\(c \mapsto
+\operatorname{pm}(\log(1 +
+\boldsymbol{\Lambda}_{\textrm{true}}/c))\)</span> is computable from the
+generative model with no fitting at all. Comparing it to the budget the
+fitted models actually realize:</p>
+<pre class="r"><code>pm_true &lt;- do.call(rbind, lapply(ds, function(d) data.frame(
+  seed = d$seed, cc = CC_GRID,
+  ct = factor(paste0(&quot;c_true = &quot;, fmtc(d$c_true)), levels = levels(res$ct)),
+  pm_true = sapply(CC_GRID, function(cc) {
+    g &lt;- log1p(d$lambda / cc); max(g) / mean(g) }))))
+cmp &lt;- merge(exm[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;, &quot;pm_B&quot;)],
+             pm_true, by = c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;))
+cmp$ratio &lt;- cmp$pm_B / cmp$pm_true
+
+avg  &lt;- aggregate(cbind(pm_B, pm_true) ~ cc + ct, cmp, mean)
+p1 &lt;- ggplot(cmp, aes(cc, pm_B)) +
+  geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;,
+            linewidth = 0.35, alpha = 0.8) +
+  geom_line(data = avg, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+  geom_line(data = avg, aes(y = pm_true), colour = &quot;#C2410C&quot;,
+            linetype = &quot;dashed&quot;, linewidth = 0.7) +
+  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+  scale_y_log10(labels = scales::label_log()) +
+  facet_wrap(~ ct, nrow = 1) +
+  labs(x = NULL, y = &quot;pm(B)&quot;,
+       title = &quot;Fitted budget vs the true-rate budget of the proposition&quot;,
+       subtitle = paste(&quot;thin: fitted, per seed;  thick: fitted, mean;&quot;,
+                        &quot;dashed: pm(log(1 + Λ_true/c)), mean&quot;)) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = &quot;bold&quot;, size = 10),
+        plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
+        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))
+
+ravg &lt;- aggregate(ratio ~ cc + ct, cmp, mean)
+p2 &lt;- ggplot(cmp, aes(cc, ratio)) +
+  geom_hline(yintercept = 1, linetype = &quot;dashed&quot;, colour = &quot;#C2410C&quot;) +
+  geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;,
+            linewidth = 0.35, alpha = 0.8) +
+  geom_line(data = ravg, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+  geom_point(data = ravg, colour = &quot;#0E5C6B&quot;, size = 1.4) +
+  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+  facet_wrap(~ ct, nrow = 1) +
+  labs(x = &quot;c used for fitting&quot;,
+       y = &quot;fitted / true-rate budget&quot;) +
+  theme(strip.background = element_blank(),
+        strip.text = element_blank(),
+        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))
+
+cowplot::plot_grid(p1, p2, ncol = 1, rel_heights = c(1.5, 1), align = &quot;v&quot;)</code></pre>
+<p><img src="figure/sim_design.Rmd/budget-true-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>The dashed curve is barely distinguishable from the fitted one: the
+mean ratio stays within <span class="math inline">\(0.85\)</span>–<span
+class="math inline">\(1.02\)</span> across the entire grid (bottom row),
+and the individual seeds mostly within <span
+class="math inline">\(0.8\)</span>–<span
+class="math inline">\(1.05\)</span> — the visible exception being the
+largest <span class="math inline">\(c_{\textrm{fit}}\)</span> values at
+finite <span class="math inline">\(c_{\textrm{true}}\)</span>, where a
+rank-<span class="math inline">\(5\)</span> fit can trim the single most
+extreme entry of <span class="math inline">\(\mathbf{B}\)</span>
+relative to the truth and an occasional seed drops to <span
+class="math inline">\(\approx 0.55\)</span>. The mild, systematic
+compression elsewhere (<span class="math inline">\(\approx 0.9\)</span>)
+is the same rank-<span class="math inline">\(K\)</span> smoothing in
+gentler form, and at <span class="math inline">\(c_{\textrm{true}} =
+\infty\)</span> with large <span
+class="math inline">\(c_{\textrm{fit}}\)</span> the fits slightly
+<em>exceed</em> the true-rate budget instead. Practically, this closes
+the loop on the proposition: the fixed-rate budget curve, computable
+from rates (or, by the same calculation, from data) without fitting
+anything, is an accurate forecast of the budget the fitted model will
+actually have — which is what makes the budget a usable a-priori
+diagnostic rather than a post-hoc description.</p>
 <p><strong>How tight are the bounds?</strong> For each fitted factor we
 compute the slack of inequality (1), <span
 class="math inline">\(\operatorname{pm}(\mathbf{B}) /
@@ -2280,6 +2432,43 @@ ggplot(sl, aes(cc, slack)) +
         plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
         panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))</code></pre>
 <p><img src="figure/sim_design.Rmd/slack-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-slack-fig-1">
+Past versions of slack-fig-1.png
+</button>
+</p>
+<div id="fig-slack-fig-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/4346638cec99ffb8ee69e3146553ae43b47c96ba/docs/figure/sim_design.Rmd/slack-fig-1.png" target="_blank">4346638</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The two rows say different things. The <strong>pm-budget lemma is
 close to equality wherever the budget is scarce</strong>: for <span
 class="math inline">\(c_{\textrm{fit}} \leq 0.1\)</span> the median
@@ -2328,6 +2517,43 @@ ggplot(be, aes(allow, Hsum, colour = cf)) +
         plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
         panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))</code></pre>
 <p><img src="figure/sim_design.Rmd/allowance-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-allowance-fig-1">
+Past versions of allowance-fig-1.png
+</button>
+</p>
+<div id="fig-allowance-fig-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/4346638cec99ffb8ee69e3146553ae43b47c96ba/docs/figure/sim_design.Rmd/allowance-fig-1.png" target="_blank">4346638</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Every point lies below the diagonal, as it must. Two practical
 readings. First, the allowance and the observed sparsity move together:
 small <span class="math inline">\(c_{\textrm{fit}}\)</span> (light
