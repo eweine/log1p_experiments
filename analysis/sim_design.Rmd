@@ -637,66 +637,104 @@ concerns $\operatorname{pm}(\mathbf{B}^{*}_{c})$ with
 $b^{*}_{ij}(c) = \log(1 + \lambda_{ij}/c)$. In this simulation the natural
 fixed rates are the truth itself, and the quantity
 $c \mapsto \operatorname{pm}(\log(1 + \boldsymbol{\Lambda}_{\textrm{true}}/c))$
-is computable from the generative model with no fitting at all. Comparing
-it to the budget the fitted models actually realize:
+is computable from the generative model with no fitting at all. Alongside
+it we show the same curve computed from the observed counts,
+$\operatorname{pm}(\log(1 + \mathbf{Y}/c))$ — the version available in
+practice (it is the calibration target of this whole design), and, by the
+saturated-case remark in the appendix, *exactly* the fitted budget when
+$K \geq \min(n, p)$. Comparing both to the budget the rank-$5$ fits
+actually realize:
 
-```{r budget-true-fig, fig.width=8.5, fig.height=5.2}
+```{r budget-true-fig, fig.width=8.5, fig.height=5.6}
 pm_true <- do.call(rbind, lapply(ds, function(d) data.frame(
   seed = d$seed, cc = CC_GRID,
   ct = factor(paste0("c_true = ", fmtc(d$c_true)), levels = levels(res$ct)),
   pm_true = sapply(CC_GRID, function(cc) {
-    g <- log1p(d$lambda / cc); max(g) / mean(g) }))))
+    g <- log1p(d$lambda / cc); max(g) / mean(g) }),
+  pm_data = sapply(CC_GRID, function(cc) {
+    g <- log1p(d$Y / cc); max(g) / mean(g) }))))
 cmp <- merge(exm[c("seed", "cc", "ct", "pm_B")],
              pm_true, by = c("seed", "cc", "ct"))
-cmp$ratio <- cmp$pm_B / cmp$pm_true
+cmp$ratio      <- cmp$pm_B / cmp$pm_true
+cmp$ratio_data <- cmp$pm_B / cmp$pm_data
 
-avg  <- aggregate(cbind(pm_B, pm_true) ~ cc + ct, cmp, mean)
+avg  <- aggregate(cbind(pm_B, pm_true, pm_data) ~ cc + ct, cmp, mean)
 p1 <- ggplot(cmp, aes(cc, pm_B)) +
   geom_line(aes(group = seed), colour = "#9BB7BD",
             linewidth = 0.35, alpha = 0.8) +
   geom_line(data = avg, colour = "#0E5C6B", linewidth = 1) +
   geom_line(data = avg, aes(y = pm_true), colour = "#C2410C",
             linetype = "dashed", linewidth = 0.7) +
+  geom_line(data = avg, aes(y = pm_data), colour = "#B45309",
+            linetype = "dotdash", linewidth = 0.7) +
   scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
   scale_y_log10(labels = scales::label_log()) +
   facet_wrap(~ ct, nrow = 1) +
   labs(x = NULL, y = "pm(B)",
-       title = "Fitted budget vs the true-rate budget of the proposition",
+       title = "Fitted budget vs the true-rate and data budgets",
        subtitle = paste("thin: fitted, per seed;  thick: fitted, mean;",
-                        "dashed: pm(log(1 + Λ_true/c)), mean")) +
+                        "dashed: pm(log(1 + Λ_true/c));",
+                        "dot-dash: pm(log(1 + Y/c))")) +
   theme(strip.background = element_blank(),
         strip.text = element_text(face = "bold", size = 10),
         plot.subtitle = element_text(size = 10, colour = "grey35"),
         panel.border = element_rect(colour = "grey80", fill = NA))
 
-ravg <- aggregate(ratio ~ cc + ct, cmp, mean)
+ravg <- aggregate(cbind(ratio, ratio_data) ~ cc + ct, cmp, mean)
 p2 <- ggplot(cmp, aes(cc, ratio)) +
-  geom_hline(yintercept = 1, linetype = "dashed", colour = "#C2410C") +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = "grey40") +
   geom_line(aes(group = seed), colour = "#9BB7BD",
             linewidth = 0.35, alpha = 0.8) +
   geom_line(data = ravg, colour = "#0E5C6B", linewidth = 1) +
   geom_point(data = ravg, colour = "#0E5C6B", size = 1.4) +
+  geom_line(data = ravg, aes(y = ratio_data), colour = "#B45309",
+            linetype = "dotdash", linewidth = 0.8) +
+  geom_point(data = ravg, aes(y = ratio_data), colour = "#B45309",
+             size = 1.4) +
   scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+  scale_y_log10(breaks = c(0.125, 0.25, 0.5, 1),
+                labels = c("0.125", "0.25", "0.5", "1")) +
   facet_wrap(~ ct, nrow = 1) +
-  labs(x = "c used for fitting",
-       y = "fitted / true-rate budget") +
+  labs(x = "c used for fitting", y = "fitted / reference budget",
+       subtitle = paste("blue: fitted / true-rate budget (thin: seeds);",
+                        "amber: fitted / data budget")) +
   theme(strip.background = element_blank(),
         strip.text = element_blank(),
+        plot.subtitle = element_text(size = 10, colour = "grey35"),
         panel.border = element_rect(colour = "grey80", fill = NA))
 
-cowplot::plot_grid(p1, p2, ncol = 1, rel_heights = c(1.5, 1), align = "v")
+cowplot::plot_grid(p1, p2, ncol = 1, rel_heights = c(1.4, 1), align = "v")
 ```
 
 The dashed curve is barely distinguishable from the fitted one: the mean
-ratio stays within $0.85$–$1.02$ across the entire grid (bottom row), and
-the individual seeds mostly within $0.8$–$1.05$ — the visible exception
+ratio stays within $0.85$–$1.02$ across the entire grid (bottom row, blue),
+and the individual seeds mostly within $0.8$–$1.05$ — the visible exception
 being the largest $c_{\textrm{fit}}$ values at finite $c_{\textrm{true}}$,
 where a rank-$5$ fit can trim the single most extreme entry of $\mathbf{B}$
 relative to the truth and an occasional seed drops to $\approx 0.55$. The
 mild, systematic compression elsewhere ($\approx 0.9$) is the same rank-$K$
 smoothing in gentler form, and at $c_{\textrm{true}} = \infty$ with large
 $c_{\textrm{fit}}$ the fits slightly *exceed* the true-rate budget
-instead. Practically, this closes the loop on the proposition: the
+instead.
+
+The **data budget** (dot-dash) tells a complementary story. At
+$c_{\textrm{fit}} \gtrsim 1$ it agrees with the other two curves to within
+$\sim 15\%$. At small $c_{\textrm{fit}}$ it splits off upward, exceeding
+the fitted budget by a factor of $4$–$8$ (bottom row, amber, dropping to
+$0.13$–$0.23$): on the link scale the $\sim 89\%$ zero entries of
+$\mathbf{Y}$ stay exactly zero and drag the matrix mean down, while the
+true rates — and every entry of a rank-$5$ fit — are strictly positive.
+This is the saturated-case remark playing out in reverse: at
+$K \geq \min(n,p)$ the fit would reproduce $\mathbf{Y}$ and its budget
+exactly, but a low-rank fit smooths the zeros up to small positive values,
+and its budget lands on the *true-rate* curve rather than the data curve.
+Practically: for sparse count data,
+$\operatorname{pm}(\log(1 + \mathbf{Y}/c))$ preserves the shape and
+ordering of the budget — it remains monotone and spans the same three
+decades, which is all its role as a calibration target requires — but as a
+forecast of the budget a low-rank fit will realize at small $c$ it
+overstates the level, and the true-rate (equivalently, fitted-rate) version
+is the sharper reference. Practically, this closes the loop on the proposition: the
 fixed-rate budget curve, computable from rates (or, by the same
 calculation, from data) without fitting anything, is an accurate forecast
 of the budget the fitted model will actually have — which is what makes
