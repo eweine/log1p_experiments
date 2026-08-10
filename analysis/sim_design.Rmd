@@ -548,6 +548,179 @@ regimes is that **every fit's factor columns are more rank-correlated than
 the truth's** (the entire seed band sits above the dashed lines): the fits
 never fully reproduce the decoupling of the generative factors.
 
+## The sparsity bounds in practice
+
+The manuscript's appendix (*Hoyer Sparsity Results*) proves a chain of
+inequalities that constrain how sparse the columns of a fit can be. All of
+them are stated for an arbitrary non-negative factorization
+$\mathbf{B} = \mathbf{L}\mathbf{F}^{\top}$, so they can be checked directly
+on every fitted model here, using each fit's own $\mathbf{B}$. Writing
+$\operatorname{pm}(x) = \max(x)/\operatorname{mean}(x)$ for the max-to-mean
+ratio, $d(x) = \|x\|_1 / (\sqrt{m}\|x\|_2)$ for the density of an
+$m$-vector, $H(x) = \kappa_m(1 - d(x))$ with
+$\kappa_m = \sqrt{m}/(\sqrt{m}-1)$ for the Hoyer sparsity, and
+$$w_k = \frac{\operatorname{mean}(\mathbf{l}_{\cdot k})
+\operatorname{mean}(\mathbf{f}_{\cdot k})}{\operatorname{mean}(\mathbf{B})},
+\qquad \textstyle\sum_{k=1}^{K} w_k = 1,$$
+the results used below are:
+
+1. **The pm-budget lemma.** For every factor $k$,
+   $$\operatorname{pm}(\mathbf{l}_{\cdot k})\,
+     \operatorname{pm}(\mathbf{f}_{\cdot k})\, w_k
+     \;\leq\; \operatorname{pm}(\mathbf{B}).$$
+   The matrix's max-to-mean ratio is a *budget* that the factors' own
+   max-to-mean ratios, weighted by $w_k$, must fit inside.
+2. **The hyperbola theorem.** Combining (1) with the elementary bound
+   $d(x) \geq 1/\sqrt{\operatorname{pm}(x)}$ gives
+   $$d(\mathbf{l}_{\cdot k})\, d(\mathbf{f}_{\cdot k})
+     \;\geq\; \sqrt{w_k / \operatorname{pm}(\mathbf{B})}:$$
+   a loading and its factor cannot both be sparse, and the constraint
+   tightens as $\operatorname{pm}(\mathbf{B})$ falls.
+3. **The sum-form corollary.** In Hoyer units (here $n = p$, so
+   $\kappa_n = \kappa_p = \kappa$),
+   $$H(\mathbf{l}_{\cdot k}) + H(\mathbf{f}_{\cdot k})
+     \;\leq\; 2\kappa\left(1 -
+     \left(w_k/\operatorname{pm}(\mathbf{B})\right)^{1/4}\right):$$
+   the pair shares a single sparsity allowance set by
+   $\operatorname{pm}(\mathbf{B})$.
+4. **The monotone-budget proposition.** For any fixed rates, the budget
+   $\operatorname{pm}(\mathbf{B}_c)$ is non-decreasing in $c$ — small $c$
+   does not merely fail to produce sparse factors, it makes them
+   unavailable.
+
+One caveat established before plotting: the appendix's *averaged* ceiling
+(mean Hoyer $\leq \kappa(1 - 1/(K\sqrt{\operatorname{pm}(\mathbf{B})}))$)
+is vacuous at this design — with $K = 5$ and budgets that never fall below
+$\approx 3$, it sits at $\approx 1$ across the whole grid. The averaging
+step costs a factor of $K$; the per-column forms above are the ones with
+empirical content, and they are what we examine. All figures in this
+section use the exact fits.
+
+**The realized budget.** First, the budget itself. The proposition concerns
+fixed rates, whereas each fit re-estimates its rates at its own $c$ — yet
+the realized $\operatorname{pm}(\mathbf{B})$ of the fitted models is
+monotone in $c_{\textrm{fit}}$ anyway, spanning three orders of magnitude
+across the grid ($\sim 3$ to $\sim 5{,}000$), and nearly identical across
+seeds:
+
+```{r bounds-load}
+bounds <- readRDS(file.path(exp_dir, "approx_sim_bounds.rds"))
+bounds$ct <- factor(paste0("c_true = ", sapply(bounds$c_true, fmtc)),
+                    levels = levels(res$ct))
+be <- subset(bounds, method == "exact")
+```
+
+```{r budget-fig, fig.width=8.5, fig.height=3.2}
+exm <- subset(res, method == "exact")
+avg <- aggregate(pm_B ~ cc + ct, exm, mean)
+ggplot(exm, aes(cc, pm_B)) +
+  geom_line(aes(group = seed), colour = "#9BB7BD",
+            linewidth = 0.35, alpha = 0.8) +
+  geom_line(data = avg, colour = "#0E5C6B", linewidth = 1) +
+  geom_point(data = avg, colour = "#0E5C6B", size = 1.6) +
+  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+  scale_y_log10(labels = scales::label_log()) +
+  facet_wrap(~ ct, nrow = 1) +
+  labs(x = "c used for fitting", y = "pm(B) of the fitted model",
+       title = "The realized sparsity budget is monotone in the fitting c",
+       subtitle = "thin lines: 10 individual seeds;  thick line: mean") +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(size = 10, colour = "grey35"),
+        panel.border = element_rect(colour = "grey80", fill = NA))
+```
+
+**How tight are the bounds?** For each fitted factor we compute the slack
+of inequality (1), $\operatorname{pm}(\mathbf{B}) /
+(\operatorname{pm}(\mathbf{l}_{\cdot k})\operatorname{pm}(\mathbf{f}_{\cdot k})
+w_k) \geq 1$, and of inequality (2),
+$d(\mathbf{l}_{\cdot k}) d(\mathbf{f}_{\cdot k}) \big/
+\sqrt{w_k/\operatorname{pm}(\mathbf{B})} \geq 1$. Slack $1$ means the fit
+sits exactly on the constraint.
+
+```{r slack-fig, fig.width=8.5, fig.height=5.4}
+sl <- rbind(
+  data.frame(be[c("seed", "cc", "ct", "k")], bound = "pm budget (1)",
+             slack = be$slack_pm),
+  data.frame(be[c("seed", "cc", "ct", "k")], bound = "density hyperbola (2)",
+             slack = be$slack_hyper))
+sl$bound <- factor(sl$bound, levels = c("pm budget (1)",
+                                        "density hyperbola (2)"))
+med <- aggregate(slack ~ bound + cc + ct, sl, median)
+ggplot(sl, aes(cc, slack)) +
+  geom_point(size = 0.7, alpha = 0.25, colour = "#0E5C6B",
+             position = position_jitter(width = 0.05, height = 0)) +
+  geom_line(data = med, colour = "#0E5C6B", linewidth = 1) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = "#C2410C") +
+  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+  scale_y_log10() +
+  facet_grid(bound ~ ct) +
+  labs(x = "c used for fitting", y = "slack of the bound  (1 = active)",
+       title = "Slack of the per-factor sparsity bounds",
+       subtitle = paste("one point per (seed, factor); line: median;",
+                        "dashed: the bound itself")) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(size = 10, colour = "grey35"),
+        panel.border = element_rect(colour = "grey80", fill = NA))
+```
+
+The two rows say different things. The **pm-budget lemma is close to
+equality wherever the budget is scarce**: for $c_{\textrm{fit}} \leq 0.1$
+the median slack is $1.07$–$1.14$ at the finite $c_{\textrm{true}}$
+regimes (minimum $1.000$ — some factors sit exactly on the constraint),
+growing to $2$–$6$ only at the large-$c$ end where the budget is plentiful.
+Small $c$ genuinely exhausts the budget. The **density hyperbola inherits
+extra slack** from the step $d(x) \geq 1/\sqrt{\operatorname{pm}(x)}$,
+which is loose for the dense columns that small $c$ forces; its slack
+floor is $\approx 1.3$–$2$ across the grid. So in Hoyer units the bounds
+are valid but conservative envelopes at this $K$, while in pm units the
+budget accounting is nearly sharp.
+
+**The sum-form allowance.** Finally, inequality (3) read as intended: each
+factor's observed $H(\mathbf{l}_{\cdot k}) + H(\mathbf{f}_{\cdot k})$
+against its own allowance
+$2\kappa(1 - (w_k/\operatorname{pm}(\mathbf{B}))^{1/4})$.
+
+```{r allowance-fig, fig.width=8.5, fig.height=3.6}
+kn <- sqrt(N_ROWS) / (sqrt(N_ROWS) - 1)
+be$allow <- 2 * kn * (1 - (be$w / be$pm_B)^0.25)
+be$Hsum  <- be$H_L + be$H_F
+be$cf    <- factor(be$cc, levels = sort(unique(be$cc)),
+                   labels = sapply(sort(unique(be$cc)), fmtc))
+ggplot(be, aes(allow, Hsum, colour = cf)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed",
+              colour = "grey40") +
+  geom_point(size = 1, alpha = 0.6) +
+  scale_colour_viridis_d(name = "c_fit", option = "mako", end = 0.9,
+                         direction = -1) +
+  facet_wrap(~ ct, nrow = 1) +
+  coord_equal(xlim = c(0, 2.1), ylim = c(0, 2.1)) +
+  labs(x = "allowance  2κ(1 − (w/pm(B))^{1/4})",
+       y = "observed  H(l) + H(f)",
+       title = "Observed sparsity vs the sum-form allowance, per factor",
+       subtitle = "dashed: allowance used in full; points cannot lie above it") +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(size = 10, colour = "grey35"),
+        panel.border = element_rect(colour = "grey80", fill = NA))
+```
+
+Every point lies below the diagonal, as it must. Two practical readings.
+First, the allowance and the observed sparsity move together: small
+$c_{\textrm{fit}}$ (light points) sits at small allowance and small
+observed sum, large $c_{\textrm{fit}}$ (dark) at large allowance and large
+observed sum — the budget is the axis along which $c$ operates, exactly as
+the theory says. Second, the *fraction* of the allowance actually used
+grows with $c_{\textrm{fit}}$: the median factor uses $40$–$65\%$ of its
+allowance at $c_{\textrm{fit}} = 10^{-4}$ and $73$–$91\%$ at
+$c_{\textrm{fit}} \geq 10^{2}$ (highest in the $c_{\textrm{true}} = 10^{-3}$
+regime, whose truth is sparsest). In other words: at small $c$ the fits sit
+against the *pm form* of the constraint while the Hoyer conversion leaves
+headroom, and at large $c$ the fits approach the Hoyer allowance itself.
+The bounds are therefore practically relevant in both regimes, but through
+different faces of the same inequality chain.
+
 ## Summary
 
 The simulation does what it was designed to do. On counts calibrated to a
@@ -555,9 +728,14 @@ real dataset's budget curve in all three generative regimes: (i) the
 sparsity of the fitted loadings and factors is controlled by the fitting
 $c$, monotonically and over a wide range; (ii) fitting at the generative
 $c$ reproduces the generative sparsity almost exactly, so misfit in $c$ is
-visible as over- or under-sparsification; (iii) the Chebyshev approximation
-is faithful to the exact objective everywhere on the grid (worst case
-$\sim 0.03$ log-likelihood units per entry, typically orders of magnitude
-less), while the Taylor approximation is faithful only for
-$c_{\textrm{fit}} \gtrsim 0.1$ and fails badly — slowly and to bad optima —
-below that.
+visible as over- or under-sparsification; (iii) the appendix bounds are
+live constraints, not formalities — the realized budget
+$\operatorname{pm}(\mathbf{B})$ is monotone in $c_{\textrm{fit}}$ over
+three orders of magnitude, the pm-budget lemma is within $7$–$14\%$ of
+equality wherever the budget is scarce, and the fits use up to $\sim 90\%$
+of the sum-form Hoyer allowance at the large-$c$ end; and (iv) the
+Chebyshev approximation is faithful to the exact objective everywhere on
+the grid (worst case $\sim 0.03$ log-likelihood units per entry, typically
+orders of magnitude less), while the Taylor approximation is faithful only
+for $c_{\textrm{fit}} \gtrsim 0.1$ and fails badly — slowly and to bad
+optima — below that.
