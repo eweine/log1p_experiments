@@ -549,15 +549,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree950e6f78f1f176990d3e0fb1498f238a0e33c8b3targetblank950e6f7a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed946579ce1c1cb0437f5b5f15bb8762f92f52987targetblankd946579a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/950e6f78f1f176990d3e0fb1498f238a0e33c8b3" target="_blank">950e6f7</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/d946579ce1c1cb0437f5b5f15bb8762f92f52987" target="_blank">d946579</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree950e6f78f1f176990d3e0fb1498f238a0e33c8b3targetblank950e6f7a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed946579ce1c1cb0437f5b5f15bb8762f92f52987targetblankd946579a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -567,7 +567,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/950e6f78f1f176990d3e0fb1498f238a0e33c8b3" target="_blank">950e6f7</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/d946579ce1c1cb0437f5b5f15bb8762f92f52987" target="_blank">d946579</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -632,6 +632,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d946579ce1c1cb0437f5b5f15bb8762f92f52987/analysis/sim_design.Rmd" target="_blank">d946579</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+approx-ratio figure: 95% CI error bars instead of +/- 1 SE
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/c11592303da69098b86fa7e38793df0d3dbfa21a/docs/sim_design.html" target="_blank">c115923</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1676,20 +1710,22 @@ class="math inline">\(\bar\ell\)</span> is the per-entry exact
 log-likelihood of the fitted rates — <span
 class="math inline">\(1\)</span> means the approximation loses nothing,
 <span class="math inline">\(0\)</span> means it collapses. Mean over the
-ten seeds, error bars <span class="math inline">\(\pm 1\)</span>
-standard error.</p>
+ten seeds, error bars a 95% confidence interval (<span
+class="math inline">\(t_{9}\)</span>-based).</p>
 <pre class="r"><code>ap &lt;- subset(res, method != &quot;exact&quot;)
 ap$ratio &lt;- exp(ap$gap_pe)
 ap$Approximation &lt;- ifelse(ap$method == &quot;taylor&quot;, &quot;Taylor&quot;, &quot;Chebyshev&quot;)
 agg &lt;- do.call(data.frame,
   aggregate(ratio ~ Approximation + cc + ct, ap,
-            function(x) c(mean = mean(x), se = sd(x) / sqrt(length(x)))))
-ymax &lt;- max(1.05, agg$ratio.mean + agg$ratio.se)
+            function(x) c(mean = mean(x),
+                          half = qt(0.975, length(x) - 1) *
+                                 sd(x) / sqrt(length(x)))))
+ymax &lt;- max(1.05, agg$ratio.mean + agg$ratio.half)
 ggplot(agg, aes(cc, ratio.mean, colour = Approximation)) +
   geom_hline(yintercept = 1, linetype = &quot;dashed&quot;) +
   geom_line() + geom_point() +
-  geom_errorbar(aes(ymin = ratio.mean - ratio.se,
-                    ymax = ratio.mean + ratio.se), width = 0.15) +
+  geom_errorbar(aes(ymin = ratio.mean - ratio.half,
+                    ymax = ratio.mean + ratio.half), width = 0.15) +
   scale_x_continuous(transform = &quot;log10&quot;,
                      breaks = c(1e-4, 1e-2, 1, 1e2, 1e4),
                      labels = scales::label_log()) +
@@ -1697,6 +1733,43 @@ ggplot(agg, aes(cc, ratio.mean, colour = Approximation)) +
   facet_wrap(~ ct, nrow = 1) +
   labs(x = &quot;Value of c for Optimization&quot;, y = &quot;Likelihood Ratio&quot;)</code></pre>
 <p><img src="figure/sim_design.Rmd/approx-ratio-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-approx-ratio-fig-1">
+Past versions of approx-ratio-fig-1.png
+</button>
+</p>
+<div id="fig-approx-ratio-fig-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/c11592303da69098b86fa7e38793df0d3dbfa21a/docs/figure/sim_design.Rmd/approx-ratio-fig-1.png" target="_blank">c115923</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Two regimes are visible. For <span
 class="math inline">\(c_{\textrm{fit}} \geq 0.1\)</span>
 <strong>both</strong> approximations sit on the dashed line: per-entry
@@ -1738,6 +1811,43 @@ methods.</p>
        title = &quot;Iterations to convergence&quot;,
        subtitle = &quot;one point per seed; line = median over seeds&quot;)</code></pre>
 <p><img src="figure/sim_design.Rmd/iterations-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-iterations-fig-1">
+Past versions of iterations-fig-1.png
+</button>
+</p>
+<div id="fig-iterations-fig-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/c11592303da69098b86fa7e38793df0d3dbfa21a/docs/figure/sim_design.Rmd/iterations-fig-1.png" target="_blank">c115923</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Iteration counts rise steadily as <span
 class="math inline">\(c_{\textrm{fit}}\)</span> decreases for every
 method — at <span class="math inline">\(c_{\textrm{fit}} =
@@ -1845,6 +1955,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/c11592303da69098b86fa7e38793df0d3dbfa21a/docs/figure/sim_design.Rmd/sparsity-fig-1.png" target="_blank">c115923</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/61e6cb9a616f57a935ff1728e14b245f3b65f4fa/docs/figure/sim_design.Rmd/sparsity-fig-1.png" target="_blank">61e6cb9</a>
 </td>
 <td>
@@ -1926,6 +2047,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/c11592303da69098b86fa7e38793df0d3dbfa21a/docs/figure/sim_design.Rmd/rankcor-fig-1.png" target="_blank">c115923</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/eweine/log1p_experiments/blob/61e6cb9a616f57a935ff1728e14b245f3b65f4fa/docs/figure/sim_design.Rmd/rankcor-fig-1.png" target="_blank">61e6cb9</a>
