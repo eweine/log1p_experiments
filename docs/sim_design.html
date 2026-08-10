@@ -549,15 +549,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed946579ce1c1cb0437f5b5f15bb8762f92f52987targetblankd946579a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2fcdd058f53d0076a0c6110242a5317667e571e0targetblank2fcdd05a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/d946579ce1c1cb0437f5b5f15bb8762f92f52987" target="_blank">d946579</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/2fcdd058f53d0076a0c6110242a5317667e571e0" target="_blank">2fcdd05</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed946579ce1c1cb0437f5b5f15bb8762f92f52987targetblankd946579a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2fcdd058f53d0076a0c6110242a5317667e571e0targetblank2fcdd05a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -567,7 +567,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/d946579ce1c1cb0437f5b5f15bb8762f92f52987" target="_blank">d946579</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/2fcdd058f53d0076a0c6110242a5317667e571e0" target="_blank">2fcdd05</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -632,6 +632,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/2fcdd058f53d0076a0c6110242a5317667e571e0/analysis/sim_design.Rmd" target="_blank">2fcdd05</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+sim_design: add sparsity-bounds section (budget, per-factor slack,
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/c9980382a863011e0ac9974ec4bf9226bd75db62/docs/sim_design.html" target="_blank">c998038</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1757,6 +1791,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/c9980382a863011e0ac9974ec4bf9226bd75db62/docs/figure/sim_design.Rmd/approx-ratio-fig-1.png" target="_blank">c998038</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/c11592303da69098b86fa7e38793df0d3dbfa21a/docs/figure/sim_design.Rmd/approx-ratio-fig-1.png" target="_blank">c115923</a>
 </td>
 <td>
@@ -2104,6 +2149,209 @@ rank-correlated than the truth’s</strong> (the entire seed band sits
 above the dashed lines): the fits never fully reproduce the decoupling
 of the generative factors.</p>
 </div>
+<div id="the-sparsity-bounds-in-practice" class="section level2">
+<h2>The sparsity bounds in practice</h2>
+<p>The manuscript’s appendix (<em>Hoyer Sparsity Results</em>) proves a
+chain of inequalities that constrain how sparse the columns of a fit can
+be. All of them are stated for an arbitrary non-negative factorization
+<span class="math inline">\(\mathbf{B} =
+\mathbf{L}\mathbf{F}^{\top}\)</span>, so they can be checked directly on
+every fitted model here, using each fit’s own <span
+class="math inline">\(\mathbf{B}\)</span>. Writing <span
+class="math inline">\(\operatorname{pm}(x) =
+\max(x)/\operatorname{mean}(x)\)</span> for the max-to-mean ratio, <span
+class="math inline">\(d(x) = \|x\|_1 / (\sqrt{m}\|x\|_2)\)</span> for
+the density of an <span class="math inline">\(m\)</span>-vector, <span
+class="math inline">\(H(x) = \kappa_m(1 - d(x))\)</span> with <span
+class="math inline">\(\kappa_m = \sqrt{m}/(\sqrt{m}-1)\)</span> for the
+Hoyer sparsity, and <span class="math display">\[w_k =
+\frac{\operatorname{mean}(\mathbf{l}_{\cdot k})
+\operatorname{mean}(\mathbf{f}_{\cdot
+k})}{\operatorname{mean}(\mathbf{B})},
+\qquad \textstyle\sum_{k=1}^{K} w_k = 1,\]</span> the results used below
+are:</p>
+<ol style="list-style-type: decimal">
+<li><strong>The pm-budget lemma.</strong> For every factor <span
+class="math inline">\(k\)</span>, <span
+class="math display">\[\operatorname{pm}(\mathbf{l}_{\cdot k})\,
+  \operatorname{pm}(\mathbf{f}_{\cdot k})\, w_k
+  \;\leq\; \operatorname{pm}(\mathbf{B}).\]</span> The matrix’s
+max-to-mean ratio is a <em>budget</em> that the factors’ own max-to-mean
+ratios, weighted by <span class="math inline">\(w_k\)</span>, must fit
+inside.</li>
+<li><strong>The hyperbola theorem.</strong> Combining (1) with the
+elementary bound <span class="math inline">\(d(x) \geq
+1/\sqrt{\operatorname{pm}(x)}\)</span> gives <span
+class="math display">\[d(\mathbf{l}_{\cdot k})\, d(\mathbf{f}_{\cdot k})
+  \;\geq\; \sqrt{w_k / \operatorname{pm}(\mathbf{B})}:\]</span> a
+loading and its factor cannot both be sparse, and the constraint
+tightens as <span
+class="math inline">\(\operatorname{pm}(\mathbf{B})\)</span> falls.</li>
+<li><strong>The sum-form corollary.</strong> In Hoyer units (here <span
+class="math inline">\(n = p\)</span>, so <span
+class="math inline">\(\kappa_n = \kappa_p = \kappa\)</span>), <span
+class="math display">\[H(\mathbf{l}_{\cdot k}) + H(\mathbf{f}_{\cdot k})
+  \;\leq\; 2\kappa\left(1 -
+  \left(w_k/\operatorname{pm}(\mathbf{B})\right)^{1/4}\right):\]</span>
+the pair shares a single sparsity allowance set by <span
+class="math inline">\(\operatorname{pm}(\mathbf{B})\)</span>.</li>
+<li><strong>The monotone-budget proposition.</strong> For any fixed
+rates, the budget <span
+class="math inline">\(\operatorname{pm}(\mathbf{B}_c)\)</span> is
+non-decreasing in <span class="math inline">\(c\)</span> — small <span
+class="math inline">\(c\)</span> does not merely fail to produce sparse
+factors, it makes them unavailable.</li>
+</ol>
+<p>One caveat established before plotting: the appendix’s
+<em>averaged</em> ceiling (mean Hoyer <span class="math inline">\(\leq
+\kappa(1 - 1/(K\sqrt{\operatorname{pm}(\mathbf{B})}))\)</span>) is
+vacuous at this design — with <span class="math inline">\(K = 5\)</span>
+and budgets that never fall below <span class="math inline">\(\approx
+3\)</span>, it sits at <span class="math inline">\(\approx 1\)</span>
+across the whole grid. The averaging step costs a factor of <span
+class="math inline">\(K\)</span>; the per-column forms above are the
+ones with empirical content, and they are what we examine. All figures
+in this section use the exact fits.</p>
+<p><strong>The realized budget.</strong> First, the budget itself. The
+proposition concerns fixed rates, whereas each fit re-estimates its
+rates at its own <span class="math inline">\(c\)</span> — yet the
+realized <span
+class="math inline">\(\operatorname{pm}(\mathbf{B})\)</span> of the
+fitted models is monotone in <span
+class="math inline">\(c_{\textrm{fit}}\)</span> anyway, spanning three
+orders of magnitude across the grid (<span class="math inline">\(\sim
+3\)</span> to <span class="math inline">\(\sim 5{,}000\)</span>), and
+nearly identical across seeds:</p>
+<pre class="r"><code>bounds &lt;- readRDS(file.path(exp_dir, &quot;approx_sim_bounds.rds&quot;))
+bounds$ct &lt;- factor(paste0(&quot;c_true = &quot;, sapply(bounds$c_true, fmtc)),
+                    levels = levels(res$ct))
+be &lt;- subset(bounds, method == &quot;exact&quot;)</code></pre>
+<pre class="r"><code>exm &lt;- subset(res, method == &quot;exact&quot;)
+avg &lt;- aggregate(pm_B ~ cc + ct, exm, mean)
+ggplot(exm, aes(cc, pm_B)) +
+  geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;,
+            linewidth = 0.35, alpha = 0.8) +
+  geom_line(data = avg, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+  geom_point(data = avg, colour = &quot;#0E5C6B&quot;, size = 1.6) +
+  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+  scale_y_log10(labels = scales::label_log()) +
+  facet_wrap(~ ct, nrow = 1) +
+  labs(x = &quot;c used for fitting&quot;, y = &quot;pm(B) of the fitted model&quot;,
+       title = &quot;The realized sparsity budget is monotone in the fitting c&quot;,
+       subtitle = &quot;thin lines: 10 individual seeds;  thick line: mean&quot;) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = &quot;bold&quot;, size = 10),
+        plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
+        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))</code></pre>
+<p><img src="figure/sim_design.Rmd/budget-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p><strong>How tight are the bounds?</strong> For each fitted factor we
+compute the slack of inequality (1), <span
+class="math inline">\(\operatorname{pm}(\mathbf{B}) /
+(\operatorname{pm}(\mathbf{l}_{\cdot
+k})\operatorname{pm}(\mathbf{f}_{\cdot k})
+w_k) \geq 1\)</span>, and of inequality (2), <span
+class="math inline">\(d(\mathbf{l}_{\cdot k}) d(\mathbf{f}_{\cdot k})
+\big/
+\sqrt{w_k/\operatorname{pm}(\mathbf{B})} \geq 1\)</span>. Slack <span
+class="math inline">\(1\)</span> means the fit sits exactly on the
+constraint.</p>
+<pre class="r"><code>sl &lt;- rbind(
+  data.frame(be[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;, &quot;k&quot;)], bound = &quot;pm budget (1)&quot;,
+             slack = be$slack_pm),
+  data.frame(be[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;, &quot;k&quot;)], bound = &quot;density hyperbola (2)&quot;,
+             slack = be$slack_hyper))
+sl$bound &lt;- factor(sl$bound, levels = c(&quot;pm budget (1)&quot;,
+                                        &quot;density hyperbola (2)&quot;))
+med &lt;- aggregate(slack ~ bound + cc + ct, sl, median)
+ggplot(sl, aes(cc, slack)) +
+  geom_point(size = 0.7, alpha = 0.25, colour = &quot;#0E5C6B&quot;,
+             position = position_jitter(width = 0.05, height = 0)) +
+  geom_line(data = med, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+  geom_hline(yintercept = 1, linetype = &quot;dashed&quot;, colour = &quot;#C2410C&quot;) +
+  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+  scale_y_log10() +
+  facet_grid(bound ~ ct) +
+  labs(x = &quot;c used for fitting&quot;, y = &quot;slack of the bound  (1 = active)&quot;,
+       title = &quot;Slack of the per-factor sparsity bounds&quot;,
+       subtitle = paste(&quot;one point per (seed, factor); line: median;&quot;,
+                        &quot;dashed: the bound itself&quot;)) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = &quot;bold&quot;, size = 10),
+        plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
+        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))</code></pre>
+<p><img src="figure/sim_design.Rmd/slack-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>The two rows say different things. The <strong>pm-budget lemma is
+close to equality wherever the budget is scarce</strong>: for <span
+class="math inline">\(c_{\textrm{fit}} \leq 0.1\)</span> the median
+slack is <span class="math inline">\(1.07\)</span>–<span
+class="math inline">\(1.14\)</span> at the finite <span
+class="math inline">\(c_{\textrm{true}}\)</span> regimes (minimum <span
+class="math inline">\(1.000\)</span> — some factors sit exactly on the
+constraint), growing to <span class="math inline">\(2\)</span>–<span
+class="math inline">\(6\)</span> only at the large-<span
+class="math inline">\(c\)</span> end where the budget is plentiful.
+Small <span class="math inline">\(c\)</span> genuinely exhausts the
+budget. The <strong>density hyperbola inherits extra slack</strong> from
+the step <span class="math inline">\(d(x) \geq
+1/\sqrt{\operatorname{pm}(x)}\)</span>, which is loose for the dense
+columns that small <span class="math inline">\(c\)</span> forces; its
+slack floor is <span class="math inline">\(\approx 1.3\)</span>–<span
+class="math inline">\(2\)</span> across the grid. So in Hoyer units the
+bounds are valid but conservative envelopes at this <span
+class="math inline">\(K\)</span>, while in pm units the budget
+accounting is nearly sharp.</p>
+<p><strong>The sum-form allowance.</strong> Finally, inequality (3) read
+as intended: each factor’s observed <span
+class="math inline">\(H(\mathbf{l}_{\cdot k}) + H(\mathbf{f}_{\cdot
+k})\)</span> against its own allowance <span
+class="math inline">\(2\kappa(1 -
+(w_k/\operatorname{pm}(\mathbf{B}))^{1/4})\)</span>.</p>
+<pre class="r"><code>kn &lt;- sqrt(N_ROWS) / (sqrt(N_ROWS) - 1)
+be$allow &lt;- 2 * kn * (1 - (be$w / be$pm_B)^0.25)
+be$Hsum  &lt;- be$H_L + be$H_F
+be$cf    &lt;- factor(be$cc, levels = sort(unique(be$cc)),
+                   labels = sapply(sort(unique(be$cc)), fmtc))
+ggplot(be, aes(allow, Hsum, colour = cf)) +
+  geom_abline(slope = 1, intercept = 0, linetype = &quot;dashed&quot;,
+              colour = &quot;grey40&quot;) +
+  geom_point(size = 1, alpha = 0.6) +
+  scale_colour_viridis_d(name = &quot;c_fit&quot;, option = &quot;mako&quot;, end = 0.9,
+                         direction = -1) +
+  facet_wrap(~ ct, nrow = 1) +
+  coord_equal(xlim = c(0, 2.1), ylim = c(0, 2.1)) +
+  labs(x = &quot;allowance  2κ(1 − (w/pm(B))^{1/4})&quot;,
+       y = &quot;observed  H(l) + H(f)&quot;,
+       title = &quot;Observed sparsity vs the sum-form allowance, per factor&quot;,
+       subtitle = &quot;dashed: allowance used in full; points cannot lie above it&quot;) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = &quot;bold&quot;, size = 10),
+        plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
+        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))</code></pre>
+<p><img src="figure/sim_design.Rmd/allowance-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>Every point lies below the diagonal, as it must. Two practical
+readings. First, the allowance and the observed sparsity move together:
+small <span class="math inline">\(c_{\textrm{fit}}\)</span> (light
+points) sits at small allowance and small observed sum, large <span
+class="math inline">\(c_{\textrm{fit}}\)</span> (dark) at large
+allowance and large observed sum — the budget is the axis along which
+<span class="math inline">\(c\)</span> operates, exactly as the theory
+says. Second, the <em>fraction</em> of the allowance actually used grows
+with <span class="math inline">\(c_{\textrm{fit}}\)</span>: the median
+factor uses <span class="math inline">\(40\)</span>–<span
+class="math inline">\(65\%\)</span> of its allowance at <span
+class="math inline">\(c_{\textrm{fit}} = 10^{-4}\)</span> and <span
+class="math inline">\(73\)</span>–<span
+class="math inline">\(91\%\)</span> at <span
+class="math inline">\(c_{\textrm{fit}} \geq 10^{2}\)</span> (highest in
+the <span class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span>
+regime, whose truth is sparsest). In other words: at small <span
+class="math inline">\(c\)</span> the fits sit against the <em>pm
+form</em> of the constraint while the Hoyer conversion leaves headroom,
+and at large <span class="math inline">\(c\)</span> the fits approach
+the Hoyer allowance itself. The bounds are therefore practically
+relevant in both regimes, but through different faces of the same
+inequality chain.</p>
+</div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
 <p>The simulation does what it was designed to do. On counts calibrated
@@ -2113,7 +2361,16 @@ fitting <span class="math inline">\(c\)</span>, monotonically and over a
 wide range; (ii) fitting at the generative <span
 class="math inline">\(c\)</span> reproduces the generative sparsity
 almost exactly, so misfit in <span class="math inline">\(c\)</span> is
-visible as over- or under-sparsification; (iii) the Chebyshev
+visible as over- or under-sparsification; (iii) the appendix bounds are
+live constraints, not formalities — the realized budget <span
+class="math inline">\(\operatorname{pm}(\mathbf{B})\)</span> is monotone
+in <span class="math inline">\(c_{\textrm{fit}}\)</span> over three
+orders of magnitude, the pm-budget lemma is within <span
+class="math inline">\(7\)</span>–<span
+class="math inline">\(14\%\)</span> of equality wherever the budget is
+scarce, and the fits use up to <span class="math inline">\(\sim
+90\%\)</span> of the sum-form Hoyer allowance at the large-<span
+class="math inline">\(c\)</span> end; and (iv) the Chebyshev
 approximation is faithful to the exact objective everywhere on the grid
 (worst case <span class="math inline">\(\sim 0.03\)</span>
 log-likelihood units per entry, typically orders of magnitude less),
@@ -2158,12 +2415,12 @@ loaded via a namespace (and not attached):
 [21] tibble_3.3.1       rprojroot_2.1.1    RColorBrewer_1.1-3 bslib_0.10.0      
 [25] pillar_1.11.1      rlang_1.2.0        cachem_1.1.0       stringi_1.8.7     
 [29] httpuv_1.6.17      xfun_0.57          S7_0.2.2           getPass_0.2-4     
-[33] fs_2.1.0           sass_0.4.10        otel_0.2.0         cli_3.6.6         
-[37] withr_3.0.2        magrittr_2.0.5     digest_0.6.39      grid_4.5.2        
-[41] processx_3.9.0     rstudioapi_0.18.0  lifecycle_1.0.5    vctrs_0.7.3       
-[45] evaluate_1.0.5     glue_1.8.1         farver_2.1.2       whisker_0.4.1     
-[49] rmarkdown_2.31     httr_1.4.8         tools_4.5.2        pkgconfig_2.0.3   
-[53] htmltools_0.5.9   </code></pre>
+[33] fs_2.1.0           sass_0.4.10        otel_0.2.0         viridisLite_0.4.3 
+[37] cli_3.6.6          withr_3.0.2        magrittr_2.0.5     digest_0.6.39     
+[41] grid_4.5.2         processx_3.9.0     rstudioapi_0.18.0  lifecycle_1.0.5   
+[45] vctrs_0.7.3        evaluate_1.0.5     glue_1.8.1         farver_2.1.2      
+[49] whisker_0.4.1      rmarkdown_2.31     httr_1.4.8         tools_4.5.2       
+[53] pkgconfig_2.0.3    htmltools_0.5.9   </code></pre>
 </div>
 </div>
 </div>
