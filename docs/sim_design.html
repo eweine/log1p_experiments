@@ -549,15 +549,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb3a00c92298a42ee37468ebe219ddc2c30ce9fcatargetblankb3a00c9a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3ea0a61deeb48d958abd552eb722e18290f4c848targetblank3ea0a61a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/b3a00c92298a42ee37468ebe219ddc2c30ce9fca" target="_blank">b3a00c9</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/3ea0a61deeb48d958abd552eb722e18290f4c848" target="_blank">3ea0a61</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreeb3a00c92298a42ee37468ebe219ddc2c30ce9fcatargetblankb3a00c9a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3ea0a61deeb48d958abd552eb722e18290f4c848targetblank3ea0a61a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -567,7 +567,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/b3a00c92298a42ee37468ebe219ddc2c30ce9fca" target="_blank">b3a00c9</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/3ea0a61deeb48d958abd552eb722e18290f4c848" target="_blank">3ea0a61</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -632,6 +632,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/3ea0a61deeb48d958abd552eb722e18290f4c848/analysis/sim_design.Rmd" target="_blank">3ea0a61</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+budget figure: add the data budget pm(log(1 + Y/c)) alongside fitted
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/6c9d5469fc52eb8995f73c0b9f085744efbaa79e/docs/sim_design.html" target="_blank">6c9d546</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2326,57 +2360,114 @@ with <span class="math inline">\(b^{*}_{ij}(c) = \log(1 +
 the truth itself, and the quantity <span class="math inline">\(c \mapsto
 \operatorname{pm}(\log(1 +
 \boldsymbol{\Lambda}_{\textrm{true}}/c))\)</span> is computable from the
-generative model with no fitting at all. Comparing it to the budget the
-fitted models actually realize:</p>
+generative model with no fitting at all. Alongside it we show the same
+curve computed from the observed counts, <span
+class="math inline">\(\operatorname{pm}(\log(1 + \mathbf{Y}/c))\)</span>
+— the version available in practice (it is the calibration target of
+this whole design), and, by the saturated-case remark in the appendix,
+<em>exactly</em> the fitted budget when <span class="math inline">\(K
+\geq \min(n, p)\)</span>. Comparing both to the budget the rank-<span
+class="math inline">\(5\)</span> fits actually realize:</p>
 <pre class="r"><code>pm_true &lt;- do.call(rbind, lapply(ds, function(d) data.frame(
   seed = d$seed, cc = CC_GRID,
   ct = factor(paste0(&quot;c_true = &quot;, fmtc(d$c_true)), levels = levels(res$ct)),
   pm_true = sapply(CC_GRID, function(cc) {
-    g &lt;- log1p(d$lambda / cc); max(g) / mean(g) }))))
+    g &lt;- log1p(d$lambda / cc); max(g) / mean(g) }),
+  pm_data = sapply(CC_GRID, function(cc) {
+    g &lt;- log1p(d$Y / cc); max(g) / mean(g) }))))
 cmp &lt;- merge(exm[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;, &quot;pm_B&quot;)],
              pm_true, by = c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;))
-cmp$ratio &lt;- cmp$pm_B / cmp$pm_true
+cmp$ratio      &lt;- cmp$pm_B / cmp$pm_true
+cmp$ratio_data &lt;- cmp$pm_B / cmp$pm_data
 
-avg  &lt;- aggregate(cbind(pm_B, pm_true) ~ cc + ct, cmp, mean)
+avg  &lt;- aggregate(cbind(pm_B, pm_true, pm_data) ~ cc + ct, cmp, mean)
 p1 &lt;- ggplot(cmp, aes(cc, pm_B)) +
   geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;,
             linewidth = 0.35, alpha = 0.8) +
   geom_line(data = avg, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
   geom_line(data = avg, aes(y = pm_true), colour = &quot;#C2410C&quot;,
             linetype = &quot;dashed&quot;, linewidth = 0.7) +
+  geom_line(data = avg, aes(y = pm_data), colour = &quot;#B45309&quot;,
+            linetype = &quot;dotdash&quot;, linewidth = 0.7) +
   scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
   scale_y_log10(labels = scales::label_log()) +
   facet_wrap(~ ct, nrow = 1) +
   labs(x = NULL, y = &quot;pm(B)&quot;,
-       title = &quot;Fitted budget vs the true-rate budget of the proposition&quot;,
+       title = &quot;Fitted budget vs the true-rate and data budgets&quot;,
        subtitle = paste(&quot;thin: fitted, per seed;  thick: fitted, mean;&quot;,
-                        &quot;dashed: pm(log(1 + Λ_true/c)), mean&quot;)) +
+                        &quot;dashed: pm(log(1 + Λ_true/c));&quot;,
+                        &quot;dot-dash: pm(log(1 + Y/c))&quot;)) +
   theme(strip.background = element_blank(),
         strip.text = element_text(face = &quot;bold&quot;, size = 10),
         plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
         panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))
 
-ravg &lt;- aggregate(ratio ~ cc + ct, cmp, mean)
+ravg &lt;- aggregate(cbind(ratio, ratio_data) ~ cc + ct, cmp, mean)
 p2 &lt;- ggplot(cmp, aes(cc, ratio)) +
-  geom_hline(yintercept = 1, linetype = &quot;dashed&quot;, colour = &quot;#C2410C&quot;) +
+  geom_hline(yintercept = 1, linetype = &quot;dashed&quot;, colour = &quot;grey40&quot;) +
   geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;,
             linewidth = 0.35, alpha = 0.8) +
   geom_line(data = ravg, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
   geom_point(data = ravg, colour = &quot;#0E5C6B&quot;, size = 1.4) +
+  geom_line(data = ravg, aes(y = ratio_data), colour = &quot;#B45309&quot;,
+            linetype = &quot;dotdash&quot;, linewidth = 0.8) +
+  geom_point(data = ravg, aes(y = ratio_data), colour = &quot;#B45309&quot;,
+             size = 1.4) +
   scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
+  scale_y_log10(breaks = c(0.125, 0.25, 0.5, 1),
+                labels = c(&quot;0.125&quot;, &quot;0.25&quot;, &quot;0.5&quot;, &quot;1&quot;)) +
   facet_wrap(~ ct, nrow = 1) +
-  labs(x = &quot;c used for fitting&quot;,
-       y = &quot;fitted / true-rate budget&quot;) +
+  labs(x = &quot;c used for fitting&quot;, y = &quot;fitted / reference budget&quot;,
+       subtitle = paste(&quot;blue: fitted / true-rate budget (thin: seeds);&quot;,
+                        &quot;amber: fitted / data budget&quot;)) +
   theme(strip.background = element_blank(),
         strip.text = element_blank(),
+        plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
         panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))
 
-cowplot::plot_grid(p1, p2, ncol = 1, rel_heights = c(1.5, 1), align = &quot;v&quot;)</code></pre>
+cowplot::plot_grid(p1, p2, ncol = 1, rel_heights = c(1.4, 1), align = &quot;v&quot;)</code></pre>
 <p><img src="figure/sim_design.Rmd/budget-true-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-budget-true-fig-1">
+Past versions of budget-true-fig-1.png
+</button>
+</p>
+<div id="fig-budget-true-fig-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/6c9d5469fc52eb8995f73c0b9f085744efbaa79e/docs/figure/sim_design.Rmd/budget-true-fig-1.png" target="_blank">6c9d546</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The dashed curve is barely distinguishable from the fitted one: the
 mean ratio stays within <span class="math inline">\(0.85\)</span>–<span
-class="math inline">\(1.02\)</span> across the entire grid (bottom row),
-and the individual seeds mostly within <span
+class="math inline">\(1.02\)</span> across the entire grid (bottom row,
+blue), and the individual seeds mostly within <span
 class="math inline">\(0.8\)</span>–<span
 class="math inline">\(1.05\)</span> — the visible exception being the
 largest <span class="math inline">\(c_{\textrm{fit}}\)</span> values at
@@ -2390,12 +2481,39 @@ is the same rank-<span class="math inline">\(K\)</span> smoothing in
 gentler form, and at <span class="math inline">\(c_{\textrm{true}} =
 \infty\)</span> with large <span
 class="math inline">\(c_{\textrm{fit}}\)</span> the fits slightly
-<em>exceed</em> the true-rate budget instead. Practically, this closes
-the loop on the proposition: the fixed-rate budget curve, computable
-from rates (or, by the same calculation, from data) without fitting
-anything, is an accurate forecast of the budget the fitted model will
-actually have — which is what makes the budget a usable a-priori
-diagnostic rather than a post-hoc description.</p>
+<em>exceed</em> the true-rate budget instead.</p>
+<p>The <strong>data budget</strong> (dot-dash) tells a complementary
+story. At <span class="math inline">\(c_{\textrm{fit}} \gtrsim
+1\)</span> it agrees with the other two curves to within <span
+class="math inline">\(\sim 15\%\)</span>. At small <span
+class="math inline">\(c_{\textrm{fit}}\)</span> it splits off upward,
+exceeding the fitted budget by a factor of <span
+class="math inline">\(4\)</span>–<span class="math inline">\(8\)</span>
+(bottom row, amber, dropping to <span
+class="math inline">\(0.13\)</span>–<span
+class="math inline">\(0.23\)</span>): on the link scale the <span
+class="math inline">\(\sim 89\%\)</span> zero entries of <span
+class="math inline">\(\mathbf{Y}\)</span> stay exactly zero and drag the
+matrix mean down, while the true rates — and every entry of a rank-<span
+class="math inline">\(5\)</span> fit — are strictly positive. This is
+the saturated-case remark playing out in reverse: at <span
+class="math inline">\(K \geq \min(n,p)\)</span> the fit would reproduce
+<span class="math inline">\(\mathbf{Y}\)</span> and its budget exactly,
+but a low-rank fit smooths the zeros up to small positive values, and
+its budget lands on the <em>true-rate</em> curve rather than the data
+curve. Practically: for sparse count data, <span
+class="math inline">\(\operatorname{pm}(\log(1 + \mathbf{Y}/c))\)</span>
+preserves the shape and ordering of the budget — it remains monotone and
+spans the same three decades, which is all its role as a calibration
+target requires — but as a forecast of the budget a low-rank fit will
+realize at small <span class="math inline">\(c\)</span> it overstates
+the level, and the true-rate (equivalently, fitted-rate) version is the
+sharper reference. Practically, this closes the loop on the proposition:
+the fixed-rate budget curve, computable from rates (or, by the same
+calculation, from data) without fitting anything, is an accurate
+forecast of the budget the fitted model will actually have — which is
+what makes the budget a usable a-priori diagnostic rather than a
+post-hoc description.</p>
 <p><strong>How tight are the bounds?</strong> For each fitted factor we
 compute the slack of inequality (1), <span
 class="math inline">\(\operatorname{pm}(\mathbf{B}) /
