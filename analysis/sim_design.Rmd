@@ -5,7 +5,7 @@ output:
     code_folding: hide
     toc: true
     toc_float: true
-date: "2026-08-10"
+date: "2026-08-13"
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ```
 
 This page describes **exactly** the simulation that the exact-vs-approx /
-sparsity experiment will run. To make drift impossible, every constant below
+sparsity experiment runs, and reports its results. To make drift impossible, every constant below
 is read from the experiment's own configuration file
 (`inst/paper_figures/experiments/approx_sim_common.R` in the log1pNMF repo),
 which is what the cluster workers source — including the calibrated knobs,
@@ -52,7 +52,7 @@ knitr::kable(kb, digits = 4,
 > Counts were simulated from the log1p NMF model itself at each of three
 > link constants $c_{\textrm{true}} \in \{10^{-3}, 1, \infty\}$, with
 > parameters calibrated so that all three regimes reproduce the count
-> characteristics of the pancreas dataset. For each of ten seeds we drew an
+> characteristics of the pancreas dataset. For each of thirty seeds we drew an
 > $n \times K$ loading matrix $L$ with rows
 > $\mathbf{l}_{i\cdot} \sim \textrm{Dirichlet}(0.3, \dots, 0.3)$ — the same
 > $L$ at every $c_{\textrm{true}}$, so the true loadings and their sparsity
@@ -77,8 +77,8 @@ knitr::kable(kb, digits = 4,
 > simulation's size. Calibrating every regime to one shared target is what
 > makes the datasets comparable across $c_{\textrm{true}}$.
 
-Everything in that paragraph is verified below on the thirty datasets
-(ten seeds $\times$ three $c_{\textrm{true}}$) the experiment will actually
+Everything in that paragraph is verified below on the ninety datasets
+(thirty seeds $\times$ three $c_{\textrm{true}}$) the experiment will actually
 use.
 
 # The generative model, precisely
@@ -145,7 +145,7 @@ scripts; it loops over the $c_{\textrm{true}}$ grid and writes
 `approx_sim_calibration.rds`, which `approx_sim_common.R` reads back with a
 consistency check.
 
-# Verification on the thirty datasets the experiment will use
+# Verification on the ninety datasets the experiment uses
 
 Not held-out seeds — these are the (seed, $c_{\textrm{true}}$) datasets
 exactly as the workers will regenerate them.
@@ -169,7 +169,7 @@ for (ct in C_TRUE_GRID) {
             apply(r, 1, min), apply(r, 1, max))
 }
 knitr::kable(ratio_tab, caption = "Budget-curve ratio to the shared
-  size-adjusted pancreas target: median (range) over the ten seeds, per
+  size-adjusted pancreas target: median (range) over the thirty seeds, per
   c_true. 1.00 = exact match.")
 
 stat_tab <- data.frame(
@@ -185,7 +185,7 @@ for (ct in C_TRUE_GRID) {
 }
 stat_tab$real <- c("0.822", "0.674", paste0(CAL$tstar, " (size-adj.)"))
 knitr::kable(stat_tab, caption = "Count characteristics, median (range) over
-  the ten seeds.")
+  the thirty seeds.")
 ```
 
 ```{r tail-plot, fig.width=7, fig.height=4}
@@ -238,7 +238,7 @@ for (ct in C_TRUE_GRID) {
     round(median(sapply(D, function(d) mean(rowSums(d$FF > 0)))), 2),
     round(median(sapply(D, function(d) mean(apply(d$FF, 2, hoyer)))), 3))
 }
-knitr::kable(tt, caption = "Truth structure, median over the ten seeds. The
+knitr::kable(tt, caption = "Truth structure, median over the thirty seeds. The
   loading rows (first two lines) are byte-identical across c_true; the factor
   law differs because its knobs are calibrated per c_true.")
 ```
@@ -279,7 +279,8 @@ knitr::kable(data.frame(
   value = c(sprintf("%d seeds per c_true (same L across c_true)", N_SEEDS),
             paste(sapply(C_TRUE_GRID, fmtc), collapse = ", "),
             paste(format(CC_GRID, scientific = TRUE, trim = TRUE), collapse = ", "),
-            paste(METHODS, collapse = ", "),
+            paste0(paste(METHODS, collapse = ", "),
+                   " (c = Inf: exact only, fastTopics)"),
             "rank-1 (each method's own warm-up, seeded)",
             format(TOL, scientific = TRUE),
             format(MAXITER, big.mark = ","),
@@ -300,14 +301,19 @@ anything missing or unconverged for resubmission.
 
 # Results
 
-The experiment has now run. All $810$ fits are present and all converged.
-Twenty-one needed more than the 250k-iteration cap and were rerun from
-scratch with a 1M cap; eighteen of those were Taylor fits at
-$c_{\textrm{fit}} \leq 10^{-3}$, a first symptom of the Taylor pathology
-quantified below. Metrics were computed on the cluster by
-`analyze_approx_sim.R` (one row per fit; Hoyer sparsity and pairwise
-Spearman correlations of the fitted $L$ and $F$, plus the stored exact
-log-likelihoods), and only that table is read here.
+The full experiment has now run: $2{,}520$ fits — thirty seeds, three
+$c_{\textrm{true}}$, the nine-point finite $c_{\textrm{fit}}$ grid under
+all three methods, **plus $c_{\textrm{fit}} = \infty$** (plain Poisson NMF,
+i.e. the topic model, fit with fastTopics from the same rank-1-padded
+initialization; the quadratic zero-term approximations have no
+$c = \infty$ analogue, so that column is exact-only). All $2{,}520$
+converged. The 810 seed-1–10 fits are the first round's, reused verbatim
+(their generator, grid and tags are unchanged); the extension ran at a 1M
+iteration cap, which the first round's Taylor pathology motivated — this
+time nothing hit it (worst fit: 850k iterations, 17.4h). Metrics were
+computed on the cluster by `analyze_approx_sim.R` (one row per fit; Hoyer
+sparsity and pairwise Spearman correlations of the fitted $L$ and $F$,
+plus the stored exact log-likelihoods), and only that table is read here.
 
 ```{r load-results}
 res <- readRDS(file.path(exp_dir, "approx_sim_metrics.rds"))
@@ -334,8 +340,9 @@ knitr::kable(data.frame(
   `max seconds` = sapply(METHODS, function(m)
     round(max(res$seconds[res$method == m]))),
   check.names = FALSE, row.names = NULL),
-  caption = "Convergence and timing. The Taylor maximum is a c_fit <= 1e-3
-  fit that needed the extended 1M-iteration cap.")
+  caption = "Convergence and timing. The Taylor maximum is a c_fit = 1e-4
+  fit that ran 850k iterations (17.4h) before converging; the exact column's
+  maximum is likewise a c_fit = 1e-4 fit.")
 ```
 
 ## Approximation accuracy
@@ -358,7 +365,7 @@ The display matches the paper's approximation-quality figure: the
 **per-entry likelihood ratio** $\exp(\bar\ell_{\textrm{approx}} -
 \bar\ell_{\textrm{exact}})$, where $\bar\ell$ is the per-entry exact
 log-likelihood of the fitted rates — $1$ means the approximation loses
-nothing, $0$ means it collapses. Mean over the ten seeds, error bars a 95%
+nothing, $0$ means it collapses. Mean over the thirty seeds, error bars a 95%
 confidence interval ($t_{9}$-based).
 
 ```{r approx-ratio-fig, fig.width=8.5, fig.height=3.4}
@@ -384,20 +391,26 @@ ggplot(agg, aes(cc, ratio.mean, colour = Approximation)) +
   labs(x = "Value of c for Optimization", y = "Likelihood Ratio")
 ```
 
-Two regimes are visible. For $c_{\textrm{fit}} \geq 0.1$ **both**
-approximations sit on the dashed line: per-entry gaps of $10^{-2}$ down to
-$10^{-10}$, i.e. from negligible to identical (the tables above). The few
-points marginally *above* $1$ — clearest for Chebyshev mid-grid at
-$c_{\textrm{true}} = 10^{-3}$ — are the approximation landing in a slightly
-better local optimum of the common exact criterion, so the remaining spread
-there is local-optimum noise, not approximation error. For
-$c_{\textrm{fit}} \leq 10^{-2}$ the two methods part company: **Chebyshev
-degrades gracefully** (worst case $\sim 0.03$ per entry, a ratio of
-$\sim 0.97$) while **Taylor collapses to ratio $0$** at
-$c_{\textrm{fit}} \leq 10^{-3}$, giving up tens to thousands of
-log-likelihood units per entry. The Chebyshev coefficients are fit to the
-relevant interval, while the Taylor expansion is anchored at a point that
-small $c$ pushes far from where the zero-term sum is evaluated.
+Two regimes are visible. For $c_{\textrm{fit}} \geq 0.1$ at
+$c_{\textrm{true}} = 1$ and $\infty$, **both** approximations sit on the
+dashed line: per-entry gaps of $10^{-3}$ down to $10^{-10}$, negligible to
+identical (the tables above). The $c_{\textrm{true}} = 10^{-3}$ panel is
+noisier across the whole grid, and thirty seeds make the reason plain:
+that regime's optimum landscape is heavy-tailed, and an occasional single
+fit — by any method — lands in a substantially better or worse local
+optimum of the common exact criterion (the worst Chebyshev fit anywhere is
+one seed at $c_{\textrm{fit}} = 1$ losing $1.3$ per entry; the worst
+Taylor fit at $c_{\textrm{fit}} \geq 0.1$ loses $27$; other seeds land
+*above* the line). That spread is local-optimum variation, not
+approximation error, and it is what the wide intervals in the first panel
+are showing. For $c_{\textrm{fit}} \leq 10^{-2}$ the two methods part
+company systematically: **Chebyshev degrades gracefully** (mean gap at
+most $\sim 0.03$ per entry in every cell) while **Taylor collapses to
+ratio $0$** at $c_{\textrm{fit}} \leq 10^{-3}$, giving up tens to
+thousands of log-likelihood units per entry in the mean. The Chebyshev
+coefficients are fit to the relevant interval, while the Taylor expansion
+is anchored at a point that small $c$ pushes far from where the zero-term
+sum is evaluated.
 
 ## Iterations to convergence
 
@@ -405,7 +418,9 @@ Every fit ran to the same tolerance on its own objective, so the iteration
 count is comparable within a method and diagnostic across methods.
 
 ```{r iterations-fig, fig.width=8.5, fig.height=3.4}
-ggplot(res, aes(cc, n_iter, colour = method)) +
+## finite c only: the c = Inf fits use a different optimizer (fastTopics
+## SCD; median 53 iterations), so their counts are not comparable
+ggplot(subset(res, is.finite(cc)), aes(cc, n_iter, colour = method)) +
   geom_point(size = 1, alpha = 0.3,
              position = position_jitter(width = 0.06, height = 0)) +
   stat_summary(fun = median, geom = "line", linewidth = 0.8) +
@@ -420,16 +435,17 @@ ggplot(res, aes(cc, n_iter, colour = method)) +
 
 Iteration counts rise steadily as $c_{\textrm{fit}}$ decreases for every
 method — at $c_{\textrm{fit}} = 10^{4}$ the median fit converges in
-$\sim 55$ iterations, at $c_{\textrm{fit}} = 10^{-4}$ the exact method needs
-$\sim 16{,}000$ — consistent with the increasingly ill-conditioned small-$c$
-regime. The methods only separate where the approximation is poor:
-Chebyshev tracks exact throughout (its maximum anywhere is 34k iterations,
-vs 102k for exact), but Taylor detaches below $c_{\textrm{fit}} = 10^{-2}$,
-with a *median* of 272k iterations at $c_{\textrm{fit}} = 10^{-4}$ (all 18
-fits that outgrew the original 250k cap were Taylor at
-$c_{\textrm{fit}} \leq 10^{-3}$; the worst needed 844k). Taylor's failure at
-small $c$ is thus doubly expensive: it converges to a much worse fit, and
-takes far longer to get there.
+$\sim 55$ iterations, at $c_{\textrm{fit}} = 10^{-4}$ the exact method
+needs $\sim 17{,}000$ — consistent with the increasingly ill-conditioned
+small-$c$ regime. The methods only separate where the approximation is
+poor: Chebyshev tracks exact throughout, but Taylor detaches below
+$c_{\textrm{fit}} = 10^{-2}$, with a *median* of 301k iterations at
+$c_{\textrm{fit}} = 10^{-4}$ and a worst case of 850k (17.4 hours) —
+under the 1M cap, but only just. Taylor's failure at small $c$ is thus
+doubly expensive: it converges to a much worse fit, and takes far longer
+to get there. (The $c_{\textrm{fit}} = \infty$ fits are excluded here:
+fastTopics' SCD updates are a different algorithm whose median 53
+iterations are not comparable to the log1p fits' cycle counts.)
 
 ## Sparsity of the fitted loadings and factors
 
@@ -441,48 +457,56 @@ truth was generated with loading sparsity **identical across regimes**
 (dashed line at the same height in every panel of the top row).
 
 Exact fits only from here on (the previous sections established where the
-approximations can be trusted). As in the c-grid figures: thin lines are the
-ten individual seeds, the thick line their mean, the dashed line the truth's
-own value, and the circled point marks $c_{\textrm{fit}} = c_{\textrm{true}}$
-(absent at $c_{\textrm{true}} = \infty$, which lies off the fitting grid).
+approximations can be trusted). As in the c-grid figures: thin lines are
+the thirty individual seeds, the thick line their mean, the dashed line the
+truth's own value, and the circled point marks
+$c_{\textrm{fit}} = c_{\textrm{true}}$ — now present in **all three**
+panels, since the fitting grid includes $c = \infty$ (the topic model).
+Because $\infty$ has no place on a log axis, $c$ is a discrete axis from
+here on, as in the c-grid figures.
 
 ```{r seed-panels-helper}
 ## long format + the c-grid panel style, shared by the sparsity and
-## rank-correlation figures below
+## rank-correlation figures below. c is DISCRETE (c_fit = Inf is a real
+## level of the grid and has no place on a log axis).
+cf_of <- function(cc) factor(sapply(cc, fmtc),
+                             levels = sapply(CC_GRID, fmtc))
 make_long <- function(ex, vL, vF, tL, tF) {
   sp <- rbind(
-    data.frame(ex[c("seed", "cc", "ct")], what = "loadings L",
+    data.frame(ex[c("seed", "cc", "ct", "c_true")], what = "loadings L",
                value = ex[[vL]], truth = ex[[tL]]),
-    data.frame(ex[c("seed", "cc", "ct")], what = "factors F",
+    data.frame(ex[c("seed", "cc", "ct", "c_true")], what = "factors F",
                value = ex[[vF]], truth = ex[[tF]]))
   sp$what <- factor(sp$what, levels = c("loadings L", "factors F"))
+  sp$cf   <- cf_of(sp$cc)
   sp
 }
 seed_panels <- function(sp, ylab, title) {
-  avg <- aggregate(value ~ what + cc + ct, sp, mean)
+  avg <- aggregate(value ~ what + cf + ct, sp, mean)
   tru <- aggregate(truth ~ what + ct, sp, mean)
-  mp  <- unique(res[c("ct", "c_true")])
-  dg  <- merge(avg, mp)
-  dg  <- dg[is.finite(dg$c_true) & dg$cc == dg$c_true, ]
-  ggplot(sp, aes(cc, value)) +
+  dg  <- unique(sp[(is.finite(sp$c_true) & sp$cc == sp$c_true) |
+                   (is.infinite(sp$c_true) & is.infinite(sp$cc)),
+                   c("what", "cf", "ct")])
+  dg  <- merge(dg, avg)
+  ggplot(sp, aes(cf, value)) +
     geom_line(aes(group = seed), colour = "#9BB7BD",
-              linewidth = 0.35, alpha = 0.8) +
+              linewidth = 0.35, alpha = 0.7) +
     geom_hline(data = tru, aes(yintercept = truth), linetype = "dashed",
                colour = "#C2410C", linewidth = 0.5) +
-    geom_line(data = avg, colour = "#0E5C6B", linewidth = 1) +
+    geom_line(data = avg, aes(group = 1), colour = "#0E5C6B", linewidth = 1) +
     geom_point(data = avg, colour = "#0E5C6B", size = 1.6) +
     geom_point(data = dg, shape = 21, size = 3.6, stroke = 1.1,
                fill = NA, colour = "#C2410C") +
-    scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
     facet_grid(what ~ ct) +
     labs(x = "c used for fitting", y = ylab, title = title,
-         subtitle = paste("thin lines: 10 individual seeds;  thick line:",
+         subtitle = paste("thin lines: 30 individual seeds;  thick line:",
                           "mean;  dashed: the true value;  circled:",
                           "c_fit = c_true")) +
     theme(strip.background = element_blank(),
           strip.text = element_text(face = "bold", size = 10),
           plot.subtitle = element_text(size = 10, colour = "grey35"),
-          panel.border = element_rect(colour = "grey80", fill = NA))
+          panel.border = element_rect(colour = "grey80", fill = NA),
+          axis.text.x = element_text(size = 7, angle = 45, hjust = 1))
 }
 ```
 
@@ -494,20 +518,24 @@ seed_panels(make_long(ex, "hoyer_L", "hoyer_F",
             title = "Sparsity of the fit is set by the fitting c")
 ```
 
-Two things to read off:
+Three things to read off:
 
 - **Monotonicity, seed by seed.** At every $c_{\textrm{true}}$, for both $L$
-  and $F$, sparsity increases in $c_{\textrm{fit}}$ across the entire
-  eight-decade grid — and the thin lines show this is true of essentially
-  every individual seed, not just the average; the seed spread is a small
-  band around the mean.
+  and $F$, sparsity increases in $c_{\textrm{fit}}$ across the entire grid —
+  and the thin lines show this is true of essentially every individual
+  seed, not just the average; the seed spread is a small band around the
+  mean.
+- **The topic model is the continuous endpoint of the grid.** The new
+  $c_{\textrm{fit}} = \infty$ column continues every curve smoothly from
+  $c_{\textrm{fit}} = 10^{4}$ — plain Poisson NMF behaves as the
+  large-$c$ limit of the log1p family, not as a different method.
 - **The fit recovers the truth's sparsity when fit at the true $c$.** The
-  circled points sit almost exactly on the dashed truth lines: for loadings
-  (truth $0.398$ everywhere) the exact fits give $0.41$ at
-  $(10^{-3}, 10^{-3})$ and $0.41$ at $(1, 1)$, and the
-  $c_{\textrm{true}} = \infty$ curves reach the truth at the top of the
-  grid ($0.40$ at $c_{\textrm{fit}} = 10^{3\text{--}4}$); for factors the
-  crossing is equally tight ($|{\Delta}| = 0.004$ at $c_{\textrm{true}} = 1$).
+  circled points sit almost exactly on the dashed truth lines in all three
+  panels: for loadings (truth $0.396$ everywhere) the exact fits give
+  $0.41$ at $(10^{-3}, 10^{-3})$, $0.41$ at $(1, 1)$, and — the case the
+  grid could not show before — the topic model on topic-model truth gives
+  $0.406$ at $(\infty, \infty)$; for factors the crossings are equally
+  tight ($|\Delta| \leq 0.005$ at $c_{\textrm{true}} = 1$ and $\infty$).
   Misfit in $c$ translates directly into over- or under-sparse estimates.
 
 The approximate fits (not shown) trace the same curves wherever the
@@ -529,24 +557,35 @@ seed_panels(make_long(ex, "rankcor_L", "rankcor_F",
             title = "Rank correlation between fitted columns")
 ```
 
+(One thin line in the $c_{\textrm{true}} = \infty$ panels shoots upward at
+the large-$c$ end: that is the single near-degenerate seed of the
+identity-link generator's heavy-tailed law, whose dataset has
+$\max(Y) = 30$ and a mean count of $0.096$ — visible for the same reason
+in the budget figure below. It is left in deliberately; the mean curves
+barely feel it.)
+
 For the **loadings** at $c_{\textrm{true}} = 1$ and $\infty$ the effect is
 clean: pairwise rank correlation rises toward zero as $c_{\textrm{fit}}$
-grows, reaching the truth's value ($-0.174$) near
+grows, reaching the truth's value ($-0.176$) near
 $c_{\textrm{fit}} \approx c_{\textrm{true}}$, with a tight seed band. At
 $c_{\textrm{true}} = 10^{-3}$ the mean curve is not monotone — it peaks
 around $c_{\textrm{fit}} = 10$ and comes back down where the fits are
-heavily over-sparsified — and the thin lines show the seeds genuinely
-disagreeing about the large-$c$ end. For the **factors** the curves are
-non-monotone but, at $c_{\textrm{true}} = 1$ and $\infty$, systematic — the
-seed bands are tight, and the pairwise rank correlation is at its most
-negative, i.e. closest to the truth's decoupled factors, in a trough near
-$c_{\textrm{fit}} \approx c_{\textrm{true}}$ (at $c_{\textrm{fit}} = 1$ and
-$10$ respectively), rising toward zero or above on both sides, where the
-fits are mis-sparsified. At $c_{\textrm{true}} = 10^{-3}$ the factor curve
-is flat and the seed spread dominates. The one robust feature across all
-regimes is that **every fit's factor columns are more rank-correlated than
-the truth's** (the entire seed band sits above the dashed lines): the fits
-never fully reproduce the decoupling of the generative factors.
+heavily over-sparsified — and the topic-model column adds a sharp coda:
+at $c_{\textrm{fit}} = \infty$ on small-$c$ truth the loading rank
+correlation drops to $-0.194$, *below* the truth's value, the one place on
+the grid where a fit over-decouples the loadings. For the **factors** the
+curves are non-monotone but, at $c_{\textrm{true}} = 1$ and $\infty$,
+systematic — the seed bands are tight, and the pairwise rank correlation
+is at its most negative, i.e. closest to the truth's decoupled factors, in
+a trough near $c_{\textrm{fit}} \approx c_{\textrm{true}}$ (at
+$c_{\textrm{fit}} = 1$ and $10$ respectively), rising toward zero or above
+on both sides, where the fits are mis-sparsified. At
+$c_{\textrm{true}} = 10^{-3}$ the factor curve is flat and the seed spread
+dominates. The one robust feature across all regimes is that **every
+fit's factor columns are more rank-correlated than the truth's** (the
+seed band sits above the dashed lines, coming closest to them in the
+topic-model column at $c_{\textrm{true}} = 10^{-3}$): the fits never fully
+reproduce the decoupling of the generative factors.
 
 ## The sparsity bounds in practice
 
@@ -599,9 +638,10 @@ section use the exact fits.
 **The realized budget.** First, the budget itself. The proposition concerns
 fixed rates, whereas each fit re-estimates its rates at its own $c$ — yet
 the realized $\operatorname{pm}(\mathbf{B})$ of the fitted models is
-monotone in $c_{\textrm{fit}}$ anyway, spanning three orders of magnitude
-across the grid ($\sim 3$ to $\sim 5{,}000$), and nearly identical across
-seeds:
+monotone in $c_{\textrm{fit}}$ anyway — all the way through the topic
+model at $c_{\textrm{fit}} = \infty$, where $\mathbf{B}$ is the fitted
+rate matrix itself — spanning three orders of magnitude across the grid
+($\sim 3$ to $\sim 5{,}900$), and nearly identical across seeds:
 
 ```{r bounds-load}
 bounds <- readRDS(file.path(exp_dir, "approx_sim_bounds.rds"))
@@ -612,22 +652,23 @@ be <- subset(bounds, method == "exact")
 
 ```{r budget-fig, fig.width=8.5, fig.height=3.2}
 exm <- subset(res, method == "exact")
-avg <- aggregate(pm_B ~ cc + ct, exm, mean)
-ggplot(exm, aes(cc, pm_B)) +
+exm$cf <- cf_of(exm$cc)
+avg <- aggregate(pm_B ~ cf + ct, exm, mean)
+ggplot(exm, aes(cf, pm_B)) +
   geom_line(aes(group = seed), colour = "#9BB7BD",
-            linewidth = 0.35, alpha = 0.8) +
-  geom_line(data = avg, colour = "#0E5C6B", linewidth = 1) +
+            linewidth = 0.35, alpha = 0.7) +
+  geom_line(data = avg, aes(group = 1), colour = "#0E5C6B", linewidth = 1) +
   geom_point(data = avg, colour = "#0E5C6B", size = 1.6) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
   scale_y_log10(labels = scales::label_log()) +
   facet_wrap(~ ct, nrow = 1) +
   labs(x = "c used for fitting", y = "pm(B) of the fitted model",
        title = "The realized sparsity budget is monotone in the fitting c",
-       subtitle = "thin lines: 10 individual seeds;  thick line: mean") +
+       subtitle = "thin lines: 30 individual seeds;  thick line: mean") +
   theme(strip.background = element_blank(),
         strip.text = element_text(face = "bold", size = 10),
         plot.subtitle = element_text(size = 10, colour = "grey35"),
-        panel.border = element_rect(colour = "grey80", fill = NA))
+        panel.border = element_rect(colour = "grey80", fill = NA),
+        axis.text.x = element_text(size = 7, angle = 45, hjust = 1))
 ```
 
 **The proposition's fixed-rate budget predicts the fitted budget.** The
@@ -646,28 +687,32 @@ $K \geq \min(n, p)$. Comparing both to the budget the rank-$5$ fits
 actually realize:
 
 ```{r budget-true-fig, fig.width=8.5, fig.height=5.6}
+## at c = Inf the link is the identity: B* = Lambda, and the data budget is
+## pm(Y) itself
+pm_of <- function(M, cc) {
+  g <- if (is.finite(cc)) log1p(M / cc) else M
+  max(g) / mean(g)
+}
 pm_true <- do.call(rbind, lapply(ds, function(d) data.frame(
   seed = d$seed, cc = CC_GRID,
   ct = factor(paste0("c_true = ", fmtc(d$c_true)), levels = levels(res$ct)),
-  pm_true = sapply(CC_GRID, function(cc) {
-    g <- log1p(d$lambda / cc); max(g) / mean(g) }),
-  pm_data = sapply(CC_GRID, function(cc) {
-    g <- log1p(d$Y / cc); max(g) / mean(g) }))))
+  pm_true = sapply(CC_GRID, pm_of, M = d$lambda),
+  pm_data = sapply(CC_GRID, pm_of, M = d$Y))))
 cmp <- merge(exm[c("seed", "cc", "ct", "pm_B")],
              pm_true, by = c("seed", "cc", "ct"))
+cmp$cf         <- cf_of(cmp$cc)
 cmp$ratio      <- cmp$pm_B / cmp$pm_true
 cmp$ratio_data <- cmp$pm_B / cmp$pm_data
 
-avg  <- aggregate(cbind(pm_B, pm_true, pm_data) ~ cc + ct, cmp, mean)
-p1 <- ggplot(cmp, aes(cc, pm_B)) +
+avg  <- aggregate(cbind(pm_B, pm_true, pm_data) ~ cf + ct, cmp, mean)
+p1 <- ggplot(cmp, aes(cf, pm_B)) +
   geom_line(aes(group = seed), colour = "#9BB7BD",
-            linewidth = 0.35, alpha = 0.8) +
-  geom_line(data = avg, colour = "#0E5C6B", linewidth = 1) +
-  geom_line(data = avg, aes(y = pm_true), colour = "#C2410C",
+            linewidth = 0.35, alpha = 0.7) +
+  geom_line(data = avg, aes(group = 1), colour = "#0E5C6B", linewidth = 1) +
+  geom_line(data = avg, aes(y = pm_true, group = 1), colour = "#C2410C",
             linetype = "dashed", linewidth = 0.7) +
-  geom_line(data = avg, aes(y = pm_data), colour = "#B45309",
+  geom_line(data = avg, aes(y = pm_data, group = 1), colour = "#B45309",
             linetype = "dotdash", linewidth = 0.7) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
   scale_y_log10(labels = scales::label_log()) +
   facet_wrap(~ ct, nrow = 1) +
   labs(x = NULL, y = "pm(B)",
@@ -678,20 +723,20 @@ p1 <- ggplot(cmp, aes(cc, pm_B)) +
   theme(strip.background = element_blank(),
         strip.text = element_text(face = "bold", size = 10),
         plot.subtitle = element_text(size = 10, colour = "grey35"),
-        panel.border = element_rect(colour = "grey80", fill = NA))
+        panel.border = element_rect(colour = "grey80", fill = NA),
+        axis.text.x = element_blank())
 
-ravg <- aggregate(cbind(ratio, ratio_data) ~ cc + ct, cmp, mean)
-p2 <- ggplot(cmp, aes(cc, ratio)) +
+ravg <- aggregate(cbind(ratio, ratio_data) ~ cf + ct, cmp, mean)
+p2 <- ggplot(cmp, aes(cf, ratio)) +
   geom_hline(yintercept = 1, linetype = "dashed", colour = "grey40") +
   geom_line(aes(group = seed), colour = "#9BB7BD",
-            linewidth = 0.35, alpha = 0.8) +
-  geom_line(data = ravg, colour = "#0E5C6B", linewidth = 1) +
+            linewidth = 0.35, alpha = 0.7) +
+  geom_line(data = ravg, aes(group = 1), colour = "#0E5C6B", linewidth = 1) +
   geom_point(data = ravg, colour = "#0E5C6B", size = 1.4) +
-  geom_line(data = ravg, aes(y = ratio_data), colour = "#B45309",
+  geom_line(data = ravg, aes(y = ratio_data, group = 1), colour = "#B45309",
             linetype = "dotdash", linewidth = 0.8) +
   geom_point(data = ravg, aes(y = ratio_data), colour = "#B45309",
              size = 1.4) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
   scale_y_log10(breaks = c(0.125, 0.25, 0.5, 1),
                 labels = c("0.125", "0.25", "0.5", "1")) +
   facet_wrap(~ ct, nrow = 1) +
@@ -701,25 +746,29 @@ p2 <- ggplot(cmp, aes(cc, ratio)) +
   theme(strip.background = element_blank(),
         strip.text = element_blank(),
         plot.subtitle = element_text(size = 10, colour = "grey35"),
-        panel.border = element_rect(colour = "grey80", fill = NA))
+        panel.border = element_rect(colour = "grey80", fill = NA),
+        axis.text.x = element_text(size = 7, angle = 45, hjust = 1))
 
-cowplot::plot_grid(p1, p2, ncol = 1, rel_heights = c(1.4, 1), align = "v")
+cowplot::plot_grid(p1, p2, ncol = 1, rel_heights = c(1.35, 1), align = "v")
 ```
 
 The dashed curve is barely distinguishable from the fitted one: the mean
-ratio stays within $0.85$–$1.02$ across the entire grid (bottom row, blue),
-and the individual seeds mostly within $0.8$–$1.05$ — the visible exception
-being the largest $c_{\textrm{fit}}$ values at finite $c_{\textrm{true}}$,
-where a rank-$5$ fit can trim the single most extreme entry of $\mathbf{B}$
-relative to the truth and an occasional seed drops to $\approx 0.55$. The
-mild, systematic compression elsewhere ($\approx 0.9$) is the same rank-$K$
-smoothing in gentler form, and at $c_{\textrm{true}} = \infty$ with large
+ratio stays within $0.84$–$1.02$ across the entire grid, including the
+$c_{\textrm{fit}} = \infty$ column (bottom row, blue), and the individual
+seeds mostly within $0.8$–$1.05$ — the visible exception being the largest
+$c_{\textrm{fit}}$ values at finite $c_{\textrm{true}}$, where a rank-$5$
+fit can trim the single most extreme entry of $\mathbf{B}$ relative to the
+truth and an occasional seed drops to $\approx 0.55$. The mild, systematic
+compression elsewhere ($\approx 0.9$) is the same rank-$K$ smoothing in
+gentler form, and at $c_{\textrm{true}} = \infty$ with large
 $c_{\textrm{fit}}$ the fits slightly *exceed* the true-rate budget
 instead.
 
 The **data budget** (dot-dash) tells a complementary story. At
 $c_{\textrm{fit}} \gtrsim 1$ it agrees with the other two curves to within
-$\sim 15\%$. At small $c_{\textrm{fit}}$ it splits off upward, exceeding
+$\sim 15\%$, all the way out to $c_{\textrm{fit}} = \infty$, where it is
+simply $\operatorname{pm}(\mathbf{Y})$ and the fitted topic model matches
+it closely. At small $c_{\textrm{fit}}$ it splits off upward, exceeding
 the fitted budget by a factor of $4$–$8$ (bottom row, amber, dropping to
 $0.13$–$0.23$): on the link scale the $\sim 89\%$ zero entries of
 $\mathbf{Y}$ stay exactly zero and drag the matrix mean down, while the
@@ -750,20 +799,20 @@ $d(\mathbf{l}_{\cdot k}) d(\mathbf{f}_{\cdot k}) \big/
 sits exactly on the constraint.
 
 ```{r slack-fig, fig.width=8.5, fig.height=5.4}
+be$cf <- cf_of(be$cc)
 sl <- rbind(
-  data.frame(be[c("seed", "cc", "ct", "k")], bound = "pm budget (1)",
+  data.frame(be[c("seed", "cf", "ct", "k")], bound = "pm budget (1)",
              slack = be$slack_pm),
-  data.frame(be[c("seed", "cc", "ct", "k")], bound = "density hyperbola (2)",
+  data.frame(be[c("seed", "cf", "ct", "k")], bound = "density hyperbola (2)",
              slack = be$slack_hyper))
 sl$bound <- factor(sl$bound, levels = c("pm budget (1)",
                                         "density hyperbola (2)"))
-med <- aggregate(slack ~ bound + cc + ct, sl, median)
-ggplot(sl, aes(cc, slack)) +
-  geom_point(size = 0.7, alpha = 0.25, colour = "#0E5C6B",
-             position = position_jitter(width = 0.05, height = 0)) +
-  geom_line(data = med, colour = "#0E5C6B", linewidth = 1) +
+med <- aggregate(slack ~ bound + cf + ct, sl, median)
+ggplot(sl, aes(cf, slack)) +
+  geom_point(size = 0.6, alpha = 0.2, colour = "#0E5C6B",
+             position = position_jitter(width = 0.15, height = 0)) +
+  geom_line(data = med, aes(group = 1), colour = "#0E5C6B", linewidth = 1) +
   geom_hline(yintercept = 1, linetype = "dashed", colour = "#C2410C") +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
   scale_y_log10() +
   facet_grid(bound ~ ct) +
   labs(x = "c used for fitting", y = "slack of the bound  (1 = active)",
@@ -773,14 +822,16 @@ ggplot(sl, aes(cc, slack)) +
   theme(strip.background = element_blank(),
         strip.text = element_text(face = "bold", size = 10),
         plot.subtitle = element_text(size = 10, colour = "grey35"),
-        panel.border = element_rect(colour = "grey80", fill = NA))
+        panel.border = element_rect(colour = "grey80", fill = NA),
+        axis.text.x = element_text(size = 7, angle = 45, hjust = 1))
 ```
 
 The two rows say different things. The **pm-budget lemma is close to
 equality wherever the budget is scarce**: for $c_{\textrm{fit}} \leq 0.1$
-the median slack is $1.07$–$1.14$ at the finite $c_{\textrm{true}}$
+the median slack is $1.09$–$1.15$ at the finite $c_{\textrm{true}}$
 regimes (minimum $1.000$ — some factors sit exactly on the constraint),
-growing to $2$–$6$ only at the large-$c$ end where the budget is plentiful.
+growing to $2$–$6$ only at the large-$c$ end — including the topic-model
+column — where the budget is plentiful.
 Small $c$ genuinely exhausts the budget. The **density hyperbola inherits
 extra slack** from the step $d(x) \geq 1/\sqrt{\operatorname{pm}(x)}$,
 which is loose for the dense columns that small $c$ forces; its slack
@@ -823,10 +874,10 @@ $c_{\textrm{fit}}$ (light points) sits at small allowance and small
 observed sum, large $c_{\textrm{fit}}$ (dark) at large allowance and large
 observed sum — the budget is the axis along which $c$ operates, exactly as
 the theory says. Second, the *fraction* of the allowance actually used
-grows with $c_{\textrm{fit}}$: the median factor uses $40$–$65\%$ of its
-allowance at $c_{\textrm{fit}} = 10^{-4}$ and $73$–$91\%$ at
-$c_{\textrm{fit}} \geq 10^{2}$ (highest in the $c_{\textrm{true}} = 10^{-3}$
-regime, whose truth is sparsest). In other words: at small $c$ the fits sit
+grows with $c_{\textrm{fit}}$: the median factor uses $39$–$65\%$ of its
+allowance at $c_{\textrm{fit}} = 10^{-4}$ and $73$–$89\%$ at
+$c_{\textrm{fit}} \geq 10^{2}$, topic model included (highest in the
+$c_{\textrm{true}} = 10^{-3}$ regime, whose truth is sparsest). In other words: at small $c$ the fits sit
 against the *pm form* of the constraint while the Hoyer conversion leaves
 headroom, and at large $c$ the fits approach the Hoyer allowance itself.
 The bounds are therefore practically relevant in both regimes, but through
@@ -835,18 +886,23 @@ different faces of the same inequality chain.
 ## Summary
 
 The simulation does what it was designed to do. On counts calibrated to a
-real dataset's budget curve in all three generative regimes: (i) the
+real dataset's budget curve in all three generative regimes, with thirty
+seeds and the topic model anchoring the large-$c$ end of the grid: (i) the
 sparsity of the fitted loadings and factors is controlled by the fitting
-$c$, monotonically and over a wide range; (ii) fitting at the generative
-$c$ reproduces the generative sparsity almost exactly, so misfit in $c$ is
-visible as over- or under-sparsification; (iii) the appendix bounds are
-live constraints, not formalities — the realized budget
+$c$, monotonically and over a wide range, with plain Poisson NMF behaving
+as the continuous $c \to \infty$ endpoint of the log1p family; (ii)
+fitting at the generative $c$ reproduces the generative sparsity almost
+exactly — now including the topic model on topic-model truth — so misfit
+in $c$ is visible as over- or under-sparsification; (iii) the appendix
+bounds are live constraints, not formalities — the realized budget
 $\operatorname{pm}(\mathbf{B})$ is monotone in $c_{\textrm{fit}}$ over
-three orders of magnitude, the pm-budget lemma is within $7$–$14\%$ of
-equality wherever the budget is scarce, and the fits use up to $\sim 90\%$
+three orders of magnitude, the pm-budget lemma is within $9$–$15\%$ of
+equality wherever the budget is scarce, and the fits use up to $\sim 89\%$
 of the sum-form Hoyer allowance at the large-$c$ end; and (iv) the
 Chebyshev approximation is faithful to the exact objective everywhere on
-the grid (worst case $\sim 0.03$ log-likelihood units per entry, typically
-orders of magnitude less), while the Taylor approximation is faithful only
-for $c_{\textrm{fit}} \gtrsim 0.1$ and fails badly — slowly and to bad
-optima — below that.
+the grid (mean gap at most $\sim 0.03$ log-likelihood units per entry in
+every cell, typically orders of magnitude less; isolated single-fit
+outliers in the $c_{\textrm{true}} = 10^{-3}$ regime are local-optimum
+variation shared with the exact fits), while the Taylor approximation is
+faithful only for $c_{\textrm{fit}} \gtrsim 0.1$ and fails badly — slowly
+and to bad optima — below that.
