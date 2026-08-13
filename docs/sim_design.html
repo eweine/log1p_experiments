@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2026-08-10" />
+<meta name="date" content="2026-08-13" />
 
 <title>The calibrated simulation: a paper-ready description</title>
 
@@ -366,7 +366,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">The calibrated simulation: a paper-ready
 description</h1>
-<h4 class="date">2026-08-10</h4>
+<h4 class="date">2026-08-13</h4>
 
 </div>
 
@@ -395,7 +395,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-08-10
+<strong>Last updated:</strong> 2026-08-13
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -505,21 +505,6 @@ aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
 The following chunks had caches available:
 <ul>
 <li>
-acceptance
-</li>
-<li>
-calibrate
-</li>
-<li>
-pancreas-acceptance
-</li>
-<li>
-pancreas-calibrate
-</li>
-<li>
-truth
-</li>
-<li>
 verify
 </li>
 </ul>
@@ -549,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3ea0a61deeb48d958abd552eb722e18290f4c848targetblank3ea0a61a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree0cf68013e2418ba81699b0363540a783e5890edatargetblank0cf6801a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/3ea0a61deeb48d958abd552eb722e18290f4c848" target="_blank">3ea0a61</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/0cf68013e2418ba81699b0363540a783e5890eda" target="_blank">0cf6801</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree3ea0a61deeb48d958abd552eb722e18290f4c848targetblank3ea0a61a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree0cf68013e2418ba81699b0363540a783e5890edatargetblank0cf6801a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -567,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/3ea0a61deeb48d958abd552eb722e18290f4c848" target="_blank">3ea0a61</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/0cf68013e2418ba81699b0363540a783e5890eda" target="_blank">0cf6801</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -632,6 +617,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/0cf68013e2418ba81699b0363540a783e5890eda/analysis/sim_design.Rmd" target="_blank">0cf6801</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-13
+</td>
+<td>
+sim_design: full 30-seed results with topic-model (c_fit = Inf) column;
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/02188733f8f08c86a5de17a856df7121de8e647d/docs/sim_design.html" target="_blank">0218873</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -997,9 +1016,9 @@ Add sim_design: budget-curve-calibrated simulation matched to MOCA
 </div>
 </div>
 <p>This page describes <strong>exactly</strong> the simulation that the
-exact-vs-approx / sparsity experiment will run. To make drift
-impossible, every constant below is read from the experiment’s own
-configuration file
+exact-vs-approx / sparsity experiment runs, and reports its results. To
+make drift impossible, every constant below is read from the
+experiment’s own configuration file
 (<code>inst/paper_figures/experiments/approx_sim_common.R</code> in the
 log1pNMF repo), which is what the cluster workers source — including the
 calibrated knobs, which that file in turn reads from
@@ -1124,14 +1143,14 @@ class="section level1">
 three link constants <span class="math inline">\(c_{\textrm{true}} \in
 \{10^{-3}, 1, \infty\}\)</span>, with parameters calibrated so that all
 three regimes reproduce the count characteristics of the pancreas
-dataset. For each of ten seeds we drew an <span class="math inline">\(n
-\times K\)</span> loading matrix <span class="math inline">\(L\)</span>
-with rows <span class="math inline">\(\mathbf{l}_{i\cdot} \sim
-\textrm{Dirichlet}(0.3, \dots, 0.3)\)</span> — the same <span
-class="math inline">\(L\)</span> at every <span
-class="math inline">\(c_{\textrm{true}}\)</span>, so the true loadings
-and their sparsity are identical across regimes — and a <span
-class="math inline">\(p \times K\)</span> factor matrix <span
+dataset. For each of thirty seeds we drew an <span
+class="math inline">\(n \times K\)</span> loading matrix <span
+class="math inline">\(L\)</span> with rows <span
+class="math inline">\(\mathbf{l}_{i\cdot} \sim \textrm{Dirichlet}(0.3,
+\dots, 0.3)\)</span> — the same <span class="math inline">\(L\)</span>
+at every <span class="math inline">\(c_{\textrm{true}}\)</span>, so the
+true loadings and their sparsity are identical across regimes — and a
+<span class="math inline">\(p \times K\)</span> factor matrix <span
 class="math inline">\(F\)</span> with independent entries that are zero
 with probability <span class="math inline">\(\pi_0\)</span> and
 otherwise <span class="math inline">\(\exp(\mu + \sigma t)\)</span>,
@@ -1163,14 +1182,14 @@ size. Calibrating every regime to one shared target is what makes the
 datasets comparable across <span
 class="math inline">\(c_{\textrm{true}}\)</span>.</p>
 </blockquote>
-<p>Everything in that paragraph is verified below on the thirty datasets
-(ten seeds <span class="math inline">\(\times\)</span> three <span
+<p>Everything in that paragraph is verified below on the ninety datasets
+(thirty seeds <span class="math inline">\(\times\)</span> three <span
 class="math inline">\(c_{\textrm{true}}\)</span>) the experiment will
 actually use.</p>
 </div>
 <div id="the-generative-model-precisely" class="section level1">
 <h1>The generative model, precisely</h1>
-<p>For seed <span class="math inline">\(s \in \{1, \dots, 10\}\)</span>
+<p>For seed <span class="math inline">\(s \in \{1, \dots, 30\}\)</span>
 and each <span class="math inline">\(c_{\textrm{true}}\)</span>, with
 knobs <span class="math inline">\((\pi_0, \mu, \sigma, T,
 T_{\textrm{lo}})\)</span> from that <span
@@ -1259,9 +1278,9 @@ class="math inline">\(c_{\textrm{true}}\)</span> grid and writes
 <code>approx_sim_common.R</code> reads back with a consistency
 check.</p>
 </div>
-<div id="verification-on-the-thirty-datasets-the-experiment-will-use"
+<div id="verification-on-the-ninety-datasets-the-experiment-uses"
 class="section level1">
-<h1>Verification on the thirty datasets the experiment will use</h1>
+<h1>Verification on the ninety datasets the experiment uses</h1>
 <p>Not held-out seeds — these are the (seed, <span
 class="math inline">\(c_{\textrm{true}}\)</span>) datasets exactly as
 the workers will regenerate them.</p>
@@ -1283,11 +1302,11 @@ for (ct in C_TRUE_GRID) {
             apply(r, 1, min), apply(r, 1, max))
 }
 knitr::kable(ratio_tab, caption = &quot;Budget-curve ratio to the shared
-  size-adjusted pancreas target: median (range) over the ten seeds, per
+  size-adjusted pancreas target: median (range) over the thirty seeds, per
   c_true. 1.00 = exact match.&quot;)</code></pre>
 <table>
 <caption>Budget-curve ratio to the shared size-adjusted pancreas target:
-median (range) over the ten seeds, per c_true. 1.00 = exact
+median (range) over the thirty seeds, per c_true. 1.00 = exact
 match.</caption>
 <colgroup>
 <col width="20%" />
@@ -1306,57 +1325,57 @@ match.</caption>
 <tbody>
 <tr class="odd">
 <td align="left">1e-04</td>
-<td align="left">2.02 (1.90–2.16)</td>
-<td align="left">1.38 (1.34–1.49)</td>
-<td align="left">2.44 (2.14–2.69)</td>
+<td align="left">2.05 (1.80–2.22)</td>
+<td align="left">1.38 (1.26–1.49)</td>
+<td align="left">2.37 (2.10–2.75)</td>
 </tr>
 <tr class="even">
 <td align="left">1e-03</td>
-<td align="left">1.99 (1.85–2.12)</td>
-<td align="left">1.37 (1.32–1.48)</td>
-<td align="left">2.38 (2.07–2.62)</td>
+<td align="left">2.01 (1.73–2.19)</td>
+<td align="left">1.37 (1.25–1.48)</td>
+<td align="left">2.30 (2.00–2.69)</td>
 </tr>
 <tr class="odd">
 <td align="left">1e-02</td>
-<td align="left">1.94 (1.77–2.06)</td>
-<td align="left">1.35 (1.31–1.47)</td>
-<td align="left">2.30 (1.92–2.53)</td>
+<td align="left">1.95 (1.63–2.14)</td>
+<td align="left">1.36 (1.23–1.47)</td>
+<td align="left">2.19 (1.87–2.60)</td>
 </tr>
 <tr class="even">
 <td align="left">1e-01</td>
-<td align="left">1.82 (1.63–1.94)</td>
-<td align="left">1.35 (1.28–1.46)</td>
-<td align="left">2.13 (1.70–2.38)</td>
+<td align="left">1.84 (1.47–2.02)</td>
+<td align="left">1.35 (1.21–1.46)</td>
+<td align="left">2.02 (1.66–2.45)</td>
 </tr>
 <tr class="odd">
 <td align="left">1e+00</td>
-<td align="left">1.55 (1.37–1.69)</td>
-<td align="left">1.34 (1.22–1.45)</td>
-<td align="left">1.72 (1.35–2.04)</td>
+<td align="left">1.56 (1.20–1.77)</td>
+<td align="left">1.34 (1.16–1.45)</td>
+<td align="left">1.68 (1.32–2.19)</td>
 </tr>
 <tr class="even">
 <td align="left">1e+01</td>
-<td align="left">1.17 (1.00–1.31)</td>
-<td align="left">1.17 (0.96–1.36)</td>
-<td align="left">1.07 (0.73–1.48)</td>
+<td align="left">1.18 (0.84–1.41)</td>
+<td align="left">1.19 (0.95–1.36)</td>
+<td align="left">1.07 (0.73–1.63)</td>
 </tr>
 <tr class="odd">
 <td align="left">1e+02</td>
-<td align="left">0.85 (0.69–1.03)</td>
-<td align="left">0.78 (0.54–1.09)</td>
-<td align="left">0.49 (0.29–0.77)</td>
+<td align="left">0.87 (0.53–1.11)</td>
+<td align="left">0.79 (0.54–1.10)</td>
+<td align="left">0.48 (0.28–0.83)</td>
 </tr>
 <tr class="even">
 <td align="left">1e+03</td>
-<td align="left">0.67 (0.44–0.85)</td>
-<td align="left">0.47 (0.29–0.78)</td>
-<td align="left">0.21 (0.08–0.34)</td>
+<td align="left">0.68 (0.26–0.98)</td>
+<td align="left">0.50 (0.29–0.81)</td>
+<td align="left">0.20 (0.08–0.36)</td>
 </tr>
 <tr class="odd">
 <td align="left">1e+04</td>
-<td align="left">0.56 (0.26–0.68)</td>
-<td align="left">0.29 (0.18–0.51)</td>
-<td align="left">0.11 (0.04–0.17)</td>
+<td align="left">0.55 (0.13–0.89)</td>
+<td align="left">0.32 (0.18–0.56)</td>
+<td align="left">0.10 (0.03–0.19)</td>
 </tr>
 </tbody>
 </table>
@@ -1373,9 +1392,9 @@ for (ct in C_TRUE_GRID) {
 }
 stat_tab$real &lt;- c(&quot;0.822&quot;, &quot;0.674&quot;, paste0(CAL$tstar, &quot; (size-adj.)&quot;))
 knitr::kable(stat_tab, caption = &quot;Count characteristics, median (range) over
-  the ten seeds.&quot;)</code></pre>
+  the thirty seeds.&quot;)</code></pre>
 <table>
-<caption>Count characteristics, median (range) over the ten
+<caption>Count characteristics, median (range) over the thirty
 seeds.</caption>
 <colgroup>
 <col width="15%" />
@@ -1396,23 +1415,23 @@ seeds.</caption>
 <tbody>
 <tr class="odd">
 <td align="left">zero fraction</td>
-<td align="left">0.918 (0.914–0.924)</td>
-<td align="left">0.879 (0.875–0.888)</td>
-<td align="left">0.938 (0.930–0.942)</td>
+<td align="left">0.920 (0.914–0.925)</td>
+<td align="left">0.879 (0.869–0.888)</td>
+<td align="left">0.938 (0.928–0.946)</td>
 <td align="left">0.822</td>
 </tr>
 <tr class="even">
 <td align="left">mean count</td>
-<td align="left">0.748 (0.416–1.063)</td>
-<td align="left">0.714 (0.393–1.280)</td>
-<td align="left">0.639 (0.171–1.439)</td>
+<td align="left">0.654 (0.338–1.063)</td>
+<td align="left">0.658 (0.393–1.280)</td>
+<td align="left">0.611 (0.095–1.669)</td>
 <td align="left">0.674</td>
 </tr>
 <tr class="odd">
 <td align="left">max count</td>
-<td align="left">5162 (1129–5840)</td>
-<td align="left">2386 (1155–2525)</td>
-<td align="left">920 (64–964)</td>
+<td align="left">4744 (455–5840)</td>
+<td align="left">2353 (1155–2525)</td>
+<td align="left">915 (33–976)</td>
 <td align="left">8820 (size-adj.)</td>
 </tr>
 </tbody>
@@ -1526,11 +1545,11 @@ for (ct in C_TRUE_GRID) {
     round(median(sapply(D, function(d) mean(rowSums(d$FF &gt; 0)))), 2),
     round(median(sapply(D, function(d) mean(apply(d$FF, 2, hoyer)))), 3))
 }
-knitr::kable(tt, caption = &quot;Truth structure, median over the ten seeds. The
+knitr::kable(tt, caption = &quot;Truth structure, median over the thirty seeds. The
   loading rows (first two lines) are byte-identical across c_true; the factor
   law differs because its knobs are calibrated per c_true.&quot;)</code></pre>
 <table>
-<caption>Truth structure, median over the ten seeds. The loading rows
+<caption>Truth structure, median over the thirty seeds. The loading rows
 (first two lines) are byte-identical across c_true; the factor law
 differs because its knobs are calibrated per c_true.</caption>
 <colgroup>
@@ -1550,21 +1569,21 @@ differs because its knobs are calibrated per c_true.</caption>
 <tbody>
 <tr class="odd">
 <td align="left">mean Hoyer sparsity of loading columns</td>
-<td align="right">0.399</td>
-<td align="right">0.399</td>
-<td align="right">0.399</td>
+<td align="right">0.397</td>
+<td align="right">0.397</td>
+<td align="right">0.397</td>
 </tr>
 <tr class="even">
 <td align="left">mean # factors carrying 90% of a sample</td>
-<td align="right">2.540</td>
-<td align="right">2.540</td>
-<td align="right">2.540</td>
+<td align="right">2.550</td>
+<td align="right">2.550</td>
+<td align="right">2.550</td>
 </tr>
 <tr class="odd">
 <td align="left">fraction of exact zeros in F</td>
 <td align="right">0.797</td>
-<td align="right">0.757</td>
-<td align="right">0.784</td>
+<td align="right">0.755</td>
+<td align="right">0.783</td>
 </tr>
 <tr class="even">
 <td align="left">mean # factors per feature</td>
@@ -1575,8 +1594,8 @@ differs because its knobs are calibrated per c_true.</caption>
 <tr class="odd">
 <td align="left">mean Hoyer sparsity of factor columns</td>
 <td align="right">0.580</td>
-<td align="right">0.730</td>
-<td align="right">0.947</td>
+<td align="right">0.728</td>
+<td align="right">0.945</td>
 </tr>
 </tbody>
 </table>
@@ -1620,7 +1639,8 @@ every\)</span>c_{}$ within a regime see identical data.</p>
   value = c(sprintf(&quot;%d seeds per c_true (same L across c_true)&quot;, N_SEEDS),
             paste(sapply(C_TRUE_GRID, fmtc), collapse = &quot;, &quot;),
             paste(format(CC_GRID, scientific = TRUE, trim = TRUE), collapse = &quot;, &quot;),
-            paste(METHODS, collapse = &quot;, &quot;),
+            paste0(paste(METHODS, collapse = &quot;, &quot;),
+                   &quot; (c = Inf: exact only, fastTopics)&quot;),
             &quot;rank-1 (each method&#39;s own warm-up, seeded)&quot;,
             format(TOL, scientific = TRUE),
             format(MAXITER, big.mark = &quot;,&quot;),
@@ -1633,8 +1653,8 @@ every\)</span>c_{}$ within a regime see identical data.</p>
 <caption>The protocol, from approx_sim_common.R and
 run_approx_sim.sbatch.</caption>
 <colgroup>
-<col width="28%" />
-<col width="71%" />
+<col width="27%" />
+<col width="72%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1645,7 +1665,7 @@ run_approx_sim.sbatch.</caption>
 <tbody>
 <tr class="odd">
 <td align="left">datasets</td>
-<td align="left">10 seeds per c_true (same L across c_true)</td>
+<td align="left">30 seeds per c_true (same L across c_true)</td>
 </tr>
 <tr class="even">
 <td align="left">c_true grid (generation)</td>
@@ -1654,11 +1674,12 @@ run_approx_sim.sbatch.</caption>
 <tr class="odd">
 <td align="left">c grid for fitting</td>
 <td align="left">1e-04, 1e-03, 1e-02, 1e-01, 1e+00, 1e+01, 1e+02, 1e+03,
-1e+04</td>
+1e+04, Inf</td>
 </tr>
 <tr class="even">
 <td align="left">methods</td>
-<td align="left">exact, taylor, chebyshev</td>
+<td align="left">exact, taylor, chebyshev (c = Inf: exact only,
+fastTopics)</td>
 </tr>
 <tr class="odd">
 <td align="left">initialization</td>
@@ -1670,7 +1691,7 @@ run_approx_sim.sbatch.</caption>
 </tr>
 <tr class="odd">
 <td align="left">iteration safety cap</td>
-<td align="left">250,000</td>
+<td align="left">1,000,000</td>
 </tr>
 <tr class="even">
 <td align="left">optimization-time cap</td>
@@ -1686,7 +1707,7 @@ run_approx_sim.sbatch.</caption>
 </tr>
 <tr class="odd">
 <td align="left">tasks</td>
-<td align="left">810 (one fit per task)</td>
+<td align="left">2520 (one fit per task)</td>
 </tr>
 </tbody>
 </table>
@@ -1703,14 +1724,22 @@ unconverged for resubmission.</p>
 </div>
 <div id="results" class="section level1">
 <h1>Results</h1>
-<p>The experiment has now run. All <span
-class="math inline">\(810\)</span> fits are present and all converged.
-Twenty-one needed more than the 250k-iteration cap and were rerun from
-scratch with a 1M cap; eighteen of those were Taylor fits at <span
-class="math inline">\(c_{\textrm{fit}} \leq 10^{-3}\)</span>, a first
-symptom of the Taylor pathology quantified below. Metrics were computed
-on the cluster by <code>analyze_approx_sim.R</code> (one row per fit;
-Hoyer sparsity and pairwise Spearman correlations of the fitted <span
+<p>The full experiment has now run: <span
+class="math inline">\(2{,}520\)</span> fits — thirty seeds, three <span
+class="math inline">\(c_{\textrm{true}}\)</span>, the nine-point finite
+<span class="math inline">\(c_{\textrm{fit}}\)</span> grid under all
+three methods, <strong>plus <span class="math inline">\(c_{\textrm{fit}}
+= \infty\)</span></strong> (plain Poisson NMF, i.e. the topic model, fit
+with fastTopics from the same rank-1-padded initialization; the
+quadratic zero-term approximations have no <span class="math inline">\(c
+= \infty\)</span> analogue, so that column is exact-only). All <span
+class="math inline">\(2{,}520\)</span> converged. The 810 seed-1–10 fits
+are the first round’s, reused verbatim (their generator, grid and tags
+are unchanged); the extension ran at a 1M iteration cap, which the first
+round’s Taylor pathology motivated — this time nothing hit it (worst
+fit: 850k iterations, 17.4h). Metrics were computed on the cluster by
+<code>analyze_approx_sim.R</code> (one row per fit; Hoyer sparsity and
+pairwise Spearman correlations of the fitted <span
 class="math inline">\(L\)</span> and <span
 class="math inline">\(F\)</span>, plus the stored exact
 log-likelihoods), and only that table is read here.</p>
@@ -1738,11 +1767,13 @@ knitr::kable(data.frame(
   `max seconds` = sapply(METHODS, function(m)
     round(max(res$seconds[res$method == m]))),
   check.names = FALSE, row.names = NULL),
-  caption = &quot;Convergence and timing. The Taylor maximum is a c_fit &lt;= 1e-3
-  fit that needed the extended 1M-iteration cap.&quot;)</code></pre>
+  caption = &quot;Convergence and timing. The Taylor maximum is a c_fit = 1e-4
+  fit that ran 850k iterations (17.4h) before converging; the exact column&#39;s
+  maximum is likewise a c_fit = 1e-4 fit.&quot;)</code></pre>
 <table>
-<caption>Convergence and timing. The Taylor maximum is a c_fit &lt;=
-1e-3 fit that needed the extended 1M-iteration cap.</caption>
+<caption>Convergence and timing. The Taylor maximum is a c_fit = 1e-4
+fit that ran 850k iterations (17.4h) before converging; the exact
+column’s maximum is likewise a c_fit = 1e-4 fit.</caption>
 <thead>
 <tr class="header">
 <th align="left">method</th>
@@ -1754,21 +1785,21 @@ knitr::kable(data.frame(
 <tbody>
 <tr class="odd">
 <td align="left">exact</td>
-<td align="left">270 / 270</td>
-<td align="right">78.5</td>
+<td align="left">900 / 900</td>
+<td align="right">64.0</td>
 <td align="right">50639</td>
 </tr>
 <tr class="even">
 <td align="left">taylor</td>
-<td align="left">270 / 270</td>
-<td align="right">25.4</td>
-<td align="right">47009</td>
+<td align="left">810 / 810</td>
+<td align="right">20.5</td>
+<td align="right">62781</td>
 </tr>
 <tr class="odd">
 <td align="left">chebyshev</td>
-<td align="left">270 / 270</td>
+<td align="left">810 / 810</td>
 <td align="right">20.2</td>
-<td align="right">1794</td>
+<td align="right">2976</td>
 </tr>
 </tbody>
 </table>
@@ -1790,20 +1821,20 @@ approximation ended somewhere worse.</p>
 
 Table: Mean per-entry gap, taylor (rows = c_true, cols = c_fit).
 
-|               | 1e-04|    0.001|   0.01|     0.1|        1|       10|     100|    1000|    10000|
-|:--------------|-----:|--------:|------:|-------:|--------:|--------:|-------:|-------:|--------:|
-|c_true = 0.001 |  -190| -5800.00| -0.021| -2.9000|  0.01300|  8.3e-02| 7.1e-03| -0.0180|  0.01000|
-|c_true = 1     |  -510|   -38.00| -0.110| -0.0094| -0.00010| -2.0e-07| 0.0e+00| -0.0025| -0.00093|
-|c_true = Inf   | -2100|    -0.31| -0.050| -0.0038| -0.00015| -7.0e-07| 1.0e-07|  0.0000|  0.00000|
+|               | 1e-04|   0.001|   0.01|     0.1|        1|       10|   100|     1000|   10000|
+|:--------------|-----:|-------:|------:|-------:|--------:|--------:|-----:|--------:|-------:|
+|c_true = 0.001 |  -120| -1900.0| -0.022| -1.1000| -0.04600| -7.2e-03| 0.017| -0.02600|  0.0090|
+|c_true = 1     |  -740|   -15.0| -0.110| -0.0094| -0.00010| -2.0e-07| 0.000|  0.00060| -0.0072|
+|c_true = Inf   |  -890|    -0.3| -0.049| -0.0037| -0.00038| -4.0e-07| 0.000| -0.00037|  0.0000|
 
 
 Table: Mean per-entry gap, chebyshev (rows = c_true, cols = c_fit).
 
-|               |  1e-04|   0.001|    0.01|     0.1|        1|       10|      100|    1000|    10000|
-|:--------------|------:|-------:|-------:|-------:|--------:|--------:|--------:|-------:|--------:|
-|c_true = 0.001 | -0.012| -0.0098| -0.0130| -0.0160|  6.3e-02|  1.4e-02| -1.2e-02| -0.0180| -1.2e-02|
-|c_true = 1     | -0.026| -0.0130| -0.0062| -0.0033| -1.5e-05| -1.0e-07|  0.0e+00| -0.0025| -2.1e-03|
-|c_true = Inf   | -0.020| -0.0110| -0.0080| -0.0045| -5.3e-05| -1.3e-03|  1.0e-07|  0.0000|  1.0e-07|</code></pre>
+|               |  1e-04|   0.001|    0.01|     0.1|        1|       10|     100|     1000|   10000|
+|:--------------|------:|-------:|-------:|-------:|--------:|--------:|-------:|--------:|-------:|
+|c_true = 0.001 | -0.012| -0.0098| -0.0130| -0.0100| -2.7e-02| -4.7e-02| -0.0051| -1.3e-02|  0.0230|
+|c_true = 1     | -0.026| -0.0130| -0.0061| -0.0033| -1.5e-05| -1.0e-07|  0.0000|  6.3e-05| -0.0013|
+|c_true = Inf   | -0.020| -0.0110| -0.0080| -0.0045| -5.8e-05| -4.3e-04|  0.0000|  0.0e+00|  0.0000|</code></pre>
 <p>The display matches the paper’s approximation-quality figure: the
 <strong>per-entry likelihood ratio</strong> <span
 class="math inline">\(\exp(\bar\ell_{\textrm{approx}} -
@@ -1812,7 +1843,7 @@ class="math inline">\(\bar\ell\)</span> is the per-entry exact
 log-likelihood of the fitted rates — <span
 class="math inline">\(1\)</span> means the approximation loses nothing,
 <span class="math inline">\(0\)</span> means it collapses. Mean over the
-ten seeds, error bars a 95% confidence interval (<span
+thirty seeds, error bars a 95% confidence interval (<span
 class="math inline">\(t_{9}\)</span>-based).</p>
 <pre class="r"><code>ap &lt;- subset(res, method != &quot;exact&quot;)
 ap$ratio &lt;- exp(ap$gap_pe)
@@ -1884,26 +1915,33 @@ Eric Weine
 </div>
 </div>
 <p>Two regimes are visible. For <span
-class="math inline">\(c_{\textrm{fit}} \geq 0.1\)</span>
-<strong>both</strong> approximations sit on the dashed line: per-entry
-gaps of <span class="math inline">\(10^{-2}\)</span> down to <span
-class="math inline">\(10^{-10}\)</span>, i.e. from negligible to
-identical (the tables above). The few points marginally <em>above</em>
-<span class="math inline">\(1\)</span> — clearest for Chebyshev mid-grid
-at <span class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span> —
-are the approximation landing in a slightly better local optimum of the
-common exact criterion, so the remaining spread there is local-optimum
-noise, not approximation error. For <span
-class="math inline">\(c_{\textrm{fit}} \leq 10^{-2}\)</span> the two
-methods part company: <strong>Chebyshev degrades gracefully</strong>
-(worst case <span class="math inline">\(\sim 0.03\)</span> per entry, a
-ratio of <span class="math inline">\(\sim 0.97\)</span>) while
-<strong>Taylor collapses to ratio <span
-class="math inline">\(0\)</span></strong> at <span
+class="math inline">\(c_{\textrm{fit}} \geq 0.1\)</span> at <span
+class="math inline">\(c_{\textrm{true}} = 1\)</span> and <span
+class="math inline">\(\infty\)</span>, <strong>both</strong>
+approximations sit on the dashed line: per-entry gaps of <span
+class="math inline">\(10^{-3}\)</span> down to <span
+class="math inline">\(10^{-10}\)</span>, negligible to identical (the
+tables above). The <span class="math inline">\(c_{\textrm{true}} =
+10^{-3}\)</span> panel is noisier across the whole grid, and thirty
+seeds make the reason plain: that regime’s optimum landscape is
+heavy-tailed, and an occasional single fit — by any method — lands in a
+substantially better or worse local optimum of the common exact
+criterion (the worst Chebyshev fit anywhere is one seed at <span
+class="math inline">\(c_{\textrm{fit}} = 1\)</span> losing <span
+class="math inline">\(1.3\)</span> per entry; the worst Taylor fit at
+<span class="math inline">\(c_{\textrm{fit}} \geq 0.1\)</span> loses
+<span class="math inline">\(27\)</span>; other seeds land <em>above</em>
+the line). That spread is local-optimum variation, not approximation
+error, and it is what the wide intervals in the first panel are showing.
+For <span class="math inline">\(c_{\textrm{fit}} \leq 10^{-2}\)</span>
+the two methods part company systematically: <strong>Chebyshev degrades
+gracefully</strong> (mean gap at most <span class="math inline">\(\sim
+0.03\)</span> per entry in every cell) while <strong>Taylor collapses to
+ratio <span class="math inline">\(0\)</span></strong> at <span
 class="math inline">\(c_{\textrm{fit}} \leq 10^{-3}\)</span>, giving up
-tens to thousands of log-likelihood units per entry. The Chebyshev
-coefficients are fit to the relevant interval, while the Taylor
-expansion is anchored at a point that small <span
+tens to thousands of log-likelihood units per entry in the mean. The
+Chebyshev coefficients are fit to the relevant interval, while the
+Taylor expansion is anchored at a point that small <span
 class="math inline">\(c\)</span> pushes far from where the zero-term sum
 is evaluated.</p>
 </div>
@@ -1912,7 +1950,9 @@ is evaluated.</p>
 <p>Every fit ran to the same tolerance on its own objective, so the
 iteration count is comparable within a method and diagnostic across
 methods.</p>
-<pre class="r"><code>ggplot(res, aes(cc, n_iter, colour = method)) +
+<pre class="r"><code>## finite c only: the c = Inf fits use a different optimizer (fastTopics
+## SCD; median 53 iterations), so their counts are not comparable
+ggplot(subset(res, is.finite(cc)), aes(cc, n_iter, colour = method)) +
   geom_point(size = 1, alpha = 0.3,
              position = position_jitter(width = 0.06, height = 0)) +
   stat_summary(fun = median, geom = &quot;line&quot;, linewidth = 0.8) +
@@ -1967,19 +2007,20 @@ method — at <span class="math inline">\(c_{\textrm{fit}} =
 10^{4}\)</span> the median fit converges in <span
 class="math inline">\(\sim 55\)</span> iterations, at <span
 class="math inline">\(c_{\textrm{fit}} = 10^{-4}\)</span> the exact
-method needs <span class="math inline">\(\sim 16{,}000\)</span> —
+method needs <span class="math inline">\(\sim 17{,}000\)</span> —
 consistent with the increasingly ill-conditioned small-<span
 class="math inline">\(c\)</span> regime. The methods only separate where
-the approximation is poor: Chebyshev tracks exact throughout (its
-maximum anywhere is 34k iterations, vs 102k for exact), but Taylor
+the approximation is poor: Chebyshev tracks exact throughout, but Taylor
 detaches below <span class="math inline">\(c_{\textrm{fit}} =
-10^{-2}\)</span>, with a <em>median</em> of 272k iterations at <span
-class="math inline">\(c_{\textrm{fit}} = 10^{-4}\)</span> (all 18 fits
-that outgrew the original 250k cap were Taylor at <span
-class="math inline">\(c_{\textrm{fit}} \leq 10^{-3}\)</span>; the worst
-needed 844k). Taylor’s failure at small <span
-class="math inline">\(c\)</span> is thus doubly expensive: it converges
-to a much worse fit, and takes far longer to get there.</p>
+10^{-2}\)</span>, with a <em>median</em> of 301k iterations at <span
+class="math inline">\(c_{\textrm{fit}} = 10^{-4}\)</span> and a worst
+case of 850k (17.4 hours) — under the 1M cap, but only just. Taylor’s
+failure at small <span class="math inline">\(c\)</span> is thus doubly
+expensive: it converges to a much worse fit, and takes far longer to get
+there. (The <span class="math inline">\(c_{\textrm{fit}} =
+\infty\)</span> fits are excluded here: fastTopics’ SCD updates are a
+different algorithm whose median 53 iterations are not comparable to the
+log1p fits’ cycle counts.)</p>
 </div>
 <div id="sparsity-of-the-fitted-loadings-and-factors"
 class="section level2">
@@ -1996,47 +2037,55 @@ regimes</strong> (dashed line at the same height in every panel of the
 top row).</p>
 <p>Exact fits only from here on (the previous sections established where
 the approximations can be trusted). As in the c-grid figures: thin lines
-are the ten individual seeds, the thick line their mean, the dashed line
-the truth’s own value, and the circled point marks <span
-class="math inline">\(c_{\textrm{fit}} = c_{\textrm{true}}\)</span>
-(absent at <span class="math inline">\(c_{\textrm{true}} =
-\infty\)</span>, which lies off the fitting grid).</p>
+are the thirty individual seeds, the thick line their mean, the dashed
+line the truth’s own value, and the circled point marks <span
+class="math inline">\(c_{\textrm{fit}} = c_{\textrm{true}}\)</span> —
+now present in <strong>all three</strong> panels, since the fitting grid
+includes <span class="math inline">\(c = \infty\)</span> (the topic
+model). Because <span class="math inline">\(\infty\)</span> has no place
+on a log axis, <span class="math inline">\(c\)</span> is a discrete axis
+from here on, as in the c-grid figures.</p>
 <pre class="r"><code>## long format + the c-grid panel style, shared by the sparsity and
-## rank-correlation figures below
+## rank-correlation figures below. c is DISCRETE (c_fit = Inf is a real
+## level of the grid and has no place on a log axis).
+cf_of &lt;- function(cc) factor(sapply(cc, fmtc),
+                             levels = sapply(CC_GRID, fmtc))
 make_long &lt;- function(ex, vL, vF, tL, tF) {
   sp &lt;- rbind(
-    data.frame(ex[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;)], what = &quot;loadings L&quot;,
+    data.frame(ex[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;, &quot;c_true&quot;)], what = &quot;loadings L&quot;,
                value = ex[[vL]], truth = ex[[tL]]),
-    data.frame(ex[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;)], what = &quot;factors F&quot;,
+    data.frame(ex[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;, &quot;c_true&quot;)], what = &quot;factors F&quot;,
                value = ex[[vF]], truth = ex[[tF]]))
   sp$what &lt;- factor(sp$what, levels = c(&quot;loadings L&quot;, &quot;factors F&quot;))
+  sp$cf   &lt;- cf_of(sp$cc)
   sp
 }
 seed_panels &lt;- function(sp, ylab, title) {
-  avg &lt;- aggregate(value ~ what + cc + ct, sp, mean)
+  avg &lt;- aggregate(value ~ what + cf + ct, sp, mean)
   tru &lt;- aggregate(truth ~ what + ct, sp, mean)
-  mp  &lt;- unique(res[c(&quot;ct&quot;, &quot;c_true&quot;)])
-  dg  &lt;- merge(avg, mp)
-  dg  &lt;- dg[is.finite(dg$c_true) &amp; dg$cc == dg$c_true, ]
-  ggplot(sp, aes(cc, value)) +
+  dg  &lt;- unique(sp[(is.finite(sp$c_true) &amp; sp$cc == sp$c_true) |
+                   (is.infinite(sp$c_true) &amp; is.infinite(sp$cc)),
+                   c(&quot;what&quot;, &quot;cf&quot;, &quot;ct&quot;)])
+  dg  &lt;- merge(dg, avg)
+  ggplot(sp, aes(cf, value)) +
     geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;,
-              linewidth = 0.35, alpha = 0.8) +
+              linewidth = 0.35, alpha = 0.7) +
     geom_hline(data = tru, aes(yintercept = truth), linetype = &quot;dashed&quot;,
                colour = &quot;#C2410C&quot;, linewidth = 0.5) +
-    geom_line(data = avg, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+    geom_line(data = avg, aes(group = 1), colour = &quot;#0E5C6B&quot;, linewidth = 1) +
     geom_point(data = avg, colour = &quot;#0E5C6B&quot;, size = 1.6) +
     geom_point(data = dg, shape = 21, size = 3.6, stroke = 1.1,
                fill = NA, colour = &quot;#C2410C&quot;) +
-    scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
     facet_grid(what ~ ct) +
     labs(x = &quot;c used for fitting&quot;, y = ylab, title = title,
-         subtitle = paste(&quot;thin lines: 10 individual seeds;  thick line:&quot;,
+         subtitle = paste(&quot;thin lines: 30 individual seeds;  thick line:&quot;,
                           &quot;mean;  dashed: the true value;  circled:&quot;,
                           &quot;c_fit = c_true&quot;)) +
     theme(strip.background = element_blank(),
           strip.text = element_text(face = &quot;bold&quot;, size = 10),
           plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
-          panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))
+          panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA),
+          axis.text.x = element_text(size = 7, angle = 45, hjust = 1))
 }</code></pre>
 <pre class="r"><code>ex &lt;- subset(res, method == &quot;exact&quot;)
 seed_panels(make_long(ex, &quot;hoyer_L&quot;, &quot;hoyer_F&quot;,
@@ -2092,31 +2141,37 @@ Eric Weine
 </table>
 </div>
 </div>
-<p>Two things to read off:</p>
+<p>Three things to read off:</p>
 <ul>
 <li><strong>Monotonicity, seed by seed.</strong> At every <span
 class="math inline">\(c_{\textrm{true}}\)</span>, for both <span
 class="math inline">\(L\)</span> and <span
 class="math inline">\(F\)</span>, sparsity increases in <span
-class="math inline">\(c_{\textrm{fit}}\)</span> across the entire
-eight-decade grid — and the thin lines show this is true of essentially
-every individual seed, not just the average; the seed spread is a small
-band around the mean.</li>
+class="math inline">\(c_{\textrm{fit}}\)</span> across the entire grid —
+and the thin lines show this is true of essentially every individual
+seed, not just the average; the seed spread is a small band around the
+mean.</li>
+<li><strong>The topic model is the continuous endpoint of the
+grid.</strong> The new <span class="math inline">\(c_{\textrm{fit}} =
+\infty\)</span> column continues every curve smoothly from <span
+class="math inline">\(c_{\textrm{fit}} = 10^{4}\)</span> — plain Poisson
+NMF behaves as the large-<span class="math inline">\(c\)</span> limit of
+the log1p family, not as a different method.</li>
 <li><strong>The fit recovers the truth’s sparsity when fit at the true
 <span class="math inline">\(c\)</span>.</strong> The circled points sit
-almost exactly on the dashed truth lines: for loadings (truth <span
-class="math inline">\(0.398\)</span> everywhere) the exact fits give
-<span class="math inline">\(0.41\)</span> at <span
-class="math inline">\((10^{-3}, 10^{-3})\)</span> and <span
+almost exactly on the dashed truth lines in all three panels: for
+loadings (truth <span class="math inline">\(0.396\)</span> everywhere)
+the exact fits give <span class="math inline">\(0.41\)</span> at <span
+class="math inline">\((10^{-3}, 10^{-3})\)</span>, <span
 class="math inline">\(0.41\)</span> at <span class="math inline">\((1,
-1)\)</span>, and the <span class="math inline">\(c_{\textrm{true}} =
-\infty\)</span> curves reach the truth at the top of the grid (<span
-class="math inline">\(0.40\)</span> at <span
-class="math inline">\(c_{\textrm{fit}} = 10^{3\text{--}4}\)</span>); for
-factors the crossing is equally tight (<span
-class="math inline">\(|{\Delta}| = 0.004\)</span> at <span
-class="math inline">\(c_{\textrm{true}} = 1\)</span>). Misfit in <span
-class="math inline">\(c\)</span> translates directly into over- or
+1)\)</span>, and — the case the grid could not show before — the topic
+model on topic-model truth gives <span
+class="math inline">\(0.406\)</span> at <span
+class="math inline">\((\infty, \infty)\)</span>; for factors the
+crossings are equally tight (<span class="math inline">\(|\Delta| \leq
+0.005\)</span> at <span class="math inline">\(c_{\textrm{true}} =
+1\)</span> and <span class="math inline">\(\infty\)</span>). Misfit in
+<span class="math inline">\(c\)</span> translates directly into over- or
 under-sparse estimates.</li>
 </ul>
 <p>The approximate fits (not shown) trace the same curves wherever the
@@ -2186,21 +2241,32 @@ Eric Weine
 </table>
 </div>
 </div>
+<p>(One thin line in the <span class="math inline">\(c_{\textrm{true}} =
+\infty\)</span> panels shoots upward at the large-<span
+class="math inline">\(c\)</span> end: that is the single near-degenerate
+seed of the identity-link generator’s heavy-tailed law, whose dataset
+has <span class="math inline">\(\max(Y) = 30\)</span> and a mean count
+of <span class="math inline">\(0.096\)</span> — visible for the same
+reason in the budget figure below. It is left in deliberately; the mean
+curves barely feel it.)</p>
 <p>For the <strong>loadings</strong> at <span
 class="math inline">\(c_{\textrm{true}} = 1\)</span> and <span
 class="math inline">\(\infty\)</span> the effect is clean: pairwise rank
 correlation rises toward zero as <span
 class="math inline">\(c_{\textrm{fit}}\)</span> grows, reaching the
-truth’s value (<span class="math inline">\(-0.174\)</span>) near <span
+truth’s value (<span class="math inline">\(-0.176\)</span>) near <span
 class="math inline">\(c_{\textrm{fit}} \approx
 c_{\textrm{true}}\)</span>, with a tight seed band. At <span
 class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span> the mean
 curve is not monotone — it peaks around <span
 class="math inline">\(c_{\textrm{fit}} = 10\)</span> and comes back down
-where the fits are heavily over-sparsified — and the thin lines show the
-seeds genuinely disagreeing about the large-<span
-class="math inline">\(c\)</span> end. For the <strong>factors</strong>
-the curves are non-monotone but, at <span
+where the fits are heavily over-sparsified — and the topic-model column
+adds a sharp coda: at <span class="math inline">\(c_{\textrm{fit}} =
+\infty\)</span> on small-<span class="math inline">\(c\)</span> truth
+the loading rank correlation drops to <span
+class="math inline">\(-0.194\)</span>, <em>below</em> the truth’s value,
+the one place on the grid where a fit over-decouples the loadings. For
+the <strong>factors</strong> the curves are non-monotone but, at <span
 class="math inline">\(c_{\textrm{true}} = 1\)</span> and <span
 class="math inline">\(\infty\)</span>, systematic — the seed bands are
 tight, and the pairwise rank correlation is at its most negative,
@@ -2213,9 +2279,10 @@ above on both sides, where the fits are mis-sparsified. At <span
 class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span> the factor
 curve is flat and the seed spread dominates. The one robust feature
 across all regimes is that <strong>every fit’s factor columns are more
-rank-correlated than the truth’s</strong> (the entire seed band sits
-above the dashed lines): the fits never fully reproduce the decoupling
-of the generative factors.</p>
+rank-correlated than the truth’s</strong> (the seed band sits above the
+dashed lines, coming closest to them in the topic-model column at <span
+class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span>): the fits
+never fully reproduce the decoupling of the generative factors.</p>
 </div>
 <div id="the-sparsity-bounds-in-practice" class="section level2">
 <h2>The sparsity bounds in practice</h2>
@@ -2286,31 +2353,35 @@ rates at its own <span class="math inline">\(c\)</span> — yet the
 realized <span
 class="math inline">\(\operatorname{pm}(\mathbf{B})\)</span> of the
 fitted models is monotone in <span
-class="math inline">\(c_{\textrm{fit}}\)</span> anyway, spanning three
-orders of magnitude across the grid (<span class="math inline">\(\sim
-3\)</span> to <span class="math inline">\(\sim 5{,}000\)</span>), and
-nearly identical across seeds:</p>
+class="math inline">\(c_{\textrm{fit}}\)</span> anyway — all the way
+through the topic model at <span class="math inline">\(c_{\textrm{fit}}
+= \infty\)</span>, where <span class="math inline">\(\mathbf{B}\)</span>
+is the fitted rate matrix itself — spanning three orders of magnitude
+across the grid (<span class="math inline">\(\sim 3\)</span> to <span
+class="math inline">\(\sim 5{,}900\)</span>), and nearly identical
+across seeds:</p>
 <pre class="r"><code>bounds &lt;- readRDS(file.path(exp_dir, &quot;approx_sim_bounds.rds&quot;))
 bounds$ct &lt;- factor(paste0(&quot;c_true = &quot;, sapply(bounds$c_true, fmtc)),
                     levels = levels(res$ct))
 be &lt;- subset(bounds, method == &quot;exact&quot;)</code></pre>
 <pre class="r"><code>exm &lt;- subset(res, method == &quot;exact&quot;)
-avg &lt;- aggregate(pm_B ~ cc + ct, exm, mean)
-ggplot(exm, aes(cc, pm_B)) +
+exm$cf &lt;- cf_of(exm$cc)
+avg &lt;- aggregate(pm_B ~ cf + ct, exm, mean)
+ggplot(exm, aes(cf, pm_B)) +
   geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;,
-            linewidth = 0.35, alpha = 0.8) +
-  geom_line(data = avg, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+            linewidth = 0.35, alpha = 0.7) +
+  geom_line(data = avg, aes(group = 1), colour = &quot;#0E5C6B&quot;, linewidth = 1) +
   geom_point(data = avg, colour = &quot;#0E5C6B&quot;, size = 1.6) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
   scale_y_log10(labels = scales::label_log()) +
   facet_wrap(~ ct, nrow = 1) +
   labs(x = &quot;c used for fitting&quot;, y = &quot;pm(B) of the fitted model&quot;,
        title = &quot;The realized sparsity budget is monotone in the fitting c&quot;,
-       subtitle = &quot;thin lines: 10 individual seeds;  thick line: mean&quot;) +
+       subtitle = &quot;thin lines: 30 individual seeds;  thick line: mean&quot;) +
   theme(strip.background = element_blank(),
         strip.text = element_text(face = &quot;bold&quot;, size = 10),
         plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
-        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))</code></pre>
+        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA),
+        axis.text.x = element_text(size = 7, angle = 45, hjust = 1))</code></pre>
 <p><img src="figure/sim_design.Rmd/budget-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-budget-fig-1">
@@ -2368,28 +2439,32 @@ this whole design), and, by the saturated-case remark in the appendix,
 <em>exactly</em> the fitted budget when <span class="math inline">\(K
 \geq \min(n, p)\)</span>. Comparing both to the budget the rank-<span
 class="math inline">\(5\)</span> fits actually realize:</p>
-<pre class="r"><code>pm_true &lt;- do.call(rbind, lapply(ds, function(d) data.frame(
+<pre class="r"><code>## at c = Inf the link is the identity: B* = Lambda, and the data budget is
+## pm(Y) itself
+pm_of &lt;- function(M, cc) {
+  g &lt;- if (is.finite(cc)) log1p(M / cc) else M
+  max(g) / mean(g)
+}
+pm_true &lt;- do.call(rbind, lapply(ds, function(d) data.frame(
   seed = d$seed, cc = CC_GRID,
   ct = factor(paste0(&quot;c_true = &quot;, fmtc(d$c_true)), levels = levels(res$ct)),
-  pm_true = sapply(CC_GRID, function(cc) {
-    g &lt;- log1p(d$lambda / cc); max(g) / mean(g) }),
-  pm_data = sapply(CC_GRID, function(cc) {
-    g &lt;- log1p(d$Y / cc); max(g) / mean(g) }))))
+  pm_true = sapply(CC_GRID, pm_of, M = d$lambda),
+  pm_data = sapply(CC_GRID, pm_of, M = d$Y))))
 cmp &lt;- merge(exm[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;, &quot;pm_B&quot;)],
              pm_true, by = c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;))
+cmp$cf         &lt;- cf_of(cmp$cc)
 cmp$ratio      &lt;- cmp$pm_B / cmp$pm_true
 cmp$ratio_data &lt;- cmp$pm_B / cmp$pm_data
 
-avg  &lt;- aggregate(cbind(pm_B, pm_true, pm_data) ~ cc + ct, cmp, mean)
-p1 &lt;- ggplot(cmp, aes(cc, pm_B)) +
+avg  &lt;- aggregate(cbind(pm_B, pm_true, pm_data) ~ cf + ct, cmp, mean)
+p1 &lt;- ggplot(cmp, aes(cf, pm_B)) +
   geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;,
-            linewidth = 0.35, alpha = 0.8) +
-  geom_line(data = avg, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
-  geom_line(data = avg, aes(y = pm_true), colour = &quot;#C2410C&quot;,
+            linewidth = 0.35, alpha = 0.7) +
+  geom_line(data = avg, aes(group = 1), colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+  geom_line(data = avg, aes(y = pm_true, group = 1), colour = &quot;#C2410C&quot;,
             linetype = &quot;dashed&quot;, linewidth = 0.7) +
-  geom_line(data = avg, aes(y = pm_data), colour = &quot;#B45309&quot;,
+  geom_line(data = avg, aes(y = pm_data, group = 1), colour = &quot;#B45309&quot;,
             linetype = &quot;dotdash&quot;, linewidth = 0.7) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
   scale_y_log10(labels = scales::label_log()) +
   facet_wrap(~ ct, nrow = 1) +
   labs(x = NULL, y = &quot;pm(B)&quot;,
@@ -2400,20 +2475,20 @@ p1 &lt;- ggplot(cmp, aes(cc, pm_B)) +
   theme(strip.background = element_blank(),
         strip.text = element_text(face = &quot;bold&quot;, size = 10),
         plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
-        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))
+        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA),
+        axis.text.x = element_blank())
 
-ravg &lt;- aggregate(cbind(ratio, ratio_data) ~ cc + ct, cmp, mean)
-p2 &lt;- ggplot(cmp, aes(cc, ratio)) +
+ravg &lt;- aggregate(cbind(ratio, ratio_data) ~ cf + ct, cmp, mean)
+p2 &lt;- ggplot(cmp, aes(cf, ratio)) +
   geom_hline(yintercept = 1, linetype = &quot;dashed&quot;, colour = &quot;grey40&quot;) +
   geom_line(aes(group = seed), colour = &quot;#9BB7BD&quot;,
-            linewidth = 0.35, alpha = 0.8) +
-  geom_line(data = ravg, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+            linewidth = 0.35, alpha = 0.7) +
+  geom_line(data = ravg, aes(group = 1), colour = &quot;#0E5C6B&quot;, linewidth = 1) +
   geom_point(data = ravg, colour = &quot;#0E5C6B&quot;, size = 1.4) +
-  geom_line(data = ravg, aes(y = ratio_data), colour = &quot;#B45309&quot;,
+  geom_line(data = ravg, aes(y = ratio_data, group = 1), colour = &quot;#B45309&quot;,
             linetype = &quot;dotdash&quot;, linewidth = 0.8) +
   geom_point(data = ravg, aes(y = ratio_data), colour = &quot;#B45309&quot;,
              size = 1.4) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
   scale_y_log10(breaks = c(0.125, 0.25, 0.5, 1),
                 labels = c(&quot;0.125&quot;, &quot;0.25&quot;, &quot;0.5&quot;, &quot;1&quot;)) +
   facet_wrap(~ ct, nrow = 1) +
@@ -2423,9 +2498,10 @@ p2 &lt;- ggplot(cmp, aes(cc, ratio)) +
   theme(strip.background = element_blank(),
         strip.text = element_blank(),
         plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
-        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))
+        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA),
+        axis.text.x = element_text(size = 7, angle = 45, hjust = 1))
 
-cowplot::plot_grid(p1, p2, ncol = 1, rel_heights = c(1.4, 1), align = &quot;v&quot;)</code></pre>
+cowplot::plot_grid(p1, p2, ncol = 1, rel_heights = c(1.35, 1), align = &quot;v&quot;)</code></pre>
 <p><img src="figure/sim_design.Rmd/budget-true-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-budget-true-fig-1">
@@ -2451,6 +2527,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/02188733f8f08c86a5de17a856df7121de8e647d/docs/figure/sim_design.Rmd/budget-true-fig-1.png" target="_blank">0218873</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-10
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/6c9d5469fc52eb8995f73c0b9f085744efbaa79e/docs/figure/sim_design.Rmd/budget-true-fig-1.png" target="_blank">6c9d546</a>
 </td>
 <td>
@@ -2465,9 +2552,10 @@ Eric Weine
 </div>
 </div>
 <p>The dashed curve is barely distinguishable from the fitted one: the
-mean ratio stays within <span class="math inline">\(0.85\)</span>–<span
-class="math inline">\(1.02\)</span> across the entire grid (bottom row,
-blue), and the individual seeds mostly within <span
+mean ratio stays within <span class="math inline">\(0.84\)</span>–<span
+class="math inline">\(1.02\)</span> across the entire grid, including
+the <span class="math inline">\(c_{\textrm{fit}} = \infty\)</span>
+column (bottom row, blue), and the individual seeds mostly within <span
 class="math inline">\(0.8\)</span>–<span
 class="math inline">\(1.05\)</span> — the visible exception being the
 largest <span class="math inline">\(c_{\textrm{fit}}\)</span> values at
@@ -2485,7 +2573,11 @@ class="math inline">\(c_{\textrm{fit}}\)</span> the fits slightly
 <p>The <strong>data budget</strong> (dot-dash) tells a complementary
 story. At <span class="math inline">\(c_{\textrm{fit}} \gtrsim
 1\)</span> it agrees with the other two curves to within <span
-class="math inline">\(\sim 15\%\)</span>. At small <span
+class="math inline">\(\sim 15\%\)</span>, all the way out to <span
+class="math inline">\(c_{\textrm{fit}} = \infty\)</span>, where it is
+simply <span
+class="math inline">\(\operatorname{pm}(\mathbf{Y})\)</span> and the
+fitted topic model matches it closely. At small <span
 class="math inline">\(c_{\textrm{fit}}\)</span> it splits off upward,
 exceeding the fitted budget by a factor of <span
 class="math inline">\(4\)</span>–<span class="math inline">\(8\)</span>
@@ -2525,20 +2617,20 @@ class="math inline">\(d(\mathbf{l}_{\cdot k}) d(\mathbf{f}_{\cdot k})
 \sqrt{w_k/\operatorname{pm}(\mathbf{B})} \geq 1\)</span>. Slack <span
 class="math inline">\(1\)</span> means the fit sits exactly on the
 constraint.</p>
-<pre class="r"><code>sl &lt;- rbind(
-  data.frame(be[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;, &quot;k&quot;)], bound = &quot;pm budget (1)&quot;,
+<pre class="r"><code>be$cf &lt;- cf_of(be$cc)
+sl &lt;- rbind(
+  data.frame(be[c(&quot;seed&quot;, &quot;cf&quot;, &quot;ct&quot;, &quot;k&quot;)], bound = &quot;pm budget (1)&quot;,
              slack = be$slack_pm),
-  data.frame(be[c(&quot;seed&quot;, &quot;cc&quot;, &quot;ct&quot;, &quot;k&quot;)], bound = &quot;density hyperbola (2)&quot;,
+  data.frame(be[c(&quot;seed&quot;, &quot;cf&quot;, &quot;ct&quot;, &quot;k&quot;)], bound = &quot;density hyperbola (2)&quot;,
              slack = be$slack_hyper))
 sl$bound &lt;- factor(sl$bound, levels = c(&quot;pm budget (1)&quot;,
                                         &quot;density hyperbola (2)&quot;))
-med &lt;- aggregate(slack ~ bound + cc + ct, sl, median)
-ggplot(sl, aes(cc, slack)) +
-  geom_point(size = 0.7, alpha = 0.25, colour = &quot;#0E5C6B&quot;,
-             position = position_jitter(width = 0.05, height = 0)) +
-  geom_line(data = med, colour = &quot;#0E5C6B&quot;, linewidth = 1) +
+med &lt;- aggregate(slack ~ bound + cf + ct, sl, median)
+ggplot(sl, aes(cf, slack)) +
+  geom_point(size = 0.6, alpha = 0.2, colour = &quot;#0E5C6B&quot;,
+             position = position_jitter(width = 0.15, height = 0)) +
+  geom_line(data = med, aes(group = 1), colour = &quot;#0E5C6B&quot;, linewidth = 1) +
   geom_hline(yintercept = 1, linetype = &quot;dashed&quot;, colour = &quot;#C2410C&quot;) +
-  scale_x_log10(breaks = 10^seq(-4, 4, 2), labels = scales::label_log()) +
   scale_y_log10() +
   facet_grid(bound ~ ct) +
   labs(x = &quot;c used for fitting&quot;, y = &quot;slack of the bound  (1 = active)&quot;,
@@ -2548,7 +2640,8 @@ ggplot(sl, aes(cc, slack)) +
   theme(strip.background = element_blank(),
         strip.text = element_text(face = &quot;bold&quot;, size = 10),
         plot.subtitle = element_text(size = 10, colour = &quot;grey35&quot;),
-        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA))</code></pre>
+        panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA),
+        axis.text.x = element_text(size = 7, angle = 45, hjust = 1))</code></pre>
 <p><img src="figure/sim_design.Rmd/slack-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-slack-fig-1">
@@ -2590,16 +2683,17 @@ Eric Weine
 <p>The two rows say different things. The <strong>pm-budget lemma is
 close to equality wherever the budget is scarce</strong>: for <span
 class="math inline">\(c_{\textrm{fit}} \leq 0.1\)</span> the median
-slack is <span class="math inline">\(1.07\)</span>–<span
-class="math inline">\(1.14\)</span> at the finite <span
+slack is <span class="math inline">\(1.09\)</span>–<span
+class="math inline">\(1.15\)</span> at the finite <span
 class="math inline">\(c_{\textrm{true}}\)</span> regimes (minimum <span
 class="math inline">\(1.000\)</span> — some factors sit exactly on the
 constraint), growing to <span class="math inline">\(2\)</span>–<span
 class="math inline">\(6\)</span> only at the large-<span
-class="math inline">\(c\)</span> end where the budget is plentiful.
-Small <span class="math inline">\(c\)</span> genuinely exhausts the
-budget. The <strong>density hyperbola inherits extra slack</strong> from
-the step <span class="math inline">\(d(x) \geq
+class="math inline">\(c\)</span> end — including the topic-model column
+— where the budget is plentiful. Small <span
+class="math inline">\(c\)</span> genuinely exhausts the budget. The
+<strong>density hyperbola inherits extra slack</strong> from the step
+<span class="math inline">\(d(x) \geq
 1/\sqrt{\operatorname{pm}(x)}\)</span>, which is loose for the dense
 columns that small <span class="math inline">\(c\)</span> forces; its
 slack floor is <span class="math inline">\(\approx 1.3\)</span>–<span
@@ -2681,44 +2775,52 @@ allowance and large observed sum — the budget is the axis along which
 <span class="math inline">\(c\)</span> operates, exactly as the theory
 says. Second, the <em>fraction</em> of the allowance actually used grows
 with <span class="math inline">\(c_{\textrm{fit}}\)</span>: the median
-factor uses <span class="math inline">\(40\)</span>–<span
+factor uses <span class="math inline">\(39\)</span>–<span
 class="math inline">\(65\%\)</span> of its allowance at <span
 class="math inline">\(c_{\textrm{fit}} = 10^{-4}\)</span> and <span
 class="math inline">\(73\)</span>–<span
-class="math inline">\(91\%\)</span> at <span
-class="math inline">\(c_{\textrm{fit}} \geq 10^{2}\)</span> (highest in
-the <span class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span>
-regime, whose truth is sparsest). In other words: at small <span
-class="math inline">\(c\)</span> the fits sit against the <em>pm
-form</em> of the constraint while the Hoyer conversion leaves headroom,
-and at large <span class="math inline">\(c\)</span> the fits approach
-the Hoyer allowance itself. The bounds are therefore practically
-relevant in both regimes, but through different faces of the same
-inequality chain.</p>
+class="math inline">\(89\%\)</span> at <span
+class="math inline">\(c_{\textrm{fit}} \geq 10^{2}\)</span>, topic model
+included (highest in the <span class="math inline">\(c_{\textrm{true}} =
+10^{-3}\)</span> regime, whose truth is sparsest). In other words: at
+small <span class="math inline">\(c\)</span> the fits sit against the
+<em>pm form</em> of the constraint while the Hoyer conversion leaves
+headroom, and at large <span class="math inline">\(c\)</span> the fits
+approach the Hoyer allowance itself. The bounds are therefore
+practically relevant in both regimes, but through different faces of the
+same inequality chain.</p>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
 <p>The simulation does what it was designed to do. On counts calibrated
-to a real dataset’s budget curve in all three generative regimes: (i)
-the sparsity of the fitted loadings and factors is controlled by the
-fitting <span class="math inline">\(c\)</span>, monotonically and over a
-wide range; (ii) fitting at the generative <span
+to a real dataset’s budget curve in all three generative regimes, with
+thirty seeds and the topic model anchoring the large-<span
+class="math inline">\(c\)</span> end of the grid: (i) the sparsity of
+the fitted loadings and factors is controlled by the fitting <span
+class="math inline">\(c\)</span>, monotonically and over a wide range,
+with plain Poisson NMF behaving as the continuous <span
+class="math inline">\(c \to \infty\)</span> endpoint of the log1p
+family; (ii) fitting at the generative <span
 class="math inline">\(c\)</span> reproduces the generative sparsity
-almost exactly, so misfit in <span class="math inline">\(c\)</span> is
-visible as over- or under-sparsification; (iii) the appendix bounds are
-live constraints, not formalities — the realized budget <span
+almost exactly — now including the topic model on topic-model truth — so
+misfit in <span class="math inline">\(c\)</span> is visible as over- or
+under-sparsification; (iii) the appendix bounds are live constraints,
+not formalities — the realized budget <span
 class="math inline">\(\operatorname{pm}(\mathbf{B})\)</span> is monotone
 in <span class="math inline">\(c_{\textrm{fit}}\)</span> over three
 orders of magnitude, the pm-budget lemma is within <span
-class="math inline">\(7\)</span>–<span
-class="math inline">\(14\%\)</span> of equality wherever the budget is
+class="math inline">\(9\)</span>–<span
+class="math inline">\(15\%\)</span> of equality wherever the budget is
 scarce, and the fits use up to <span class="math inline">\(\sim
-90\%\)</span> of the sum-form Hoyer allowance at the large-<span
+89\%\)</span> of the sum-form Hoyer allowance at the large-<span
 class="math inline">\(c\)</span> end; and (iv) the Chebyshev
 approximation is faithful to the exact objective everywhere on the grid
-(worst case <span class="math inline">\(\sim 0.03\)</span>
-log-likelihood units per entry, typically orders of magnitude less),
-while the Taylor approximation is faithful only for <span
+(mean gap at most <span class="math inline">\(\sim 0.03\)</span>
+log-likelihood units per entry in every cell, typically orders of
+magnitude less; isolated single-fit outliers in the <span
+class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span> regime are
+local-optimum variation shared with the exact fits), while the Taylor
+approximation is faithful only for <span
 class="math inline">\(c_{\textrm{fit}} \gtrsim 0.1\)</span> and fails
 badly — slowly and to bad optima — below that.</p>
 <br>
