@@ -680,6 +680,76 @@ recovers the rates of additive truth about equally well — and the lines
 figure, for which the finite-$c$ fits recover the true rates better than
 the topic-model reference itself.
 
+## Fitted rates across c, one typical dataset per regime
+
+The summaries above compress each fit to a number; here we look at the
+fitted rates themselves. For one representative dataset per regime (the
+seed whose mean count is closest to its regime's median: seed 13 at
+$c_{\textrm{true}} = 10^{-3}$, seed 1 at $c_{\textrm{true}} = 1$, seed 10
+at $c_{\textrm{true}} = \infty$), we compare the exact fits at
+$c_{\textrm{fit}} \in \{10^{-3}, 1, \infty\}$ pairwise: each panel
+scatters all $250{,}000$ fitted rates of one fit against another, on the
+$\log_{10}(1 + \lambda)$ scale. Rows are the generative regimes, columns
+the three pairs; the diagonal is equality, and the annotation gives the
+Pearson correlation on the plotted scale.
+
+```{r rates-pairs-fig, fig.width=8.5, fig.height=8}
+fit_dir <- file.path(exp_dir, "approx_sim_fits")
+need <- expand.grid(seed = c(13, 1, 10), cfit = c("0.001", "1", "Inf"))
+need$ctrue <- rep(c("0.001", "1", "Inf"), 3)
+need$file <- sprintf("approxsim_seed%02d_ctrue%s_cfit%s_exact.rds",
+                     need$seed, need$ctrue, need$cfit)
+if (!all(file.exists(file.path(fit_dir, need$file)))) {
+  cat("(Waiting on the nine per-fit .rds files in",
+      "inst/paper_figures/experiments/approx_sim_fits/ -- see the scp",
+      "command in the session notes; the figure renders once they are",
+      "present.)")
+} else {
+  rates_of <- function(f, cc) {
+    x  <- readRDS(file.path(fit_dir, f))
+    th <- tcrossprod(as.matrix(x$LL), as.matrix(x$FF))
+    if (is.infinite(cc)) th else cc * expm1(th / max(1, cc))
+  }
+  scen <- data.frame(ctrue = c("0.001", "1", "Inf"), seed = c(13, 1, 10))
+  pairs <- list(c("0.001", "1"), c("0.001", "Inf"), c("1", "Inf"))
+  pan <- list(); ann <- list()
+  for (i in seq_len(nrow(scen))) for (pr in pairs) {
+    fa <- sprintf("approxsim_seed%02d_ctrue%s_cfit%s_exact.rds",
+                  scen$seed[i], scen$ctrue[i], pr[1])
+    fb <- sprintf("approxsim_seed%02d_ctrue%s_cfit%s_exact.rds",
+                  scen$seed[i], scen$ctrue[i], pr[2])
+    a <- log10(1 + as.vector(rates_of(fa, as.numeric(pr[1]))))
+    b <- log10(1 + as.vector(rates_of(fb, as.numeric(pr[2]))))
+    row_lab <- paste0("truth: c = ", scen$ctrue[i], " (seed ", scen$seed[i], ")")
+    col_lab <- paste0("c = ", pr[1], "  vs  c = ", pr[2])
+    pan[[length(pan) + 1]] <- data.frame(x = a, y = b,
+                                         row = row_lab, col = col_lab)
+    ann[[length(ann) + 1]] <- data.frame(
+      row = row_lab, col = col_lab,
+      lab = sprintf("r = %.3f", cor(a, b)))
+  }
+  pan <- do.call(rbind, pan); ann <- do.call(rbind, ann)
+  rl <- paste0("truth: c = ", scen$ctrue, " (seed ", scen$seed, ")")
+  pan$row <- factor(pan$row, levels = rl); ann$row <- factor(ann$row, levels = rl)
+  print(ggplot(pan, aes(x, y)) +
+    geom_bin2d(bins = 70) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed",
+                colour = "#C2410C", linewidth = 0.4) +
+    geom_text(data = ann, aes(label = lab), x = -Inf, y = Inf,
+              hjust = -0.15, vjust = 1.6, size = 3, colour = "grey20") +
+    scale_fill_gradient(low = "#DCE8EB", high = "#0E3A44",
+                        trans = "log10", name = "entries") +
+    facet_grid(row ~ col) +
+    coord_equal() +
+    labs(x = "log10(1 + fitted rate), smaller c of the pair",
+         y = "log10(1 + fitted rate), larger c of the pair",
+         title = "Fitted rates compared across fitting c, entry by entry") +
+    theme(strip.background = element_blank(),
+          strip.text = element_text(face = "bold", size = 9),
+          panel.border = element_rect(colour = "grey80", fill = NA)))
+}
+```
+
 ## Rank correlation of the factors
 
 The redundancy measure: mean Spearman correlation over the
