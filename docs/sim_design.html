@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea658bfde3cb49b58d17fbcf167873a0031aa7983targetblanka658bfda">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreec980640d35ac24dcb3d534ab93d197f036a7ab22targetblankc980640a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/a658bfde3cb49b58d17fbcf167873a0031aa7983" target="_blank">a658bfd</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/c980640d35ac24dcb3d534ab93d197f036a7ab22" target="_blank">c980640</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea658bfde3cb49b58d17fbcf167873a0031aa7983targetblanka658bfda"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreec980640d35ac24dcb3d534ab93d197f036a7ab22targetblankc980640a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/a658bfde3cb49b58d17fbcf167873a0031aa7983" target="_blank">a658bfd</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/c980640d35ac24dcb3d534ab93d197f036a7ab22" target="_blank">c980640</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -617,6 +617,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/c980640d35ac24dcb3d534ab93d197f036a7ab22/analysis/sim_design.Rmd" target="_blank">c980640</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-20
+</td>
+<td>
+sim_design: pairwise fitted-rate scatter section (3x3, one typical seed
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/69bdcf1f597a6b4e5848557b708c0d382eaeae35/docs/sim_design.html" target="_blank">69bdcf1</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2495,6 +2529,43 @@ structure).</p>
           axis.text.x = element_text(size = 7, angle = 45, hjust = 1)))
 }</code></pre>
 <p><img src="figure/sim_design.Rmd/rel-rmse-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-rel-rmse-fig-1">
+Past versions of rel-rmse-fig-1.png
+</button>
+</p>
+<div id="fig-rel-rmse-fig-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/69bdcf1f597a6b4e5848557b708c0d382eaeae35/docs/figure/sim_design.Rmd/rel-rmse-fig-1.png" target="_blank">69bdcf1</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The striking feature is the <strong>asymmetry</strong>: fitting at a
 <span class="math inline">\(c\)</span> <em>below</em> the truth costs
 almost nothing in rate recovery (at <span
@@ -2517,6 +2588,78 @@ recovers the rates of additive truth about equally well — and the lines
 SCD-trapped seeds from the likelihood-ratio figure, for which the
 finite-<span class="math inline">\(c\)</span> fits recover the true
 rates better than the topic-model reference itself.</p>
+</div>
+<div id="fitted-rates-across-c-one-typical-dataset-per-regime"
+class="section level2">
+<h2>Fitted rates across c, one typical dataset per regime</h2>
+<p>The summaries above compress each fit to a number; here we look at
+the fitted rates themselves. For one representative dataset per regime
+(the seed whose mean count is closest to its regime’s median: seed 13 at
+<span class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span>, seed 1
+at <span class="math inline">\(c_{\textrm{true}} = 1\)</span>, seed 10
+at <span class="math inline">\(c_{\textrm{true}} = \infty\)</span>), we
+compare the exact fits at <span class="math inline">\(c_{\textrm{fit}}
+\in \{10^{-3}, 1, \infty\}\)</span> pairwise: each panel scatters all
+<span class="math inline">\(250{,}000\)</span> fitted rates of one fit
+against another, on the <span class="math inline">\(\log_{10}(1 +
+\lambda)\)</span> scale. Rows are the generative regimes, columns the
+three pairs; the diagonal is equality, and the annotation gives the
+Pearson correlation on the plotted scale.</p>
+<pre class="r"><code>fit_dir &lt;- file.path(exp_dir, &quot;approx_sim_fits&quot;)
+need &lt;- expand.grid(seed = c(13, 1, 10), cfit = c(&quot;0.001&quot;, &quot;1&quot;, &quot;Inf&quot;))
+need$ctrue &lt;- rep(c(&quot;0.001&quot;, &quot;1&quot;, &quot;Inf&quot;), 3)
+need$file &lt;- sprintf(&quot;approxsim_seed%02d_ctrue%s_cfit%s_exact.rds&quot;,
+                     need$seed, need$ctrue, need$cfit)
+if (!all(file.exists(file.path(fit_dir, need$file)))) {
+  cat(&quot;(Waiting on the nine per-fit .rds files in&quot;,
+      &quot;inst/paper_figures/experiments/approx_sim_fits/ -- see the scp&quot;,
+      &quot;command in the session notes; the figure renders once they are&quot;,
+      &quot;present.)&quot;)
+} else {
+  rates_of &lt;- function(f, cc) {
+    x  &lt;- readRDS(file.path(fit_dir, f))
+    th &lt;- tcrossprod(as.matrix(x$LL), as.matrix(x$FF))
+    if (is.infinite(cc)) th else cc * expm1(th / max(1, cc))
+  }
+  scen &lt;- data.frame(ctrue = c(&quot;0.001&quot;, &quot;1&quot;, &quot;Inf&quot;), seed = c(13, 1, 10))
+  pairs &lt;- list(c(&quot;0.001&quot;, &quot;1&quot;), c(&quot;0.001&quot;, &quot;Inf&quot;), c(&quot;1&quot;, &quot;Inf&quot;))
+  pan &lt;- list(); ann &lt;- list()
+  for (i in seq_len(nrow(scen))) for (pr in pairs) {
+    fa &lt;- sprintf(&quot;approxsim_seed%02d_ctrue%s_cfit%s_exact.rds&quot;,
+                  scen$seed[i], scen$ctrue[i], pr[1])
+    fb &lt;- sprintf(&quot;approxsim_seed%02d_ctrue%s_cfit%s_exact.rds&quot;,
+                  scen$seed[i], scen$ctrue[i], pr[2])
+    a &lt;- log10(1 + as.vector(rates_of(fa, as.numeric(pr[1]))))
+    b &lt;- log10(1 + as.vector(rates_of(fb, as.numeric(pr[2]))))
+    row_lab &lt;- paste0(&quot;truth: c = &quot;, scen$ctrue[i], &quot; (seed &quot;, scen$seed[i], &quot;)&quot;)
+    col_lab &lt;- paste0(&quot;c = &quot;, pr[1], &quot;  vs  c = &quot;, pr[2])
+    pan[[length(pan) + 1]] &lt;- data.frame(x = a, y = b,
+                                         row = row_lab, col = col_lab)
+    ann[[length(ann) + 1]] &lt;- data.frame(
+      row = row_lab, col = col_lab,
+      lab = sprintf(&quot;r = %.3f&quot;, cor(a, b)))
+  }
+  pan &lt;- do.call(rbind, pan); ann &lt;- do.call(rbind, ann)
+  rl &lt;- paste0(&quot;truth: c = &quot;, scen$ctrue, &quot; (seed &quot;, scen$seed, &quot;)&quot;)
+  pan$row &lt;- factor(pan$row, levels = rl); ann$row &lt;- factor(ann$row, levels = rl)
+  print(ggplot(pan, aes(x, y)) +
+    geom_bin2d(bins = 70) +
+    geom_abline(slope = 1, intercept = 0, linetype = &quot;dashed&quot;,
+                colour = &quot;#C2410C&quot;, linewidth = 0.4) +
+    geom_text(data = ann, aes(label = lab), x = -Inf, y = Inf,
+              hjust = -0.15, vjust = 1.6, size = 3, colour = &quot;grey20&quot;) +
+    scale_fill_gradient(low = &quot;#DCE8EB&quot;, high = &quot;#0E3A44&quot;,
+                        trans = &quot;log10&quot;, name = &quot;entries&quot;) +
+    facet_grid(row ~ col) +
+    coord_equal() +
+    labs(x = &quot;log10(1 + fitted rate), smaller c of the pair&quot;,
+         y = &quot;log10(1 + fitted rate), larger c of the pair&quot;,
+         title = &quot;Fitted rates compared across fitting c, entry by entry&quot;) +
+    theme(strip.background = element_blank(),
+          strip.text = element_text(face = &quot;bold&quot;, size = 9),
+          panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA)))
+}</code></pre>
+<pre><code>(Waiting on the nine per-fit .rds files in inst/paper_figures/experiments/approx_sim_fits/ -- see the scp command in the session notes; the figure renders once they are present.)</code></pre>
 </div>
 <div id="rank-correlation-of-the-factors" class="section level2">
 <h2>Rank correlation of the factors</h2>
