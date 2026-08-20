@@ -603,12 +603,15 @@ Second, the $c_{\textrm{true}} = 10^{-3}$ panel again shows the
 heavy-tailed local-optimum variation of that regime (individual seeds dip
 to $\sim 0.6$ at mid-grid $c_{\textrm{fit}}$ while others sit at $1$).
 Third, at $c_{\textrm{true}} = \infty$ the finite-$c$ fits sit slightly
-*above* $1$ on average, with two seeds far above: for those datasets the
-log1p fits achieve a better exact Poisson likelihood than the fastTopics
-reference fit itself. The two extreme lines are the weakest datasets of
-the heavy-tailed $\infty$ generator; whether the remaining $\sim 2\%$ mean
-excess reflects fastTopics' SCD stopping rule or genuinely better optima
-is worth a look before any of this goes in the paper.
+*above* $1$ on average. This is not a convergence-criterion artifact (the
+fastTopics reference uses the same stopping rule, an absolute
+own-objective change below $10^{-6}$ per iteration, and the median seed's
+ratio is $1.000$): the whole mean excess comes from three seeds (5, 11,
+20 — ordinary datasets, not the degenerate one) on which fastTopics' SCD
+updates converged into a local optimum $\sim 0.3$ nats per entry worse
+than what the log1p fits reach at every finite $c$. An optimizer-basin
+effect on 3 of 30 datasets, worth knowing about before the topic-model
+column anchors any paper claim.
 
 **Relative RMSE on the rates.** For each exact fit, the RMSE of its rates
 against the true rates, divided by the same seed's RMSE at
