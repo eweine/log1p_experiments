@@ -542,6 +542,127 @@ The approximate fits (not shown) trace the same curves wherever the
 approximation is accurate; Taylor's small-$c$ fits deviate, but those are
 exactly the fits the accuracy section already ruled out.
 
+## Fit quality relative to the fit at the true c
+
+The sparsity panels show what misfit in $c$ does to the *representation*;
+the two figures here show what it costs in *fit quality*, using the fit at
+$c_{\textrm{fit}} = c_{\textrm{true}}$ on the same dataset as the
+reference. Both are per-seed-referenced, so every thin line passes through
+the reference value exactly at the circled point.
+
+**Likelihood ratio.** For each exact fit, the per-entry likelihood ratio
+against the same seed's fit at the true $c$:
+$\exp((\bar\ell(c_{\textrm{fit}}) - \bar\ell(c_{\textrm{true}}))$, where
+$\bar\ell$ is the per-entry exact Poisson log-likelihood of the fitted
+rates. Values above $1$ mean the misfit $c$ actually achieved a better
+exact likelihood than the true one on that dataset.
+
+```{r lr-true-fig, fig.width=8.5, fig.height=3.4}
+exq <- subset(res, method == "exact")
+ref <- exq[(is.finite(exq$c_true) & exq$cc == exq$c_true) |
+           (is.infinite(exq$c_true) & is.infinite(exq$cc)),
+           c("seed", "ct", "loglik_exact")]
+names(ref)[3] <- "ll_ref"
+lr <- merge(exq, ref, by = c("seed", "ct"))
+lr$lr_pe <- exp((lr$loglik_exact - lr$ll_ref) / (N_ROWS * N_COLS))
+lr$cf <- cf_of(lr$cc)
+avg <- aggregate(lr_pe ~ cf + ct, lr, mean)
+dg  <- merge(unique(lr[(is.finite(lr$c_true) & lr$cc == lr$c_true) |
+                       (is.infinite(lr$c_true) & is.infinite(lr$cc)),
+                       c("cf", "ct")]), avg)
+ggplot(lr, aes(cf, lr_pe)) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = "#C2410C",
+             linewidth = 0.5) +
+  geom_line(aes(group = seed), colour = "#9BB7BD",
+            linewidth = 0.35, alpha = 0.7) +
+  geom_line(data = avg, aes(group = 1), colour = "#0E5C6B", linewidth = 1) +
+  geom_point(data = avg, colour = "#0E5C6B", size = 1.6) +
+  geom_point(data = dg, shape = 21, size = 3.6, stroke = 1.1,
+             fill = NA, colour = "#C2410C") +
+  facet_wrap(~ ct, nrow = 1) +
+  labs(x = "c used for fitting",
+       y = "per-entry likelihood ratio",
+       title = "Likelihood ratio relative to the fit at the true c",
+       subtitle = paste("thin lines: 30 individual seeds;  thick line:",
+                        "mean;  circled: c_fit = c_true (ratio 1 by",
+                        "definition)")) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(size = 10, colour = "grey35"),
+        panel.border = element_rect(colour = "grey80", fill = NA),
+        axis.text.x = element_text(size = 7, angle = 45, hjust = 1))
+```
+
+Three readings. First — and this is the figure's headline — the
+likelihood surface over $c$ is remarkably **flat** compared to the
+representational changes in the sparsity figure: misfitting $c$ by two
+decades in either direction costs at most a few percent of per-entry
+likelihood, while the fitted sparsity moves across most of its range. The
+likelihood alone cannot choose $c$; the representation is what changes.
+Second, the $c_{\textrm{true}} = 10^{-3}$ panel again shows the
+heavy-tailed local-optimum variation of that regime (individual seeds dip
+to $\sim 0.6$ at mid-grid $c_{\textrm{fit}}$ while others sit at $1$).
+Third, at $c_{\textrm{true}} = \infty$ the finite-$c$ fits sit slightly
+*above* $1$ on average, with two seeds far above: for those datasets the
+log1p fits achieve a better exact Poisson likelihood than the fastTopics
+reference fit itself. The two extreme lines are the weakest datasets of
+the heavy-tailed $\infty$ generator; whether the remaining $\sim 2\%$ mean
+excess reflects fastTopics' SCD stopping rule or genuinely better optima
+is worth a look before any of this goes in the paper.
+
+**Relative RMSE on the rates.** For each exact fit, the RMSE of its rates
+against the true rates, divided by the same seed's RMSE at
+$c_{\textrm{fit}} = c_{\textrm{true}}$ — on the raw rate scale (dominated
+by the largest rates) and on the log1p rate scale (weights the low-rate
+structure).
+
+```{r rel-rmse-fig, fig.width=8.5, fig.height=5.4}
+if (!"rmse_log1p" %in% names(res)) {
+  cat("(The RMSE columns are not yet in approx_sim_metrics.rds; rerun",
+      "analyze_approx_sim.R on the cluster and re-download the metrics",
+      "table to render this figure.)")
+} else {
+  refm <- exq[(is.finite(exq$c_true) & exq$cc == exq$c_true) |
+              (is.infinite(exq$c_true) & is.infinite(exq$cc)),
+              c("seed", "ct", "rmse", "rmse_log1p")]
+  names(refm)[3:4] <- c("rmse_ref", "rmse_log1p_ref")
+  rr <- merge(exq, refm, by = c("seed", "ct"))
+  rr <- rbind(
+    data.frame(rr[c("seed", "cc", "ct", "c_true")], what = "rate scale",
+               value = rr$rmse / rr$rmse_ref),
+    data.frame(rr[c("seed", "cc", "ct", "c_true")], what = "log1p rate scale",
+               value = rr$rmse_log1p / rr$rmse_log1p_ref))
+  rr$what <- factor(rr$what, levels = c("rate scale", "log1p rate scale"))
+  rr$cf <- cf_of(rr$cc)
+  avg <- aggregate(value ~ what + cf + ct, rr, mean)
+  dg  <- merge(unique(rr[(is.finite(rr$c_true) & rr$cc == rr$c_true) |
+                         (is.infinite(rr$c_true) & is.infinite(rr$cc)),
+                         c("what", "cf", "ct")]), avg)
+  print(ggplot(rr, aes(cf, value)) +
+    geom_hline(yintercept = 1, linetype = "dashed", colour = "#C2410C",
+               linewidth = 0.5) +
+    geom_line(aes(group = seed), colour = "#9BB7BD",
+              linewidth = 0.35, alpha = 0.7) +
+    geom_line(data = avg, aes(group = 1), colour = "#0E5C6B", linewidth = 1) +
+    geom_point(data = avg, colour = "#0E5C6B", size = 1.6) +
+    geom_point(data = dg, shape = 21, size = 3.6, stroke = 1.1,
+               fill = NA, colour = "#C2410C") +
+    scale_y_log10() +
+    facet_grid(what ~ ct) +
+    labs(x = "c used for fitting",
+         y = "RMSE relative to the fit at the true c",
+         title = "Rate-recovery error relative to the fit at the true c",
+         subtitle = paste("thin lines: 30 individual seeds;  thick line:",
+                          "mean;  circled: c_fit = c_true (ratio 1 by",
+                          "definition)")) +
+    theme(strip.background = element_blank(),
+          strip.text = element_text(face = "bold", size = 10),
+          plot.subtitle = element_text(size = 10, colour = "grey35"),
+          panel.border = element_rect(colour = "grey80", fill = NA),
+          axis.text.x = element_text(size = 7, angle = 45, hjust = 1)))
+}
+```
+
 ## Rank correlation of the factors
 
 The redundancy measure: mean Spearman correlation over the
