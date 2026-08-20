@@ -666,6 +666,20 @@ if (!"rmse_log1p" %in% names(res)) {
 }
 ```
 
+The striking feature is the **asymmetry**: fitting at a $c$ *below* the
+truth costs almost nothing in rate recovery (at $c_{\textrm{true}} = 1$,
+even $c_{\textrm{fit}} = 10^{-4}$ leaves the rate-scale RMSE at $\sim 1.05$;
+the log1p scale shows a milder $\sim 2\times$ penalty in the low-rate
+structure), while fitting *above* the truth degrades recovery steadily —
+up to $\sim 4\times$ at $c_{\textrm{true}} = 1$ and, with the usual
+heavy-tailed seed scatter, $\sim 5$–$10\times$ in the mean at
+$c_{\textrm{true}} = 10^{-3}$. At $c_{\textrm{true}} = \infty$ the
+rate-scale curve is flat at $1$ across the entire grid — every $c$
+recovers the rates of additive truth about equally well — and the lines
+*below* $1$ are the three SCD-trapped seeds from the likelihood-ratio
+figure, for which the finite-$c$ fits recover the true rates better than
+the topic-model reference itself.
+
 ## Rank correlation of the factors
 
 The redundancy measure: mean Spearman correlation over the
