@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee15d25b3e2799bfa2d7a6dc4f2b682af031c946etargetblanke15d25ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2d9926e9243ee752905691fc826eb05fd08e32e6targetblank2d9926ea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/e15d25b3e2799bfa2d7a6dc4f2b682af031c946e" target="_blank">e15d25b</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/2d9926e9243ee752905691fc826eb05fd08e32e6" target="_blank">2d9926e</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreee15d25b3e2799bfa2d7a6dc4f2b682af031c946etargetblanke15d25ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2d9926e9243ee752905691fc826eb05fd08e32e6targetblank2d9926ea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/e15d25b3e2799bfa2d7a6dc4f2b682af031c946e" target="_blank">e15d25b</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/2d9926e9243ee752905691fc826eb05fd08e32e6" target="_blank">2d9926e</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -617,6 +617,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/2d9926e9243ee752905691fc826eb05fd08e32e6/analysis/sim_design.Rmd" target="_blank">2d9926e</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-20
+</td>
+<td>
+sim_design: correct the c_true=Inf LR-excess reading (three ordinary
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/d5bf63acc45856953492f0fcff58f910828f0f7d/docs/sim_design.html" target="_blank">d5bf63a</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2311,6 +2345,43 @@ ggplot(lr, aes(cf, lr_pe)) +
         panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA),
         axis.text.x = element_text(size = 7, angle = 45, hjust = 1))</code></pre>
 <p><img src="figure/sim_design.Rmd/lr-true-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-lr-true-fig-1">
+Past versions of lr-true-fig-1.png
+</button>
+</p>
+<div id="fig-lr-true-fig-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d5bf63acc45856953492f0fcff58f910828f0f7d/docs/figure/sim_design.Rmd/lr-true-fig-1.png" target="_blank">d5bf63a</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Three readings. First — and this is the figure’s headline — the
 likelihood surface over <span class="math inline">\(c\)</span> is
 remarkably <strong>flat</strong> compared to the representational
@@ -2327,14 +2398,18 @@ class="math inline">\(c_{\textrm{fit}}\)</span> while others sit at
 <span class="math inline">\(1\)</span>). Third, at <span
 class="math inline">\(c_{\textrm{true}} = \infty\)</span> the
 finite-<span class="math inline">\(c\)</span> fits sit slightly
-<em>above</em> <span class="math inline">\(1\)</span> on average, with
-two seeds far above: for those datasets the log1p fits achieve a better
-exact Poisson likelihood than the fastTopics reference fit itself. The
-two extreme lines are the weakest datasets of the heavy-tailed <span
-class="math inline">\(\infty\)</span> generator; whether the remaining
-<span class="math inline">\(\sim 2\%\)</span> mean excess reflects
-fastTopics’ SCD stopping rule or genuinely better optima is worth a look
-before any of this goes in the paper.</p>
+<em>above</em> <span class="math inline">\(1\)</span> on average. This
+is not a convergence-criterion artifact (the fastTopics reference uses
+the same stopping rule, an absolute own-objective change below <span
+class="math inline">\(10^{-6}\)</span> per iteration, and the median
+seed’s ratio is <span class="math inline">\(1.000\)</span>): the whole
+mean excess comes from three seeds (5, 11, 20 — ordinary datasets, not
+the degenerate one) on which fastTopics’ SCD updates converged into a
+local optimum <span class="math inline">\(\sim 0.3\)</span> nats per
+entry worse than what the log1p fits reach at every finite <span
+class="math inline">\(c\)</span>. An optimizer-basin effect on 3 of 30
+datasets, worth knowing about before the topic-model column anchors any
+paper claim.</p>
 <p><strong>Relative RMSE on the rates.</strong> For each exact fit, the
 RMSE of its rates against the true rates, divided by the same seed’s
 RMSE at <span class="math inline">\(c_{\textrm{fit}} =
