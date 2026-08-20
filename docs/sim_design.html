@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2d9926e9243ee752905691fc826eb05fd08e32e6targetblank2d9926ea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea658bfde3cb49b58d17fbcf167873a0031aa7983targetblanka658bfda">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/2d9926e9243ee752905691fc826eb05fd08e32e6" target="_blank">2d9926e</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/a658bfde3cb49b58d17fbcf167873a0031aa7983" target="_blank">a658bfd</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree2d9926e9243ee752905691fc826eb05fd08e32e6targetblank2d9926ea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreea658bfde3cb49b58d17fbcf167873a0031aa7983targetblanka658bfda"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/2d9926e9243ee752905691fc826eb05fd08e32e6" target="_blank">2d9926e</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/a658bfde3cb49b58d17fbcf167873a0031aa7983" target="_blank">a658bfd</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -617,6 +617,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/a658bfde3cb49b58d17fbcf167873a0031aa7983/analysis/sim_design.Rmd" target="_blank">a658bfd</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-20
+</td>
+<td>
+sim_design: relative-RMSE figure live (rate + log1p scales) with
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/c12b5e2d1ff18e7404b6e4306734c9a0cd08b7fa/docs/sim_design.html" target="_blank">c12b5e2</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2460,7 +2494,29 @@ structure).</p>
           panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA),
           axis.text.x = element_text(size = 7, angle = 45, hjust = 1)))
 }</code></pre>
-<pre><code>(The RMSE columns are not yet in approx_sim_metrics.rds; rerun analyze_approx_sim.R on the cluster and re-download the metrics table to render this figure.)</code></pre>
+<p><img src="figure/sim_design.Rmd/rel-rmse-fig-1.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>The striking feature is the <strong>asymmetry</strong>: fitting at a
+<span class="math inline">\(c\)</span> <em>below</em> the truth costs
+almost nothing in rate recovery (at <span
+class="math inline">\(c_{\textrm{true}} = 1\)</span>, even <span
+class="math inline">\(c_{\textrm{fit}} = 10^{-4}\)</span> leaves the
+rate-scale RMSE at <span class="math inline">\(\sim 1.05\)</span>; the
+log1p scale shows a milder <span class="math inline">\(\sim
+2\times\)</span> penalty in the low-rate structure), while fitting
+<em>above</em> the truth degrades recovery steadily — up to <span
+class="math inline">\(\sim 4\times\)</span> at <span
+class="math inline">\(c_{\textrm{true}} = 1\)</span> and, with the usual
+heavy-tailed seed scatter, <span class="math inline">\(\sim
+5\)</span>–<span class="math inline">\(10\times\)</span> in the mean at
+<span class="math inline">\(c_{\textrm{true}} = 10^{-3}\)</span>. At
+<span class="math inline">\(c_{\textrm{true}} = \infty\)</span> the
+rate-scale curve is flat at <span class="math inline">\(1\)</span>
+across the entire grid — every <span class="math inline">\(c\)</span>
+recovers the rates of additive truth about equally well — and the lines
+<em>below</em> <span class="math inline">\(1\)</span> are the three
+SCD-trapped seeds from the likelihood-ratio figure, for which the
+finite-<span class="math inline">\(c\)</span> fits recover the true
+rates better than the topic-model reference itself.</p>
 </div>
 <div id="rank-correlation-of-the-factors" class="section level2">
 <h2>Rank correlation of the factors</h2>
