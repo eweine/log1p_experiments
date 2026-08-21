@@ -732,6 +732,30 @@ if (!all(file.exists(file.path(fit_dir, need$file)))) {
   pan <- do.call(rbind, pan); ann <- do.call(rbind, ann)
   rl <- paste0("truth: c = ", scen$ctrue, " (seed ", scen$seed, ")")
   pan$row <- factor(pan$row, levels = rl); ann$row <- factor(ann$row, levels = rl)
+  rates_true <- function(f, ct) {
+    x  <- readRDS(file.path(fit_dir, f))
+    th <- tcrossprod(as.matrix(x$L_true), as.matrix(x$F_true))
+    if (is.infinite(ct)) th else ct * expm1(th)
+  }
+  pan2 <- list(); ann2 <- list()
+  for (i in seq_len(nrow(scen))) {
+    tr <- as.vector(rates_true(
+      sprintf("approxsim_seed%02d_ctrue%s_cfit1_exact.rds",
+              scen$seed[i], scen$ctrue[i]), as.numeric(scen$ctrue[i])))
+    for (cf in c("0.001", "1", "Inf")) {
+      ft <- as.vector(rates_of(
+        sprintf("approxsim_seed%02d_ctrue%s_cfit%s_exact.rds",
+                scen$seed[i], scen$ctrue[i], cf), as.numeric(cf)))
+      col_lab <- paste0("fit at c = ", cf)
+      pan2[[length(pan2) + 1]] <- data.frame(x = tr, y = ft,
+        row = rl[i], col = col_lab)
+      ann2[[length(ann2) + 1]] <- data.frame(row = rl[i], col = col_lab,
+        lab = sprintf("r = %.3f", cor(log1p(tr), log1p(ft))))
+    }
+  }
+  pan2 <- do.call(rbind, pan2); ann2 <- do.call(rbind, ann2)
+  pan2$row <- factor(pan2$row, levels = rl)
+  ann2$row <- factor(ann2$row, levels = rl)
   print(ggplot(pan, aes(x, y)) +
     geom_bin2d(bins = 70) +
     geom_abline(slope = 1, intercept = 0, linetype = "dashed",
@@ -752,8 +776,34 @@ if (!all(file.exists(file.path(fit_dir, need$file)))) {
     theme(strip.background = element_blank(),
           strip.text = element_text(face = "bold", size = 9),
           panel.border = element_rect(colour = "grey80", fill = NA)))
+  print(ggplot(pan2, aes(x, y)) +
+    geom_bin2d(bins = 70) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed",
+                colour = "#C2410C", linewidth = 0.4) +
+    geom_text(data = ann2, aes(label = lab), x = -Inf, y = Inf,
+              hjust = -0.15, vjust = 1.6, size = 3, colour = "grey20") +
+    scale_fill_gradient(low = "#DCE8EB", high = "#0E3A44",
+                        trans = "log10", name = "entries") +
+    scale_x_continuous(trans = "log1p", breaks = c(0, 1, 10, 100, 1000),
+                       labels = scales::comma) +
+    scale_y_continuous(trans = "log1p", breaks = c(0, 1, 10, 100, 1000),
+                       labels = scales::comma) +
+    facet_grid(row ~ col) +
+    coord_equal() +
+    labs(x = "true rate (log1p scale)",
+         y = "fitted rate (log1p scale)",
+         title = "Fitted rates against the truth, entry by entry") +
+    theme(strip.background = element_blank(),
+          strip.text = element_text(face = "bold", size = 9),
+          panel.border = element_rect(colour = "grey80", fill = NA)))
 }
 ```
+
+The companion grid anchors the pairwise comparisons to the truth: rows are
+the same scenarios, columns the three fits, $x$ the true rate. The
+diagonal panels (fit at the generative $c$) show what recovery looks like
+when the model is correctly specified; reading along a row shows what the
+misfit $c$'s do to it.
 
 The high-rate tail is pinned to the diagonal in every panel — above
 $\lambda \approx 30$ the fits at different $c$ essentially agree entry by
