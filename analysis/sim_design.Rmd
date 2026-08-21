@@ -750,6 +750,20 @@ if (!all(file.exists(file.path(fit_dir, need$file)))) {
 }
 ```
 
+The high-rate tail is pinned to the diagonal in every panel — above
+$\lambda \approx 30$ the fits at different $c$ essentially agree entry by
+entry, whichever truth generated the data. All of the disagreement lives
+in the low-rate mass, and its shape depends on the regime: on additive
+truth (bottom row) even that vanishes ($r \geq 0.99$ everywhere —
+matching the flat relative-RMSE row), while on the log-link truths the
+panels involving a larger fitting $c$ show a lobe *above* the diagonal at
+low rates — the larger-$c$ fit assigns systematically higher rates to
+entries the smaller-$c$ fit shrinks toward zero. This is the entry-level
+face of the sparsity story: what the budget takes away at small $c$ is
+precisely the ability to hold many entries near zero while a few grow
+large, and what a large-$c$ fit loses on log-link truth is the aggressive
+shrinkage of the low-rate mass.
+
 ## Rank correlation of the factors
 
 The redundancy measure: mean Spearman correlation over the
