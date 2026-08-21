@@ -534,15 +534,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree0efdb1d35f0418336fd1bffb3d71d6476b93d8e8targetblank0efdb1da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed27421d447a3e8ec103988a370b91de52a1ca6d1targetblankd27421da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/eweine/log1p_experiments/tree/0efdb1d35f0418336fd1bffb3d71d6476b93d8e8" target="_blank">0efdb1d</a>
+<a href="https://github.com/eweine/log1p_experiments/tree/d27421d447a3e8ec103988a370b91de52a1ca6d1" target="_blank">d27421d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstree0efdb1d35f0418336fd1bffb3d71d6476b93d8e8targetblank0efdb1da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomeweinelog1pexperimentstreed27421d447a3e8ec103988a370b91de52a1ca6d1targetblankd27421da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -552,7 +552,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/eweine/log1p_experiments/tree/0efdb1d35f0418336fd1bffb3d71d6476b93d8e8" target="_blank">0efdb1d</a>.
+<a href="https://github.com/eweine/log1p_experiments/tree/d27421d447a3e8ec103988a370b91de52a1ca6d1" target="_blank">d27421d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -617,6 +617,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/eweine/log1p_experiments/blob/d27421d447a3e8ec103988a370b91de52a1ca6d1/analysis/sim_design.Rmd" target="_blank">d27421d</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-21
+</td>
+<td>
+rates figure: companion truth-vs-fitted 3x3 grid
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/eweine/log1p_experiments/4c205c2ba6cc9624cd252f52acd2a1c8ac3d2669/docs/sim_design.html" target="_blank">4c205c2</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -2711,6 +2745,30 @@ if (!all(file.exists(file.path(fit_dir, need$file)))) {
   pan &lt;- do.call(rbind, pan); ann &lt;- do.call(rbind, ann)
   rl &lt;- paste0(&quot;truth: c = &quot;, scen$ctrue, &quot; (seed &quot;, scen$seed, &quot;)&quot;)
   pan$row &lt;- factor(pan$row, levels = rl); ann$row &lt;- factor(ann$row, levels = rl)
+  rates_true &lt;- function(f, ct) {
+    x  &lt;- readRDS(file.path(fit_dir, f))
+    th &lt;- tcrossprod(as.matrix(x$L_true), as.matrix(x$F_true))
+    if (is.infinite(ct)) th else ct * expm1(th)
+  }
+  pan2 &lt;- list(); ann2 &lt;- list()
+  for (i in seq_len(nrow(scen))) {
+    tr &lt;- as.vector(rates_true(
+      sprintf(&quot;approxsim_seed%02d_ctrue%s_cfit1_exact.rds&quot;,
+              scen$seed[i], scen$ctrue[i]), as.numeric(scen$ctrue[i])))
+    for (cf in c(&quot;0.001&quot;, &quot;1&quot;, &quot;Inf&quot;)) {
+      ft &lt;- as.vector(rates_of(
+        sprintf(&quot;approxsim_seed%02d_ctrue%s_cfit%s_exact.rds&quot;,
+                scen$seed[i], scen$ctrue[i], cf), as.numeric(cf)))
+      col_lab &lt;- paste0(&quot;fit at c = &quot;, cf)
+      pan2[[length(pan2) + 1]] &lt;- data.frame(x = tr, y = ft,
+        row = rl[i], col = col_lab)
+      ann2[[length(ann2) + 1]] &lt;- data.frame(row = rl[i], col = col_lab,
+        lab = sprintf(&quot;r = %.3f&quot;, cor(log1p(tr), log1p(ft))))
+    }
+  }
+  pan2 &lt;- do.call(rbind, pan2); ann2 &lt;- do.call(rbind, ann2)
+  pan2$row &lt;- factor(pan2$row, levels = rl)
+  ann2$row &lt;- factor(ann2$row, levels = rl)
   print(ggplot(pan, aes(x, y)) +
     geom_bin2d(bins = 70) +
     geom_abline(slope = 1, intercept = 0, linetype = &quot;dashed&quot;,
@@ -2728,6 +2786,26 @@ if (!all(file.exists(file.path(fit_dir, need$file)))) {
     labs(x = &quot;fitted rate (log1p scale), smaller c of the pair&quot;,
          y = &quot;fitted rate (log1p scale), larger c of the pair&quot;,
          title = &quot;Fitted rates compared across fitting c, entry by entry&quot;) +
+    theme(strip.background = element_blank(),
+          strip.text = element_text(face = &quot;bold&quot;, size = 9),
+          panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA)))
+  print(ggplot(pan2, aes(x, y)) +
+    geom_bin2d(bins = 70) +
+    geom_abline(slope = 1, intercept = 0, linetype = &quot;dashed&quot;,
+                colour = &quot;#C2410C&quot;, linewidth = 0.4) +
+    geom_text(data = ann2, aes(label = lab), x = -Inf, y = Inf,
+              hjust = -0.15, vjust = 1.6, size = 3, colour = &quot;grey20&quot;) +
+    scale_fill_gradient(low = &quot;#DCE8EB&quot;, high = &quot;#0E3A44&quot;,
+                        trans = &quot;log10&quot;, name = &quot;entries&quot;) +
+    scale_x_continuous(trans = &quot;log1p&quot;, breaks = c(0, 1, 10, 100, 1000),
+                       labels = scales::comma) +
+    scale_y_continuous(trans = &quot;log1p&quot;, breaks = c(0, 1, 10, 100, 1000),
+                       labels = scales::comma) +
+    facet_grid(row ~ col) +
+    coord_equal() +
+    labs(x = &quot;true rate (log1p scale)&quot;,
+         y = &quot;fitted rate (log1p scale)&quot;,
+         title = &quot;Fitted rates against the truth, entry by entry&quot;) +
     theme(strip.background = element_blank(),
           strip.text = element_text(face = &quot;bold&quot;, size = 9),
           panel.border = element_rect(colour = &quot;grey80&quot;, fill = NA)))
@@ -2757,6 +2835,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/eweine/log1p_experiments/blob/4c205c2ba6cc9624cd252f52acd2a1c8ac3d2669/docs/figure/sim_design.Rmd/rates-pairs-fig-1.png" target="_blank">4c205c2</a>
+</td>
+<td>
+Eric Weine
+</td>
+<td>
+2026-08-21
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/eweine/log1p_experiments/blob/849ff29b84ec682c5e6fd0ad8e0ffb8129c8fabc/docs/figure/sim_design.Rmd/rates-pairs-fig-1.png" target="_blank">849ff29</a>
 </td>
 <td>
@@ -2770,6 +2859,14 @@ Eric Weine
 </table>
 </div>
 </div>
+<p><img src="figure/sim_design.Rmd/rates-pairs-fig-2.png" alt="" width="935" style="display: block; margin: auto;" /></p>
+<p>The companion grid anchors the pairwise comparisons to the truth:
+rows are the same scenarios, columns the three fits, <span
+class="math inline">\(x\)</span> the true rate. The diagonal panels (fit
+at the generative <span class="math inline">\(c\)</span>) show what
+recovery looks like when the model is correctly specified; reading along
+a row shows what the misfit <span class="math inline">\(c\)</span>’s do
+to it.</p>
 <p>The high-rate tail is pinned to the diagonal in every panel — above
 <span class="math inline">\(\lambda \approx 30\)</span> the fits at
 different <span class="math inline">\(c\)</span> essentially agree entry
